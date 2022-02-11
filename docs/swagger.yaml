@@ -1,0 +1,69 @@
+basePath: /notifications/api
+definitions:
+  sampleRecord:
+    properties:
+      name:
+        type: string
+    type: object
+host: localhost
+info:
+  contact: {}
+  description: Rokwire Rokwire Building Block API Documentation.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Rokwire Dinings Building Block API
+  version: 0.1.0
+paths:
+  /token:
+    post:
+      consumes:
+      - application/json
+      operationId: Name
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/sampleRecord'
+      responses:
+        "200":
+          description: ""
+      security:
+      - RokwireAuth UserAuth: []
+      tags:
+      - Client
+  /version:
+    get:
+      description: Gives the service version.
+      operationId: Version
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: ""
+      security:
+      - RokwireAuth: []
+      tags:
+      - Client
+schemes:
+- https
+securityDefinitions:
+  AdminUserAuth:
+    in: header (add admin id token with Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+  InternalAuth:
+    in: header
+    name: INTERNAL-API-KEY
+    type: apiKey
+  RokwireAuth:
+    in: header
+    name: ROKWIRE-API-KEY
+    type: apiKey
+  UserAuth:
+    in: header (add client id token with Bearer prefix to the Authorization value)
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,0 +1,106 @@
+{
+    "schemes": [
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Rokwire Rokwire Building Block API Documentation.",
+        "title": "Rokwire Gateway Building Block API",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "0.1.0"
+    },
+    "host": "localhost",
+    "basePath": "/notifications/api",
+    "paths": {
+        "/token": {
+            "post": {
+                "security": [
+                    {
+                        "RokwireAuth UserAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "Name",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sampleRecord"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/version": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth": []
+                    }
+                ],
+                "description": "Gives the service version.",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "Version",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "sampleRecord": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "AdminUserAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header (add admin id token with Bearer prefix to the Authorization value)"
+        },
+        "InternalAuth": {
+            "type": "apiKey",
+            "name": "INTERNAL-API-KEY",
+            "in": "header"
+        },
+        "RokwireAuth": {
+            "type": "apiKey",
+            "name": "ROKWIRE-API-KEY",
+            "in": "header"
+        },
+        "UserAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header (add client id token with Bearer prefix to the Authorization value)"
+        }
+    }
+}
