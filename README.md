@@ -1,4 +1,4 @@
-# Dining building block
+# Gateway Building Bock
 
 Go project to provide rest service for rokwire dining building block.
 
@@ -111,7 +111,7 @@ Verify the service is running as calling the get version API.
 
 #### Call get version API
 
-curl -X GET -i https://api-dev.rokwire.illinois.edu/dining/api/version
+curl -X GET -i https://api-dev.rokwire.illinois.edu/gateway/api/version
 
 Response
 ```
@@ -122,4 +122,4 @@ Response
 
 The documentation is placed here - https://api-dev.rokwire.illinois.edu/docs/
 
-Alternativelly the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/dining/doc/ui/
+Alternativelly the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/gateway/doc/ui/
