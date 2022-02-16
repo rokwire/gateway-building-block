@@ -1,7 +1,7 @@
 package laundry
 
 import (
-	"apigateway/core/model/laundry"
+	model "apigateway/core/model/laundry"
 	"encoding/xml"
 )
 
@@ -38,7 +38,6 @@ type School struct {
 	LaundryRooms []*LaundryLocation `xml:"laundry_rooms>laundryroom"`
 }
 
-
 type Capacity struct {
 	Location   string   `xml:"location"`
 	XMLName    xml.Name `xml:"laundryroom"`
@@ -51,18 +50,17 @@ type Capacities struct {
 	RoomCapacities []*Capacity `xml:"laundryroom"`
 }
 
-type CSCLaundryView struct{
+type CSCLaundryView struct {
 	//configuration information (url, api keys...gets passed into here)
 }
 
-func(lv *CSCLaundryView) ListRooms() (*model.Organization, error){
+func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 	org := model.Organization{}
 	//code here to make the web call and transform the xml into an organization object
 	return &org, nil
 }
 
-func(lv *CSCLaundryView) GetLaundryRoom(roomid int) (*model.RoomDetail, error)
-{
+func (lv *CSCLaundryView) GetLaundryRoom(roomid int) (*model.RoomDetail, error) {
 	rd := model.RoomDetail{}
 	//code here to make the web call and return the xml as a room detail object
 	return &rd, nil

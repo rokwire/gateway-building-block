@@ -46,3 +46,8 @@ type Laundry interface {
 	ListRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid int) (*model.RoomDetail, error)
 }
+
+type LaundryServiceRequest interface {
+	InitServiceRequest(machineId string) (*model.MachineRequestDetail, error)
+	SubmitServiceRequest(machineId string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
+}
