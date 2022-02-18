@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"dining/core"
+	"apigateway/core"
 )
 
 // AdminApisHandler handles the rest Admin APIs implementation

@@ -18,8 +18,8 @@
 package rest
 
 import (
-	"dining/core"
-	"dining/core/model"
+	"apigateway/core"
+	"apigateway/core/model"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
