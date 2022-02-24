@@ -19,6 +19,7 @@ package main
 
 import (
 	"apigateway/core"
+	"apigateway/driven/laundry"
 	storage "apigateway/driven/storage"
 	driver "apigateway/driver/web"
 	"log"
@@ -44,14 +45,18 @@ func main() {
 	mongoDBAuth := getEnvKey("MONGO_AUTH", true)
 	mongoDBName := getEnvKey("MONGO_DATABASE", true)
 	mongoTimeout := getEnvKey("MONGO_TIMEOUT", false)
+	laundryKey := getEnvKey("LAUNDRY_APIKEY", true)
+	laundryAPI := getEnvKey("LAUNDRY_APIURL", true)
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
+	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI)
+
 	err := storageAdapter.Start()
 	if err != nil {
 		log.Fatal("Cannot start the mongoDB adapter - " + err.Error())
 	}
 
 	//application
-	application := core.NewApplication(Version, Build, storageAdapter)
+	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter)
 	application.Start()
 
 	//web adapter

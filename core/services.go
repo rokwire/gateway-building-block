@@ -17,10 +17,22 @@
 
 package core
 
+import laundry "apigateway/core/model/laundry"
+
 func (app *Application) getVersion() string {
 	return app.version
 }
 
 func (app *Application) storeRecord(name string) error {
 	return app.storage.StoreRecord(name)
+}
+
+func (app *Application) listLaundryRooms() (laundry.Organization, error) {
+	lr, _ := app.laundry.ListRooms()
+	return *lr, nil
+}
+
+func (app *Application) listAppliances(id int) (laundry.RoomDetail, error) {
+	ap, _ := app.laundry.GetLaundryRoom(id)
+	return *ap, nil
 }

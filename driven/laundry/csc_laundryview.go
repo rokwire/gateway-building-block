@@ -17,49 +17,60 @@ type appliance struct {
 	TimeRemaining string   `xml:"time_remaining"`
 }
 
-type LaundryRoom struct {
+type laundryroom struct {
 	XMLName    xml.Name     `xml:"laundry_room"`
 	Name       string       `xml:"laundry_room_name"`
 	CampusName string       `xml:"campus_name"`
 	Appliances []*appliance `xml:"appliances>appliance"`
 }
 
-type LaundryLocation struct {
-	Location          int      `xml:"location"`
-	XMLName           xml.Name `xml:"laundryroom"`
-	Campus_name       string   `xml:"campus_name"`
-	Luandry_room_name string   `xml:"laundry_room_name"`
-	Status            string   `xml:"status"`
+type laundrylocation struct {
+	Location        int      `xml:"location"`
+	XMLName         xml.Name `xml:"laundryroom"`
+	Campusname      string   `xml:"campus_name"`
+	Luandryroomname string   `xml:"laundry_room_name"`
+	Status          string   `xml:"status"`
 }
 
-type School struct {
+type school struct {
 	XMLName      xml.Name           `xml:"school"`
 	SchoolName   string             `xml:"school_name"`
-	LaundryRooms []*LaundryLocation `xml:"laundry_rooms>laundryroom"`
+	LaundryRooms []*laundrylocation `xml:"laundry_rooms>laundryroom"`
 }
 
-type Capacity struct {
+type capacity struct {
 	Location   string   `xml:"location"`
 	XMLName    xml.Name `xml:"laundryroom"`
 	NumWashers string   `xml:"available_washers"`
 	NumDryers  string   `xml:"available_dryers"`
 }
 
-type Capacities struct {
+type capacities struct {
 	XMLName        xml.Name    `xml:"laundry_rooms"`
-	RoomCapacities []*Capacity `xml:"laundryroom"`
+	RoomCapacities []*capacity `xml:"laundryroom"`
 }
 
+//CSCLaundryView is a vendor specific structure that implements the Laundry interface
 type CSCLaundryView struct {
 	//configuration information (url, api keys...gets passed into here)
+	APIKey string
+	APIUrl string
 }
 
+//NewCSCLaundryAdapter returns a vendor specific implementation of the Laundry interface
+func NewCSCLaundryAdapter(apikey string, url string) *CSCLaundryView {
+	return &CSCLaundryView{APIKey: apikey, APIUrl: url}
+
+}
+
+//ListRooms lists the laundry rooms
 func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 	org := model.Organization{}
 	//code here to make the web call and transform the xml into an organization object
 	return &org, nil
 }
 
+//GetLaundryRoom returns the room details along with the list of machines in that room
 func (lv *CSCLaundryView) GetLaundryRoom(roomid int) (*model.RoomDetail, error) {
 	rd := model.RoomDetail{}
 	//code here to make the web call and return the xml as a room detail object

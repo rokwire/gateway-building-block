@@ -23,6 +23,8 @@ import model "apigateway/core/model/laundry"
 type Services interface {
 	GetVersion() string
 	StoreRecord(name string) error
+	ListLaundryRooms() (*model.Organization, error)
+	GetLaundryRoom(roomid int) (*model.RoomDetail, error)
 }
 
 type servicesImpl struct {
@@ -37,17 +39,31 @@ func (s *servicesImpl) StoreRecord(name string) error {
 	return s.app.storeRecord(name)
 }
 
+func (s *servicesImpl) ListLaundryRooms() (*model.Organization, error) {
+	lr, err := s.app.listLaundryRooms()
+	return &lr, err
+}
+
+func (s *servicesImpl) GetLaundryRoom(roomid int) (*model.RoomDetail, error) {
+	ap, err := s.app.listAppliances(roomid)
+	return &ap, err
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	StoreRecord(name string) error
 }
 
+//Laundry is used by core to request data from the laundry provider
 type Laundry interface {
 	ListRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid int) (*model.RoomDetail, error)
 }
 
+/*
 type LaundryServiceRequest interface {
 	InitServiceRequest(machineId string) (*model.MachineRequestDetail, error)
 	SubmitServiceRequest(machineId string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
 }
+
+*/

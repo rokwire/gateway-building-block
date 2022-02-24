@@ -4,10 +4,10 @@ import (
 	model "apigateway/core/model/laundry"
 )
 
-type MachineDetail struct {
+type machineDetail struct {
 	Address             string `json:"address"`
 	LaundryLocation     string `json:"laundryLocaiton"`
-	MachineId           string `json:"machineId"`
+	MachineID           string `json:"machineId"`
 	MachineType         string `json:"machineType"`
 	Message             string `json:"message"`
 	Property            string `json:"property"`
@@ -17,44 +17,47 @@ type MachineDetail struct {
 	SiteID              string `json:"siteID"`
 }
 
+//ServiceRequest represents the access and data provided by the laundry service provider to facilitate submitting a service request
 type ServiceRequest struct {
 	SubscriptionKey string
-	ApiKey          string
+	APIKey          string
 	Token           string
-	Details         MachineDetail
+	Details         machineDetail
 	ProblemCodes    []string
 	CookieValue     string
 }
 
-func newServiceRequest(subscriptionKey string) *ServiceRequest {
+//NewServiceRequest initializes a new instance of a ServiceRequest struct
+func NewServiceRequest(subscriptionKey string) *ServiceRequest {
 	sr := ServiceRequest{SubscriptionKey: subscriptionKey}
 	return &sr
 }
 
+//InitiateRequest returns the data necessary for reporting a problem
 func (sr *ServiceRequest) InitiateRequest(machineid string) (*model.MachineRequestDetail, error) {
-	sr.GetAPIKey()
-	sr.GetToken()
-	sr.GetMachineDetails(machineid)
-	sr.GetProblemCodes(sr.Details.MachineType)
+	sr.getAPIKey()
+	sr.getToken()
+	sr.getMachineDetails(machineid)
+	sr.getProblemCodes(sr.Details.MachineType)
 	mrd := model.MachineRequestDetail{}
 	//map current ServiceRequest properties to MachineRequestDetail Properties
 	return &mrd, nil
 }
 
-func (sr *ServiceRequest) GetAPIKey() error {
+func (sr *ServiceRequest) getAPIKey() error {
 	//make calls to get api key - sets value of sr.ApiKey
 	return nil
 }
 
-func (sr *ServiceRequest) GetToken() error {
+func (sr *ServiceRequest) getToken() error {
 	//makes call to get token and session cookie
 	return nil
 }
 
-func (sr *ServiceRequest) GetMachineDetails(machineId string) error {
+func (sr *ServiceRequest) getMachineDetails(machineID string) error {
 	return nil
 }
 
-func (sr *ServiceRequest) GetProblemCodes(machinetype string) error {
+func (sr *ServiceRequest) getProblemCodes(machinetype string) error {
 	return nil
 }
