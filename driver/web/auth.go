@@ -80,11 +80,15 @@ func (auth *Auth) userCheck(w http.ResponseWriter, r *http.Request) (bool, *mode
 func NewAuth(app *core.Application, appKeys []string, oidcProvider string,
 	oidcAppClientID string, appClientID string, webAppClientID string, phoneAuthSecret string,
 	authKeys string, authIssuer string) *Auth {
+	log.Printf("creating api keys")
 	apiKeysAuth := newAPIKeysAuth(appKeys)
-	userAuth2 := newUserAuth(app, oidcProvider, oidcAppClientID, phoneAuthSecret, authKeys, authIssuer)
-	adminAuth := newAdminAuth(app, oidcProvider, appClientID, webAppClientID)
+	//log.Printf("creating user auth")
+	//userAuth2 := newUserAuth(app, oidcProvider, oidcAppClientID, phoneAuthSecret, authKeys, authIssuer)
+	//log.Printf("creating admin auth")
+	//adminAuth := newAdminAuth(app, oidcProvider, appClientID, webAppClientID)
 
-	auth := Auth{apiKeysAuth: apiKeysAuth, userAuth: userAuth2, adminAuth: adminAuth}
+	//auth := Auth{apiKeysAuth: apiKeysAuth, userAuth: userAuth2, adminAuth: adminAuth}
+	auth := Auth{apiKeysAuth: apiKeysAuth}
 	return &auth
 }
 

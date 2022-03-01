@@ -224,14 +224,18 @@ func (auth *AdminAuth) check(w http.ResponseWriter, r *http.Request) (bool, *mod
 func NewWebAdapter(host string, port string, app *core.Application, appKeys []string, oidcProvider string,
 	oidcAppClientID string, adminAppClientID string, adminWebAppClientID string, phoneAuthSecret string,
 	authKeys string, authIssuer string) Adapter {
+
+	log.Printf("creating new auth")
 	auth := NewAuth(app, appKeys, oidcProvider, oidcAppClientID, adminAppClientID, adminWebAppClientID,
 		phoneAuthSecret, authKeys, authIssuer)
 	authorization := casbin.NewEnforcer("driver/web/authorization_model.conf", "driver/web/authorization_policy.csv")
 
+	log.Printf("creating new handlers")
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
+	laundryapiHandler := rest.NewLaundryApisHandler(app)
 	return Adapter{host: host, port: port, auth: auth, authorization: authorization,
-		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app}
+		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler}
 }
 
 //AppListener implements core.ApplicationListener interface

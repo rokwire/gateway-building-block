@@ -3,6 +3,9 @@ package laundry
 import (
 	model "apigateway/core/model/laundry"
 	"encoding/xml"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 type appliance struct {
@@ -28,7 +31,7 @@ type laundrylocation struct {
 	Location        int      `xml:"location"`
 	XMLName         xml.Name `xml:"laundryroom"`
 	Campusname      string   `xml:"campus_name"`
-	Luandryroomname string   `xml:"laundry_room_name"`
+	Laundryroomname string   `xml:"laundry_room_name"`
 	Status          string   `xml:"status"`
 }
 
@@ -65,9 +68,49 @@ func NewCSCLaundryAdapter(apikey string, url string) *CSCLaundryView {
 
 //ListRooms lists the laundry rooms
 func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
-	org := model.Organization{}
-	//code here to make the web call and transform the xml into an organization object
-	return &org, nil
+
+	log.Printf("now in ListRooms")
+	log.Printf(lv.APIKey + ":" + lv.APIUrl)
+	url := lv.APIUrl + "/school/?api_key=" + lv.APIKey + "&method=getRoomData&type=json"
+	log.Printf(url)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.Status == "200 OK" {
+		log.Printf("requests succeeded")
+		body, bodyerr := ioutil.ReadAll(resp.Body)
+		if bodyerr != nil {
+			return nil, err
+		}
+
+		var nS school
+		out := []byte(body)
+		if err := xml.Unmarshal(out, &nS); err != nil {
+			log.Fatal("could not unmarshal xml data")
+			return nil, err
+		}
+		org := model.Organization{SchoolName: nS.SchoolName}
+		org.LaundryRooms = make([]*model.LaundryRoom, 0)
+		for _, lr := range nS.LaundryRooms {
+			org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status))
+		}
+		return &org, nil
+	}
+	return nil, err
+	/*
+		org := model.Organization{SchoolName: "hello World"}
+		org.LaundryRooms = make([]*model.LaundryRoom, 0)
+		org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(1, "clint", "open"))
+		return &org, nil
+	*/
+}
+
+func newLaundryRoom(id int, name string, status string) *model.LaundryRoom {
+	lr := model.LaundryRoom{Name: name, ID: id, Status: status}
+	return &lr
 }
 
 //GetLaundryRoom returns the room details along with the list of machines in that room

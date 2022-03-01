@@ -55,6 +55,7 @@ func main() {
 		log.Fatal("Cannot start the mongoDB adapter - " + err.Error())
 	}
 
+	log.Printf("MongoDB Started")
 	//application
 	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter)
 	application.Start()
@@ -69,10 +70,11 @@ func main() {
 	phoneSecret := getEnvKey("PHONE_SECRET", true)
 	authKeys := getEnvKey("AUTH_KEYS", true)
 	authIssuer := getEnvKey("AUTH_ISSUER", true)
-
+	log.Printf("Creating web adapter")
 	webAdapter := driver.NewWebAdapter(host, port, application, apiKeys, oidcProvider, oidcAppClientID, adminAppClientID,
 		adminWebAppClientID, phoneSecret, authKeys, authIssuer)
 
+	log.Printf("starting web adapter")
 	webAdapter.Start()
 }
 

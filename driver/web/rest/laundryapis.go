@@ -45,6 +45,7 @@ func NewLaundryApisHandler(app *core.Application) LaundryApisHandler {
 func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Request) {
 
 	org, err := h.app.Services.ListLaundryRooms()
+	log.Printf("Org is " + org.SchoolName)
 	if err != nil {
 		log.Printf("Error on creating student guide: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
