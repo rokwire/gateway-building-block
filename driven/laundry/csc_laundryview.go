@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type appliance struct {
@@ -42,7 +43,7 @@ type school struct {
 }
 
 type capacity struct {
-	Location   string   `xml:"location"`
+	Location   int      `xml:"location"`
 	XMLName    xml.Name `xml:"laundryroom"`
 	NumWashers string   `xml:"available_washers"`
 	NumDryers  string   `xml:"available_dryers"`
@@ -69,10 +70,7 @@ func NewCSCLaundryAdapter(apikey string, url string) *CSCLaundryView {
 //ListRooms lists the laundry rooms
 func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 
-	log.Printf("now in ListRooms")
-	log.Printf(lv.APIKey + ":" + lv.APIUrl)
 	url := lv.APIUrl + "/school/?api_key=" + lv.APIKey + "&method=getRoomData&type=json"
-	log.Printf(url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -80,7 +78,6 @@ func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 	defer resp.Body.Close()
 
 	if resp.Status == "200 OK" {
-		log.Printf("requests succeeded")
 		body, bodyerr := ioutil.ReadAll(resp.Body)
 		if bodyerr != nil {
 			return nil, err
@@ -94,8 +91,11 @@ func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 		}
 		org := model.Organization{SchoolName: nS.SchoolName}
 		org.LaundryRooms = make([]*model.LaundryRoom, 0)
+		roomCapacities, _ := lv.getNumAvailable()
+
 		for _, lr := range nS.LaundryRooms {
-			org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status))
+			washers, dryers := findRoomCapacity(lr.Location, *roomCapacities)
+			org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status, washers, dryers))
 		}
 		return &org, nil
 	}
@@ -108,14 +108,57 @@ func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 	*/
 }
 
-func newLaundryRoom(id int, name string, status string) *model.LaundryRoom {
-	lr := model.LaundryRoom{Name: name, ID: id, Status: status}
+func findRoomCapacity(roomid int, rc capacities) (washers int, dryers int) {
+	numWashers := 0
+	numDryers := 0
+	for _, v := range rc.RoomCapacities {
+		if v.Location == roomid {
+			if i, err := strconv.Atoi(v.NumWashers); err == nil {
+				numWashers = i
+			}
+			if j, err := strconv.Atoi(v.NumDryers); err == nil {
+				numDryers = j
+			}
+			return numWashers, numDryers
+		}
+	}
+	return numWashers, numDryers
+}
+
+func newLaundryRoom(id int, name string, status string, numwashers int, numdryers int) *model.LaundryRoom {
+	lr := model.LaundryRoom{Name: name, ID: id, Status: status, AvialableWashers: numwashers, AvailableDryers: numdryers}
 	return &lr
+}
+
+func (lv *CSCLaundryView) getNumAvailable() (*capacities, error) {
+
+	url := lv.APIUrl + "/school/?api_key=" + lv.APIKey + "&method=getNumAvailable&type=json"
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.Status == "200 OK" {
+		body, bodyerr := ioutil.ReadAll(resp.Body)
+		if bodyerr != nil {
+			return nil, err
+		}
+
+		var cap capacities
+		out := []byte(body)
+		if err := xml.Unmarshal(out, &cap); err != nil {
+			log.Fatal("could not unmarshal xml data")
+			return nil, err
+		}
+
+		return &cap, nil
+	}
+	return nil, err
 }
 
 //GetLaundryRoom returns the room details along with the list of machines in that room
 func (lv *CSCLaundryView) GetLaundryRoom(roomid int) (*model.RoomDetail, error) {
 	rd := model.RoomDetail{}
-	//code here to make the web call and return the xml as a room detail object
 	return &rd, nil
 }
