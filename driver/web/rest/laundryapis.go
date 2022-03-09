@@ -19,6 +19,7 @@ package rest
 
 import (
 	"apigateway/core"
+	"apigateway/utils"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -37,17 +38,16 @@ func NewLaundryApisHandler(app *core.Application) LaundryApisHandler {
 // GetLaundryRooms returns an organization record
 // @Tags Client
 // @ID Name
-// @Param data body sampleRecord true "body json"
+// @Param  body sampleRecord true "body json"
 // @Accept  json
 // @Success 200
 // @Security RokwireAuth UserAuth
-// @Router /token [post]
+// @Router /rooms [get]
 func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Request) {
 
 	org, err := h.app.Services.ListLaundryRooms()
-	log.Printf("Org is " + org.SchoolName)
 	if err != nil {
-		log.Printf("Error on creating student guide: %s\n", err)
+		log.Printf("Error on listing laundry rooms: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -61,4 +61,50 @@ func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Reque
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(resAsJSON)
+}
+
+// GetRoomDetails returns a laundry room detail record
+// @Tags Client
+// @ID Name
+// @Param id query
+// @Accept  json
+// @Success 200
+// @Security RokwireAuth UserAuth
+// @Router /roomdetail [get]
+func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Request) {
+	reqParams := utils.ConstructFilter(r)
+	id := ""
+	for _, v := range reqParams.Items {
+		if v.Field == "id" {
+			//do work here
+			id = v.Value[0]
+			break
+		}
+	}
+
+	if id != "" {
+		rd, err := h.app.Services.GetLaundryRoom(id)
+		if err != nil {
+			log.Printf("Error retrieving laundry room details: %s\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		resAsJSON, err := json.Marshal(rd)
+		if err != nil {
+			log.Printf("Error on marshalling laundry room detail: %s\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(resAsJSON)
+
+	} else {
+		//no id field was found
+		log.Printf("Error on retrieving laundry detail: missing id parameter")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
 }

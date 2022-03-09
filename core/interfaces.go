@@ -24,7 +24,7 @@ type Services interface {
 	GetVersion() string
 	StoreRecord(name string) error
 	ListLaundryRooms() (*model.Organization, error)
-	GetLaundryRoom(roomid int) (*model.RoomDetail, error)
+	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 }
 
 type servicesImpl struct {
@@ -44,7 +44,7 @@ func (s *servicesImpl) ListLaundryRooms() (*model.Organization, error) {
 	return &lr, err
 }
 
-func (s *servicesImpl) GetLaundryRoom(roomid int) (*model.RoomDetail, error) {
+func (s *servicesImpl) GetLaundryRoom(roomid string) (*model.RoomDetail, error) {
 	ap, err := s.app.listAppliances(roomid)
 	return &ap, err
 }
@@ -57,7 +57,7 @@ type Storage interface {
 //Laundry is used by core to request data from the laundry provider
 type Laundry interface {
 	ListRooms() (*model.Organization, error)
-	GetLaundryRoom(roomid int) (*model.RoomDetail, error)
+	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 }
 
 /*

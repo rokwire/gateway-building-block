@@ -32,7 +32,7 @@ func (app *Application) listLaundryRooms() (laundry.Organization, error) {
 	return *lr, nil
 }
 
-func (app *Application) listAppliances(id int) (laundry.RoomDetail, error) {
+func (app *Application) listAppliances(id string) (laundry.RoomDetail, error) {
 	ap, _ := app.laundry.GetLaundryRoom(id)
 	return *ap, nil
 }

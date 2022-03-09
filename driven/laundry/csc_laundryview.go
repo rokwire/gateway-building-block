@@ -17,7 +17,7 @@ type appliance struct {
 	Status        string   `xml:"status"`
 	OutOfService  string   `xml:"out_of_service"`
 	Name          string   `xml:"label"`
-	AvgCycleType  string   `xml:"avg_cycle_time"`
+	AvgCycleTime  string   `xml:"avg_cycle_time"`
 	TimeRemaining string   `xml:"time_remaining"`
 }
 
@@ -43,15 +43,9 @@ type school struct {
 }
 
 type capacity struct {
-	Location   int      `xml:"location"`
-	XMLName    xml.Name `xml:"laundryroom"`
-	NumWashers string   `xml:"available_washers"`
-	NumDryers  string   `xml:"available_dryers"`
-}
-
-type capacities struct {
-	XMLName        xml.Name    `xml:"laundry_rooms"`
-	RoomCapacities []*capacity `xml:"laundryroom"`
+	XMLName    xml.Name `xml:"laundry_room"`
+	NumWashers string   `xml:"washer"`
+	NumDryers  string   `xml:"dryer"`
 }
 
 //CSCLaundryView is a vendor specific structure that implements the Laundry interface
@@ -91,48 +85,23 @@ func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 		}
 		org := model.Organization{SchoolName: nS.SchoolName}
 		org.LaundryRooms = make([]*model.LaundryRoom, 0)
-		roomCapacities, _ := lv.getNumAvailable()
 
 		for _, lr := range nS.LaundryRooms {
-			washers, dryers := findRoomCapacity(lr.Location, *roomCapacities)
-			org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status, washers, dryers))
+			org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status))
 		}
 		return &org, nil
 	}
 	return nil, err
-	/*
-		org := model.Organization{SchoolName: "hello World"}
-		org.LaundryRooms = make([]*model.LaundryRoom, 0)
-		org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(1, "clint", "open"))
-		return &org, nil
-	*/
 }
 
-func findRoomCapacity(roomid int, rc capacities) (washers int, dryers int) {
-	numWashers := 0
-	numDryers := 0
-	for _, v := range rc.RoomCapacities {
-		if v.Location == roomid {
-			if i, err := strconv.Atoi(v.NumWashers); err == nil {
-				numWashers = i
-			}
-			if j, err := strconv.Atoi(v.NumDryers); err == nil {
-				numDryers = j
-			}
-			return numWashers, numDryers
-		}
-	}
-	return numWashers, numDryers
-}
-
-func newLaundryRoom(id int, name string, status string, numwashers int, numdryers int) *model.LaundryRoom {
-	lr := model.LaundryRoom{Name: name, ID: id, Status: status, AvialableWashers: numwashers, AvailableDryers: numdryers}
+func newLaundryRoom(id int, name string, status string) *model.LaundryRoom {
+	lr := model.LaundryRoom{Name: name, ID: id, Status: status}
 	return &lr
 }
 
-func (lv *CSCLaundryView) getNumAvailable() (*capacities, error) {
+func (lv *CSCLaundryView) getNumAvailable(roomid string) (*capacity, error) {
 
-	url := lv.APIUrl + "/school/?api_key=" + lv.APIKey + "&method=getNumAvailable&type=json"
+	url := lv.APIUrl + "/room/?api_key=" + lv.APIKey + "&method=getNumAvailable&location=" + roomid + "&type=json"
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -145,7 +114,7 @@ func (lv *CSCLaundryView) getNumAvailable() (*capacities, error) {
 			return nil, err
 		}
 
-		var cap capacities
+		var cap capacity
 		out := []byte(body)
 		if err := xml.Unmarshal(out, &cap); err != nil {
 			log.Fatal("could not unmarshal xml data")
@@ -158,7 +127,52 @@ func (lv *CSCLaundryView) getNumAvailable() (*capacities, error) {
 }
 
 //GetLaundryRoom returns the room details along with the list of machines in that room
-func (lv *CSCLaundryView) GetLaundryRoom(roomid int) (*model.RoomDetail, error) {
-	rd := model.RoomDetail{}
-	return &rd, nil
+func (lv *CSCLaundryView) GetLaundryRoom(roomid string) (*model.RoomDetail, error) {
+
+	url := lv.APIUrl + "/room/?api_key=" + lv.APIKey + "&method=getAppliances&location=" + roomid + "&type=json"
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.Status == "200 OK" {
+		body, bodyerr := ioutil.ReadAll(resp.Body)
+		if bodyerr != nil {
+			return nil, err
+		}
+
+		var lr laundryroom
+		out := []byte(body)
+		if err := xml.Unmarshal(out, &lr); err != nil {
+			log.Fatal("could not unmarshal xml data")
+			return nil, err
+		}
+
+		rd := model.RoomDetail{CampusName: lr.CampusName, RoomName: lr.Name}
+		rd.Appliances = make([]*model.Appliance, len(lr.Appliances))
+		roomCapacity, _ := lv.getNumAvailable(roomid)
+		rd.NumDryers = evalNumAvailable(roomCapacity.NumDryers)
+		rd.NumWashers = evalNumAvailable(roomCapacity.NumWashers)
+
+		for i, appl := range lr.Appliances {
+			avgCycle, _ := strconv.Atoi(appl.AvgCycleTime)
+			outOfService, _ := strconv.ParseBool(appl.OutOfService)
+			rd.Appliances[i] = newAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining, outOfService)
+		}
+		return &rd, nil
+	}
+	return nil, err
+}
+
+func newAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string, outofservice bool) *model.Appliance {
+	appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: status, TimeRemaining: timeremaining, OutofService: outofservice}
+	return &appl
+}
+
+func evalNumAvailable(inputstr string) int {
+	if i, err := strconv.Atoi(inputstr); err == nil {
+		return i
+	}
+	return 0
 }

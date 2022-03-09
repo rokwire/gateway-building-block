@@ -2,11 +2,9 @@ package model
 
 //LaundryRoom represents the basic information returned as part of requesting and organization
 type LaundryRoom struct {
-	ID               int
-	Name             string
-	Status           string
-	AvialableWashers int
-	AvailableDryers  int
+	ID     int
+	Name   string
+	Status string
 }
 
 //Organization represents the top most level of inforomation provided by teh laundry api
@@ -20,13 +18,15 @@ type RoomDetail struct {
 	NumWashers int
 	NumDryers  int
 	Appliances []*Appliance
+	RoomName   string
+	CampusName string
 }
 
 //Appliance represents the information specific to an identifiiable appliance in a laundry room
 type Appliance struct {
-	ID               int
+	ID               string
 	Status           string
-	Name             string
+	ApplianceType    string
 	AverageCycleTime int
 	TimeRemaining    string
 	OutofService     bool
