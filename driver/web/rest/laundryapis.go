@@ -21,9 +21,20 @@ import (
 	"apigateway/core"
 	"apigateway/utils"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
+
+type serviceSubmission struct {
+	MachineID   *string `json:"machineid"`
+	ProblemType *string `json:"problemtype"`
+	Comments    *string `json:"comments"`
+	FirstName   *string `json:"firstname"`
+	LastName    *string `json:"lastname"`
+	Phone       *string `json:"phone"`
+}
 
 // LaundryApisHandler handles the laudnry rest APIs implementation
 type LaundryApisHandler struct {
@@ -76,7 +87,6 @@ func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Reques
 	id := ""
 	for _, v := range reqParams.Items {
 		if v.Field == "id" {
-			//do work here
 			id = v.Value[0]
 			break
 		}
@@ -107,4 +117,120 @@ func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+}
+
+// InitServiceRequest returns a laundry room detail record
+// @Tags Client
+// @ID Name
+// @Param id query
+// @Accept  json
+// @Success 200
+// @Security RokwireAuth UserAuth
+// @Router /roomdetail [get]
+func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Request) {
+	reqParams := utils.ConstructFilter(r)
+	id := ""
+	for _, v := range reqParams.Items {
+		if v.Field == "machineid" {
+			//do work here
+			id = v.Value[0]
+			break
+		}
+	}
+
+	if id != "" {
+		mrd, err := h.app.Services.InitServiceRequest(id)
+		if err != nil {
+			log.Printf("Error retrieving machine service details: %s\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		resAsJSON, err := json.Marshal(mrd)
+		if err != nil {
+			log.Printf("Error on marshalling laundry room detail: %s\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(resAsJSON)
+
+	} else {
+		//no id field was found
+		log.Printf("Error on retrieving machine request detail: missing machine id parameter")
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+}
+
+// SubmitServiceRequest returns the results of attempting to submit a service request for a laundyr appliance
+// @Tags Client
+// @ID Name
+// @Param id query
+// @Accept  json
+// @Success 200
+// @Security RokwireAuth UserAuth
+// @Router /roomdetail [get]
+func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error on marshal token data - %s\n", err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	var record serviceSubmission
+	err = json.Unmarshal(data, &record)
+	if err != nil {
+		if jsonErr, ok := err.(*json.SyntaxError); ok {
+			problemPart := data[jsonErr.Offset : jsonErr.Offset+10]
+			log.Printf("json error new '%s'", problemPart)
+		}
+		log.Printf("Error on unmarshal the request submission data - %s\n", err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if record.MachineID == nil || len(*record.MachineID) == 0 {
+		log.Printf("machine id is empty or null")
+		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		return
+	}
+
+	if record.ProblemType == nil || len(*record.ProblemType) == 0 {
+		log.Printf("Problem type is empty or null")
+		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		return
+	}
+
+	if record.FirstName == nil || len(*record.FirstName) == 0 {
+		log.Printf("First name is empty or null")
+		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		return
+	}
+
+	if record.LastName == nil || len(*record.LastName) == 0 {
+		log.Printf("Last name is empty or null")
+		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		return
+	}
+
+	sr, err := h.app.Services.SubmitServiceRequest(*record.MachineID, *record.ProblemType, *record.Comments, *record.FirstName, *record.LastName, *record.Phone)
+
+	if err != nil {
+		log.Printf("Error submitting laundry service request: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resAsJSON, err := json.Marshal(sr)
+	if err != nil {
+		log.Printf("Error on marshalling laundry service request result: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resAsJSON)
 }

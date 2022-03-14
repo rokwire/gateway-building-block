@@ -47,8 +47,10 @@ func main() {
 	mongoTimeout := getEnvKey("MONGO_TIMEOUT", false)
 	laundryKey := getEnvKey("LAUNDRY_APIKEY", true)
 	laundryAPI := getEnvKey("LAUNDRY_APIURL", true)
+	luandryServiceKey := getEnvKey("LAUNDRYSERVICE_APIKEY", true)
+	laundryServiceAPI := getEnvKey("LAUNDRYSERVICE_API", true)
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
-	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI)
+	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI)
 
 	err := storageAdapter.Start()
 	if err != nil {

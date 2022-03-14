@@ -25,6 +25,8 @@ type Services interface {
 	StoreRecord(name string) error
 	ListLaundryRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
+	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)
+	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
 }
 
 type servicesImpl struct {
@@ -49,6 +51,16 @@ func (s *servicesImpl) GetLaundryRoom(roomid string) (*model.RoomDetail, error) 
 	return &ap, err
 }
 
+func (s *servicesImpl) InitServiceRequest(machineid string) (*model.MachineRequestDetail, error) {
+	sr, err := s.app.initServiceRequest(machineid)
+	return &sr, err
+}
+
+func (s *servicesImpl) SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error) {
+	srr, err := s.app.submitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone)
+	return &srr, err
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	StoreRecord(name string) error
@@ -58,12 +70,6 @@ type Storage interface {
 type Laundry interface {
 	ListRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
+	InitServiceRequest(machineID string) (*model.MachineRequestDetail, error)
+	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
 }
-
-/*
-type LaundryServiceRequest interface {
-	InitServiceRequest(machineId string) (*model.MachineRequestDetail, error)
-	SubmitServiceRequest(machineId string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
-}
-
-*/

@@ -36,3 +36,13 @@ func (app *Application) listAppliances(id string) (laundry.RoomDetail, error) {
 	ap, _ := app.laundry.GetLaundryRoom(id)
 	return *ap, nil
 }
+
+func (app *Application) initServiceRequest(machineid string) (laundry.MachineRequestDetail, error) {
+	sr, _ := app.laundry.InitServiceRequest(machineid)
+	return *sr, nil
+}
+
+func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (laundry.ServiceRequestResult, error) {
+	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone)
+	return *srr, nil
+}

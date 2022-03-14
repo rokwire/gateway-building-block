@@ -34,10 +34,10 @@ type Appliance struct {
 
 //MachineRequestDetail represents the basic details needed in order to submit a request about a machine
 type MachineRequestDetail struct {
-	MachineID           string
-	Message             string
-	RecentServiceStatus bool
-	ProblemCodes        []string
+	MachineID    string
+	Message      string
+	OpenIssue    bool
+	ProblemCodes []string
 }
 
 //ServiceRequestResult represents the information returned upon submission of a machine service request
