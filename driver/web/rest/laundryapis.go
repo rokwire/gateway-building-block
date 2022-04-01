@@ -83,7 +83,7 @@ func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Reque
 // @Param id query
 // @Accept  json
 // @Success 200 {object} model.RoomDetail
-// @Failur 400 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
 // @Router /roomdetail [get]
 func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Request) {
@@ -130,6 +130,7 @@ func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Reques
 // @Param machineid query
 // @Accept  json
 // @Success 200 {object} model.MachineRequestDetail
+// @Failure 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
 // @Router /roomdetail [get]
 func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Request) {
@@ -174,7 +175,9 @@ func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Re
 // @ID Name
 // @Param data body model.serviceSubmission true "body json"
 // @Accept  json
-// @Success 200
+// @Success 200 {object} model.ServiceRequestResult
+// @Failure 400 {object} httputil.HTTPError
+// @Failur 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
 // @Router /roomdetail [get]
 func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.Request) {
