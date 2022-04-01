@@ -47,11 +47,13 @@ func NewLaundryApisHandler(app *core.Application) LaundryApisHandler {
 }
 
 // GetLaundryRooms returns an organization record
+// @Summary Get list of all campus laundry rooms
 // @Tags Client
 // @ID Name
-// @Param  body sampleRecord true "body json"
+// @Param  none
 // @Accept  json
-// @Success 200
+// @Success 200 {object} model.Organization
+// @Failure 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
 // @Router /rooms [get]
 func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Request) {
@@ -75,11 +77,13 @@ func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Reque
 }
 
 // GetRoomDetails returns a laundry room detail record
+// @Summary Returns the list of machines and the number of washers and dryers available in a laundry room
 // @Tags Client
 // @ID Name
 // @Param id query
 // @Accept  json
-// @Success 200
+// @Success 200 {object} model.RoomDetail
+// @Failur 400 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
 // @Router /roomdetail [get]
 func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Request) {
@@ -120,11 +124,12 @@ func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Reques
 }
 
 // InitServiceRequest returns a laundry room detail record
+// @Summary Returns the problem codes and pending service reqeust status for a laundry machine.
 // @Tags Client
 // @ID Name
-// @Param id query
+// @Param machineid query
 // @Accept  json
-// @Success 200
+// @Success 200 {object} model.MachineRequestDetail
 // @Security RokwireAuth UserAuth
 // @Router /roomdetail [get]
 func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Request) {
@@ -167,7 +172,7 @@ func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Re
 // SubmitServiceRequest returns the results of attempting to submit a service request for a laundyr appliance
 // @Tags Client
 // @ID Name
-// @Param id query
+// @Param data body model.serviceSubmission true "body json"
 // @Accept  json
 // @Success 200
 // @Security RokwireAuth UserAuth
