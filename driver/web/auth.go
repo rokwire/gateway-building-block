@@ -37,13 +37,20 @@ type TokenAuth struct {
 	tokenAuth *tokenauth.TokenAuth
 }
 
-func (auth TokenAuth) check(r *http.Request) error {
-	_, err := auth.tokenAuth.CheckRequestTokens(r)
+// Check checks the request contains a valid Core access token
+func (auth TokenAuth) Check(r *http.Request) (bool, *tokenauth.Claims) {
+	claims, err := auth.tokenAuth.CheckRequestTokens(r)
 	if err != nil {
 		log.Printf("auth -> coreAuthCheck: FAILED to validate token: %s", err.Error())
-		return err
+		return false, nil
 	}
-	return nil
+
+	if claims != nil {
+		if claims.Valid() == nil {
+			return true, claims
+		}
+	}
+	return false, nil
 }
 
 func printDeletedAccountIDs(accountIDs []string) error {
@@ -56,29 +63,29 @@ func NewTokenAuth(serviceHost string, coreHost string) *TokenAuth {
 	serviceID := "gateway"
 	config := authservice.RemoteAuthDataLoaderConfig{
 		AuthServicesHost: coreHost,
-		ServiceToken:     "sampleotken",
-
-		DeletedAccountsCallback: printDeletedAccountIDs,
 	}
 
 	logger := logs.NewLogger(serviceID, nil)
-	dataLoader, err := authservice.NewRemoteAuthDataLoader(config, nil, logger)
+	dataLoader, err := authservice.NewRemoteAuthDataLoader(config, []string{"gateway"}, logger)
+
+	if err != nil {
+		log.Fatalf("Error initializing auth service: %v", err)
+	}
+
 	authHost := fmt.Sprintf("%s/bbs/service-regs", coreHost)
 	fmt.Println(authHost)
 	hostArray := make([]string, 1)
 	hostArray[0] = authHost
 
-	//serviceLoader := authservice.NewRemoteServiceRegLoader(hostArray)
-
 	authService, err := authservice.NewAuthService(serviceID, serviceHost, dataLoader)
-	var tokenAuth *tokenauth.TokenAuth
-	if err == nil {
-		tokenAuth, err = tokenauth.NewTokenAuth(true, authService, nil, nil)
-		if err != nil {
-			log.Printf("auth -> newAuth: FAILED to init token auth: %s", err.Error())
-		}
-	} else {
-		log.Printf("auth -> newAuth: FAILED to init auth service: %s", err.Error())
+
+	if err != nil {
+		log.Fatalf("Error initializing auth service: %v", err)
+	}
+
+	tokenAuth, err := tokenauth.NewTokenAuth(true, authService, nil, nil)
+	if err != nil {
+		log.Fatalf("auth -> newAuth: FAILED to init token auth: %s", err.Error())
 	}
 
 	auth := TokenAuth{tokenAuth: tokenAuth}

@@ -74,38 +74,11 @@ func main() {
 	host := getEnvKey("HOST", true)
 	corehost := getEnvKey("CORE_HOST", true)
 	log.Printf(corehost)
-	log.Printf("Creating web adapter")
-	/*
-		serviceID := "laundry"
-		config := authservice.RemoteAuthDataLoaderConfig{
-			AuthServicesHost: corehost,
-			ServiceToken:     serviceToken,
 
-			DeletedAccountsCallback: printDeletedAccountIDs,
-		}
-		logger := logs.NewLogger(serviceID, nil)
-		dataLoader, err := authservice.NewRemoteAuthDataLoader(config, nil, logger)
-		if err != nil {
-			log.Fatalf("Error initializing remote data loader: %v", err)
-		}
-
-		authservice, err := authservice.NewAuthService(serviceID, host, dataLoader)
-		if err != nil {
-			log.Fatalf("Error initializing auth service: %v", err)
-		}
-
-		permissionAuth := authorization.NewCasbinStringAuthorization("./permissions_authorization_policy.csv")
-		scopeAuth := authorization.NewCasbinScopeAuthorization("./scope_authorization_policy.csv", serviceID)
-
-		tokenAuth, err := tokenauth.NewTokenAuth(true, authservice, permissionAuth, scopeAuth)
-		if err != nil {
-			log.Fatalf("Error initializing toekan auth: %v", err)
-		}
-
-	*/
 	tokenAuth := driver.NewTokenAuth(host, corehost)
-	fmt.Println("setup complete")
+	fmt.Println("auth setup complete")
 
+	log.Printf("Creating web adapter")
 	webAdapter := driver.NewWebAdapter(host, port, application, tokenAuth)
 
 	log.Printf("starting web adapter")

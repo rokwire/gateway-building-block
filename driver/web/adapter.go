@@ -112,21 +112,13 @@ func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 func (we Adapter) tokenAuthWrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		//authenticate token
-		claims, err := we.tokenAuth.tokenAuth.CheckRequestTokens(req)
-		if err != nil {
-			log.Printf("Authentication error: %v\n", err)
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
-		}
+		authenticated, _ := we.tokenAuth.Check(req)
 
-		err = we.tokenAuth.tokenAuth.AuthorizeRequestScope(claims, req)
-		if err != nil {
-			log.Printf("Scope error: %v\n", err)
-			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		if authenticated {
+			handler(w, req)
 			return
 		}
-		log.Printf("Authentication successful for user: %v", claims)
-		handler(w, req)
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
 }
 
