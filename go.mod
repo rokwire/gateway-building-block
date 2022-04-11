@@ -18,11 +18,12 @@ require (
 	github.com/lestrrat-go/jwx v1.2.1
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
+	github.com/rokwire/core-auth-library-go v1.0.8 //indirect
+	github.com/rokwire/logging-library-go v1.0.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/swaggo/http-swagger v1.0.0
 	github.com/swaggo/swag v1.7.0
 	go.mongodb.org/mongo-driver v1.5.3
-	golang.org/x/net v0.0.0-20210610132358-84b48f89b13b // indirect
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210611083646-a4fc73990273 // indirect

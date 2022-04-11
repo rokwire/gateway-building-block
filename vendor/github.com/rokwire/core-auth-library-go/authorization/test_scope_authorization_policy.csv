@@ -1,0 +1,2 @@
+p, test, read, /test, (GET)
+p, test, write, /test, (PUT)

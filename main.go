@@ -22,6 +22,7 @@ import (
 	"apigateway/driven/laundry"
 	storage "apigateway/driven/storage"
 	driver "apigateway/driver/web"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -33,6 +34,13 @@ var (
 	// Build : build date of this executable
 	Build string
 )
+
+/*
+func printDeletedAccountIDs(accountIDs []string) error {
+	log.Printf("Deleted account IDs: %v\n", accountIDs)
+	return nil
+}
+*/
 
 func main() {
 	if len(Version) == 0 {
@@ -63,18 +71,42 @@ func main() {
 	application.Start()
 
 	//web adapter
-	apiKeys := getAPIKeys()
 	host := getEnvKey("HOST", true)
-	oidcProvider := getEnvKey("OIDC_PROVIDER", true)
-	oidcAppClientID := getEnvKey("OIDC_APP_CLIENT_ID", true)
-	adminAppClientID := getEnvKey("OIDC_ADMIN_CLIENT_ID", true)
-	adminWebAppClientID := getEnvKey("OIDC_ADMIN_WEB_CLIENT_ID", true)
-	phoneSecret := getEnvKey("PHONE_SECRET", true)
-	authKeys := getEnvKey("AUTH_KEYS", true)
-	authIssuer := getEnvKey("AUTH_ISSUER", true)
+	corehost := getEnvKey("CORE_HOST", true)
+	log.Printf(corehost)
 	log.Printf("Creating web adapter")
-	webAdapter := driver.NewWebAdapter(host, port, application, apiKeys, oidcProvider, oidcAppClientID, adminAppClientID,
-		adminWebAppClientID, phoneSecret, authKeys, authIssuer)
+	/*
+		serviceID := "laundry"
+		config := authservice.RemoteAuthDataLoaderConfig{
+			AuthServicesHost: corehost,
+			ServiceToken:     serviceToken,
+
+			DeletedAccountsCallback: printDeletedAccountIDs,
+		}
+		logger := logs.NewLogger(serviceID, nil)
+		dataLoader, err := authservice.NewRemoteAuthDataLoader(config, nil, logger)
+		if err != nil {
+			log.Fatalf("Error initializing remote data loader: %v", err)
+		}
+
+		authservice, err := authservice.NewAuthService(serviceID, host, dataLoader)
+		if err != nil {
+			log.Fatalf("Error initializing auth service: %v", err)
+		}
+
+		permissionAuth := authorization.NewCasbinStringAuthorization("./permissions_authorization_policy.csv")
+		scopeAuth := authorization.NewCasbinScopeAuthorization("./scope_authorization_policy.csv", serviceID)
+
+		tokenAuth, err := tokenauth.NewTokenAuth(true, authservice, permissionAuth, scopeAuth)
+		if err != nil {
+			log.Fatalf("Error initializing toekan auth: %v", err)
+		}
+
+	*/
+	tokenAuth := driver.NewTokenAuth(host, corehost)
+	fmt.Println("setup complete")
+
+	webAdapter := driver.NewWebAdapter(host, port, application, tokenAuth)
 
 	log.Printf("starting web adapter")
 	webAdapter.Start()

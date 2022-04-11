@@ -19,7 +19,6 @@ package rest
 
 import (
 	"apigateway/core"
-	"apigateway/core/model"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -65,7 +64,7 @@ func (h ApisHandler) Version(w http.ResponseWriter, r *http.Request) {
 // @Success 200
 // @Security RokwireAuth UserAuth
 // @Router /token [post]
-func (h ApisHandler) StoreRecord(user *model.ShibbolethUser, w http.ResponseWriter, r *http.Request) {
+func (h ApisHandler) StoreRecord(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error on marshal token data - %s\n", err.Error())

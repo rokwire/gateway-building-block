@@ -47,7 +47,7 @@ $(BIN):
 	
 $(BIN)/%: | $(BIN) $(BASE) ; $(info $(M) building $(REPOSITORY)…)
 	$Q tmp=$$(mktemp -d); \
-		(cd $(tmp) && GOPATH=$$tmp $(GO) get $(REPOSITORY) && cp $$tmp/bin/* $(BIN)/.) || ret=$$?; \
+		(cd $(tmp) && GOPATH=$$tmp $(GO) install $(REPOSITORY)@latest && cp $$tmp/bin/* $(BIN)/.) || ret=$$?; \
 		rm -rf $$tmp ; exit $$ret
 
 GOLINT = $(BIN)/golint

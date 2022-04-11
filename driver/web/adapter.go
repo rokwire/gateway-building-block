@@ -19,30 +19,26 @@ package web
 
 import (
 	"apigateway/core"
-	"apigateway/core/model"
 	"apigateway/driver/web/rest"
 	"apigateway/utils"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/casbin/casbin"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 //Adapter entity
 type Adapter struct {
-	host          string
-	port          string
-	auth          *Auth
-	authorization *casbin.Enforcer
+	host string
+	port string
 
 	apisHandler       rest.ApisHandler
 	adminApisHandler  rest.AdminApisHandler
 	laundryapiHandler rest.LaundryApisHandler
-
-	app *core.Application
+	tokenAuth         *TokenAuth
+	app               *core.Application
 }
 
 // @title Rokwire Gatewauy Building Block API
@@ -73,8 +69,6 @@ type Adapter struct {
 // Start starts the module
 func (we Adapter) Start() {
 
-	we.auth.Start()
-
 	router := mux.NewRouter().StrictSlash(true)
 
 	// handle apis
@@ -87,7 +81,7 @@ func (we Adapter) Start() {
 	mainRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
 
 	// Client APIs
-	mainRouter.HandleFunc("/record", we.apiKeyOrTokenWrapFunc(we.apisHandler.StoreRecord)).Methods("POST")
+	mainRouter.HandleFunc("/record", we.tokenAuthWrapFunc(we.apisHandler.StoreRecord)).Methods("POST")
 	mainRouter.HandleFunc("/rooms", we.wrapFunc(we.laundryapiHandler.GetLaundryRooms)).Methods("GET")
 	mainRouter.HandleFunc("/room", we.wrapFunc(we.laundryapiHandler.GetRoomDetails)).Methods("GET")
 	mainRouter.HandleFunc("/initrequest", we.wrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
@@ -106,6 +100,7 @@ func (we Adapter) serveDocUI() http.Handler {
 	return httpSwagger.Handler(httpSwagger.URL(url))
 }
 
+//functions with no authentication at all
 func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
@@ -114,131 +109,35 @@ func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-type apiKeysAuthFunc = func(*model.ShibbolethUser, http.ResponseWriter, *http.Request)
-
-func (we Adapter) apiKeyOrTokenWrapFunc(handler apiKeysAuthFunc) http.HandlerFunc {
+func (we Adapter) tokenAuthWrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
-
-		apiKeyAuthenticated := we.auth.apiKeyCheck(w, req)
-		userAuthenticated, user, _ := we.auth.userCheck(w, req)
-
-		if apiKeyAuthenticated || userAuthenticated {
-			handler(user, w, req)
-		} else {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		}
-	}
-}
-
-type tokenAuthFunc = func(*model.ShibbolethUser, http.ResponseWriter, *http.Request)
-
-func (we Adapter) tokenWrapFunc(handler tokenAuthFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
-
-		userAuthenticated, user, _ := we.auth.userCheck(w, req)
-
-		if userAuthenticated {
-			handler(user, w, req)
-		} else {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		}
-	}
-}
-
-type adminAuthFunc = func(*model.ShibbolethUser, http.ResponseWriter, *http.Request)
-
-func (we Adapter) adminAppIDTokenAuthWrapFunc(handler adminAuthFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
-
-		ok, shiboUser := we.auth.adminCheck(w, req)
-		if !ok {
+		//authenticate token
+		claims, err := we.tokenAuth.tokenAuth.CheckRequestTokens(req)
+		if err != nil {
+			log.Printf("Authentication error: %v\n", err)
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
-		obj := req.URL.Path // the resource that is going to be accessed.
-		act := req.Method   // the operation that the user performs on the resource.
-
-		var HasAccess = false
-		for _, s := range *shiboUser.Membership {
-			HasAccess = we.authorization.Enforce(s, obj, act)
-			if HasAccess {
-				break
-			}
-		}
-
-		if !HasAccess {
-			log.Printf("Access control error - UIN: %s is trying to apply %s operation for %s\n", *shiboUser.Uin, act, obj)
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		err = we.tokenAuth.tokenAuth.AuthorizeRequestScope(claims, req)
+		if err != nil {
+			log.Printf("Scope error: %v\n", err)
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
-
-		handler(shiboUser, w, req)
+		log.Printf("Authentication successful for user: %v", claims)
+		handler(w, req)
 	}
-}
-
-func (auth *Auth) adminCheck(w http.ResponseWriter, r *http.Request) (bool, *model.ShibbolethUser) {
-	return auth.adminAuth.check(w, r)
-}
-
-func (auth *AdminAuth) check(w http.ResponseWriter, r *http.Request) (bool, *model.ShibbolethUser) {
-	//1. Get the token from the request
-	rawIDToken, tokenType, err := auth.getIDToken(r)
-	if err != nil {
-		auth.responseBadRequest(w)
-		return false, nil
-	}
-
-	//3. Validate the token
-	idToken, err := auth.verify(*rawIDToken, *tokenType)
-	if err != nil {
-		log.Printf("error validating token - %s\n", err)
-
-		auth.responseUnauthorized(*rawIDToken, w)
-		return false, nil
-	}
-
-	//4. Get the user data from the token
-	var userData userData
-	if err := idToken.Claims(&userData); err != nil {
-		log.Printf("error getting user data from token - %s\n", err)
-
-		auth.responseUnauthorized(*rawIDToken, w)
-		return false, nil
-	}
-	//we must have UIuceduUIN
-	if userData.UIuceduUIN == nil {
-		log.Printf("error - missing uiuceuin data in the token - %s\n", err)
-
-		auth.responseUnauthorized(*rawIDToken, w)
-		return false, nil
-	}
-
-	shibboAuth := &model.ShibbolethUser{Uin: userData.UIuceduUIN, Email: userData.Email,
-		Membership: userData.UIuceduIsMemberOf}
-
-	return true, shibboAuth
 }
 
 //NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(host string, port string, app *core.Application, appKeys []string, oidcProvider string,
-	oidcAppClientID string, adminAppClientID string, adminWebAppClientID string, phoneAuthSecret string,
-	authKeys string, authIssuer string) Adapter {
+func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *TokenAuth) Adapter {
 
-	log.Printf("creating new auth")
-	auth := NewAuth(app, appKeys, oidcProvider, oidcAppClientID, adminAppClientID, adminWebAppClientID,
-		phoneAuthSecret, authKeys, authIssuer)
-	authorization := casbin.NewEnforcer("driver/web/authorization_model.conf", "driver/web/authorization_policy.csv")
-
-	log.Printf("creating new handlers")
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
 	laundryapiHandler := rest.NewLaundryApisHandler(app)
-	return Adapter{host: host, port: port, auth: auth, authorization: authorization,
-		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler}
+	return Adapter{host: host, port: port,
+		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler, tokenAuth: tokenAuth}
 }
 
 //AppListener implements core.ApplicationListener interface
