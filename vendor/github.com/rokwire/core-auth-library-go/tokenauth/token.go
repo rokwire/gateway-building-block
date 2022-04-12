@@ -38,7 +38,6 @@ type Claims struct {
 	jwt.StandardClaims
 	OrgID         string `json:"org_id" validate:"required"`    // Organization ID
 	AppID         string `json:"app_id"`                        // Application ID
-	SessionID     string `json:"session_id"`                    // Session ID
 	Purpose       string `json:"purpose" validate:"required"`   // Token purpose (eg. access, csrf...)
 	AuthType      string `json:"auth_type" validate:"required"` // Authentication method (eg. email, phone...)
 	Permissions   string `json:"permissions"`                   // Granted permissions
@@ -46,15 +45,12 @@ type Claims struct {
 	Anonymous     bool   `json:"anonymous"`                     // Is the user anonymous?
 	Authenticated bool   `json:"authenticated"`                 // Did the user authenticate? (false on refresh)
 	Service       bool   `json:"service"`                       // Is this token for a service account?
-	FirstParty    bool   `json:"first_party"`                   // Is this token used by a first party service (eg. ROKWIRE building block)?
 	Admin         bool   `json:"admin"`                         // Is this token for an admin?
-	System        bool   `json:"system"`                        // Is this token for a system admin?
 
 	// User Data: DO NOT USE AS IDENTIFIER OR SHARE WITH THIRD-PARTY SERVICES
-	Name        string            `json:"name,omitempty"`         // User full name
-	Email       string            `json:"email,omitempty"`        // User email address
-	Phone       string            `json:"phone,omitempty"`        // User phone number
-	ExternalIDs map[string]string `json:"external_ids,omitempty"` // External user identifiers for use in external integrations
+	Name  string `json:"name,omitempty"`  // User full name
+	Email string `json:"email,omitempty"` // User email address
+	Phone string `json:"phone,omitempty"` // User phone number
 
 	//TODO: Once the new user ID scheme has been adopted across all services these claims should be removed
 	UID string `json:"uid,omitempty"` // Unique user identifier for specified "auth_type"

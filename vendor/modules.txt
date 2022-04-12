@@ -106,7 +106,7 @@ github.com/mailru/easyjson/jwriter
 github.com/pkg/errors
 # github.com/pquerna/cachecontrol v0.1.0
 ## explicit
-# github.com/rokwire/core-auth-library-go v1.0.8
+# github.com/rokwire/core-auth-library-go v1.0.5
 ## explicit
 github.com/rokwire/core-auth-library-go/authorization
 github.com/rokwire/core-auth-library-go/authservice

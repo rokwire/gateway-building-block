@@ -20,10 +20,10 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -98,29 +98,7 @@ func HashSha256(data []byte) ([]byte, error) {
 	return hasher.Sum(nil), nil
 }
 
-// GetDefaultAccessTokenRequest returns a HTTP request to get an access token using a static token
-func GetDefaultAccessTokenRequest(host string, path string, token string) (*http.Request, error) {
-	if token == "" {
-		return nil, errors.New("service token is missing")
-	}
-
-	params := map[string]interface{}{
-		"auth_type": "static_token",
-		"creds": map[string]string{
-			"token": token,
-		},
-	}
-	data, err := json.Marshal(params)
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling request body toget access token: %v", err)
-	}
-
-	r, err := http.NewRequest("POST", host+path, bytes.NewReader(data))
-	if err != nil {
-		return nil, fmt.Errorf("error formatting request to get access token: %v", err)
-	}
-
-	r.Header.Set("Content-Type", "application/json")
-
-	return r, nil
+// ResetRequestBody sets r.Body to read from data (use to read from r.Body multiple times)
+func ResetRequestBody(r *http.Request, data []byte) {
+	r.Body = ioutil.NopCloser(bytes.NewReader(data))
 }

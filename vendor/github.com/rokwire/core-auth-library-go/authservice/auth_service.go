@@ -15,6 +15,7 @@
 package authservice
 
 import (
+	"bytes"
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
@@ -301,15 +302,32 @@ type RemoteAuthDataLoaderConfig struct {
 	DeletedAccountsPath string // Path to auth service deleted accounts endpoint
 	ServiceRegPath      string // Path to auth service service registration endpoint
 
-	AccessTokenRequest       *http.Request
 	DeletedAccountsCallback  func([]string) error // Function to call once the deleted accounts list is received from the auth service
 	GetDeletedAccountsPeriod int64                // How often to request deleted account list from the auth service (in hours)
 }
 
 // GetAccessToken implements AuthDataLoader interface
 func (r *RemoteAuthDataLoaderImpl) GetAccessToken() error {
+	params := map[string]interface{}{
+		"auth_type": "static_token",
+		"creds": map[string]string{
+			"token": r.config.ServiceToken,
+		},
+	}
+	data, err := json.Marshal(params)
+	if err != nil {
+		return fmt.Errorf("error marshaling request body toget access token: %v", err)
+	}
+
 	client := &http.Client{}
-	resp, err := client.Do(r.config.AccessTokenRequest)
+	req, err := http.NewRequest("POST", r.config.AuthServicesHost+r.config.AccessTokenPath, bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("error formatting request to get access token: %v", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("error requesting access token: %v", err)
 	}
@@ -435,11 +453,7 @@ func NewRemoteAuthDataLoader(config RemoteAuthDataLoaderConfig, subscribedServic
 	if config.ServiceToken == "" && config.DeletedAccountsCallback != nil {
 		return nil, errors.New("service token is missing")
 	}
-
-	err := constructDataLoaderConfig(&config)
-	if err != nil {
-		return nil, fmt.Errorf("error constructing data loader config: %v", err)
-	}
+	constructDataLoaderConfig(&config)
 
 	serviceRegLoader := NewRemoteServiceRegLoader(subscribedServices)
 
@@ -455,7 +469,7 @@ func NewRemoteAuthDataLoader(config RemoteAuthDataLoaderConfig, subscribedServic
 	return &dataLoader, nil
 }
 
-func constructDataLoaderConfig(config *RemoteAuthDataLoaderConfig) error {
+func constructDataLoaderConfig(config *RemoteAuthDataLoaderConfig) {
 	if config.AccessTokenPath == "" {
 		config.AccessTokenPath = "/bbs/access-token"
 	}
@@ -465,20 +479,9 @@ func constructDataLoaderConfig(config *RemoteAuthDataLoaderConfig) error {
 	if config.ServiceRegPath == "" {
 		config.ServiceRegPath = "/bbs/service-regs"
 	}
-
-	if config.AccessTokenRequest == nil {
-		r, err := authutils.GetDefaultAccessTokenRequest(config.AuthServicesHost, config.AccessTokenPath, config.ServiceToken)
-		if err != nil {
-			return err
-		}
-
-		config.AccessTokenRequest = r
-	}
 	if config.GetDeletedAccountsPeriod <= 0 {
 		config.GetDeletedAccountsPeriod = 2
 	}
-
-	return nil
 }
 
 // AccessToken represents an access token granted by a remote auth service

@@ -82,10 +82,10 @@ func (we Adapter) Start() {
 
 	// Client APIs
 	mainRouter.HandleFunc("/record", we.tokenAuthWrapFunc(we.apisHandler.StoreRecord)).Methods("POST")
-	mainRouter.HandleFunc("/rooms", we.wrapFunc(we.laundryapiHandler.GetLaundryRooms)).Methods("GET")
-	mainRouter.HandleFunc("/room", we.wrapFunc(we.laundryapiHandler.GetRoomDetails)).Methods("GET")
-	mainRouter.HandleFunc("/initrequest", we.wrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
-	mainRouter.HandleFunc("/requestservice", we.wrapFunc(we.laundryapiHandler.SubmitServiceRequest)).Methods("POST")
+	mainRouter.HandleFunc("/rooms", we.tokenAuthWrapFunc(we.laundryapiHandler.GetLaundryRooms)).Methods("GET")
+	mainRouter.HandleFunc("/room", we.tokenAuthWrapFunc(we.laundryapiHandler.GetRoomDetails)).Methods("GET")
+	mainRouter.HandleFunc("/initrequest", we.tokenAuthWrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
+	mainRouter.HandleFunc("/requestservice", we.tokenAuthWrapFunc(we.laundryapiHandler.SubmitServiceRequest)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }

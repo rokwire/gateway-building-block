@@ -61,6 +61,7 @@ func printDeletedAccountIDs(accountIDs []string) error {
 //NewTokenAuth creats a token auth instance
 func NewTokenAuth(serviceHost string, coreHost string) *TokenAuth {
 	serviceID := "gateway"
+
 	config := authservice.RemoteAuthDataLoaderConfig{
 		AuthServicesHost: coreHost,
 	}
@@ -76,7 +77,6 @@ func NewTokenAuth(serviceHost string, coreHost string) *TokenAuth {
 	fmt.Println(authHost)
 	hostArray := make([]string, 1)
 	hostArray[0] = authHost
-
 	authService, err := authservice.NewAuthService(serviceID, serviceHost, dataLoader)
 
 	if err != nil {
