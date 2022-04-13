@@ -46,3 +46,13 @@ type ServiceRequestResult struct {
 	RequestNumber int
 	Status        string
 }
+
+//ServiceSubmission represents the data required to submit a service request for a laundry machine
+type ServiceSubmission struct {
+	MachineID   *string `json:"machineid"`
+	ProblemType *string `json:"problemtype"`
+	Comments    *string `json:"comments"`
+	FirstName   *string `json:"firstname"`
+	LastName    *string `json:"lastname"`
+	Phone       *string `json:"phone"`
+}

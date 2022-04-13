@@ -47,7 +47,7 @@ type Adapter struct {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost
-// @BasePath /notifications/api
+// @BasePath /gateway/api
 // @schemes https
 
 // @securityDefinitions.apikey RokwireAuth
@@ -75,17 +75,17 @@ func (we Adapter) Start() {
 	//do i need a different adapter for each "endpoint" (laundry, courselist, wayfinding, etc)
 	//or can I set different routers for different router path prefixise (/laundry, /courselist, ...)
 	//still learning the gorilla mux library
-	mainRouter := router.PathPrefix("/laundry/api").Subrouter()
+	mainRouter := router.PathPrefix("/gateway/api").Subrouter()
 	mainRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
 	mainRouter.HandleFunc("/doc", we.serveDoc)
 	mainRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
 
 	// Client APIs
 	mainRouter.HandleFunc("/record", we.tokenAuthWrapFunc(we.apisHandler.StoreRecord)).Methods("POST")
-	mainRouter.HandleFunc("/rooms", we.tokenAuthWrapFunc(we.laundryapiHandler.GetLaundryRooms)).Methods("GET")
-	mainRouter.HandleFunc("/room", we.tokenAuthWrapFunc(we.laundryapiHandler.GetRoomDetails)).Methods("GET")
-	mainRouter.HandleFunc("/initrequest", we.tokenAuthWrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
-	mainRouter.HandleFunc("/requestservice", we.tokenAuthWrapFunc(we.laundryapiHandler.SubmitServiceRequest)).Methods("POST")
+	mainRouter.HandleFunc("/laundry/rooms", we.tokenAuthWrapFunc(we.laundryapiHandler.GetLaundryRooms)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/room", we.tokenAuthWrapFunc(we.laundryapiHandler.GetRoomDetails)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/initrequest", we.tokenAuthWrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/requestservice", we.tokenAuthWrapFunc(we.laundryapiHandler.SubmitServiceRequest)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
@@ -96,7 +96,7 @@ func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (we Adapter) serveDocUI() http.Handler {
-	url := fmt.Sprintf("%s/notifications/api/doc", we.host)
+	url := fmt.Sprintf("%s/api/doc", we.host)
 	return httpSwagger.Handler(httpSwagger.URL(url))
 }
 

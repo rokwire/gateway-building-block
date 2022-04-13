@@ -19,6 +19,7 @@ package rest
 
 import (
 	"apigateway/core"
+	model "apigateway/core/model/laundry"
 	"apigateway/utils"
 	"encoding/json"
 	"fmt"
@@ -26,15 +27,6 @@ import (
 	"log"
 	"net/http"
 )
-
-type serviceSubmission struct {
-	MachineID   *string `json:"machineid"`
-	ProblemType *string `json:"problemtype"`
-	Comments    *string `json:"comments"`
-	FirstName   *string `json:"firstname"`
-	LastName    *string `json:"lastname"`
-	Phone       *string `json:"phone"`
-}
 
 // LaundryApisHandler handles the laudnry rest APIs implementation
 type LaundryApisHandler struct {
@@ -49,13 +41,12 @@ func NewLaundryApisHandler(app *core.Application) LaundryApisHandler {
 // GetLaundryRooms returns an organization record
 // @Summary Get list of all campus laundry rooms
 // @Tags Client
-// @ID Name
-// @Param  none
+// @ID Rooms
 // @Accept  json
+// @Produce json
 // @Success 200 {object} model.Organization
-// @Failure 500 {object} httputil.HTTPError
-// @Security RokwireAuth UserAuth
-// @Router /rooms [get]
+// @Security RokwireAuth
+// @Router /laundry/rooms [get]
 func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Request) {
 
 	org, err := h.app.Services.ListLaundryRooms()
@@ -79,13 +70,12 @@ func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Reque
 // GetRoomDetails returns a laundry room detail record
 // @Summary Returns the list of machines and the number of washers and dryers available in a laundry room
 // @Tags Client
-// @ID Name
-// @Param id query
+// @ID Room
+// @Param id query int true "Room id"
 // @Accept  json
 // @Success 200 {object} model.RoomDetail
-// @Failure 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
-// @Router /roomdetail [get]
+// @Router /laundry/roomdetail [get]
 func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Request) {
 	reqParams := utils.ConstructFilter(r)
 	id := ""
@@ -126,13 +116,12 @@ func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Reques
 // InitServiceRequest returns a laundry room detail record
 // @Summary Returns the problem codes and pending service reqeust status for a laundry machine.
 // @Tags Client
-// @ID Name
-// @Param machineid query
+// @ID InitRequest
+// @Param machineid query string true "machine service tag id"
 // @Accept  json
 // @Success 200 {object} model.MachineRequestDetail
-// @Failure 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
-// @Router /roomdetail [get]
+// @Router /laundry/initrequest [get]
 func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Request) {
 	reqParams := utils.ConstructFilter(r)
 	id := ""
@@ -172,14 +161,12 @@ func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Re
 
 // SubmitServiceRequest returns the results of attempting to submit a service request for a laundyr appliance
 // @Tags Client
-// @ID Name
-// @Param data body model.serviceSubmission true "body json"
+// @ID RequestService
+// @Param data body model.ServiceSubmission true "body json"
 // @Accept  json
 // @Success 200 {object} model.ServiceRequestResult
-// @Failure 400 {object} httputil.HTTPError
-// @Failur 500 {object} httputil.HTTPError
 // @Security RokwireAuth UserAuth
-// @Router /roomdetail [get]
+// @Router /laundry/requestservice [get]
 func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -188,7 +175,7 @@ func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.
 		return
 	}
 
-	var record serviceSubmission
+	var record model.ServiceSubmission
 	err = json.Unmarshal(data, &record)
 	if err != nil {
 		if jsonErr, ok := err.(*json.SyntaxError); ok {

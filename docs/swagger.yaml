@@ -1,5 +1,90 @@
-basePath: /notifications/api
+basePath: /gateway/api
 definitions:
+  model.Appliance:
+    properties:
+      applianceType:
+        type: string
+      averageCycleTime:
+        type: integer
+      id:
+        type: string
+      outofService:
+        type: boolean
+      status:
+        type: string
+      timeRemaining:
+        type: string
+    type: object
+  model.LaundryRoom:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  model.MachineRequestDetail:
+    properties:
+      machineID:
+        type: string
+      message:
+        type: string
+      openIssue:
+        type: boolean
+      problemCodes:
+        items:
+          type: string
+        type: array
+    type: object
+  model.Organization:
+    properties:
+      laundryRooms:
+        items:
+          $ref: '#/definitions/model.LaundryRoom'
+        type: array
+      schoolName:
+        type: string
+    type: object
+  model.RoomDetail:
+    properties:
+      appliances:
+        items:
+          $ref: '#/definitions/model.Appliance'
+        type: array
+      campusName:
+        type: string
+      numDryers:
+        type: integer
+      numWashers:
+        type: integer
+      roomName:
+        type: string
+    type: object
+  model.ServiceRequestResult:
+    properties:
+      message:
+        type: string
+      requestNumber:
+        type: integer
+      status:
+        type: string
+    type: object
+  model.ServiceSubmission:
+    properties:
+      comments:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      machineid:
+        type: string
+      phone:
+        type: string
+      problemtype:
+        type: string
+    type: object
   sampleRecord:
     properties:
       name:
@@ -12,9 +97,89 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: Rokwire Dinings Building Block API
+  title: Rokwire Gatewauy Building Block API
   version: 0.1.0
 paths:
+  /laundry/initrequest:
+    get:
+      consumes:
+      - application/json
+      operationId: InitRequest
+      parameters:
+      - description: machine service tag id
+        in: query
+        name: machineid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MachineRequestDetail'
+      security:
+      - RokwireAuth UserAuth: []
+      summary: Returns the problem codes and pending service reqeust status for a laundry machine.
+      tags:
+      - Client
+  /laundry/requestservice:
+    get:
+      consumes:
+      - application/json
+      operationId: RequestService
+      parameters:
+      - description: body json
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/model.ServiceSubmission'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ServiceRequestResult'
+      security:
+      - RokwireAuth UserAuth: []
+      tags:
+      - Client
+  /laundry/roomdetail:
+    get:
+      consumes:
+      - application/json
+      operationId: Room
+      parameters:
+      - description: Room id
+        in: query
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.RoomDetail'
+      security:
+      - RokwireAuth UserAuth: []
+      summary: Returns the list of machines and the number of washers and dryers available in a laundry room
+      tags:
+      - Client
+  /laundry/rooms:
+    get:
+      consumes:
+      - application/json
+      operationId: Rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Organization'
+      security:
+      - RokwireAuth: []
+      summary: Get list of all campus laundry rooms
+      tags:
+      - Client
   /token:
     post:
       consumes:

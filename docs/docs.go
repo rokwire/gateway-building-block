@@ -28,6 +28,137 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/laundry/initrequest": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth UserAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns the problem codes and pending service reqeust status for a laundry machine.",
+                "operationId": "InitRequest",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "machine service tag id",
+                        "name": "machineid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MachineRequestDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/laundry/requestservice": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth UserAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "RequestService",
+                "parameters": [
+                    {
+                        "description": "body json",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ServiceSubmission"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.ServiceRequestResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/laundry/roomdetail": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth UserAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns the list of machines and the number of washers and dryers available in a laundry room",
+                "operationId": "Room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Room id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.RoomDetail"
+                        }
+                    }
+                }
+            }
+        },
+        "/laundry/rooms": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Get list of all campus laundry rooms",
+                "operationId": "Rooms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Organization"
+                        }
+                    }
+                }
+            }
+        },
         "/token": {
             "post": {
                 "security": [
@@ -84,6 +215,137 @@ var doc = `{
         }
     },
     "definitions": {
+        "model.Appliance": {
+            "type": "object",
+            "properties": {
+                "applianceType": {
+                    "type": "string"
+                },
+                "averageCycleTime": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "outofService": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "timeRemaining": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.LaundryRoom": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.MachineRequestDetail": {
+            "type": "object",
+            "properties": {
+                "machineID": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "openIssue": {
+                    "type": "boolean"
+                },
+                "problemCodes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.Organization": {
+            "type": "object",
+            "properties": {
+                "laundryRooms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.LaundryRoom"
+                    }
+                },
+                "schoolName": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RoomDetail": {
+            "type": "object",
+            "properties": {
+                "appliances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Appliance"
+                    }
+                },
+                "campusName": {
+                    "type": "string"
+                },
+                "numDryers": {
+                    "type": "integer"
+                },
+                "numWashers": {
+                    "type": "integer"
+                },
+                "roomName": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ServiceRequestResult": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "requestNumber": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ServiceSubmission": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "machineid": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "problemtype": {
+                    "type": "string"
+                }
+            }
+        },
         "sampleRecord": {
             "type": "object",
             "properties": {
@@ -130,9 +392,9 @@ type swaggerInfo struct {
 var SwaggerInfo = swaggerInfo{
 	Version:     "0.1.0",
 	Host:        "localhost",
-	BasePath:    "/notifications/api",
+	BasePath:    "/gateway/api",
 	Schemes:     []string{"https"},
-	Title:       "Rokwire Dinings Building Block API",
+	Title:       "Rokwire Gatewauy Building Block API",
 	Description: "Rokwire Rokwire Building Block API Documentation.",
 }
 
