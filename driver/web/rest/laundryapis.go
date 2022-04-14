@@ -189,29 +189,29 @@ func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.
 
 	if record.MachineID == nil || len(*record.MachineID) == 0 {
 		log.Printf("machine id is empty or null")
-		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Missing miachine id\n"), http.StatusBadRequest)
 		return
 	}
 
-	if record.ProblemType == nil || len(*record.ProblemType) == 0 {
-		log.Printf("Problem type is empty or null")
-		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+	if record.ProblemCode == nil || len(*record.ProblemCode) == 0 {
+		log.Printf("Problem code is empty or null")
+		http.Error(w, fmt.Sprintf("Missing Problem Code\n"), http.StatusBadRequest)
 		return
 	}
 
 	if record.FirstName == nil || len(*record.FirstName) == 0 {
 		log.Printf("First name is empty or null")
-		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Missing first name\n"), http.StatusBadRequest)
 		return
 	}
 
 	if record.LastName == nil || len(*record.LastName) == 0 {
 		log.Printf("Last name is empty or null")
-		http.Error(w, fmt.Sprintf("token is empty or null\n"), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("missing last name\n"), http.StatusBadRequest)
 		return
 	}
 
-	sr, err := h.app.Services.SubmitServiceRequest(*record.MachineID, *record.ProblemType, *record.Comments, *record.FirstName, *record.LastName, *record.Phone)
+	sr, err := h.app.Services.SubmitServiceRequest(*record.MachineID, *record.ProblemCode, *record.Comments, *record.FirstName, *record.LastName, *record.Phone, *record.Email)
 
 	if err != nil {
 		log.Printf("Error submitting laundry service request: %s\n", err)
