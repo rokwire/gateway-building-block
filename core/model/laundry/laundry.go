@@ -28,8 +28,7 @@ type Appliance struct {
 	Status           string
 	ApplianceType    string
 	AverageCycleTime int
-	TimeRemaining    string
-	OutofService     bool
+	TimeRemaining    *int
 }
 
 //MachineRequestDetail represents the basic details needed in order to submit a request about a machine
@@ -38,6 +37,7 @@ type MachineRequestDetail struct {
 	Message      string
 	OpenIssue    bool
 	ProblemCodes []string
+	MachineType  string
 }
 
 //ServiceRequestResult represents the information returned upon submission of a machine service request
@@ -50,9 +50,10 @@ type ServiceRequestResult struct {
 //ServiceSubmission represents the data required to submit a service request for a laundry machine
 type ServiceSubmission struct {
 	MachineID   *string `json:"machineid"`
-	ProblemType *string `json:"problemtype"`
+	ProblemCode *string `json:"problemcode"`
 	Comments    *string `json:"comments"`
 	FirstName   *string `json:"firstname"`
 	LastName    *string `json:"lastname"`
 	Phone       *string `json:"phone"`
+	Email       *string `json:"email"`
 }

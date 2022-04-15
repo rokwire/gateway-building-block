@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -146,8 +147,7 @@ func (lv *CSCLaundryView) GetLaundryRoom(roomid string) (*model.RoomDetail, erro
 
 		for i, appl := range lr.Appliances {
 			avgCycle, _ := strconv.Atoi(appl.AvgCycleTime)
-			outOfService, _ := strconv.ParseBool(appl.OutOfService)
-			rd.Appliances[i] = newAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining, outOfService)
+			rd.Appliances[i] = newAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining)
 		}
 		return &rd, nil
 	}
@@ -173,7 +173,7 @@ func (lv *CSCLaundryView) InitServiceRequest(machineID string) (*model.MachineRe
 		return nil, err
 	}
 
-	mrd := newMachineRequestDetail(md.MachineID, md.Message, md.RecentServiceStatus)
+	mrd := newMachineRequestDetail(md.MachineID, md.Message, md.RecentServiceStatus, md.MachineType)
 	log.Printf(mrd.MachineID + " " + mrd.Message)
 	mrd.ProblemCodes, err = lv.getProblemCodes(md.MachineType)
 	if err != nil {
@@ -183,7 +183,7 @@ func (lv *CSCLaundryView) InitServiceRequest(machineID string) (*model.MachineRe
 }
 
 //SubmitServiceRequest submits a request for a machine
-func (lv *CSCLaundryView) SubmitServiceRequest(machineid string, problemCode string, comments string, firstName string, lastName string, phone string) (*model.ServiceRequestResult, error) {
+func (lv *CSCLaundryView) SubmitServiceRequest(machineid string, problemCode string, comments string, firstName string, lastName string, phone string, email string) (*model.ServiceRequestResult, error) {
 
 	err := lv.getServiceSubscriptionKey()
 	if err != nil {
@@ -196,16 +196,16 @@ func (lv *CSCLaundryView) SubmitServiceRequest(machineid string, problemCode str
 		return nil, err
 	}
 
-	srr, err := lv.submitTicket(machineid, problemCode, comments, firstName, lastName, phone)
+	srr, err := lv.submitTicket(machineid, problemCode, comments, firstName, lastName, phone, email)
 	if err != nil {
 		return nil, err
 	}
 	return srr, nil
 }
 
-func newMachineRequestDetail(machineid string, message string, serviceStatus string) *model.MachineRequestDetail {
+func newMachineRequestDetail(machineid string, message string, serviceStatus string, machinetype string) *model.MachineRequestDetail {
 	var openTicket = serviceStatus == "Open"
-	mrd := model.MachineRequestDetail{MachineID: machineid, Message: message, OpenIssue: openTicket}
+	mrd := model.MachineRequestDetail{MachineID: machineid, Message: message, OpenIssue: openTicket, MachineType: machinetype}
 	return &mrd
 }
 
@@ -241,9 +241,41 @@ func (lv *CSCLaundryView) getNumAvailable(roomid string) (*capacity, error) {
 	return nil, err
 }
 
-func newAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string, outofservice bool) *model.Appliance {
-	appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: status, TimeRemaining: timeremaining, OutofService: outofservice}
+func newAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string) *model.Appliance {
+
+	var finalStatus string
+	switch status {
+	case "Available":
+		finalStatus = "available"
+	case "In Use":
+		finalStatus = "in_use"
+	default:
+		finalStatus = "out_of_service"
+	}
+
+	if finalStatus == "available" || finalStatus == "out_of_service" {
+		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus}
+		return &appl
+	}
+
+	re := regexp.MustCompile("[0-9]+")
+	intsInString := re.FindAllString(timeremaining, 1)
+
+	if intsInString != nil {
+		intConvValue, err := strconv.ParseInt(intsInString[0], 10, 32)
+		if err != nil {
+			appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus}
+			return &appl
+		}
+
+		trValue := int(intConvValue)
+		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, TimeRemaining: &trValue}
+		return &appl
+	}
+
+	appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus}
 	return &appl
+
 }
 
 func evalNumAvailable(inputstr string) int {
@@ -385,7 +417,7 @@ func (lv *CSCLaundryView) getProblemCodes(machinetype string) ([]string, error) 
 	return dat["problemCodeList"], nil
 }
 
-func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, comments string, firstName string, lastName string, phone string) (*model.ServiceRequestResult, error) {
+func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, comments string, firstName string, lastName string, phone string, email string) (*model.ServiceRequestResult, error) {
 	url := lv.ServiceAPIUrl + "/sr/v1/submitServiceRequest?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 	headers := make(map[string]string)
@@ -393,7 +425,7 @@ func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, com
 	headers["Cookie"] = "session=" + lv.serviceCookie
 	headers["Content-Type"] = "application/json"
 
-	payload := `{"machineId": "` + machineid + `", "problemCode": "` + problemCode + `", "comments": "` + comments + `", "firstName": "` + firstName + `", "lastName": "` + lastName + `", "phone": "` + phone + `"}`
+	payload := `{"machineId": "` + machineid + `", "problemCode": "` + problemCode + `", "comments": "` + comments + `", "firstName": "` + firstName + `", "lastName": "` + lastName + `", "phone": "` + phone + `", "email": "` + email + `"}`
 
 	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, payload)
 

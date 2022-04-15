@@ -26,7 +26,7 @@ type Services interface {
 	ListLaundryRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)
-	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
+	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
 }
 
 type servicesImpl struct {
@@ -56,8 +56,8 @@ func (s *servicesImpl) InitServiceRequest(machineid string) (*model.MachineReque
 	return &sr, err
 }
 
-func (s *servicesImpl) SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error) {
-	srr, err := s.app.submitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone)
+func (s *servicesImpl) SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error) {
+	srr, err := s.app.submitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
 	return &srr, err
 }
 
@@ -71,5 +71,5 @@ type Laundry interface {
 	ListRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineID string) (*model.MachineRequestDetail, error)
-	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (*model.ServiceRequestResult, error)
+	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
 }

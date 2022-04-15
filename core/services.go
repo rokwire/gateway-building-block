@@ -42,7 +42,7 @@ func (app *Application) initServiceRequest(machineid string) (laundry.MachineReq
 	return *sr, nil
 }
 
-func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string) (laundry.ServiceRequestResult, error) {
-	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone)
+func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (laundry.ServiceRequestResult, error) {
+	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
 	return *srr, nil
 }
