@@ -3,15 +3,14 @@ package laundry
 import (
 	"log"
 	"os"
-	"strings"
 	"testing"
 )
 
 func TestSchoolsCall(t *testing.T) {
-	laundryKey := getEnvKey("LAUNDRY_APIKEY", true)
-	laundryAPI := getEnvKey("LAUNDRY_APIURL", true)
-	luandryServiceKey := getEnvKey("LAUNDRYSERVICE_APIKEY", true)
-	laundryServiceAPI := getEnvKey("LAUNDRYSERVICE_API", true)
+	laundryKey := getEnvKey("GATEWAY_LAUNDRY_APIKEY", true)
+	laundryAPI := getEnvKey("GATEWAY_LAUNDRY_APIURL", true)
+	luandryServiceKey := getEnvKey("GATEWAY_LAUNDRYSERVICE_APIKEY", true)
+	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
 
 	laundryAdapter := NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI)
 	_, err := laundryAdapter.ListRooms()
@@ -21,28 +20,16 @@ func TestSchoolsCall(t *testing.T) {
 }
 
 func TestSchoolsCallInvalidKey(t *testing.T) {
-	laundryKey := getEnvKey("LAUNDRY_APIKEY", true)
-	laundryAPI := getEnvKey("LAUNDRY_APIURL", true)
-	luandryServiceKey := getEnvKey("LAUNDRYSERVICE_APIKEY", true)
-	laundryServiceAPI := getEnvKey("LAUNDRYSERVICE_API", true)
+	laundryKey := getEnvKey("GATEWAY_LAUNDRY_APIKEY", true)
+	laundryAPI := getEnvKey("GATEWAY_LAUNDRY_APIURL", true)
+	luandryServiceKey := getEnvKey("GATEWAY_LAUNDRYSERVICE_APIKEY", true)
+	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
 
 	laundryAdapter := NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI)
 	_, err := laundryAdapter.ListRooms()
 	if err != nil {
 		t.Fatalf(`test failed`)
 	}
-}
-func getAPIKeys() []string {
-	//get from the environment
-	rokwireAPIKeys := getEnvKey("ROKWIRE_API_KEYS", true)
-
-	//it is comma separated format
-	rokwireAPIKeysList := strings.Split(rokwireAPIKeys, ",")
-	if len(rokwireAPIKeysList) <= 0 {
-		log.Fatal("For some reasons the apis keys list is empty")
-	}
-
-	return rokwireAPIKeysList
 }
 
 func getEnvKey(key string, required bool) string {
