@@ -17,7 +17,10 @@
 
 package core
 
-import model "apigateway/core/model/laundry"
+import (
+	buildings "apigateway/core/model/Wayfinding"
+	model "apigateway/core/model/laundry"
+)
 
 // Services exposes APIs for the driver adapters
 type Services interface {
@@ -72,4 +75,10 @@ type Laundry interface {
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineID string) (*model.MachineRequestDetail, error)
 	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
+}
+
+//BuildingLocation is used to request data from the building location/entrance provider
+type BuildingLocation interface {
+	GetBuilding(bldgID string, adaAccessibleOnly bool) *buildings.Building
+	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) *buildings.Entrance
 }

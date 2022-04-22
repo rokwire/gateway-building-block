@@ -22,4 +22,5 @@ type Building struct {
 	ZipCode     string
 	ImageURL    string
 	MailCode    string
+	Entrances   []Entrance
 }
