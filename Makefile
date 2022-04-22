@@ -1,11 +1,10 @@
 DATE    ?= $(shell date +%FT%T%z)
-GOPATH   = $(CURDIR)/vendor/gopath
-BIN      = $(CURDIR)/vendor
+BIN      = $(CURDIR)/build
 BASE     = $(CURDIR)
 MODULE = $(shell cd $(BASE) && $(GO) list -m)
-PKGS     = $(or $(PKG),$(shell cd $(BASE) && env GOPATH=$(GOPATH) $(GO) list ./...))
-BUILDS   = $(or $(BUILD),$(shell cd $(BASE) && env GOPATH=$(GOPATH) $(GO) list -f "{{if eq .Name \"main\"}}{{.ImportPath}}{{end}}" ./...))
-GIT_VERSION=$(shell git describe --match "v*" 2> /dev/null || cat $(CURDIR)/.version 2> /dev/null || echo v0.0.0)
+PKGS     = $(or $(PKG),$(shell cd $(BASE) && $(GO) list ./...))
+BUILDS   = $(or $(BUILD),$(shell cd $(BASE) && $(GO) list -f "{{if eq .Name \"main\"}}{{.ImportPath}}{{end}}" ./...))
+GIT_VERSION=$(shell git describe --match "v*" 2> /dev/null || cat $(CURDIR)/.version 2> /dev/null || echo v0.0-0-)
 BASE_VERSION=$(shell echo $(GIT_VERSION) | cut -f1 -d'-')
 MAJOR_VERSION=$(shell echo $(BASE_VERSION) | cut -f1 -d'.' | cut -f2 -d'v')
 MINOR_VERSION=$(shell echo $(BASE_VERSION) | cut -f2 -d'.')
@@ -16,7 +15,7 @@ BUILD_NUMBER=$(shell echo $$(( $(BUILD_VERSION) + $(CODE_OFFSET) )))
 VERSION ?= ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}
 
 export -n GOBIN
-export GOPATH
+export GOROOT=/usr/local/go
 #export PATH=$(BIN): $(shell printenv PATH)
 
 GO      = go
@@ -30,7 +29,7 @@ M = $(shell printf "\033[34;1m▶\033[0m")
 SHELL=bash
 
 .PHONY: all
-all: log-variables checkfmt lint test-short | $(BASE) ; $(info $(M) building executable(s)… $(VERSION) $(DATE)) @ ## Build program binary
+all: vendor log-variables checkfmt lint test-short | $(BASE) ; $(info $(M) building executable(s)… $(VERSION) $(DATE)) @ ## Build program binary
 	$Q cd $(CURDIR) && $(GO) generate ./...
 	@ret=0 && for d in $(BUILDS); do \
 		if expr \"$$d\" : \"${MODULE}\" 1>/dev/null; then SRCPATH=$(CURDIR) ; else SRCPATH=$(CURDIR)/$${d/${MODULE}\//} ; fi ;  \
@@ -47,7 +46,7 @@ $(BIN):
 	
 $(BIN)/%: | $(BIN) $(BASE) ; $(info $(M) building $(REPOSITORY)…)
 	$Q tmp=$$(mktemp -d); \
-		(cd $(tmp) && GOPATH=$$tmp $(GO) install $(REPOSITORY)@latest && cp $$tmp/bin/* $(BIN)/.) || ret=$$?; \
+		(cd $(tmp) && GOPATH=$$tmp $(GO) get $(REPOSITORY) && cp $$tmp/bin/* $(BIN)/.) || ret=$$?; \
 		rm -rf $$tmp ; exit $$ret
 
 GOLINT = $(BIN)/golint
@@ -111,6 +110,10 @@ help:
 version:
 	@echo $(VERSION)
 
+.PHONY: vendor
+vendor:
+	$(GO) mod vendor
+
 .PHONY: swagger
 swagger: ;
 	swag init -g driver/web/adapter.go
@@ -118,7 +121,6 @@ swagger: ;
 .PHONY: log-variables
 log-variables: ; $(info $(M) Log info…) @ ## Log the variables values
 	@echo "DATE:"$(DATE)
-	@echo "GOPATH:"$(GOPATH)
 	@echo "BIN:"$(BIN)
 	@echo "BASE:"$(BASE)
 	@echo "MODULE:"$(MODULE)

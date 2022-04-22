@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 )
 
 var (
@@ -47,16 +46,16 @@ func main() {
 		Version = "dev"
 	}
 
-	port := getEnvKey("PORT", true)
+	port := getEnvKey("GATEWAY_PORT", true)
 
 	//mongoDB adapter
-	mongoDBAuth := getEnvKey("MONGO_AUTH", true)
-	mongoDBName := getEnvKey("MONGO_DATABASE", true)
-	mongoTimeout := getEnvKey("MONGO_TIMEOUT", false)
-	laundryKey := getEnvKey("LAUNDRY_APIKEY", true)
-	laundryAPI := getEnvKey("LAUNDRY_APIURL", true)
-	luandryServiceKey := getEnvKey("LAUNDRYSERVICE_APIKEY", true)
-	laundryServiceAPI := getEnvKey("LAUNDRYSERVICE_API", true)
+	mongoDBAuth := getEnvKey("GATEWAY_MONGO_AUTH", true)
+	mongoDBName := getEnvKey("GATEWAY_MONGO_DATABASE", true)
+	mongoTimeout := getEnvKey("GATEWAY_MONGO_TIMEOUT", false)
+	laundryKey := getEnvKey("GATEWAY_LAUNDRY_APIKEY", true)
+	laundryAPI := getEnvKey("GATEWAY_LAUNDRY_APIURL", true)
+	luandryServiceKey := getEnvKey("GATEWAY_LAUNDRYSERVICE_APIKEY", true)
+	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
 	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI)
 
@@ -71,8 +70,8 @@ func main() {
 	application.Start()
 
 	//web adapter
-	host := getEnvKey("HOST", true)
-	corehost := getEnvKey("CORE_HOST", true)
+	host := getEnvKey("GATEWAY_HOST", true)
+	corehost := getEnvKey("GATEWAY_CORE_HOST", true)
 	log.Printf(corehost)
 
 	tokenAuth := driver.NewTokenAuth(host, corehost)
@@ -83,19 +82,6 @@ func main() {
 
 	log.Printf("starting web adapter")
 	webAdapter.Start()
-}
-
-func getAPIKeys() []string {
-	//get from the environment
-	rokwireAPIKeys := getEnvKey("ROKWIRE_API_KEYS", true)
-
-	//it is comma separated format
-	rokwireAPIKeysList := strings.Split(rokwireAPIKeys, ",")
-	if len(rokwireAPIKeysList) <= 0 {
-		log.Fatal("For some reasons the apis keys list is empty")
-	}
-
-	return rokwireAPIKeysList
 }
 
 func getEnvKey(key string, required bool) string {
