@@ -1,7 +1,7 @@
 package buildinglocation
 
 import (
-	wayfinding "apigateway/core/model/Wayfinding"
+	wayfinding "apigateway/core/model/wayfinding"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -58,11 +58,13 @@ func NewUIUCWayFinding(apikey string, apiurl string) *UIUCWayFinding {
 	return &UIUCWayFinding{APIKey: apikey, APIUrl: apiurl}
 }
 
-func NewBuilding(bldg campusBuilding) *wayfinding.Building {
+//NewBuilding creates a wayfinding.Building instance from a campusBuilding,
+//including all active entrances for the building
+func NewBuilding(bldg campusBuilding, adaOnly bool) *wayfinding.Building {
 	newBldg := wayfinding.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State}
 	newBldg.Entrances = make([]wayfinding.Entrance, 0)
 	for _, n := range bldg.Entrances {
-		if n.Available {
+		if n.Available && (!adaOnly || (adaOnly && n.ADACompliant)) {
 			newBldg.Entrances = append(newBldg.Entrances, *NewEntrance(n))
 		}
 	}
@@ -92,7 +94,7 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*
 	if err != nil {
 		return nil, err
 	}
-	return NewBuilding(*cmpBldg), nil
+	return NewBuilding(*cmpBldg, adaAccessibleOnly), nil
 }
 
 //the entrance list coming back from a ranged query to the API is sorted closest to farthest from
