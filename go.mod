@@ -20,7 +20,7 @@ require (
 	github.com/rokwire/logging-library-go v1.0.3
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/swaggo/http-swagger v1.2.6
-	github.com/swaggo/swag v1.7.0
+	github.com/swaggo/swag v1.7.9
 	go.mongodb.org/mongo-driver v1.5.3
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect

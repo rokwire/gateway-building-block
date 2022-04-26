@@ -37,7 +37,7 @@ type campusBuilding struct {
 
 type serverResponse struct {
 	Status         string `json:"status"`
-	HttpStatusCode int    `json:"http_return"`
+	HTTPStatusCode int    `json:"http_return"`
 	CollectionType string `json:"collection"`
 	Count          int    `json:"count"`
 	ErrorList      string `json:"errors"`
@@ -49,11 +49,13 @@ type serverLocationData struct {
 	Buildings []campusBuilding `json:"results"`
 }
 
+//UIUCWayFinding is a vendor specific structure that implements the BuildingLocation interface
 type UIUCWayFinding struct {
 	APIKey string
 	APIUrl string
 }
 
+//NewUIUCWayFinding returns a new instance of a UIUCWayFinding struct
 func NewUIUCWayFinding(apikey string, apiurl string) *UIUCWayFinding {
 	return &UIUCWayFinding{APIKey: apikey, APIUrl: apiurl}
 }
@@ -71,6 +73,7 @@ func NewBuilding(bldg campusBuilding, adaOnly bool) *wayfinding.Building {
 	return &newBldg
 }
 
+//NewEntrance creates a wayfinding.Entrance instance from a campusEntrance object
 func NewEntrance(ent campusEntrance) *wayfinding.Entrance {
 	newEnt := wayfinding.Entrance{ID: ent.UUID, Name: ent.Name, ADACompliant: ent.ADACompliant, Available: ent.Available, ImageURL: ent.ImageURL, Latitude: ent.Latitude, Longitude: ent.Longitude}
 	return &newEnt
