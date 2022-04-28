@@ -34,11 +34,12 @@ type Adapter struct {
 	host string
 	port string
 
-	apisHandler       rest.ApisHandler
-	adminApisHandler  rest.AdminApisHandler
-	laundryapiHandler rest.LaundryApisHandler
-	tokenAuth         *TokenAuth
-	app               *core.Application
+	apisHandler        rest.ApisHandler
+	adminApisHandler   rest.AdminApisHandler
+	laundryapiHandler  rest.LaundryApisHandler
+	buildingapiHandler rest.BuildingAPIHandler
+	tokenAuth          *TokenAuth
+	app                *core.Application
 }
 
 // @title Rokwire Gatewauy Building Block API
@@ -87,6 +88,9 @@ func (we Adapter) Start() {
 	mainRouter.HandleFunc("/laundry/initrequest", we.tokenAuthWrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/requestservice", we.tokenAuthWrapFunc(we.laundryapiHandler.SubmitServiceRequest)).Methods("POST")
 
+	mainRouter.HandleFunc("/wayfinding/building", we.tokenAuthWrapFunc(we.buildingapiHandler.GetBuilding)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/entrance", we.tokenAuthWrapFunc(we.buildingapiHandler.GetEntrance)).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 
@@ -128,8 +132,9 @@ func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *T
 	apisHandler := rest.NewApisHandler(app)
 	adminApisHandler := rest.NewAdminApisHandler(app)
 	laundryapiHandler := rest.NewLaundryApisHandler(app)
+	buildingapiHandler := rest.NewBuildingAPIHandler(app)
 	return Adapter{host: host, port: port,
-		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler, tokenAuth: tokenAuth}
+		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler, buildingapiHandler: buildingapiHandler, tokenAuth: tokenAuth}
 }
 
 //AppListener implements core.ApplicationListener interface

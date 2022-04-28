@@ -17,7 +17,10 @@
 
 package core
 
-import laundry "apigateway/core/model/laundry"
+import (
+	laundry "apigateway/core/model/laundry"
+	buildingLocation "apigateway/core/model/wayfinding"
+)
 
 func (app *Application) getVersion() string {
 	return app.version
@@ -45,4 +48,17 @@ func (app *Application) initServiceRequest(machineid string) (laundry.MachineReq
 func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (laundry.ServiceRequestResult, error) {
 	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
 	return *srr, nil
+}
+
+func (app *Application) getBuilding(bldgID string, adaOnly bool) (buildingLocation.Building, error) {
+	bldg, _ := app.locationAdapter.GetBuilding(bldgID, adaOnly)
+	return *bldg, nil
+}
+
+func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (buildingLocation.Entrance, error) {
+	entrance, err := app.locationAdapter.GetEntrance(bldgID, adaOnly, latitude, longitude)
+	if err != nil {
+		return *entrance, err
+	}
+	return *entrance, nil
 }
