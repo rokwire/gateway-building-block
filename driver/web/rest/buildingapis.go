@@ -43,7 +43,7 @@ func NewBuildingAPIHandler(app *core.Application) BuildingAPIHandler {
 // @Accept  json
 // @Produce json
 // @Param id query string true "Building identifier"
-//	@Param adaOnly bool false "ADA entrances filter"
+// @Param adaOnly query bool false "ADA entrances filter"
 // @Success 200 {object} model.Building
 // @Security RokwireAuth
 // @Router /wayfinding/building [get]
@@ -55,13 +55,12 @@ func (h BuildingAPIHandler) GetBuilding(w http.ResponseWriter, r *http.Request) 
 	for _, v := range reqParams.Items {
 		if v.Field == "id" {
 			bldgid = v.Value[0]
-			break
 		}
 		if v.Field == "adaOnly" {
 			ada, err := strconv.ParseBool(v.Value[0])
 			if err != nil {
 				log.Printf("Invalid parameter value (adaOnly): %s\n", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 			adaOnly = ada
@@ -97,9 +96,9 @@ func (h BuildingAPIHandler) GetBuilding(w http.ResponseWriter, r *http.Request) 
 // @Tags Client
 // @ID Entrance
 // @Param id query string true "Building identifier"
-//	@Param adaOnly query bool false "ADA entrances filter"
-// @Param lat query float true "latitude coordinate of the user"
-// @Param long query float true "longitude coordinate of the user"
+// @Param adaOnly query bool false "ADA entrances filter"
+// @Param lat query number true "latitude coordinate of the user"
+// @Param long query number true "longitude coordinate of the user"
 // @Accept  json
 // @Success 200 {object} model.Entrance
 // @Security RokwireAuth
@@ -112,21 +111,20 @@ func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) 
 
 	if len(reqParams.Items) < 3 || len(reqParams.Items) > 4 {
 		log.Printf("Invalid number of parameters passed")
-		http.Error(w, "Invalid number of parameters", http.StatusInternalServerError)
+		http.Error(w, "Invalid number of parameters", http.StatusBadRequest)
 		return
 	}
 
 	for _, v := range reqParams.Items {
 		if v.Field == "id" {
 			bldgID = v.Value[0]
-			break
 		}
 
 		if v.Field == "adaOnly" {
 			ada, err := strconv.ParseBool(v.Value[0])
 			if err != nil {
 				log.Printf("Invalid parameter value (adaOnly): %s\n", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 			adaOnly = ada
@@ -136,7 +134,7 @@ func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) 
 			lat, err := strconv.ParseFloat(v.Value[0], 64)
 			if err != nil {
 				log.Printf("Invalid parameter value (lat): %s\n", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 			latitude = lat
@@ -146,7 +144,7 @@ func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) 
 			long, err := strconv.ParseFloat(v.Value[0], 64)
 			if err != nil {
 				log.Printf("Invalid parameter value (long): %s\n", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 			longitude = long
@@ -154,7 +152,7 @@ func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) 
 	}
 	if latitude == 0 && longitude == 0 {
 		log.Printf("Missing latitude or longitude parameter")
-		http.Error(w, "Missing latitude or longitude parameter", http.StatusInternalServerError)
+		http.Error(w, "Missing latitude or longitude parameter", http.StatusBadRequest)
 		return
 	}
 

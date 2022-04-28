@@ -4,6 +4,7 @@ import (
 	wayfinding "apigateway/core/model/wayfinding"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -81,10 +82,13 @@ func NewEntrance(ent campusEntrance) *wayfinding.Entrance {
 
 //GetEntrance returns the active entrance closest to the user's position that meets the ADA Accessibility filter requirement
 func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*wayfinding.Entrance, error) {
-	url := uwf.APIUrl + "/buildings/number/" + bldgID + "?v=2&ranged=true&point={latitude: " + fmt.Sprintf("%f", latitude) + ", longitude: " + fmt.Sprintf("%f", longitude) + "}"
+	lat := fmt.Sprintf("%f", latitude)
+	long := fmt.Sprintf("%f", longitude)
+	url := uwf.APIUrl + "/buildings/number/" + bldgID + "?v=2&ranged=true&point=%7B%22latitude%22:%20" + lat + ",%20%22longitude%22:%20" + long + "%7D"
 	bldg, err := uwf.getBuildingData(url)
 	if err != nil {
-		return nil, err
+		ent := wayfinding.Entrance{}
+		return &ent, err
 	}
 	ent := uwf.closestEntrance(*bldg, adaAccessibleOnly)
 	return NewEntrance(*ent), nil
@@ -95,7 +99,8 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*
 	url := uwf.APIUrl + "/buildings/number/" + bldgID + "?v=2"
 	cmpBldg, err := uwf.getBuildingData(url)
 	if err != nil {
-		return nil, err
+		bldg := wayfinding.Building{}
+		return &bldg, err
 	}
 	return NewBuilding(*cmpBldg, adaAccessibleOnly), nil
 }
@@ -118,7 +123,7 @@ func (uwf *UIUCWayFinding) closestEntrance(bldg campusBuilding, adaOnly bool) *c
 	return nil
 }
 
-func (uwf *UIUCWayFinding) getBuildingData(url string) (*campusBuilding, error) {
+func (uwf *UIUCWayFinding) getBuildingData(targetURL string) (*campusBuilding, error) {
 	method := "GET"
 
 	payload := &bytes.Buffer{}
@@ -129,7 +134,8 @@ func (uwf *UIUCWayFinding) getBuildingData(url string) (*campusBuilding, error) 
 	}
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, payload)
+	fmt.Println(targetURL)
+	req, err := http.NewRequest(method, targetURL, payload)
 
 	if err != nil {
 		return nil, err
@@ -146,6 +152,11 @@ func (uwf *UIUCWayFinding) getBuildingData(url string) (*campusBuilding, error) 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode == 400 {
+		fmt.Println(string(body))
+		return nil, errors.New("Bad request to api end point")
 	}
 
 	data := serverLocationData{}
