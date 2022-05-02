@@ -174,7 +174,6 @@ func (lv *CSCLaundryView) InitServiceRequest(machineID string) (*model.MachineRe
 	}
 
 	mrd := newMachineRequestDetail(md.MachineID, md.Message, md.RecentServiceStatus, md.MachineType)
-	log.Printf(mrd.MachineID + " " + mrd.Message)
 	mrd.ProblemCodes, err = lv.getProblemCodes(md.MachineType)
 	if err != nil {
 		return nil, err
@@ -326,7 +325,6 @@ func (lv *CSCLaundryView) getServiceToken() error {
 }
 
 func (lv *CSCLaundryView) makeLaundryServiceWebRequest(url string, method string, headers map[string]string, postParams string) ([]byte, error) {
-	log.Print("Making laundry service web call")
 	payload := strings.NewReader(postParams)
 	client := http.Client{}
 	req, err := http.NewRequest(method, url, payload)
@@ -347,15 +345,12 @@ func (lv *CSCLaundryView) makeLaundryServiceWebRequest(url string, method string
 	}
 
 	defer res.Body.Close()
-
-	log.Printf("Getting Cookie Value")
 	for _, cookie := range res.Cookies() {
 		if cookie.Name == "session" {
 			lv.serviceCookie = cookie.Value
 		}
 	}
 
-	log.Printf("setting body value")
 	if res.StatusCode != 200 {
 		_, err := ioutil.ReadAll(res.Body)
 		return nil, err
@@ -442,10 +437,10 @@ func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, com
 	m := obj.(map[string]interface{})
 	//already a request for this machine, so got bsack a machine details object
 	if m["machineId"] != nil {
-		result := model.ServiceRequestResult{Message: "A ticket already exists for this machien", RequestNumber: 0, Status: "Success"}
+		result := model.ServiceRequestResult{Message: "A ticket already exists for this machien", RequestNumber: "0", Status: "Success"}
 		return &result, nil
 	}
-	result := model.ServiceRequestResult{Message: m["message"].(string), RequestNumber: m["serviceRequestNumber"].(int), Status: m["status"].(string)}
+	result := model.ServiceRequestResult{Message: m["message"].(string), RequestNumber: m["serviceRequestNumber"].(string), Status: m["status"].(string)}
 	return &result, nil
 
 }

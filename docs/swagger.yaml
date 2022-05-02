@@ -112,7 +112,7 @@ definitions:
       message:
         type: string
       requestNumber:
-        type: integer
+        type: string
       status:
         type: string
     type: object
@@ -165,12 +165,13 @@ paths:
           schema:
             $ref: '#/definitions/model.MachineRequestDetail'
       security:
-      - RokwireAuth UserAuth: []
-      summary: Returns the problem codes and pending service reqeust status for a laundry machine.
+      - RokwireAuth: []
+      summary: Returns the problem codes and pending service reqeust status for a
+        laundry machine.
       tags:
       - Client
   /laundry/requestservice:
-    get:
+    post:
       consumes:
       - application/json
       operationId: RequestService
@@ -187,7 +188,7 @@ paths:
           schema:
             $ref: '#/definitions/model.ServiceRequestResult'
       security:
-      - RokwireAuth UserAuth: []
+      - RokwireAuth: []
       tags:
       - Client
   /laundry/roomdetail:
@@ -207,8 +208,9 @@ paths:
           schema:
             $ref: '#/definitions/model.RoomDetail'
       security:
-      - RokwireAuth UserAuth: []
-      summary: Returns the list of machines and the number of washers and dryers available in a laundry room
+      - RokwireAuth: []
+      summary: Returns the list of machines and the number of washers and dryers available
+        in a laundry room
       tags:
       - Client
   /laundry/rooms:
@@ -284,7 +286,8 @@ paths:
             $ref: '#/definitions/model.Building'
       security:
       - RokwireAuth: []
-      summary: Get the requested building with all of its available entrances filterd by the ADA only flag
+      summary: Get the requested building with all of its available entrances filterd
+        by the ADA only flag
       tags:
       - Client
   /wayfinding/entrance:
@@ -319,7 +322,8 @@ paths:
             $ref: '#/definitions/model.Entrance'
       security:
       - RokwireAuth: []
-      summary: Returns the entrance of the specified building that is closest to the user
+      summary: Returns the entrance of the specified building that is closest to the
+        user
       tags:
       - Client
 schemes:

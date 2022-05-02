@@ -43,7 +43,7 @@ type MachineRequestDetail struct {
 //ServiceRequestResult represents the information returned upon submission of a machine service request
 type ServiceRequestResult struct {
 	Message       string
-	RequestNumber int
+	RequestNumber string
 	Status        string
 }
 

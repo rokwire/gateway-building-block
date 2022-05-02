@@ -74,7 +74,7 @@ func (h LaundryApisHandler) GetLaundryRooms(w http.ResponseWriter, r *http.Reque
 // @Param id query int true "Room id"
 // @Accept  json
 // @Success 200 {object} model.RoomDetail
-// @Security RokwireAuth UserAuth
+// @Security RokwireAuth
 // @Router /laundry/roomdetail [get]
 func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Request) {
 	reqParams := utils.ConstructFilter(r)
@@ -120,7 +120,7 @@ func (h LaundryApisHandler) GetRoomDetails(w http.ResponseWriter, r *http.Reques
 // @Param machineid query string true "machine service tag id"
 // @Accept  json
 // @Success 200 {object} model.MachineRequestDetail
-// @Security RokwireAuth UserAuth
+// @Security RokwireAuth
 // @Router /laundry/initrequest [get]
 func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Request) {
 	reqParams := utils.ConstructFilter(r)
@@ -165,8 +165,8 @@ func (h LaundryApisHandler) InitServiceRequest(w http.ResponseWriter, r *http.Re
 // @Param data body model.ServiceSubmission true "body json"
 // @Accept  json
 // @Success 200 {object} model.ServiceRequestResult
-// @Security RokwireAuth UserAuth
-// @Router /laundry/requestservice [get]
+// @Security RokwireAuth
+// @Router /laundry/requestservice [post]
 func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -208,6 +208,12 @@ func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.
 	if record.LastName == nil || len(*record.LastName) == 0 {
 		log.Printf("Last name is empty or null")
 		http.Error(w, fmt.Sprintf("missing last name\n"), http.StatusBadRequest)
+		return
+	}
+
+	if record.Email == nil || len(*record.Email) == 0 {
+		log.Printf("Email is empty or null")
+		http.Error(w, fmt.Sprintf("missing email\n"), http.StatusBadRequest)
 		return
 	}
 

@@ -20,7 +20,7 @@
             "get": {
                 "security": [
                     {
-                        "RokwireAuth UserAuth": []
+                        "RokwireAuth": []
                     }
                 ],
                 "consumes": [
@@ -51,10 +51,10 @@
             }
         },
         "/laundry/requestservice": {
-            "get": {
+            "post": {
                 "security": [
                     {
-                        "RokwireAuth UserAuth": []
+                        "RokwireAuth": []
                     }
                 ],
                 "consumes": [
@@ -89,7 +89,7 @@
             "get": {
                 "security": [
                     {
-                        "RokwireAuth UserAuth": []
+                        "RokwireAuth": []
                     }
                 ],
                 "consumes": [
@@ -471,7 +471,7 @@
                     "type": "string"
                 },
                 "requestNumber": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "status": {
                     "type": "string"
