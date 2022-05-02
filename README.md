@@ -15,19 +15,19 @@ The following Environment variables are supported. The service will not start un
 
 Name|Value|Required|Description
 ---|---|---|---
-PORT | < value > | yes | The port number of the listening port
-AUTH_ISSUER | < value > | yes | Auth issuer base uri
-AUTH_KEYS | < value > | yes | Auth keys
-HOST | < value > | yes | Host name
-MONGO_AUTH | <mongodb://USER:PASSWORD@HOST:PORT/DATABASE NAME> | yes | MongoDB authentication string. The user must have read/write privileges.
-MONGO_DATABASE | < value > | yes | MongoDB database name e.g dining_db
-MONGO_TIMEOUT | < value > | no | MongoDB timeout in milliseconds. Set default value(500 milliseconds) if omitted
-OIDC_ADMIN_CLIENT_ID | < value > | yes | OIDC admin client id
-OIDC_ADMIN_WEB_CLIENT_ID | < value > | yes | OIDC admin web client id
-OIDC_APP_CLIENT_ID | < value > | yes | OIDC app client id
-OIDC_PROVIDER | < value > | yes | OIDC provider
-PHONE_SECRET | < value > | yes | Phone secret
-ROKWIRE_API_KEYS | <value1,value2,value3> | yes | Comma separated list of rokwire api keys
+GATEWAY_PORT | < value > | yes | The port number of the listening port
+GATEWAY_HOST | < value > | yes | Host name
+GATEWAY_MONGO_AUTH | <mongodb://USER:PASSWORD@HOST:PORT/DATABASE NAME> | yes | MongoDB authentication string. The user must have read/write privileges.
+GATEWAY_MONGO_DATABASE | < value > | yes | MongoDB database name e.g dining_db
+GATEWAY_MONGO_TIMEOUT | < value > | no | MongoDB timeout in milliseconds. Set default value(500 milliseconds) if omitted
+GATEWAY_LAUNDRY_APIKEY | < value > | yes | API Key for laundry view information
+GATEWAY_LAUNDRY_APIURL | < value > | yes | Base URL for Laundry view apis
+GATEWAY_LAUNDRYSERVICE_APIKEY | < value > | yes | API key for calling the laundry service apis
+GATEWAY_LAUNDRYSERVICE_APIURL | < value > | yes | Base URL for the luandry service API end points
+GATEWAY_WAYFINDING_APIKEY| < value > | yes | API Key used for calling location api end points
+GATEWAY_WAYFINDING_APIURL | < value > | yes | Base URL for building location API end points
+GATEWAY_CORE_HOST | < value > | yes | URL to Rokwire Core building block
+
 ### Run Application
 
 #### Run locally without Docker
@@ -122,4 +122,4 @@ Response
 
 The documentation is placed here - https://api-dev.rokwire.illinois.edu/docs/
 
-Alternativelly the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/gateway/doc/ui/
+Alternativelly the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/gateway/doc/ui/index.html
