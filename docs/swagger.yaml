@@ -8,11 +8,55 @@ definitions:
         type: integer
       id:
         type: string
-      outofService:
-        type: boolean
       status:
         type: string
       timeRemaining:
+        type: integer
+    type: object
+  model.Building:
+    properties:
+      address1:
+        type: string
+      address2:
+        type: string
+      city:
+        type: string
+      entrances:
+        items:
+          $ref: '#/definitions/model.Entrance'
+        type: array
+      fullAddress:
+        type: string
+      id:
+        type: string
+      imageURL:
+        type: string
+      mailCode:
+        type: string
+      name:
+        type: string
+      number:
+        type: string
+      state:
+        type: string
+      zipCode:
+        type: string
+    type: object
+  model.Entrance:
+    properties:
+      adacompliant:
+        type: boolean
+      available:
+        type: boolean
+      id:
+        type: string
+      imageURL:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      name:
         type: string
     type: object
   model.LaundryRoom:
@@ -27,6 +71,8 @@ definitions:
   model.MachineRequestDetail:
     properties:
       machineID:
+        type: string
+      machineType:
         type: string
       message:
         type: string
@@ -74,6 +120,8 @@ definitions:
     properties:
       comments:
         type: string
+      email:
+        type: string
       firstname:
         type: string
       lastname:
@@ -82,7 +130,7 @@ definitions:
         type: string
       phone:
         type: string
-      problemtype:
+      problemcode:
         type: string
     type: object
   sampleRecord:
@@ -210,6 +258,68 @@ paths:
           description: ""
       security:
       - RokwireAuth: []
+      tags:
+      - Client
+  /wayfinding/building:
+    get:
+      consumes:
+      - application/json
+      operationId: Building
+      parameters:
+      - description: Building identifier
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: ADA entrances filter
+        in: query
+        name: adaOnly
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Building'
+      security:
+      - RokwireAuth: []
+      summary: Get the requested building with all of its available entrances filterd by the ADA only flag
+      tags:
+      - Client
+  /wayfinding/entrance:
+    get:
+      consumes:
+      - application/json
+      operationId: Entrance
+      parameters:
+      - description: Building identifier
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: ADA entrances filter
+        in: query
+        name: adaOnly
+        type: boolean
+      - description: latitude coordinate of the user
+        in: query
+        name: lat
+        required: true
+        type: number
+      - description: longitude coordinate of the user
+        in: query
+        name: long
+        required: true
+        type: number
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Entrance'
+      security:
+      - RokwireAuth: []
+      summary: Returns the entrance of the specified building that is closest to the user
       tags:
       - Client
 schemes:

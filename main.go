@@ -20,6 +20,7 @@ package main
 import (
 	"apigateway/core"
 	"apigateway/driven/laundry"
+	location "apigateway/driven/location"
 	storage "apigateway/driven/storage"
 	driver "apigateway/driver/web"
 	"fmt"
@@ -56,8 +57,11 @@ func main() {
 	laundryAPI := getEnvKey("GATEWAY_LAUNDRY_APIURL", true)
 	luandryServiceKey := getEnvKey("GATEWAY_LAUNDRYSERVICE_APIKEY", true)
 	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
+	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
+	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
 	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI)
+	locationAdapter := location.NewUIUCWayFinding(wayfindingKey, wayfindingURL)
 
 	err := storageAdapter.Start()
 	if err != nil {
@@ -66,7 +70,7 @@ func main() {
 
 	log.Printf("MongoDB Started")
 	//application
-	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter)
+	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter)
 	application.Start()
 
 	//web adapter

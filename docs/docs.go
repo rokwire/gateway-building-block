@@ -212,6 +212,103 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/wayfinding/building": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Get the requested building with all of its available entrances filterd by the ADA only flag",
+                "operationId": "Building",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Building identifier",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "ADA entrances filter",
+                        "name": "adaOnly",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Building"
+                        }
+                    }
+                }
+            }
+        },
+        "/wayfinding/entrance": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns the entrance of the specified building that is closest to the user",
+                "operationId": "Entrance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Building identifier",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "ADA entrances filter",
+                        "name": "adaOnly",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "latitude coordinate of the user",
+                        "name": "lat",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "longitude coordinate of the user",
+                        "name": "long",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Entrance"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -227,13 +324,80 @@ var doc = `{
                 "id": {
                     "type": "string"
                 },
-                "outofService": {
-                    "type": "boolean"
-                },
                 "status": {
                     "type": "string"
                 },
                 "timeRemaining": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Building": {
+            "type": "object",
+            "properties": {
+                "address1": {
+                    "type": "string"
+                },
+                "address2": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "entrances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Entrance"
+                    }
+                },
+                "fullAddress": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageURL": {
+                    "type": "string"
+                },
+                "mailCode": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "zipCode": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Entrance": {
+            "type": "object",
+            "properties": {
+                "adacompliant": {
+                    "type": "boolean"
+                },
+                "available": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "imageURL": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -256,6 +420,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "machineID": {
+                    "type": "string"
+                },
+                "machineType": {
                     "type": "string"
                 },
                 "message": {
@@ -329,6 +496,9 @@ var doc = `{
                 "comments": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "firstname": {
                     "type": "string"
                 },
@@ -341,7 +511,7 @@ var doc = `{
                 "phone": {
                     "type": "string"
                 },
-                "problemtype": {
+                "problemcode": {
                     "type": "string"
                 }
             }
