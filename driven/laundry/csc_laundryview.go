@@ -435,12 +435,12 @@ func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, com
 	}
 
 	m := obj.(map[string]interface{})
-	//already a request for this machine, so got bsack a machine details object
+	//already a request for this machine, so got back a machine details object
 	if m["machineId"] != nil {
-		result := model.ServiceRequestResult{Message: "A ticket already exists for this machien", RequestNumber: "0", Status: "Success"}
+		result := model.ServiceRequestResult{Message: "A ticket already exists for this machien", RequestNumber: "0", Status: "Failed"}
 		return &result, nil
 	}
-	result := model.ServiceRequestResult{Message: m["message"].(string), RequestNumber: m["serviceRequestNumber"].(string), Status: m["status"].(string)}
+	result := model.ServiceRequestResult{Message: m["message"].(string), RequestNumber: m["serviceRequestNumber"].(string), Status: "Success"}
 	return &result, nil
 
 }
