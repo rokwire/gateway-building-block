@@ -73,7 +73,7 @@ func (s *servicesImpl) GetBuilding(bldgID string, adaOnly bool) (*buildings.Buil
 
 func (s *servicesImpl) GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*buildings.Entrance, error) {
 	entrance, err := s.app.getEntrance(bldgID, adaOnly, latitude, longitude)
-	return &entrance, err
+	return entrance, err
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc

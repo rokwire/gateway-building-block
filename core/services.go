@@ -55,10 +55,13 @@ func (app *Application) getBuilding(bldgID string, adaOnly bool) (buildingLocati
 	return *bldg, nil
 }
 
-func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (buildingLocation.Entrance, error) {
+func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*buildingLocation.Entrance, error) {
 	entrance, err := app.locationAdapter.GetEntrance(bldgID, adaOnly, latitude, longitude)
 	if err != nil {
-		return *entrance, err
+		if entrance == nil {
+			return nil, nil
+		}
+		return entrance, err
 	}
-	return *entrance, nil
+	return entrance, nil
 }
