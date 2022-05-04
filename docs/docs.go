@@ -298,6 +298,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.Entrance"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rest.errorMessage"
+                        }
                     }
                 }
             }
@@ -504,6 +510,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "problemcode": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.errorMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }

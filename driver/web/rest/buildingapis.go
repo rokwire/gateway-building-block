@@ -26,6 +26,10 @@ import (
 	"strconv"
 )
 
+type errorMessage struct {
+	Message string
+}
+
 // BuildingAPIHandler handles the building rest APIs implementation
 type BuildingAPIHandler struct {
 	app *core.Application
@@ -101,6 +105,7 @@ func (h BuildingAPIHandler) GetBuilding(w http.ResponseWriter, r *http.Request) 
 // @Param long query number true "longitude coordinate of the user"
 // @Accept  json
 // @Success 200 {object} model.Entrance
+// @Failure 404 {object} rest.errorMessage
 // @Security RokwireAuth
 // @Router /wayfinding/entrance [get]
 func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) {
@@ -169,6 +174,18 @@ func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	if entrance == nil {
+		w.WriteHeader(http.StatusNotFound)
+		resp := errorMessage{Message: "Resource Not Found"}
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Printf("Error on marshaling json response. Err: %s", err)
+			return
+		}
+		w.Write(jsonResp)
+		return
+
+	}
 	resAsJSON, err := json.Marshal(entrance)
 	if err != nil {
 		log.Printf("Error on marshalling entrance: %s\n", err)

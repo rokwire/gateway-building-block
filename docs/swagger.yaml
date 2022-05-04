@@ -133,6 +133,11 @@ definitions:
       problemcode:
         type: string
     type: object
+  rest.errorMessage:
+    properties:
+      message:
+        type: string
+    type: object
   sampleRecord:
     properties:
       name:
@@ -320,6 +325,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Entrance'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.errorMessage'
       security:
       - RokwireAuth: []
       summary: Returns the entrance of the specified building that is closest to the

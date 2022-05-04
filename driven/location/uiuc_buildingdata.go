@@ -63,11 +63,11 @@ func NewUIUCWayFinding(apikey string, apiurl string) *UIUCWayFinding {
 
 //NewBuilding creates a wayfinding.Building instance from a campusBuilding,
 //including all active entrances for the building
-func NewBuilding(bldg campusBuilding, adaOnly bool) *wayfinding.Building {
+func NewBuilding(bldg campusBuilding) *wayfinding.Building {
 	newBldg := wayfinding.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State}
 	newBldg.Entrances = make([]wayfinding.Entrance, 0)
 	for _, n := range bldg.Entrances {
-		if n.Available && (!adaOnly || (adaOnly && n.ADACompliant)) {
+		if n.Available {
 			newBldg.Entrances = append(newBldg.Entrances, *NewEntrance(n))
 		}
 	}
@@ -84,50 +84,67 @@ func NewEntrance(ent campusEntrance) *wayfinding.Entrance {
 func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*wayfinding.Entrance, error) {
 	lat := fmt.Sprintf("%f", latitude)
 	long := fmt.Sprintf("%f", longitude)
-	url := uwf.APIUrl + "/buildings/number/" + bldgID + "?v=2&ranged=true&point=%7B%22latitude%22:%20" + lat + ",%20%22longitude%22:%20" + long + "%7D"
-	bldg, err := uwf.getBuildingData(url)
+	url := uwf.APIUrl + "/ccf"
+
+	parameters := "{\"v\": 1, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
+	bldSelection := "\"banner_code\": \"" + bldgID + "\""
+	adaSelection := ""
+	if adaAccessibleOnly {
+		adaSelection = ",\"entrances\": {\"ada_compliant\": true}"
+	}
+	query := "{" + bldSelection + adaSelection + "}"
+
+	bldg, err := uwf.getBuildingData(url, query, parameters)
 	if err != nil {
 		ent := wayfinding.Entrance{}
 		return &ent, err
 	}
-	ent := uwf.closestEntrance(*bldg, adaAccessibleOnly)
-	return NewEntrance(*ent), nil
+	ent := uwf.closestEntrance(*bldg)
+	if ent != nil {
+		return NewEntrance(*ent), nil
+	}
+	return nil, nil
 }
 
 //GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
 func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*wayfinding.Building, error) {
-	url := uwf.APIUrl + "/buildings/number/" + bldgID + "?v=2"
-	cmpBldg, err := uwf.getBuildingData(url)
+	url := uwf.APIUrl + "/ccf"
+	parameters := "{\"v\": 1}"
+	bldSelection := "\"banner_code\": \"" + bldgID + "\""
+	adaSelection := ""
+	if adaAccessibleOnly {
+		adaSelection = ",\"entrances\": {\"ada_compliant\": true}"
+	}
+	query := "{" + bldSelection + adaSelection + "}"
+	cmpBldg, err := uwf.getBuildingData(url, query, parameters)
 	if err != nil {
 		bldg := wayfinding.Building{}
 		return &bldg, err
 	}
-	return NewBuilding(*cmpBldg, adaAccessibleOnly), nil
+	return NewBuilding(*cmpBldg), nil
 }
 
 //the entrance list coming back from a ranged query to the API is sorted closest to farthest from
 //the user's coordinates. The first entrance in the list that is active and matches the ADA filter
 //will be the one to return
-func (uwf *UIUCWayFinding) closestEntrance(bldg campusBuilding, adaOnly bool) *campusEntrance {
+func (uwf *UIUCWayFinding) closestEntrance(bldg campusBuilding) *campusEntrance {
 	for _, n := range bldg.Entrances {
 		if n.Available {
-			if adaOnly && n.ADACompliant {
-				return &n
-			}
-
-			if !adaOnly {
-				return &n
-			}
+			return &n
 		}
 	}
 	return nil
 }
 
-func (uwf *UIUCWayFinding) getBuildingData(targetURL string) (*campusBuilding, error) {
-	method := "GET"
+func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string, parameters string) (*campusBuilding, error) {
+	method := "POST"
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
+	_ = writer.WriteField("collection", "buildings")
+	_ = writer.WriteField("action", "fetch")
+	_ = writer.WriteField("query", queryString)
+	_ = writer.WriteField("parameters", parameters)
 	err := writer.Close()
 	if err != nil {
 		return nil, err
