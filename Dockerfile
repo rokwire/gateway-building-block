@@ -1,4 +1,4 @@
-FROM golang:1.16-buster as builder
+FROM golang:1.18.1-buster as builder
 
 ENV CGO_ENABLED=0
 
@@ -24,4 +24,4 @@ COPY --from=builder /etc/passwd /etc/passwd
 #we need timezone database
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo 
 
-ENTRYPOINT ["/gateway"]
+ENTRYPOINT ["/apigateway"]
