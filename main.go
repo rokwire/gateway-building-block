@@ -19,11 +19,14 @@ package main
 
 import (
 	"apigateway/core"
+	model "apigateway/core/model"
 	"apigateway/driven/laundry"
 	location "apigateway/driven/location"
 	storage "apigateway/driven/storage"
 	driver "apigateway/driver/web"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -59,8 +62,20 @@ func main() {
 	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
 	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
 	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
+
+	//read assets
+	file, _ := ioutil.ReadFile("./assets/assets.json")
+	assets := model.Asset{}
+	_ = json.Unmarshal([]byte(file), &assets)
+	laundryAssets := make(map[string]model.LaundryDetails)
+
+	for i := 0; i < len(assets.Laundry.Assets); i++ {
+		laundryAsset := assets.Laundry.Assets[i]
+		laundryAssets[laundryAsset.LocationID] = laundryAsset.Details
+	}
+
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
-	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI)
+	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI, laundryAssets)
 	locationAdapter := location.NewUIUCWayFinding(wayfindingKey, wayfindingURL)
 
 	err := storageAdapter.Start()
@@ -69,6 +84,7 @@ func main() {
 	}
 
 	log.Printf("MongoDB Started")
+
 	//application
 	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter)
 	application.Start()

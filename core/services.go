@@ -18,8 +18,7 @@
 package core
 
 import (
-	laundry "apigateway/core/model/laundry"
-	buildingLocation "apigateway/core/model/wayfinding"
+	model "apigateway/core/model"
 )
 
 func (app *Application) getVersion() string {
@@ -30,32 +29,32 @@ func (app *Application) storeRecord(name string) error {
 	return app.storage.StoreRecord(name)
 }
 
-func (app *Application) listLaundryRooms() (laundry.Organization, error) {
+func (app *Application) listLaundryRooms() (model.Organization, error) {
 	lr, _ := app.laundry.ListRooms()
 	return *lr, nil
 }
 
-func (app *Application) listAppliances(id string) (laundry.RoomDetail, error) {
+func (app *Application) listAppliances(id string) (model.RoomDetail, error) {
 	ap, _ := app.laundry.GetLaundryRoom(id)
 	return *ap, nil
 }
 
-func (app *Application) initServiceRequest(machineid string) (laundry.MachineRequestDetail, error) {
+func (app *Application) initServiceRequest(machineid string) (model.MachineRequestDetail, error) {
 	sr, _ := app.laundry.InitServiceRequest(machineid)
 	return *sr, nil
 }
 
-func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (laundry.ServiceRequestResult, error) {
+func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (model.ServiceRequestResult, error) {
 	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
 	return *srr, nil
 }
 
-func (app *Application) getBuilding(bldgID string, adaOnly bool) (buildingLocation.Building, error) {
+func (app *Application) getBuilding(bldgID string, adaOnly bool) (model.Building, error) {
 	bldg, _ := app.locationAdapter.GetBuilding(bldgID, adaOnly)
 	return *bldg, nil
 }
 
-func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*buildingLocation.Entrance, error) {
+func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error) {
 	entrance, err := app.locationAdapter.GetEntrance(bldgID, adaOnly, latitude, longitude)
 	if err != nil {
 		if entrance == nil {

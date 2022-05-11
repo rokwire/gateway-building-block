@@ -1,7 +1,7 @@
 package buildinglocation
 
 import (
-	wayfinding "apigateway/core/model/wayfinding"
+	model "apigateway/core/model"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -63,9 +63,9 @@ func NewUIUCWayFinding(apikey string, apiurl string) *UIUCWayFinding {
 
 //NewBuilding creates a wayfinding.Building instance from a campusBuilding,
 //including all active entrances for the building
-func NewBuilding(bldg campusBuilding) *wayfinding.Building {
-	newBldg := wayfinding.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State}
-	newBldg.Entrances = make([]wayfinding.Entrance, 0)
+func NewBuilding(bldg campusBuilding) *model.Building {
+	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State}
+	newBldg.Entrances = make([]model.Entrance, 0)
 	for _, n := range bldg.Entrances {
 		if n.Available {
 			newBldg.Entrances = append(newBldg.Entrances, *NewEntrance(n))
@@ -75,13 +75,13 @@ func NewBuilding(bldg campusBuilding) *wayfinding.Building {
 }
 
 //NewEntrance creates a wayfinding.Entrance instance from a campusEntrance object
-func NewEntrance(ent campusEntrance) *wayfinding.Entrance {
-	newEnt := wayfinding.Entrance{ID: ent.UUID, Name: ent.Name, ADACompliant: ent.ADACompliant, Available: ent.Available, ImageURL: ent.ImageURL, Latitude: ent.Latitude, Longitude: ent.Longitude}
+func NewEntrance(ent campusEntrance) *model.Entrance {
+	newEnt := model.Entrance{ID: ent.UUID, Name: ent.Name, ADACompliant: ent.ADACompliant, Available: ent.Available, ImageURL: ent.ImageURL, Latitude: ent.Latitude, Longitude: ent.Longitude}
 	return &newEnt
 }
 
 //GetEntrance returns the active entrance closest to the user's position that meets the ADA Accessibility filter requirement
-func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*wayfinding.Entrance, error) {
+func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Entrance, error) {
 	lat := fmt.Sprintf("%f", latitude)
 	long := fmt.Sprintf("%f", longitude)
 	url := uwf.APIUrl + "/ccf"
@@ -96,7 +96,7 @@ func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, la
 
 	bldg, err := uwf.getBuildingData(url, query, parameters)
 	if err != nil {
-		ent := wayfinding.Entrance{}
+		ent := model.Entrance{}
 		return &ent, err
 	}
 	ent := uwf.closestEntrance(*bldg)
@@ -107,7 +107,7 @@ func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, la
 }
 
 //GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
-func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*wayfinding.Building, error) {
+func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
 	parameters := "{\"v\": 1}"
 	bldSelection := "\"banner_code\": \"" + bldgID + "\""
@@ -118,7 +118,7 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*
 	query := "{" + bldSelection + adaSelection + "}"
 	cmpBldg, err := uwf.getBuildingData(url, query, parameters)
 	if err != nil {
-		bldg := wayfinding.Building{}
+		bldg := model.Building{}
 		return &bldg, err
 	}
 	return NewBuilding(*cmpBldg), nil

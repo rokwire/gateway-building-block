@@ -19,7 +19,7 @@ package rest
 
 import (
 	"apigateway/core"
-	model "apigateway/core/model/laundry"
+	model "apigateway/core/model"
 	"apigateway/utils"
 	"encoding/json"
 	"fmt"

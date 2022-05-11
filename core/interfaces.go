@@ -18,8 +18,7 @@
 package core
 
 import (
-	model "apigateway/core/model/laundry"
-	buildings "apigateway/core/model/wayfinding"
+	model "apigateway/core/model"
 )
 
 // Services exposes APIs for the driver adapters
@@ -30,8 +29,8 @@ type Services interface {
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)
 	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
-	GetBuilding(bldgID string, adaOnly bool) (*buildings.Building, error)
-	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*buildings.Entrance, error)
+	GetBuilding(bldgID string, adaOnly bool) (*model.Building, error)
+	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 }
 
 type servicesImpl struct {
@@ -66,12 +65,12 @@ func (s *servicesImpl) SubmitServiceRequest(machineID string, problemCode string
 	return &srr, err
 }
 
-func (s *servicesImpl) GetBuilding(bldgID string, adaOnly bool) (*buildings.Building, error) {
+func (s *servicesImpl) GetBuilding(bldgID string, adaOnly bool) (*model.Building, error) {
 	bldg, err := s.app.getBuilding(bldgID, adaOnly)
 	return &bldg, err
 }
 
-func (s *servicesImpl) GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*buildings.Entrance, error) {
+func (s *servicesImpl) GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error) {
 	entrance, err := s.app.getEntrance(bldgID, adaOnly, latitude, longitude)
 	return entrance, err
 }
@@ -91,6 +90,6 @@ type Laundry interface {
 
 //BuildingLocation is used by core to request data from the building location/entrance provider
 type BuildingLocation interface {
-	GetBuilding(bldgID string, adaAccessibleOnly bool) (*buildings.Building, error)
-	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*buildings.Entrance, error)
+	GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error)
+	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 }

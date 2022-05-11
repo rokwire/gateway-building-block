@@ -1,7 +1,7 @@
 package laundry
 
 import (
-	model "apigateway/core/model/laundry"
+	model "apigateway/core/model"
 	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
@@ -19,7 +19,7 @@ type appliance struct {
 	ApplianceType string   `xml:"appliance_type"`
 	Status        string   `xml:"status"`
 	OutOfService  string   `xml:"out_of_service"`
-	Name          string   `xml:"label"`
+	Label         string   `xml:"label"`
 	AvgCycleTime  string   `xml:"avg_cycle_time"`
 	TimeRemaining string   `xml:"time_remaining"`
 }
@@ -75,11 +75,12 @@ type CSCLaundryView struct {
 	serviceToken              string
 	serviceSubscriptionKey    string
 	serviceCookie             string
+	laundryAssets             map[string]model.LaundryDetails
 }
 
 //NewCSCLaundryAdapter returns a vendor specific implementation of the Laundry interface
-func NewCSCLaundryAdapter(apikey string, url string, subscriptionkey string, serviceapiurl string) *CSCLaundryView {
-	return &CSCLaundryView{APIKey: apikey, APIUrl: url, ServiceOCPSubscriptionKey: subscriptionkey, ServiceAPIUrl: serviceapiurl}
+func NewCSCLaundryAdapter(apikey string, url string, subscriptionkey string, serviceapiurl string, assets map[string]model.LaundryDetails) *CSCLaundryView {
+	return &CSCLaundryView{APIKey: apikey, APIUrl: url, ServiceOCPSubscriptionKey: subscriptionkey, ServiceAPIUrl: serviceapiurl, laundryAssets: assets}
 
 }
 
@@ -147,11 +148,22 @@ func (lv *CSCLaundryView) GetLaundryRoom(roomid string) (*model.RoomDetail, erro
 
 		for i, appl := range lr.Appliances {
 			avgCycle, _ := strconv.Atoi(appl.AvgCycleTime)
-			rd.Appliances[i] = newAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining)
+			rd.Appliances[i] = newAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining, appl.Label)
+		}
+
+		if len(lv.laundryAssets) > 0 {
+			rd.Location = lv.getLocationData(roomid)
 		}
 		return &rd, nil
 	}
 	return nil, err
+}
+
+func (lv *CSCLaundryView) getLocationData(roomid string) *model.LaundryDetails {
+	if asset, ok := lv.laundryAssets[roomid]; ok {
+		return &asset
+	}
+	return &model.LaundryDetails{Latitude: 0, Longitude: 0, Floor: 0}
 }
 
 //InitServiceRequest gets machine request details needed to initialize a laundry service request
@@ -240,7 +252,7 @@ func (lv *CSCLaundryView) getNumAvailable(roomid string) (*capacity, error) {
 	return nil, err
 }
 
-func newAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string) *model.Appliance {
+func newAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string, label string) *model.Appliance {
 
 	var finalStatus string
 	switch status {
@@ -253,7 +265,7 @@ func newAppliance(id string, appliancetype string, cycletime int, status string,
 	}
 
 	if finalStatus == "available" || finalStatus == "out_of_service" {
-		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus}
+		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, Label: label}
 		return &appl
 	}
 
@@ -263,16 +275,16 @@ func newAppliance(id string, appliancetype string, cycletime int, status string,
 	if intsInString != nil {
 		intConvValue, err := strconv.ParseInt(intsInString[0], 10, 32)
 		if err != nil {
-			appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus}
+			appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, Label: label}
 			return &appl
 		}
 
 		trValue := int(intConvValue)
-		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, TimeRemaining: &trValue}
+		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, TimeRemaining: &trValue, Label: label}
 		return &appl
 	}
 
-	appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus}
+	appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, Label: label}
 	return &appl
 
 }

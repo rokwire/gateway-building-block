@@ -20,6 +20,7 @@ type RoomDetail struct {
 	Appliances []*Appliance
 	RoomName   string
 	CampusName string
+	Location   *LaundryDetails
 }
 
 //Appliance represents the information specific to an identifiiable appliance in a laundry room
@@ -29,6 +30,7 @@ type Appliance struct {
 	ApplianceType    string
 	AverageCycleTime int
 	TimeRemaining    *int
+	Label            string
 }
 
 //MachineRequestDetail represents the basic details needed in order to submit a request about a machine
