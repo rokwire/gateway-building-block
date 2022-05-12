@@ -110,7 +110,11 @@ func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 		org.LaundryRooms = make([]*model.LaundryRoom, 0)
 
 		for _, lr := range nS.LaundryRooms {
-			org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status))
+			if len(lv.laundryAssets) > 0 {
+				org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status, lv.getLocationData(strconv.Itoa(lr.Location))))
+			} else {
+				org.LaundryRooms = append(org.LaundryRooms, newLaundryRoom(lr.Location, lr.Laundryroomname, lr.Status, lv.getLocationData("0")))
+			}
 		}
 		return &org, nil
 	}
@@ -220,8 +224,8 @@ func newMachineRequestDetail(machineid string, message string, serviceStatus str
 	return &mrd
 }
 
-func newLaundryRoom(id int, name string, status string) *model.LaundryRoom {
-	lr := model.LaundryRoom{Name: name, ID: id, Status: status}
+func newLaundryRoom(id int, name string, status string, location *model.LaundryDetails) *model.LaundryRoom {
+	lr := model.LaundryRoom{Name: name, ID: id, Status: status, Location: location}
 	return &lr
 }
 

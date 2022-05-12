@@ -2,9 +2,10 @@ package model
 
 //LaundryRoom represents the basic information returned as part of requesting and organization
 type LaundryRoom struct {
-	ID     int
-	Name   string
-	Status string
+	ID       int
+	Name     string
+	Status   string
+	Location *LaundryDetails
 }
 
 //Organization represents the top most level of inforomation provided by teh laundry api

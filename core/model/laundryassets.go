@@ -14,6 +14,6 @@ type LaundryAsset struct {
 //LaundryDetails represents the location details of a single laundry room asset
 type LaundryDetails struct {
 	Latitude  float32 `json:"latitude"`
-	Longitude float32 `jsong:"longitude"`
+	Longitude float32 `json:"longitude"`
 	Floor     int     `json:"floor"`
 }
