@@ -322,6 +322,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "label": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -400,11 +403,28 @@ const docTemplate = `{
                 }
             }
         },
+        "model.LaundryDetails": {
+            "type": "object",
+            "properties": {
+                "floor": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
         "model.LaundryRoom": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "location": {
+                    "$ref": "#/definitions/model.LaundryDetails"
                 },
                 "name": {
                     "type": "string"
@@ -462,6 +482,9 @@ const docTemplate = `{
                 },
                 "campusName": {
                     "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/model.LaundryDetails"
                 },
                 "numDryers": {
                     "type": "integer"

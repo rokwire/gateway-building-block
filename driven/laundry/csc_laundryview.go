@@ -368,7 +368,8 @@ func (lv *CSCLaundryView) makeLaundryServiceWebRequest(url string, method string
 	}
 
 	if res.StatusCode != 200 {
-		_, err := ioutil.ReadAll(res.Body)
+		test, err := ioutil.ReadAll(res.Body)
+		log.Printf("%v", string(test))
 		return nil, err
 	}
 
@@ -436,9 +437,30 @@ func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, com
 	headers["Cookie"] = "session=" + lv.serviceCookie
 	headers["Content-Type"] = "application/json"
 
-	payload := `{"machineId": "` + machineid + `", "problemCode": "` + problemCode + `", "comments": "` + comments + `", "firstName": "` + firstName + `", "lastName": "` + lastName + `", "phone": "` + phone + `", "email": "` + email + `"}`
+	payload := struct {
+		MachineID   string `json:"machineId"`
+		ProblemCode string `json:"problemCode"`
+		Comments    string `json:"comments"`
+		FirstName   string `json:"firstName"`
+		LastName    string `json:"lastName"`
+		Phone       string `json:"phone"`
+		Email       string `json:"email"`
+	}{
+		MachineID:   machineid,
+		ProblemCode: problemCode,
+		Comments:    comments,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Phone:       phone,
+		Email:       email,
+	}
 
-	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, payload)
+	postData, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, string(postData))
 
 	if err != nil {
 		return nil, err
@@ -453,7 +475,7 @@ func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, com
 	m := obj.(map[string]interface{})
 	//already a request for this machine, so got back a machine details object
 	if m["machineId"] != nil {
-		result := model.ServiceRequestResult{Message: "A ticket already exists for this machien", RequestNumber: "0", Status: "Failed"}
+		result := model.ServiceRequestResult{Message: "A ticket already exists for this machine", RequestNumber: "0", Status: "Failed"}
 		return &result, nil
 	}
 	result := model.ServiceRequestResult{Message: m["message"].(string), RequestNumber: m["serviceRequestNumber"].(string), Status: "Success"}

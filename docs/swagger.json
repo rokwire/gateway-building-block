@@ -318,6 +318,9 @@
                 "id": {
                     "type": "string"
                 },
+                "label": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -396,11 +399,28 @@
                 }
             }
         },
+        "model.LaundryDetails": {
+            "type": "object",
+            "properties": {
+                "floor": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
         "model.LaundryRoom": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "location": {
+                    "$ref": "#/definitions/model.LaundryDetails"
                 },
                 "name": {
                     "type": "string"
@@ -458,6 +478,9 @@
                 },
                 "campusName": {
                     "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/model.LaundryDetails"
                 },
                 "numDryers": {
                     "type": "integer"

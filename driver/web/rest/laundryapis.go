@@ -217,6 +217,11 @@ func (h LaundryApisHandler) SubmitServiceRequest(w http.ResponseWriter, r *http.
 		return
 	}
 
+	if record.Phone == nil {
+		newPhone := ""
+		record.Phone = &newPhone
+	}
+
 	sr, err := h.app.Services.SubmitServiceRequest(*record.MachineID, *record.ProblemCode, *record.Comments, *record.FirstName, *record.LastName, *record.Phone, *record.Email)
 
 	if err != nil {

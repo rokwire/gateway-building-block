@@ -8,6 +8,8 @@ definitions:
         type: integer
       id:
         type: string
+      label:
+        type: string
       status:
         type: string
       timeRemaining:
@@ -59,10 +61,21 @@ definitions:
       name:
         type: string
     type: object
+  model.LaundryDetails:
+    properties:
+      floor:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
   model.LaundryRoom:
     properties:
       id:
         type: integer
+      location:
+        $ref: '#/definitions/model.LaundryDetails'
       name:
         type: string
       status:
@@ -100,6 +113,8 @@ definitions:
         type: array
       campusName:
         type: string
+      location:
+        $ref: '#/definitions/model.LaundryDetails'
       numDryers:
         type: integer
       numWashers:
