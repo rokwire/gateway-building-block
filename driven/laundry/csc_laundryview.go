@@ -75,12 +75,13 @@ type CSCLaundryView struct {
 	serviceToken              string
 	serviceSubscriptionKey    string
 	serviceCookie             string
+	serviceBasicAuthToken     string
 	laundryAssets             map[string]model.LaundryDetails
 }
 
 //NewCSCLaundryAdapter returns a vendor specific implementation of the Laundry interface
-func NewCSCLaundryAdapter(apikey string, url string, subscriptionkey string, serviceapiurl string, assets map[string]model.LaundryDetails) *CSCLaundryView {
-	return &CSCLaundryView{APIKey: apikey, APIUrl: url, ServiceOCPSubscriptionKey: subscriptionkey, ServiceAPIUrl: serviceapiurl, laundryAssets: assets}
+func NewCSCLaundryAdapter(apikey string, url string, subscriptionkey string, serviceapiurl string, assets map[string]model.LaundryDetails, authToken string) *CSCLaundryView {
+	return &CSCLaundryView{APIKey: apikey, APIUrl: url, ServiceOCPSubscriptionKey: subscriptionkey, ServiceAPIUrl: serviceapiurl, laundryAssets: assets, serviceBasicAuthToken: authToken}
 
 }
 
@@ -309,6 +310,7 @@ func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
 	headers := make(map[string]string)
 	headers["Ocp-Apim-Subscription-Key"] = lv.ServiceOCPSubscriptionKey
 	headers["Content-Type"] = "application/json"
+	headers["Authorization"] = "Basic " + lv.serviceBasicAuthToken
 
 	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, payload)
 	if err != nil {
@@ -324,6 +326,7 @@ func (lv *CSCLaundryView) getServiceToken() error {
 
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/json"
+	headers["Authorization"] = "Basic " + lv.serviceBasicAuthToken
 
 	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, "")
 
@@ -392,6 +395,7 @@ func (lv *CSCLaundryView) getMachineDetails(machineid string) (*machinedetail, e
 	headers["X-CSRFToken"] = lv.serviceToken
 	headers["Cookie"] = "session=" + lv.serviceCookie
 	headers["Content-Type"] = "application/json"
+	headers["Authorization"] = "Basic " + lv.serviceBasicAuthToken
 
 	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, payload)
 
@@ -415,6 +419,7 @@ func (lv *CSCLaundryView) getProblemCodes(machinetype string) ([]string, error) 
 	headers["X-CSRFToken"] = lv.serviceToken
 	headers["Cookie"] = "session=" + lv.serviceCookie
 	headers["Content-Type"] = "application/json"
+	headers["Authorization"] = "Basic " + lv.serviceBasicAuthToken
 
 	body, err := lv.makeLaundryServiceWebRequest(url, method, headers, payload)
 	if err != nil {
@@ -436,6 +441,7 @@ func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, com
 	headers["X-CSRFToken"] = lv.serviceToken
 	headers["Cookie"] = "session=" + lv.serviceCookie
 	headers["Content-Type"] = "application/json"
+	headers["Authorization"] = "Basic " + lv.serviceBasicAuthToken
 
 	payload := struct {
 		MachineID   string `json:"machineId"`

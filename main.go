@@ -60,6 +60,7 @@ func main() {
 	laundryAPI := getEnvKey("GATEWAY_LAUNDRY_APIURL", true)
 	luandryServiceKey := getEnvKey("GATEWAY_LAUNDRYSERVICE_APIKEY", true)
 	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
+	laundryServiceToken := getEnvKey("GATEWAY_LAUNDRYSERVICE_BASICAUTH", true)
 	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
 	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
 
@@ -75,7 +76,7 @@ func main() {
 	}
 
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
-	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI, laundryAssets)
+	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI, laundryAssets, laundryServiceToken)
 	locationAdapter := location.NewUIUCWayFinding(wayfindingKey, wayfindingURL)
 
 	err := storageAdapter.Start()
