@@ -64,3 +64,11 @@ func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float6
 	}
 	return entrance, nil
 }
+
+func (app *Application) getContactInfo(uin string, accessToken string) (*model.Person, error) {
+	person, err := app.contactInfoAdapter.GetContactInformation(uin, accessToken)
+	if err != nil {
+		return nil, err
+	}
+	return person, nil
+}

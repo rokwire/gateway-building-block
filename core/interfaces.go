@@ -31,6 +31,7 @@ type Services interface {
 	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
 	GetBuilding(bldgID string, adaOnly bool) (*model.Building, error)
 	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
+	GetContactInfo(uin string, accessToken string) (*model.Person, error)
 }
 
 type servicesImpl struct {
@@ -75,6 +76,11 @@ func (s *servicesImpl) GetEntrance(bldgID string, adaOnly bool, latitude float64
 	return entrance, err
 }
 
+func (s *servicesImpl) GetContactInfo(uin string, accessToken string) (*model.Person, error) {
+	person, err := s.app.getContactInfo(uin, accessToken)
+	return person, err
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	StoreRecord(name string) error
@@ -92,4 +98,9 @@ type Laundry interface {
 type BuildingLocation interface {
 	GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error)
 	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
+}
+
+//ContactInformation is used by core to request data from the contact information provider
+type ContactInformation interface {
+	GetContactInformation(uin string, accessToken string) (*model.Person, error)
 }

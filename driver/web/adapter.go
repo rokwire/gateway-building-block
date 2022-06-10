@@ -38,6 +38,7 @@ type Adapter struct {
 	adminApisHandler   rest.AdminApisHandler
 	laundryapiHandler  rest.LaundryApisHandler
 	buildingapiHandler rest.BuildingAPIHandler
+	contactapiHandler  rest.ContactInfoApisHandler
 	tokenAuth          *TokenAuth
 	app                *core.Application
 }
@@ -91,6 +92,8 @@ func (we Adapter) Start() {
 	mainRouter.HandleFunc("/wayfinding/building", we.tokenAuthWrapFunc(we.buildingapiHandler.GetBuilding)).Methods("GET")
 	mainRouter.HandleFunc("/wayfinding/entrance", we.tokenAuthWrapFunc(we.buildingapiHandler.GetEntrance)).Methods("GET")
 
+	mainRouter.HandleFunc("/person/contactinfo", we.tokenAuthWrapFunc(we.contactapiHandler.GetContactInfo)).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 
@@ -133,8 +136,11 @@ func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *T
 	adminApisHandler := rest.NewAdminApisHandler(app)
 	laundryapiHandler := rest.NewLaundryApisHandler(app)
 	buildingapiHandler := rest.NewBuildingAPIHandler(app)
+	contactapiHandler := rest.NewContactInfoApisHandler(app)
 	return Adapter{host: host, port: port,
-		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler, buildingapiHandler: buildingapiHandler, tokenAuth: tokenAuth}
+		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler,
+		buildingapiHandler: buildingapiHandler, tokenAuth: tokenAuth,
+		contactapiHandler: contactapiHandler}
 }
 
 //AppListener implements core.ApplicationListener interface
