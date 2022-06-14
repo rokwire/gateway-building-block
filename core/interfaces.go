@@ -31,11 +31,8 @@ type Services interface {
 	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
 	GetBuilding(bldgID string, adaOnly bool) (*model.Building, error)
 	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
-<<<<<<< HEAD
 	GetBuildings() (*[]model.Building, error)
-=======
 	GetContactInfo(uin string, accessToken string) (*model.Person, error)
->>>>>>> ContactInfo
 }
 
 type servicesImpl struct {
