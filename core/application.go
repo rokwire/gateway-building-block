@@ -24,9 +24,10 @@ type Application struct {
 
 	Services Services // expose to the drivers adapters
 
-	storage         Storage
-	laundry         Laundry
-	locationAdapter BuildingLocation
+	storage            Storage
+	laundry            Laundry
+	locationAdapter    BuildingLocation
+	contactInfoAdapter ContactInformation
 }
 
 // Start starts the core part of the application
@@ -34,9 +35,9 @@ func (app *Application) Start() {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, laundry Laundry, bldgloc BuildingLocation) *Application {
+func NewApplication(version string, build string, storage Storage, laundry Laundry, bldgloc BuildingLocation, contacts ContactInformation) *Application {
 
-	application := Application{version: version, build: build, storage: storage, laundry: laundry, locationAdapter: bldgloc}
+	application := Application{version: version, build: build, storage: storage, laundry: laundry, locationAdapter: bldgloc, contactInfoAdapter: contacts}
 
 	//add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

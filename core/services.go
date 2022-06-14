@@ -75,3 +75,11 @@ func (app *Application) getBuildings() (*[]model.Building, error) {
 	}
 	return buildings, nil
 }
+
+func (app *Application) getContactInfo(uin string, accessToken string) (*model.Person, error) {
+	person, err := app.contactInfoAdapter.GetContactInformation(uin, accessToken)
+	if err != nil {
+		return nil, err
+	}
+	return person, nil
+}

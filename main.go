@@ -20,6 +20,7 @@ package main
 import (
 	"apigateway/core"
 	model "apigateway/core/model"
+	contactinfo "apigateway/driven/contactinfo"
 	"apigateway/driven/laundry"
 	location "apigateway/driven/location"
 	storage "apigateway/driven/storage"
@@ -63,6 +64,8 @@ func main() {
 	laundryServiceToken := getEnvKey("GATEWAY_LAUNDRYSERVICE_BASICAUTH", true)
 	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
 	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
+	campusInfoAPIKey := getEnvKey("GATEWAY_CONTACTINFO_APIKEY", true)
+	campusAITSEndPoint := getEnvKey("GATEWAY_CONTACTINFO_ENDPOINT", true)
 
 	//read assets
 	file, _ := ioutil.ReadFile("./assets/assets.json")
@@ -78,6 +81,7 @@ func main() {
 	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
 	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI, laundryAssets, laundryServiceToken)
 	locationAdapter := location.NewUIUCWayFinding(wayfindingKey, wayfindingURL)
+	contactAdapter := contactinfo.NewContactAdapter(campusInfoAPIKey, campusAITSEndPoint)
 
 	err := storageAdapter.Start()
 	if err != nil {
@@ -87,7 +91,7 @@ func main() {
 	log.Printf("MongoDB Started")
 
 	//application
-	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter)
+	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter, contactAdapter)
 	application.Start()
 
 	//web adapter
