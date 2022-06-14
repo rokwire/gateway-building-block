@@ -197,3 +197,31 @@ func (h BuildingAPIHandler) GetEntrance(w http.ResponseWriter, r *http.Request) 
 	w.Write(resAsJSON)
 
 }
+
+// GetBuildings returns a list of all buildings
+// @Summary Get a list of all buildings with a list of active entrances
+// @Tags Client
+// @ID BuildingList
+// @Accept  json
+// @Produce json
+// @Success 200 {object} []model.Building
+// @Security RokwireAuth
+// @Router /wayfinding/buildings [get]
+func (h BuildingAPIHandler) GetBuildings(w http.ResponseWriter, r *http.Request) {
+	bldgs, err := h.app.Services.GetBuildings()
+	if err != nil {
+		log.Printf("Error retrieving building list: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resAsJSON, err := json.Marshal(bldgs)
+	if err != nil {
+		log.Printf("Error on marshalling building data: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(resAsJSON)
+}

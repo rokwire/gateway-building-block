@@ -50,7 +50,10 @@ func (app *Application) submitServiceRequest(machineID string, problemCode strin
 }
 
 func (app *Application) getBuilding(bldgID string, adaOnly bool) (model.Building, error) {
-	bldg, _ := app.locationAdapter.GetBuilding(bldgID, adaOnly)
+	bldg, err := app.locationAdapter.GetBuilding(bldgID, adaOnly)
+	if err != nil {
+		return *bldg, err
+	}
 	return *bldg, nil
 }
 
@@ -63,4 +66,12 @@ func (app *Application) getEntrance(bldgID string, adaOnly bool, latitude float6
 		return entrance, err
 	}
 	return entrance, nil
+}
+
+func (app *Application) getBuildings() (*[]model.Building, error) {
+	buildings, err := app.locationAdapter.GetBuildings()
+	if err != nil {
+		return nil, err
+	}
+	return buildings, nil
 }

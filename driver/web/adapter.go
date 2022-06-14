@@ -55,6 +55,10 @@ type Adapter struct {
 // @in header
 // @name ROKWIRE-API-KEY
 
+//@securityDefinitions.accesskey ExternalAuth
+//@in header
+//@name External-Authorization
+
 // @securityDefinitions.apikey InternalAuth
 // @in header
 // @name INTERNAL-API-KEY
@@ -90,6 +94,7 @@ func (we Adapter) Start() {
 
 	mainRouter.HandleFunc("/wayfinding/building", we.tokenAuthWrapFunc(we.buildingapiHandler.GetBuilding)).Methods("GET")
 	mainRouter.HandleFunc("/wayfinding/entrance", we.tokenAuthWrapFunc(we.buildingapiHandler.GetEntrance)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/buildings", we.tokenAuthWrapFunc(we.buildingapiHandler.GetBuildings)).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }

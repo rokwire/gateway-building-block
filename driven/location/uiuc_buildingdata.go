@@ -80,10 +80,10 @@ func NewBuilding(bldg campusBuilding) *model.Building {
 func NewBuildingList(bldgList *[]campusBuilding) *[]model.Building {
 	retList := make([]model.Building, len(*bldgList))
 	for i := 0; i < len(*bldgList); i++ {
-		crntBldng := NewBuilding((*bldgList)[i])
-		retList = append(retList, *crntBldng)
+		cmpsBldg := (*bldgList)[i]
+		crntBldng := NewBuilding(cmpsBldg)
+		retList[i] = *crntBldng
 	}
-
 	return &retList
 }
 
@@ -99,7 +99,7 @@ func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, la
 	long := fmt.Sprintf("%f", longitude)
 	url := uwf.APIUrl + "/ccf"
 
-	parameters := "{\"v\": 1, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
+	parameters := "{\"v\": 2, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
 	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {
@@ -135,7 +135,7 @@ func (uwf *UIUCWayFinding) GetBuildings() (*[]model.Building, error) {
 //GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
 func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
-	parameters := "{\"v\": 1}"
+	parameters := "{\"v\": 2}"
 	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {
