@@ -34,6 +34,8 @@ type campusBuilding struct {
 	ImageURL    string           `json:"image"`
 	MailCode    string           `json:"mailcode"`
 	Entrances   []campusEntrance `json:"entrances"`
+	Latitude    float32          `json:"building_centroid_latitude"`
+	Longitude   float32          `json:"building_centroid_longitude"`
 }
 
 type serverResponse struct {
@@ -64,7 +66,7 @@ func NewUIUCWayFinding(apikey string, apiurl string) *UIUCWayFinding {
 //NewBuilding creates a wayfinding.Building instance from a campusBuilding,
 //including all active entrances for the building
 func NewBuilding(bldg campusBuilding) *model.Building {
-	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State}
+	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude}
 	newBldg.Entrances = make([]model.Entrance, 0)
 	for _, n := range bldg.Entrances {
 		if n.Available {
@@ -72,6 +74,17 @@ func NewBuilding(bldg campusBuilding) *model.Building {
 		}
 	}
 	return &newBldg
+}
+
+//NewBuildingList returns a list of wayfinding buildings created frmo a list of campus building objects.
+func NewBuildingList(bldgList *[]campusBuilding) *[]model.Building {
+	retList := make([]model.Building, len(*bldgList))
+	for i := 0; i < len(*bldgList); i++ {
+		crntBldng := NewBuilding((*bldgList)[i])
+		retList = append(retList, *crntBldng)
+	}
+
+	return &retList
 }
 
 //NewEntrance creates a wayfinding.Entrance instance from a campusEntrance object
@@ -87,41 +100,54 @@ func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, la
 	url := uwf.APIUrl + "/ccf"
 
 	parameters := "{\"v\": 1, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
-	bldSelection := "\"banner_code\": \"" + bldgID + "\""
+	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {
 		adaSelection = ",\"entrances\": {\"ada_compliant\": true}"
 	}
 	query := "{" + bldSelection + adaSelection + "}"
 
-	bldg, err := uwf.getBuildingData(url, query, parameters)
+	bldg, err := uwf.getBuildingData(url, query, parameters, false)
 	if err != nil {
 		ent := model.Entrance{}
 		return &ent, err
 	}
-	ent := uwf.closestEntrance(*bldg)
+	ent := uwf.closestEntrance((*bldg)[0])
 	if ent != nil {
 		return NewEntrance(*ent), nil
 	}
 	return nil, nil
 }
 
+//GetBuildings returns a list of all buildings
+func (uwf *UIUCWayFinding) GetBuildings() (*[]model.Building, error) {
+	url := uwf.APIUrl + "/ccf"
+	parameters := "{\"v\": 2}"
+
+	cmpBldgs, err := uwf.getBuildingData(url, "{}", parameters, true)
+	if err != nil {
+		return nil, err
+	}
+	returnList := NewBuildingList(cmpBldgs)
+	return returnList, nil
+}
+
 //GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
 func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
 	parameters := "{\"v\": 1}"
-	bldSelection := "\"banner_code\": \"" + bldgID + "\""
+	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {
 		adaSelection = ",\"entrances\": {\"ada_compliant\": true}"
 	}
 	query := "{" + bldSelection + adaSelection + "}"
-	cmpBldg, err := uwf.getBuildingData(url, query, parameters)
+	cmpBldg, err := uwf.getBuildingData(url, query, parameters, false)
 	if err != nil {
 		bldg := model.Building{}
 		return &bldg, err
 	}
-	return NewBuilding(*cmpBldg), nil
+	return NewBuilding((*cmpBldg)[0]), nil
 }
 
 //the entrance list coming back from a ranged query to the API is sorted closest to farthest from
@@ -136,7 +162,7 @@ func (uwf *UIUCWayFinding) closestEntrance(bldg campusBuilding) *campusEntrance 
 	return nil
 }
 
-func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string, parameters string) (*campusBuilding, error) {
+func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string, parameters string, allBuildings bool) (*[]campusBuilding, error) {
 	method := "POST"
 
 	payload := &bytes.Buffer{}
@@ -182,6 +208,7 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string,
 	if err != nil {
 		return nil, err
 	}
-	return &data.Buildings[0], nil
 
+	campusBldgs := data.Buildings
+	return &campusBldgs, nil
 }

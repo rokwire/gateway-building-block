@@ -25,4 +25,6 @@ type Building struct {
 	ImageURL    string
 	MailCode    string
 	Entrances   []Entrance
+	Latitude    float32
+	Longitude   float32
 }
