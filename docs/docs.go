@@ -151,6 +151,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/person/contactinfo": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth ExternakAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns the name, permanent and mailing addresses, phone number and emergency contact information for a person",
+                "operationId": "ConatctInfo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Person"
+                        }
+                    }
+                }
+            }
+        },
         "/token": {
             "post": {
                 "security": [
@@ -248,6 +285,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/wayfinding/buildings": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Get a list of all buildings with a list of active entrances",
+                "operationId": "BuildingList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Building"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/wayfinding/entrance": {
             "get": {
                 "security": [
@@ -310,6 +378,35 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.Address": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "county": {
+                    "type": "string"
+                },
+                "phone": {
+                    "$ref": "#/definitions/model.PhoneNumber"
+                },
+                "stateAbbr": {
+                    "type": "string"
+                },
+                "stateName": {
+                    "type": "string"
+                },
+                "street1": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "zipCode": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Appliance": {
             "type": "object",
             "properties": {
@@ -360,6 +457,12 @@ const docTemplate = `{
                 "imageURL": {
                     "type": "string"
                 },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
                 "mailCode": {
                     "type": "string"
                 },
@@ -374,6 +477,37 @@ const docTemplate = `{
                 },
                 "zipCode": {
                     "type": "string"
+                }
+            }
+        },
+        "model.CodeDescType": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.EmergencyContact": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/model.Address"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "relationShip": {
+                    "$ref": "#/definitions/model.CodeDescType"
                 }
             }
         },
@@ -467,6 +601,46 @@ const docTemplate = `{
                     }
                 },
                 "schoolName": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Person": {
+            "type": "object",
+            "properties": {
+                "emergencycontacts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.EmergencyContact"
+                    }
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "mailingAddress": {
+                    "$ref": "#/definitions/model.Address"
+                },
+                "permanentAddress": {
+                    "$ref": "#/definitions/model.Address"
+                },
+                "preferred": {
+                    "type": "string"
+                },
+                "uin": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.PhoneNumber": {
+            "type": "object",
+            "properties": {
+                "areaCode": {
+                    "type": "string"
+                },
+                "number": {
                     "type": "string"
                 }
             }

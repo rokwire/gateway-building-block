@@ -1,5 +1,24 @@
 basePath: /gateway/api
 definitions:
+  model.Address:
+    properties:
+      city:
+        type: string
+      county:
+        type: string
+      phone:
+        $ref: '#/definitions/model.PhoneNumber'
+      stateAbbr:
+        type: string
+      stateName:
+        type: string
+      street1:
+        type: string
+      type:
+        type: string
+      zipCode:
+        type: string
+    type: object
   model.Appliance:
     properties:
       applianceType:
@@ -33,6 +52,10 @@ definitions:
         type: string
       imageURL:
         type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
       mailCode:
         type: string
       name:
@@ -43,6 +66,26 @@ definitions:
         type: string
       zipCode:
         type: string
+    type: object
+  model.CodeDescType:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+    type: object
+  model.EmergencyContact:
+    properties:
+      address:
+        $ref: '#/definitions/model.Address'
+      firstName:
+        type: string
+      lastName:
+        type: string
+      priority:
+        type: string
+      relationShip:
+        $ref: '#/definitions/model.CodeDescType'
     type: object
   model.Entrance:
     properties:
@@ -103,6 +146,32 @@ definitions:
           $ref: '#/definitions/model.LaundryRoom'
         type: array
       schoolName:
+        type: string
+    type: object
+  model.Person:
+    properties:
+      emergencycontacts:
+        items:
+          $ref: '#/definitions/model.EmergencyContact'
+        type: array
+      firstName:
+        type: string
+      lastName:
+        type: string
+      mailingAddress:
+        $ref: '#/definitions/model.Address'
+      permanentAddress:
+        $ref: '#/definitions/model.Address'
+      preferred:
+        type: string
+      uin:
+        type: string
+    type: object
+  model.PhoneNumber:
+    properties:
+      areaCode:
+        type: string
+      number:
         type: string
     type: object
   model.RoomDetail:
@@ -250,6 +319,30 @@ paths:
       summary: Get list of all campus laundry rooms
       tags:
       - Client
+  /person/contactinfo:
+    get:
+      consumes:
+      - application/json
+      operationId: ConatctInfo
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Person'
+      security:
+      - RokwireAuth ExternakAuth: []
+      summary: Returns the name, permanent and mailing addresses, phone number and
+        emergency contact information for a person
+      tags:
+      - Client
   /token:
     post:
       consumes:
@@ -308,6 +401,25 @@ paths:
       - RokwireAuth: []
       summary: Get the requested building with all of its available entrances filterd
         by the ADA only flag
+      tags:
+      - Client
+  /wayfinding/buildings:
+    get:
+      consumes:
+      - application/json
+      operationId: BuildingList
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Building'
+            type: array
+      security:
+      - RokwireAuth: []
+      summary: Get a list of all buildings with a list of active entrances
       tags:
       - Client
   /wayfinding/entrance:
