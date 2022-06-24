@@ -32,7 +32,7 @@ type Services interface {
 	GetBuilding(bldgID string, adaOnly bool) (*model.Building, error)
 	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 	GetBuildings() (*[]model.Building, error)
-	GetContactInfo(uin string, accessToken string) (*model.Person, error)
+	GetContactInfo(uin string, accessToken string, mode string) (*model.Person, error)
 }
 
 type servicesImpl struct {
@@ -82,8 +82,8 @@ func (s *servicesImpl) GetBuildings() (*[]model.Building, error) {
 	return buildings, err
 }
 
-func (s *servicesImpl) GetContactInfo(uin string, accessToken string) (*model.Person, error) {
-	person, err := s.app.getContactInfo(uin, accessToken)
+func (s *servicesImpl) GetContactInfo(uin string, accessToken string, mode string) (*model.Person, error) {
+	person, err := s.app.getContactInfo(uin, accessToken, mode)
 	return person, err
 }
 
@@ -109,5 +109,5 @@ type BuildingLocation interface {
 
 //ContactInformation is used by core to request data from the contact information provider
 type ContactInformation interface {
-	GetContactInformation(uin string, accessToken string) (*model.Person, error)
+	GetContactInformation(uin string, accessToken string, mode string) (*model.Person, error)
 }

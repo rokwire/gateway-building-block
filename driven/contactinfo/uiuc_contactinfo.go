@@ -160,11 +160,21 @@ func newPerson(cr *campusPerson) (*model.Person, error) {
 }
 
 //GetContactInformation returns a contact information object for a student
-func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string) (*model.Person, error) {
+func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, error) {
+
 	finalURL := lv.APIEndpoint + "/" + uin
+
+	if mode != "0" {
+		finalURL = lv.APIEndpoint + "/mock/123456789"
+	}
+
 	campusData, err := lv.getData(finalURL, accessToken)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(campusData.People) == 0 {
+		return nil, errors.New("No contact data found")
 	}
 
 	retValue, err := newPerson(&campusData.People[0])
@@ -198,20 +208,34 @@ func (lv *ContactAdapter) getData(targetURL string, accessToken string) (*campus
 	}
 
 	if res.StatusCode == 401 {
-		fmt.Println(string(body))
-		return nil, errors.New(string(body))
+		return nil, errors.New("Not Authorized")
+	}
+
+	if res.StatusCode == 403 {
+		return nil, errors.New(res.Status)
 	}
 
 	if res.StatusCode == 400 {
-		fmt.Println(string(body))
 		return nil, errors.New("Bad request to api end point")
 	}
 
-	data := campusUserData{}
-	err = json.Unmarshal(body, &data)
-
-	if err != nil {
-		return nil, err
+	if res.StatusCode == 406 {
+		return nil, errors.New("Server returned 406: possible uin claim mismatch")
 	}
-	return &data, nil
+
+	if res.StatusCode == 502 {
+		return nil, errors.New(res.Status)
+	}
+	if res.StatusCode == 200 {
+		data := campusUserData{}
+		err = json.Unmarshal(body, &data)
+
+		if err != nil {
+			return nil, err
+		}
+		return &data, nil
+	}
+
+	return nil, errors.New("Error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
+
 }

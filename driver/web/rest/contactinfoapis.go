@@ -35,15 +35,26 @@ func (h ContactInfoApisHandler) GetContactInfo(w http.ResponseWriter, r *http.Re
 	if externalToken == "" {
 		log.Printf("Error: External access token not includeed")
 		http.Error(w, "Missing external access token", http.StatusBadRequest)
+		return
 	}
 
-	reqParams := utils.ConstructFilter(r)
 	id := ""
-	for _, v := range reqParams.Items {
-		if v.Field == "id" {
-			id = v.Value[0]
-			break
+	mode := "0"
+
+	reqParams := utils.ConstructFilter(r)
+	if reqParams != nil {
+		for _, v := range reqParams.Items {
+			switch v.Field {
+			case "id":
+				id = v.Value[0]
+			case "mode":
+				mode = v.Value[0]
+			}
 		}
+	}
+
+	if id == "123456789" {
+		mode = "1"
 	}
 
 	if id == "" {
@@ -52,20 +63,20 @@ func (h ContactInfoApisHandler) GetContactInfo(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	person, err := h.app.Services.GetContactInfo(id, externalToken)
+	person, err := h.app.Services.GetContactInfo(id, externalToken, mode)
 	if err != nil {
-		log.Printf("Error getting contact information: %s\n", err)
+		log.Printf("Error getting contact information for %s: %s\n", id, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	resAsJSON, err := json.Marshal(person)
 	if err != nil {
-		log.Printf("Error on marshalling contact information: %s\n", err)
+		log.Printf("Error on marshalling contact information for %s: %s\n", id, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 	w.Write(resAsJSON)
 }
