@@ -30,13 +30,8 @@ func NewContactInfoApisHandler(app *core.Application) ContactInfoApisHandler {
 // @Router /person/contactinfo [get]
 func (h ContactInfoApisHandler) GetContactInfo(w http.ResponseWriter, r *http.Request) {
 
+	log.Printf("Beginning call for %s", r.URL)
 	externalToken := r.Header.Get("External-Authorization")
-
-	if externalToken == "" {
-		log.Printf("Error: External access token not includeed")
-		http.Error(w, "Missing external access token", http.StatusBadRequest)
-		return
-	}
 
 	id := ""
 	mode := "0"
@@ -57,9 +52,15 @@ func (h ContactInfoApisHandler) GetContactInfo(w http.ResponseWriter, r *http.Re
 		mode = "1"
 	}
 
-	if id == "" {
+	if id == "" || id == "null" {
 		log.Printf("Error: missing id parameter")
 		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	if externalToken == "" {
+		log.Printf("Error: External access token not includeed for %s", id)
+		http.Error(w, "Missing external access token", http.StatusBadRequest)
 		return
 	}
 
