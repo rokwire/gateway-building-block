@@ -64,10 +64,19 @@ func (h ContactInfoApisHandler) GetContactInfo(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	person, err := h.app.Services.GetContactInfo(id, externalToken, mode)
+	person, statusCode, err := h.app.Services.GetContactInfo(id, externalToken, mode)
 	if err != nil {
-		log.Printf("Error getting contact information for %s: %s\n", id, err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error getting contact information for %s: Server returned %d %s \n", id, statusCode, err.Error())
+		switch statusCode {
+		case 401:
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+		case 403:
+			http.Error(w, err.Error(), http.StatusForbidden)
+		case 404:
+			http.Error(w, err.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 

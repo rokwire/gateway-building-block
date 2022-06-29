@@ -160,7 +160,7 @@ func newPerson(cr *campusPerson) (*model.Person, error) {
 }
 
 //GetContactInformation returns a contact information object for a student
-func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, error) {
+func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error) {
 
 	finalURL := lv.APIEndpoint + "/" + uin
 
@@ -168,74 +168,75 @@ func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, 
 		finalURL = lv.APIEndpoint + "/mock/123456789"
 	}
 
-	campusData, err := lv.getData(finalURL, accessToken)
+	campusData, statusCode, err := lv.getData(finalURL, accessToken)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
 
 	if len(campusData.People) == 0 {
-		return nil, errors.New("No contact data found")
+		return nil, 404, errors.New("No contact data found")
 	}
 
 	retValue, err := newPerson(&campusData.People[0])
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
-	return retValue, nil
+	return retValue, statusCode, nil
 }
 
-func (lv *ContactAdapter) getData(targetURL string, accessToken string) (*campusUserData, error) {
+func (lv *ContactAdapter) getData(targetURL string, accessToken string) (*campusUserData, int, error) {
 	method := "GET"
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, targetURL, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
 	req.Header.Add("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Ocp-Apim-Subscription-Key", lv.APIKey)
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, res.StatusCode, err
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, res.StatusCode, err
 	}
 
 	if res.StatusCode == 401 {
-		return nil, errors.New("Not Authorized")
+		return nil, res.StatusCode, errors.New(res.Status)
 	}
 
 	if res.StatusCode == 403 {
-		return nil, errors.New(res.Status)
+		return nil, res.StatusCode, errors.New(res.Status)
 	}
 
 	if res.StatusCode == 400 {
-		return nil, errors.New("Bad request to api end point")
+		return nil, res.StatusCode, errors.New("Bad request to api end point")
 	}
 
 	if res.StatusCode == 406 {
-		return nil, errors.New("Server returned 406: possible uin claim mismatch")
+		return nil, res.StatusCode, errors.New("Server returned 406: possible uin claim mismatch")
 	}
 
+	//campus api returns a 502 when there is no banner contact data for the uin
 	if res.StatusCode == 502 {
-		return nil, errors.New(res.Status)
+		return nil, 404, errors.New(res.Status)
 	}
 	if res.StatusCode == 200 {
 		data := campusUserData{}
 		err = json.Unmarshal(body, &data)
 
 		if err != nil {
-			return nil, err
+			return nil, res.StatusCode, err
 		}
-		return &data, nil
+		return &data, res.StatusCode, nil
 	}
 
-	return nil, errors.New("Error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
+	return nil, res.StatusCode, errors.New("Error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
 
 }

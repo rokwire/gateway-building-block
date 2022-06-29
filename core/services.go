@@ -76,10 +76,10 @@ func (app *Application) getBuildings() (*[]model.Building, error) {
 	return buildings, nil
 }
 
-func (app *Application) getContactInfo(uin string, accessToken string, mode string) (*model.Person, error) {
-	person, err := app.contactInfoAdapter.GetContactInformation(uin, accessToken, mode)
+func (app *Application) getContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error) {
+	person, statusCode, err := app.contactInfoAdapter.GetContactInformation(uin, accessToken, mode)
 	if err != nil {
-		return nil, err
+		return nil, statusCode, err
 	}
-	return person, nil
+	return person, 200, nil
 }
