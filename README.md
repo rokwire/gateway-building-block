@@ -27,6 +27,8 @@ GATEWAY_LAUNDRYSERVICE_APIURL | < value > | yes | Base URL for the luandry servi
 GATEWAY_WAYFINDING_APIKEY| < value > | yes | API Key used for calling location api end points
 GATEWAY_WAYFINDING_APIURL | < value > | yes | Base URL for building location API end points
 GATEWAY_CORE_HOST | < value > | yes | URL to Rokwire Core building block
+GATEWAY_CONTACTINFO_APIKEY | <value> | yes | API key used to access campus student information apis
+GATEWAY_CONTACTINFO_ENDPOINT | <value> | yes | Base URL to th ecampus student information apis
 
 ### Run Application
 
@@ -45,7 +47,7 @@ $ make
 
 4. Run the executable
 ```
-$ ./bin/dining
+$ ./bin/apigateway
 ```
 
 #### Run locally as Docker container
@@ -56,7 +58,7 @@ $ ./bin/dining
   
 3. Create Docker image  
 ```
-docker build -t dining .
+docker build -t a .
 ```
 4. Run as Docker container
 ```
@@ -120,6 +122,6 @@ Response
 
 ## Documentation
 
-The documentation is placed here - https://api-dev.rokwire.illinois.edu/docs/
+The documentation is placed here - https://api-dev.rokwire.illinois.edu/gateway/api/doc/
 
 Alternativelly the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/gateway/doc/ui/index.html
