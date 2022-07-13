@@ -83,3 +83,11 @@ func (app *Application) getContactInfo(uin string, accessToken string, mode stri
 	}
 	return person, 200, nil
 }
+
+func (app *Application) getGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error) {
+	courseList, statusCode, err := app.giesCourseAdapter.GetGiesCourses(uin, accessToken)
+	if err != nil {
+		return nil, statusCode, err
+	}
+	return courseList, 200, nil
+}

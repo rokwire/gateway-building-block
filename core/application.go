@@ -28,6 +28,7 @@ type Application struct {
 	laundry            Laundry
 	locationAdapter    BuildingLocation
 	contactInfoAdapter ContactInformation
+	giesCourseAdapter  GiesCourses
 }
 
 // Start starts the core part of the application
@@ -35,9 +36,9 @@ func (app *Application) Start() {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, laundry Laundry, bldgloc BuildingLocation, contacts ContactInformation) *Application {
+func NewApplication(version string, build string, storage Storage, laundry Laundry, bldgloc BuildingLocation, contacts ContactInformation, gcAdapter GiesCourses) *Application {
 
-	application := Application{version: version, build: build, storage: storage, laundry: laundry, locationAdapter: bldgloc, contactInfoAdapter: contacts}
+	application := Application{version: version, build: build, storage: storage, laundry: laundry, locationAdapter: bldgloc, contactInfoAdapter: contacts, giesCourseAdapter: gcAdapter}
 
 	//add the drivers ports/interfaces
 	application.Services = &servicesImpl{app: &application}

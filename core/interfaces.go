@@ -33,6 +33,7 @@ type Services interface {
 	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 	GetBuildings() (*[]model.Building, error)
 	GetContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error)
+	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
 }
 
 type servicesImpl struct {
@@ -87,6 +88,11 @@ func (s *servicesImpl) GetContactInfo(uin string, accessToken string, mode strin
 	return person, statusCode, err
 }
 
+func (s *servicesImpl) GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error) {
+	courseList, statusCode, err := s.app.getGiesCourses(uin, accessToken)
+	return courseList, statusCode, err
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	StoreRecord(name string) error
@@ -110,4 +116,9 @@ type BuildingLocation interface {
 //ContactInformation is used by core to request data from the contact information provider
 type ContactInformation interface {
 	GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error)
+}
+
+//GiesCourses is used by core to request data from teh geis course provider
+type GiesCourses interface {
+	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
 }
