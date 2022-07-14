@@ -95,6 +95,7 @@ fixfmt: ; $(info $(M) Fixings formatting…) @ ## Run gofmt to fix formatting on
 .PHONY: clean
 clean: ; $(info $(M) cleaning…)	@ ## Cleanup everything
 	@rm -rf bin
+	@rm -rf build
 	@chmod -R +w vendor
 	@rm -rf vendor
 	@rm -f c.out
@@ -135,7 +136,4 @@ log-variables: ; $(info $(M) Log info…) @ ## Log the variables values
 	@echo "CODE_OFFSET:"$(CODE_OFFSET)
 	@echo "BUILD_NUMBER:"$(BUILD_NUMBER)
 	@echo "VERSION:"$(VERSION)
-
-
-
 
