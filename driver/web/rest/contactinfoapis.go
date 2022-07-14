@@ -43,7 +43,7 @@ func NewContactInfoApisHandler(app *core.Application) ContactInfoApisHandler {
 // @Accept  json
 // @Produce json
 // @Success 200 {object} model.Person
-// @Security RokwireAuth ExternakAuth
+// @Security RokwireAuth ExternalAuth
 // @Router /person/contactinfo [get]
 func (h ContactInfoApisHandler) GetContactInfo(w http.ResponseWriter, r *http.Request) {
 

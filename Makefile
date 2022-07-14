@@ -15,7 +15,6 @@ BUILD_NUMBER=$(shell echo $$(( $(BUILD_VERSION) + $(CODE_OFFSET) )))
 VERSION ?= ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}
 
 export -n GOBIN
-export GOROOT=/usr/local/go
 #export PATH=$(BIN): $(shell printenv PATH)
 
 GO      = go

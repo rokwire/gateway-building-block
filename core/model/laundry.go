@@ -25,7 +25,7 @@ type LaundryRoom struct {
 	Location *LaundryDetails
 }
 
-//Organization represents the top most level of inforomation provided by teh laundry api
+//Organization represents the top most level of information provided by the laundry api
 type Organization struct {
 	SchoolName   string
 	LaundryRooms []*LaundryRoom
@@ -41,7 +41,7 @@ type RoomDetail struct {
 	Location   *LaundryDetails
 }
 
-//Appliance represents the information specific to an identifiiable appliance in a laundry room
+//Appliance represents the information specific to an identifiable appliance in a laundry room
 type Appliance struct {
 	ID               string
 	Status           string
