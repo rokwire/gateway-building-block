@@ -1,6 +1,11 @@
-# Gateway Building Bock
+# Gateway Building Block
 
-Go project to provide rest service for rokwire dining building block.
+The Gateway Building Block provides access to external systems for the Rokwire platform.
+
+## Documentation
+The functionality provided by this application is documented in the [Wiki](https://github.com/rokwire/gateway-building-block/wiki).
+
+The API documentation is available here: https://api.rokwire.illinois.edu/gateway/api/doc/ui/index.html
 
 ## Set Up
 
@@ -13,22 +18,23 @@ Go v1.16+
 ### Environment variables
 The following Environment variables are supported. The service will not start unless those marked as Required are supplied.
 
-Name|Value|Required|Description
+Name|Format|Required|Description
 ---|---|---|---
-GATEWAY_PORT | < value > | yes | The port number of the listening port
-GATEWAY_HOST | < value > | yes | Host name
+GATEWAY_PORT | < int > | yes | The port number of the listening port
+GATEWAY_HOST | < url > | yes | URL where this application is being hosted
 GATEWAY_MONGO_AUTH | <mongodb://USER:PASSWORD@HOST:PORT/DATABASE NAME> | yes | MongoDB authentication string. The user must have read/write privileges.
-GATEWAY_MONGO_DATABASE | < value > | yes | MongoDB database name e.g dining_db
-GATEWAY_MONGO_TIMEOUT | < value > | no | MongoDB timeout in milliseconds. Set default value(500 milliseconds) if omitted
-GATEWAY_LAUNDRY_APIKEY | < value > | yes | API Key for laundry view information
-GATEWAY_LAUNDRY_APIURL | < value > | yes | Base URL for Laundry view apis
-GATEWAY_LAUNDRYSERVICE_APIKEY | < value > | yes | API key for calling the laundry service apis
-GATEWAY_LAUNDRYSERVICE_APIURL | < value > | yes | Base URL for the luandry service API end points
-GATEWAY_WAYFINDING_APIKEY| < value > | yes | API Key used for calling location api end points
-GATEWAY_WAYFINDING_APIURL | < value > | yes | Base URL for building location API end points
-GATEWAY_CORE_HOST | < value > | yes | URL to Rokwire Core building block
-GATEWAY_CONTACTINFO_APIKEY | <value> | yes | API key used to access campus student information apis
-GATEWAY_CONTACTINFO_ENDPOINT | <value> | yes | Base URL to th ecampus student information apis
+GATEWAY_MONGO_DATABASE | < string > | yes | MongoDB database name e.g dining_db
+GATEWAY_MONGO_TIMEOUT | < int > | no | MongoDB timeout in milliseconds. Defaults to 500
+GATEWAY_LAUNDRY_APIKEY | < string > | yes | API Key for laundry view information
+GATEWAY_LAUNDRY_APIURL | < url > | yes | Base URL for Laundry view apis
+GATEWAY_LAUNDRYSERVICE_APIKEY | < string > | yes | API key for calling the laundry service apis
+GATEWAY_LAUNDRYSERVICE_APIURL | < url > | yes | Base URL for the laundry service API endpoints
+GATEWAY_LAUNDRYSERVICE_BASICAUTH | < string > | yes | Token for calling the laundry service apis
+GATEWAY_WAYFINDING_APIKEY| < string > | yes | API Key used for calling location api end points
+GATEWAY_WAYFINDING_APIURL | < url > | yes | Base URL for building location API endpoints
+GATEWAY_CORE_HOST | < url > | yes | Core BB host URL
+GATEWAY_CONTACTINFO_APIKEY | < string > | yes | API key used to access campus student information apis
+GATEWAY_CONTACTINFO_ENDPOINT | < url > | yes | Base URL to the campus student information apis
 
 ### Run Application
 
@@ -120,8 +126,15 @@ Response
 0.1.2
 ```
 
-## Documentation
+## Contributing
+If you would like to contribute to this project, please be sure to read the [Contributing Guidelines](CONTRIBUTING.md), [Code of Conduct](CODE_OF_CONDUCT.md), and [Conventions](CONVENTIONS.md) before beginning.
 
-The documentation is placed here - https://api-dev.rokwire.illinois.edu/gateway/api/doc/
+### Secret Detection
+This repository is configured with a [pre-commit](https://pre-commit.com/) hook that runs [Yelp's Detect Secrets](https://github.com/Yelp/detect-secrets). If you intend to contribute directly to this repository, you must install pre-commit on your local machine to ensure that no secrets are pushed accidentally.
 
-Alternativelly the documentation is served by the service on the following url - https://api-dev.rokwire.illinois.edu/gateway/doc/ui/index.html
+```
+# Install software 
+$ git pull  # Pull in pre-commit configuration & baseline 
+$ pip install pre-commit 
+$ pre-commit install
+```
