@@ -35,7 +35,7 @@ func NewCourseApisHandler(app *core.Application) CourseApisHandler {
 	return CourseApisHandler{app: app}
 }
 
-// GetGiesCoruses returns a list of registered courses for GIES students
+// GetGiesCourses returns a list of registered courses for GIES students
 // @Summary Returns a list of registered courses
 // @Tags Client
 // @ID GiesCourses

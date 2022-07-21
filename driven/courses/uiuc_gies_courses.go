@@ -57,8 +57,8 @@ func newCourse(cr course) *model.GiesCourse {
 	return &ret
 }
 
-//GetStudentCourses returns a list of courses for the given GIES student
-func (lv *GiesCourseAdapter) GetStudentCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error) {
+//GetGiesCourses returns a list of courses for the given GIES student
+func (lv *GiesCourseAdapter) GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error) {
 
 	finalURL := lv.APIEndpoint + "/" + uin
 
@@ -94,7 +94,7 @@ func (lv *GiesCourseAdapter) getData(targetURL string, accessToken string) ([]co
 		return nil, http.StatusInternalServerError, err
 	}
 
-	req.Header.Add("Authorization", "Bearer "+accessToken)
+	req.Header.Add("access_token", accessToken)
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, res.StatusCode, err
