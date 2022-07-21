@@ -195,7 +195,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "RokwireAuth ExternakAuth": []
+                        "RokwireAuth ExternalAuth": []
                     }
                 ],
                 "consumes": [

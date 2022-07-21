@@ -378,7 +378,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Person'
       security:
-      - RokwireAuth ExternakAuth: []
+      - RokwireAuth ExternalAuth: []
       summary: Returns the name, permanent and mailing addresses, phone number and
         emergency contact information for a person
       tags:
