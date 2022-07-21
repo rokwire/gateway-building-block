@@ -104,6 +104,21 @@ definitions:
       name:
         type: string
     type: object
+  model.GiesCourse:
+    properties:
+      instructor:
+        type: string
+      number:
+        type: string
+      section:
+        type: string
+      subject:
+        type: string
+      term:
+        type: string
+      title:
+        type: string
+    type: object
   model.LaundryDetails:
     properties:
       floor:
@@ -237,6 +252,31 @@ info:
   title: Rokwire Gatewauy Building Block API
   version: 0.1.0
 paths:
+  /courses/giescourses:
+    get:
+      consumes:
+      - application/json
+      operationId: GiesCourses
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.GiesCourse'
+            type: array
+      security:
+      - RokwireAuth ExternalAuth: []
+      summary: Returns a list of registered courses
+      tags:
+      - Client
   /laundry/initrequest:
     get:
       consumes:

@@ -20,6 +20,46 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/courses/giescourses": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth ExternalAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns a list of registered courses",
+                "operationId": "GiesCourses",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.GiesCourse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/laundry/initrequest": {
             "get": {
                 "security": [
@@ -533,6 +573,29 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.GiesCourse": {
+            "type": "object",
+            "properties": {
+                "instructor": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "section": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
