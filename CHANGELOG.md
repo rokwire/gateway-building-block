@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 8/4/2022
 ### Fixed
+-driven/laundry/csc_laundryview.go - standardized base api url from CSC so the switch to production endpoints can be made
 ### Added
 -Endpoint courses/studentcourses was added to return classes and their locations for students for selected semester
 -driven/courses/uiuc_courses.go
