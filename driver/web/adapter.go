@@ -37,6 +37,7 @@ type Adapter struct {
 	buildingapiHandler rest.BuildingAPIHandler
 	contactapiHandler  rest.ContactInfoApisHandler
 	coursesapiHandler  rest.CourseApisHandler
+	termsapiHandler    rest.TermSessionAPIHandler
 	tokenAuth          *TokenAuth
 	app                *core.Application
 }
@@ -98,6 +99,9 @@ func (we Adapter) Start() {
 	mainRouter.HandleFunc("/person/contactinfo", we.tokenAuthWrapFunc(we.contactapiHandler.GetContactInfo)).Methods("GET")
 
 	mainRouter.HandleFunc("/courses/giescourses", we.tokenAuthWrapFunc(we.coursesapiHandler.GetGiesCourses)).Methods("GET")
+	mainRouter.HandleFunc("/courses/studentcourses", we.tokenAuthWrapFunc(we.coursesapiHandler.GetStudentcourses)).Methods("GET")
+
+	mainRouter.HandleFunc("/termsessions/listcurrent", we.tokenAuthWrapFunc(we.termsapiHandler.GetTermSessions)).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
@@ -143,10 +147,12 @@ func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *T
 	buildingapiHandler := rest.NewBuildingAPIHandler(app)
 	contactapiHandler := rest.NewContactInfoApisHandler(app)
 	coursesapiHandler := rest.NewCourseApisHandler(app)
+	termsapiHandler := rest.NewTermSessionAPIHandler(app)
+
 	return Adapter{host: host, port: port,
 		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler,
 		buildingapiHandler: buildingapiHandler, tokenAuth: tokenAuth,
-		contactapiHandler: contactapiHandler, coursesapiHandler: coursesapiHandler}
+		contactapiHandler: contactapiHandler, coursesapiHandler: coursesapiHandler, termsapiHandler: termsapiHandler}
 }
 
 //AppListener implements core.ApplicationListener interface

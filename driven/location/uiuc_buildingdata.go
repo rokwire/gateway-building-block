@@ -147,9 +147,18 @@ func (uwf *UIUCWayFinding) GetBuildings() (*[]model.Building, error) {
 }
 
 //GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
-func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error) {
+func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
-	parameters := "{\"v\": 2}"
+	lat := fmt.Sprintf("%f", latitude)
+	long := fmt.Sprintf("%f", longitude)
+
+	parameters := ""
+	if latitude == 0 && longitude == 0 {
+		parameters = "{\"v\": 2, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
+	} else {
+		parameters = "{\"v\": 2}"
+	}
+
 	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {

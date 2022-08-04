@@ -176,7 +176,7 @@ func newPerson(cr *campusPerson) (*model.Person, error) {
 //GetContactInformation returns a contact information object for a student
 func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error) {
 
-	finalURL := lv.APIEndpoint + "/" + uin
+	finalURL := lv.APIEndpoint + "/person/contact-summary-query/" + uin
 
 	if mode != "0" {
 		finalURL = lv.APIEndpoint + "/mock/123456789"

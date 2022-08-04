@@ -316,7 +316,7 @@ func evalNumAvailable(inputstr string) int {
 }
 
 func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
-	url := lv.ServiceAPIUrl + "/sr-key/getSubscriptionKey"
+	url := lv.ServiceAPIUrl + "/getSubscriptionKey"
 	method := "POST"
 
 	payload := `{"subscription-id": "univofchicago", "key-type": "primaryKey" }`
@@ -335,7 +335,7 @@ func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
 }
 
 func (lv *CSCLaundryView) getServiceToken() error {
-	url := lv.ServiceAPIUrl + "/sr/v1/generateToken?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/generateToken?subscription-key=" + lv.serviceSubscriptionKey
 	method := "GET"
 
 	headers := make(map[string]string)
@@ -400,7 +400,7 @@ func (lv *CSCLaundryView) makeLaundryServiceWebRequest(url string, method string
 func (lv *CSCLaundryView) getMachineDetails(machineid string) (*machinedetail, error) {
 	md := machinedetail{}
 
-	url := lv.ServiceAPIUrl + "/sr/v1/machineDetails?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/machineDetails?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 
 	payload := `{"machineId":"` + machineid + `"}`
@@ -424,7 +424,7 @@ func (lv *CSCLaundryView) getMachineDetails(machineid string) (*machinedetail, e
 }
 
 func (lv *CSCLaundryView) getProblemCodes(machinetype string) ([]string, error) {
-	url := lv.ServiceAPIUrl + "/sr/v1/problemCodes?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/problemCodes?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 
 	payload := `{"machineType": "` + machinetype + `"}`
@@ -449,7 +449,7 @@ func (lv *CSCLaundryView) getProblemCodes(machinetype string) ([]string, error) 
 }
 
 func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, comments string, firstName string, lastName string, phone string, email string) (*model.ServiceRequestResult, error) {
-	url := lv.ServiceAPIUrl + "/sr/v1/submitServiceRequest?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/submitServiceRequest?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 	headers := make(map[string]string)
 	headers["X-CSRFToken"] = lv.serviceToken

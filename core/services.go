@@ -46,8 +46,8 @@ func (app *Application) submitServiceRequest(machineID string, problemCode strin
 	return *srr, nil
 }
 
-func (app *Application) getBuilding(bldgID string, adaOnly bool) (model.Building, error) {
-	bldg, err := app.locationAdapter.GetBuilding(bldgID, adaOnly)
+func (app *Application) getBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (model.Building, error) {
+	bldg, err := app.locationAdapter.GetBuilding(bldgID, adaOnly, latitude, longitude)
 	if err != nil {
 		return *bldg, err
 	}
@@ -87,4 +87,20 @@ func (app *Application) getGiesCourses(uin string, accessToken string) (*[]model
 		return nil, statusCode, err
 	}
 	return courseList, 200, nil
+}
+
+func (app *Application) getStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error) {
+	courseList, statusCode, err := app.studentcourseAdapter.GetStudentCourses(uin, termid, accessToken)
+	if err != nil {
+		return nil, statusCode, err
+	}
+	return courseList, 200, nil
+}
+
+func (app *Application) getTermSessions() (*[4]model.TermSession, error) {
+	termSessions, err := app.termsessionAdapter.GetTermSessions()
+	if err != nil {
+		return nil, err
+	}
+	return termSessions, nil
 }

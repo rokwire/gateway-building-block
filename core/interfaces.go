@@ -26,11 +26,13 @@ type Services interface {
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)
 	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
-	GetBuilding(bldgID string, adaOnly bool) (*model.Building, error)
+	GetBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Building, error)
 	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 	GetBuildings() (*[]model.Building, error)
 	GetContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error)
 	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
+	GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error)
+	GetTermSessions() (*[4]model.TermSession, error)
 }
 
 type servicesImpl struct {
@@ -65,8 +67,8 @@ func (s *servicesImpl) SubmitServiceRequest(machineID string, problemCode string
 	return &srr, err
 }
 
-func (s *servicesImpl) GetBuilding(bldgID string, adaOnly bool) (*model.Building, error) {
-	bldg, err := s.app.getBuilding(bldgID, adaOnly)
+func (s *servicesImpl) GetBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Building, error) {
+	bldg, err := s.app.getBuilding(bldgID, adaOnly, latitude, longitude)
 	return &bldg, err
 }
 
@@ -90,6 +92,16 @@ func (s *servicesImpl) GetGiesCourses(uin string, accessToken string) (*[]model.
 	return courseList, statusCode, err
 }
 
+func (s *servicesImpl) GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error) {
+	courseList, statusCode, err := s.app.getStudentCourses(uin, termid, accessToken)
+	return courseList, statusCode, err
+}
+
+func (s *servicesImpl) GetTermSessions() (*[4]model.TermSession, error) {
+	termList, err := s.app.getTermSessions()
+	return termList, err
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	StoreRecord(name string) error
@@ -105,7 +117,7 @@ type Laundry interface {
 
 //BuildingLocation is used by core to request data from the building location/entrance provider
 type BuildingLocation interface {
-	GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error)
+	GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Building, error)
 	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 	GetBuildings() (*[]model.Building, error)
 }
@@ -118,4 +130,14 @@ type ContactInformation interface {
 //GiesCourses is used by core to request data from teh geis course provider
 type GiesCourses interface {
 	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
+}
+
+//StudentCourses is used by core to request data from the course data provider
+type StudentCourses interface {
+	GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error)
+}
+
+//TermSessions is used by core to request data from the term sessions data provider
+type TermSessions interface {
+	GetTermSessions() (*[4]model.TermSession, error)
 }

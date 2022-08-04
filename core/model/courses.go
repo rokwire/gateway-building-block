@@ -26,3 +26,27 @@ type GiesCourse struct {
 	Title      string `json:"title"`
 	Instructor string `json:"instructor"`
 }
+
+//CourseSection represents the elements of a course section
+type CourseSection struct {
+	Days                  string   `json:"days"`
+	MeetingDateOrRange    string   `json:"meeting_dates_or_range"`
+	Room                  string   `json:"room"`
+	BuildingName          string   `json:"buildingname"`
+	BuildingID            string   `json:"buildingid"`
+	InstructionType       string   `json:"instructiontype"`
+	Instructor            string   `json:"instructor"`
+	StartTime             string   `json:"start_time"`
+	EndTime               string   `json:"endtime"`
+	Location              Building `json:"building"`
+	CourseReferenceNumber string   `json:"courseReferenceNumber"`
+}
+
+//Course represents the full elements of a course
+type Course struct {
+	Title             string        `json:"coursetitle"`
+	ShortName         string        `json:"courseshortname"`
+	Number            string        `json:"coursenumber"`
+	InstructionMethod string        `json:"instructionmethod"`
+	Section           CourseSection `json:"coursesection"`
+}

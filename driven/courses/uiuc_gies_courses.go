@@ -46,7 +46,7 @@ func NewGiesCourseAdapter(url string) *GiesCourseAdapter {
 
 }
 
-func newCourse(cr course) *model.GiesCourse {
+func newGiesCourse(cr course) *model.GiesCourse {
 	ret := model.GiesCourse{}
 	ret.Instructor = cr.Instructor
 	ret.Number = cr.Number
@@ -75,7 +75,7 @@ func (lv *GiesCourseAdapter) GetGiesCourses(uin string, accessToken string) (*[]
 
 	for i := 0; i < len(campusData); i++ {
 		course := campusData[i]
-		retValue = append(retValue, *newCourse(course))
+		retValue = append(retValue, *newGiesCourse(course))
 	}
 
 	if err != nil {

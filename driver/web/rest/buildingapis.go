@@ -45,6 +45,8 @@ func NewBuildingAPIHandler(app *core.Application) BuildingAPIHandler {
 // @Produce json
 // @Param id query string true "Building identifier"
 // @Param adaOnly query bool false "ADA entrances filter"
+// @Param lat query number false "latitude coordinate of the user"
+// @Param long query number false "longitude coordinate of the user"
 // @Success 200 {object} model.Building
 // @Security RokwireAuth
 // @Router /wayfinding/building [get]
@@ -53,6 +55,10 @@ func (h BuildingAPIHandler) GetBuilding(w http.ResponseWriter, r *http.Request) 
 	bldgid := ""
 	adaOnly := false
 	reqParams := utils.ConstructFilter(r)
+	var latitude, longitude float64
+	latitude = 0
+	longitude = 0
+
 	for _, v := range reqParams.Items {
 		if v.Field == "id" {
 			bldgid = v.Value[0]
@@ -66,6 +72,25 @@ func (h BuildingAPIHandler) GetBuilding(w http.ResponseWriter, r *http.Request) 
 			}
 			adaOnly = ada
 		}
+		if v.Field == "lat" {
+			lat, err := strconv.ParseFloat(v.Value[0], 64)
+			if err != nil {
+				log.Printf("Invalid parameter value (lat): %s\n", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			latitude = lat
+		}
+
+		if v.Field == "long" {
+			long, err := strconv.ParseFloat(v.Value[0], 64)
+			if err != nil {
+				log.Printf("Invalid parameter value (long): %s\n", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			longitude = long
+		}
 	}
 
 	if bldgid == "" {
@@ -74,7 +99,7 @@ func (h BuildingAPIHandler) GetBuilding(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	bldg, err := h.app.Services.GetBuilding(bldgid, adaOnly)
+	bldg, err := h.app.Services.GetBuilding(bldgid, adaOnly, latitude, longitude)
 	if err != nil {
 		log.Printf("Error retrieving building details: %s\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
