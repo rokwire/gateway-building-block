@@ -59,12 +59,12 @@ func (s *servicesImpl) GetLaundryRoom(roomid string) (*model.RoomDetail, error) 
 
 func (s *servicesImpl) InitServiceRequest(machineid string) (*model.MachineRequestDetail, error) {
 	sr, err := s.app.initServiceRequest(machineid)
-	return &sr, err
+	return sr, err
 }
 
 func (s *servicesImpl) SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error) {
 	srr, err := s.app.submitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
-	return &srr, err
+	return srr, err
 }
 
 func (s *servicesImpl) GetBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Building, error) {

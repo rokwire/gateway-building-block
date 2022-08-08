@@ -36,14 +36,20 @@ func (app *Application) listAppliances(id string) (model.RoomDetail, error) {
 	return *ap, nil
 }
 
-func (app *Application) initServiceRequest(machineid string) (model.MachineRequestDetail, error) {
-	sr, _ := app.laundry.InitServiceRequest(machineid)
-	return *sr, nil
+func (app *Application) initServiceRequest(machineid string) (*model.MachineRequestDetail, error) {
+	sr, err := app.laundry.InitServiceRequest(machineid)
+	if err != nil {
+		return nil, err
+	}
+	return sr, nil
 }
 
-func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (model.ServiceRequestResult, error) {
-	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
-	return *srr, nil
+func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error) {
+	srr, err := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
+	if err != nil {
+		return nil, err
+	}
+	return srr, nil
 }
 
 func (app *Application) getBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (model.Building, error) {

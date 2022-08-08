@@ -226,7 +226,7 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string,
 
 	//used to indicate no building found
 	if res.StatusCode == 202 {
-		return nil, errors.New("Building not found.")
+		return nil, errors.New("Building not found")
 	}
 
 	data := serverLocationData{}

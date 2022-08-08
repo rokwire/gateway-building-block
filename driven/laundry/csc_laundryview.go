@@ -18,6 +18,7 @@ import (
 	model "apigateway/core/model"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -319,7 +320,7 @@ func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
 	url := lv.ServiceAPIUrl + "/getSubscriptionKey"
 	method := "POST"
 
-	payload := `{"subscription-id": "univofchicago", "key-type": "primaryKey" }`
+	payload := `{"subscription-id": "uiuc", "key-type": "primaryKey" }`
 
 	headers := make(map[string]string)
 	headers["Ocp-Apim-Subscription-Key"] = lv.ServiceOCPSubscriptionKey
@@ -330,7 +331,18 @@ func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
 	if err != nil {
 		return err
 	}
-	lv.serviceSubscriptionKey = string(body)
+
+	var dat map[string]interface{}
+	if err := json.Unmarshal(body, &dat); err != nil {
+		return err
+	}
+
+	if _, keyExists := dat["subscription-key"]; !keyExists {
+		return errors.New("Subscription key not returned")
+	}
+
+	lv.serviceSubscriptionKey = dat["subscription-key"].(string)
+
 	return nil
 }
 
@@ -351,6 +363,10 @@ func (lv *CSCLaundryView) getServiceToken() error {
 	var dat map[string]interface{}
 	if err := json.Unmarshal(body, &dat); err != nil {
 		return err
+	}
+
+	if _, keyExists := dat["token"]; !keyExists {
+		return errors.New("token not returned")
 	}
 
 	lv.serviceToken = dat["token"].(string)

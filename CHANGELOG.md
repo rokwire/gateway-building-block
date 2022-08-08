@@ -61,8 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.2] - 8/8/2022
 ### Fixed
 --uiuc_laundryview.go(322) - {"subscription-id": "uic-chicago", "key-type": "primaryKey" } to {"subscription-id": "uiuc", "key-type": "primaryKey" }
+--uiuc_laundryview.go - changed code to handle new data sent by getsubscription vendor call
+--uiuc_laundryview.go - added error handling for missing subscription key or request token
 ### Added
-
 ### Changed
--core/model/courses.go - added CourseReferenceNumber property to CourseSection object
--core/driven/courses/uiuc_courses.go - map data from campus json to CourseReferenceNumber property
