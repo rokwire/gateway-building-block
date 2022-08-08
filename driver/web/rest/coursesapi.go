@@ -168,6 +168,7 @@ func (h CourseApisHandler) GetStudentcourses(w http.ResponseWriter, r *http.Requ
 	if termid == "" || termid == "null" {
 		log.Printf("Error: missing termid parameter")
 		http.Error(w, "Missing termid parameter", http.StatusBadRequest)
+		return
 	}
 
 	if externalToken == "" {

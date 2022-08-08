@@ -221,8 +221,12 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string,
 	}
 
 	if res.StatusCode == 400 {
-		fmt.Println(string(body))
 		return nil, errors.New("Bad request to api end point")
+	}
+
+	//used to indicate no building found
+	if res.StatusCode == 202 {
+		return nil, errors.New("Building not found.")
 	}
 
 	data := serverLocationData{}

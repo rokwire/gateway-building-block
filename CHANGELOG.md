@@ -49,3 +49,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -main.go - added term session adapter to application
 -application.go - added a term session adapter
 -services.go - implemented getStudentCourses and getTermSessions
+
+## [1.2.1] - 8/4/2022
+### Fixed
+### Added
+
+### Changed
+-core/model/courses.go - added CourseReferenceNumber property to CourseSection object
+-core/driven/courses/uiuc_courses.go - map data from campus json to CourseReferenceNumber property
+
+## [1.2.2] - 8/8/2022
+### Fixed
+--uiuc_laundryview.go(322) - {"subscription-id": "uic-chicago", "key-type": "primaryKey" } to {"subscription-id": "uiuc", "key-type": "primaryKey" }
+### Added
+
+### Changed
+-core/model/courses.go - added CourseReferenceNumber property to CourseSection object
+-core/driven/courses/uiuc_courses.go - map data from campus json to CourseReferenceNumber property
