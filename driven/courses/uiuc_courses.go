@@ -76,35 +76,35 @@ type courseSectionInstructor struct {
 }
 
 type courseSectionSession struct {
-	MeetsOnMondayFlag       string                  `json:"meetsOnMondayFlag"`
-	MeetsOnTuesdayFlag      string                  `json:"meetsOnTuesdayFlag"`
-	MeetsOnWednesdayFlag    string                  `json:"meetsOnWednesdayFlag"`
-	MeetsOnThursdayFlag     string                  `json:"meetsOnThursdayFlag"`
-	MeetsOnFridayFlag       string                  `json:"meetsOnFridayFlag"`
-	MeetsOnSaturdayFlag     string                  `json:"meetsOnSaturdayFlag"`
-	MeetsOnSundayFlag       string                  `json:"meetsOnSundayFlag"`
-	Room                    string                  `json:"room"`
-	ArchibusBuildingNumber  string                  `json:"archibusBuildingNumber"`
-	StartTime               string                  `json:"startTime"`
-	EndTime                 string                  `json:"endTime"`
-	CreditHours             string                  `json:"creditHours"`
-	CourseSectionInstructor courseSectionInstructor `json:"courseSectionInstructor"`
-	MeetingDateOrRange      string                  `json:"meetingDateOrRange"`
-	ValidMeetingType        codeDescription         `json:"validMeetingType"`
-	CourseSectionSessionID  string                  `json:"courseSectionSessionID"`
-	ValidCourseScheduleType codeDescription         `json:"validCourseScheduleType"`
-	ValidBuilding           codeDescription         `json:"validBuilding"`
+	MeetsOnMondayFlag       string                    `json:"meetsOnMondayFlag"`
+	MeetsOnTuesdayFlag      string                    `json:"meetsOnTuesdayFlag"`
+	MeetsOnWednesdayFlag    string                    `json:"meetsOnWednesdayFlag"`
+	MeetsOnThursdayFlag     string                    `json:"meetsOnThursdayFlag"`
+	MeetsOnFridayFlag       string                    `json:"meetsOnFridayFlag"`
+	MeetsOnSaturdayFlag     string                    `json:"meetsOnSaturdayFlag"`
+	MeetsOnSundayFlag       string                    `json:"meetsOnSundayFlag"`
+	Room                    string                    `json:"room"`
+	ArchibusBuildingNumber  string                    `json:"archibusBuildingNumber"`
+	StartTime               string                    `json:"startTime"`
+	EndTime                 string                    `json:"endTime"`
+	CreditHours             string                    `json:"creditHours"`
+	CourseSectionInstructor []courseSectionInstructor `json:"courseSectionInstructor"`
+	MeetingDateOrRange      string                    `json:"meetingDateOrRange"`
+	ValidMeetingType        codeDescription           `json:"validMeetingType"`
+	CourseSectionSessionID  string                    `json:"courseSectionSessionID"`
+	ValidCourseScheduleType codeDescription           `json:"validCourseScheduleType"`
+	ValidBuilding           codeDescription           `json:"validBuilding"`
 }
 type courseSection struct {
-	StartDate             string               `json:"startDate"`
-	EndDate               string               `json:"endDate"`
-	ValidPartOfTerm       validPartOfTerm      `json:"validPartOfTerm"`
-	CourseReferenceNumber string               `json:"courseReferenceNumber"`
-	SectionNumber         string               `json:"sectionNumber"`
-	ValidTerm             codeDescription      `json:"validTerm"`
-	Course                campuscourse         `json:"course"`
-	CourseSectionSession  courseSectionSession `json:"courseSectionSession"`
-	CreditHours           string               `json:"creditHours"`
+	CourseReferenceNumber string                 `json:"courseReferenceNumber"`
+	SectionNumber         string                 `json:"sectionNumber"`
+	ValidTerm             codeDescription        `json:"validTerm"`
+	Course                campuscourse           `json:"course"`
+	StartDate             string                 `json:"startDate"`
+	EndDate               string                 `json:"endDate"`
+	CreditHours           string                 `json:"creditHours"`
+	ValidPartOfTerm       validPartOfTerm        `json:"validPartOfTerm"`
+	CourseSectionSession  []courseSectionSession `json:"courseSectionSession"`
 }
 type courseRegistration struct {
 	ValidRegistrationStatusType  codeDescription `json:"validRegistrationStatusType"`
@@ -116,7 +116,6 @@ type courseRegistration struct {
 	CourseSection                courseSection   `json:"courseSection"`
 }
 type studentTermCourseInfo struct {
-	PrimaryKey            string               `json:"primaryKey"`
 	Student               studentDemo          `json:"lightweightPerson"`
 	ValidEnrollmentStatus codeDescription      `json:"validEnrollmentStatus"`
 	ValidTerm             codeDescription      `json:"validTerm"`
@@ -136,14 +135,14 @@ func NewCourseAdapter(url string, apikey string) *StudentCourseAdapter {
 }
 
 //newCourse maps the campus course data to the course data sent back to the app.
-func newCourse(cr courseRegistration) *model.Course {
+func newCourse(cr courseRegistration, courseSectionSessionIndex int) *model.Course {
 	ret := model.Course{}
 	ret.Number = cr.CourseSection.CourseReferenceNumber
 	ret.ShortName = cr.CourseSection.Course.CourseAbbreviation + " " + cr.CourseSection.Course.CourseNumber
 	ret.Title = cr.CourseSection.Course.CourseTitle
-	ret.InstructionMethod = cr.CourseSection.CourseSectionSession.ValidCourseScheduleType.Code
+	ret.InstructionMethod = cr.CourseSection.CourseSectionSession[courseSectionSessionIndex].ValidCourseScheduleType.Code
 	crn := cr.CourseSection.CourseReferenceNumber
-	css := cr.CourseSection.CourseSectionSession
+	css := cr.CourseSection.CourseSectionSession[courseSectionSessionIndex]
 	newCS := newCourseSection(css, crn)
 	ret.Section = *newCS
 
@@ -160,9 +159,21 @@ func newCourseSection(cs courseSectionSession, crn string) *model.CourseSection 
 	ret.StartTime = cs.StartTime
 	ret.EndTime = cs.EndTime
 	ret.InstructionType = cs.ValidCourseScheduleType.Code
-	ret.Instructor = cs.CourseSectionInstructor.LightweightPerson.Name.LastName + ", " + cs.CourseSectionInstructor.LightweightPerson.Name.FirstName
-	ret.CourseReferenceNumber = crn
 
+	//we only want the primary instructor
+	if len(cs.CourseSectionInstructor) == 0 {
+		ret.Instructor = ""
+	} else {
+
+		for i := 0; i < len(cs.CourseSectionInstructor); i++ {
+			instructor := cs.CourseSectionInstructor[i]
+			if instructor.LightweightPerson.PrimaryIndicator == "Y" {
+				ret.Instructor = instructor.LightweightPerson.Name.LastName + ", " + instructor.LightweightPerson.Name.FirstName
+				break
+			}
+		}
+	}
+	ret.CourseReferenceNumber = crn
 	//data coming from campus only contains the fields for each day it is actually taught
 	//days the course is not taught will be empty since they won't be int he data
 	days := make([]string, 0)
@@ -215,7 +226,9 @@ func (lv *StudentCourseAdapter) GetStudentCourses(uin string, termid string, acc
 	for i := 0; i < len(campusData.List[0].CourseRegistration); i++ {
 		course := campusData.List[0].CourseRegistration[i]
 		if course.ValidRegistrationStatusType.Code == "R" {
-			retValue = append(retValue, *newCourse(course))
+			for i := 0; i < len(course.CourseSection.CourseSectionSession); i++ {
+				retValue = append(retValue, *newCourse(course, i))
+			}
 		}
 	}
 
