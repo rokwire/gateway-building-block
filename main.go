@@ -63,6 +63,7 @@ func main() {
 	laundryServiceToken := getEnvKey("GATEWAY_LAUNDRYSERVICE_BASICAUTH", true)
 	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
 	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
+	// pragma: allowlist nextline secret
 	campusInfoAPIKey := getEnvKey("GATEWAY_CENTRALCAMPUS_APIKEY", true)
 	campusAITSEndPoint := getEnvKey("GATEWAY_CENTRALCAMPUS_ENDPOINT", true)
 	coursesEndPoint := getEnvKey("GATEWAY_GIESCOURSES_ENDPOINT", true)

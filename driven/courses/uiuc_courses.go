@@ -130,6 +130,7 @@ type StudentCourseAdapter struct {
 
 //NewCourseAdapter returns a vendor specific implementation of the Course lookup interface
 func NewCourseAdapter(url string, apikey string) *StudentCourseAdapter {
+	// pragma: allowlist nextline secret
 	return &StudentCourseAdapter{CourseAPIEndpoint: url, CourseAPIKey: apikey}
 
 }
