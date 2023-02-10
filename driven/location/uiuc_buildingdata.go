@@ -147,9 +147,18 @@ func (uwf *UIUCWayFinding) GetBuildings() (*[]model.Building, error) {
 }
 
 //GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
-func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error) {
+func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
-	parameters := "{\"v\": 2}"
+	lat := fmt.Sprintf("%f", latitude)
+	long := fmt.Sprintf("%f", longitude)
+
+	parameters := ""
+	if latitude == 0 && longitude == 0 {
+		parameters = "{\"v\": 2, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
+	} else {
+		parameters = "{\"v\": 2}"
+	}
+
 	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {
@@ -212,8 +221,12 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string,
 	}
 
 	if res.StatusCode == 400 {
-		fmt.Println(string(body))
 		return nil, errors.New("Bad request to api end point")
+	}
+
+	//used to indicate no building found
+	if res.StatusCode == 202 {
+		return nil, errors.New("Building not found")
 	}
 
 	data := serverLocationData{}

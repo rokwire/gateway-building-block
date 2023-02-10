@@ -36,18 +36,24 @@ func (app *Application) listAppliances(id string) (model.RoomDetail, error) {
 	return *ap, nil
 }
 
-func (app *Application) initServiceRequest(machineid string) (model.MachineRequestDetail, error) {
-	sr, _ := app.laundry.InitServiceRequest(machineid)
-	return *sr, nil
+func (app *Application) initServiceRequest(machineid string) (*model.MachineRequestDetail, error) {
+	sr, err := app.laundry.InitServiceRequest(machineid)
+	if err != nil {
+		return nil, err
+	}
+	return sr, nil
 }
 
-func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (model.ServiceRequestResult, error) {
-	srr, _ := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
-	return *srr, nil
+func (app *Application) submitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error) {
+	srr, err := app.laundry.SubmitServiceRequest(machineID, problemCode, comments, firstname, lastname, phone, email)
+	if err != nil {
+		return nil, err
+	}
+	return srr, nil
 }
 
-func (app *Application) getBuilding(bldgID string, adaOnly bool) (model.Building, error) {
-	bldg, err := app.locationAdapter.GetBuilding(bldgID, adaOnly)
+func (app *Application) getBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (model.Building, error) {
+	bldg, err := app.locationAdapter.GetBuilding(bldgID, adaOnly, latitude, longitude)
 	if err != nil {
 		return *bldg, err
 	}
@@ -79,4 +85,28 @@ func (app *Application) getContactInfo(uin string, accessToken string, mode stri
 		return nil, statusCode, err
 	}
 	return person, 200, nil
+}
+
+func (app *Application) getGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error) {
+	courseList, statusCode, err := app.giesCourseAdapter.GetGiesCourses(uin, accessToken)
+	if err != nil {
+		return nil, statusCode, err
+	}
+	return courseList, 200, nil
+}
+
+func (app *Application) getStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error) {
+	courseList, statusCode, err := app.studentcourseAdapter.GetStudentCourses(uin, termid, accessToken)
+	if err != nil {
+		return nil, statusCode, err
+	}
+	return courseList, 200, nil
+}
+
+func (app *Application) getTermSessions() (*[4]model.TermSession, error) {
+	termSessions, err := app.termsessionAdapter.GetTermSessions()
+	if err != nil {
+		return nil, err
+	}
+	return termSessions, nil
 }

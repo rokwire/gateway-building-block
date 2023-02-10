@@ -18,6 +18,7 @@ import (
 	model "apigateway/core/model"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -316,10 +317,10 @@ func evalNumAvailable(inputstr string) int {
 }
 
 func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
-	url := lv.ServiceAPIUrl + "/sr-key/getSubscriptionKey"
+	url := lv.ServiceAPIUrl + "/getSubscriptionKey"
 	method := "POST"
 
-	payload := `{"subscription-id": "univofchicago", "key-type": "primaryKey" }`
+	payload := `{"subscription-id": "uiuc", "key-type": "primaryKey" }`
 
 	headers := make(map[string]string)
 	headers["Ocp-Apim-Subscription-Key"] = lv.ServiceOCPSubscriptionKey
@@ -330,12 +331,23 @@ func (lv *CSCLaundryView) getServiceSubscriptionKey() error {
 	if err != nil {
 		return err
 	}
-	lv.serviceSubscriptionKey = string(body)
+
+	var dat map[string]interface{}
+	if err := json.Unmarshal(body, &dat); err != nil {
+		return err
+	}
+
+	if _, keyExists := dat["subscription-key"]; !keyExists {
+		return errors.New("Subscription key not returned")
+	}
+
+	lv.serviceSubscriptionKey = dat["subscription-key"].(string)
+
 	return nil
 }
 
 func (lv *CSCLaundryView) getServiceToken() error {
-	url := lv.ServiceAPIUrl + "/sr/v1/generateToken?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/generateToken?subscription-key=" + lv.serviceSubscriptionKey
 	method := "GET"
 
 	headers := make(map[string]string)
@@ -351,6 +363,10 @@ func (lv *CSCLaundryView) getServiceToken() error {
 	var dat map[string]interface{}
 	if err := json.Unmarshal(body, &dat); err != nil {
 		return err
+	}
+
+	if _, keyExists := dat["token"]; !keyExists {
+		return errors.New("token not returned")
 	}
 
 	lv.serviceToken = dat["token"].(string)
@@ -400,7 +416,7 @@ func (lv *CSCLaundryView) makeLaundryServiceWebRequest(url string, method string
 func (lv *CSCLaundryView) getMachineDetails(machineid string) (*machinedetail, error) {
 	md := machinedetail{}
 
-	url := lv.ServiceAPIUrl + "/sr/v1/machineDetails?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/machineDetails?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 
 	payload := `{"machineId":"` + machineid + `"}`
@@ -424,7 +440,7 @@ func (lv *CSCLaundryView) getMachineDetails(machineid string) (*machinedetail, e
 }
 
 func (lv *CSCLaundryView) getProblemCodes(machinetype string) ([]string, error) {
-	url := lv.ServiceAPIUrl + "/sr/v1/problemCodes?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/problemCodes?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 
 	payload := `{"machineType": "` + machinetype + `"}`
@@ -449,7 +465,7 @@ func (lv *CSCLaundryView) getProblemCodes(machinetype string) ([]string, error) 
 }
 
 func (lv *CSCLaundryView) submitTicket(machineid string, problemCode string, comments string, firstName string, lastName string, phone string, email string) (*model.ServiceRequestResult, error) {
-	url := lv.ServiceAPIUrl + "/sr/v1/submitServiceRequest?subscription-key=" + lv.serviceSubscriptionKey
+	url := lv.ServiceAPIUrl + "/submitServiceRequest?subscription-key=" + lv.serviceSubscriptionKey
 	method := "POST"
 	headers := make(map[string]string)
 	headers["X-CSRFToken"] = lv.serviceToken

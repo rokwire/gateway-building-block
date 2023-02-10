@@ -20,6 +20,93 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/courses/giescourses": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth ExternalAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns a list of registered courses",
+                "operationId": "GiesCourses",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.GiesCourse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/studentcourses": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth ExternalAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Returns a list of registered courses",
+                "operationId": "Studentcourses",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "term id",
+                        "name": "termid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Course"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/laundry/initrequest": {
             "get": {
                 "security": [
@@ -188,6 +275,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/termsessions/listcurrent": {
+            "get": {
+                "security": [
+                    {
+                        "RokwireAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Client"
+                ],
+                "summary": "Get a list of term sessions centered on the calculated current session",
+                "operationId": "TermSession",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.TermSession"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/token": {
             "post": {
                 "security": [
@@ -272,6 +390,18 @@ const docTemplate = `{
                         "type": "boolean",
                         "description": "ADA entrances filter",
                         "name": "adaOnly",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "latitude coordinate of the user",
+                        "name": "lat",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "longitude coordinate of the user",
+                        "name": "long",
                         "in": "query"
                     }
                 ],
@@ -491,6 +621,61 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Course": {
+            "type": "object",
+            "properties": {
+                "coursenumber": {
+                    "type": "string"
+                },
+                "coursesection": {
+                    "$ref": "#/definitions/model.CourseSection"
+                },
+                "courseshortname": {
+                    "type": "string"
+                },
+                "coursetitle": {
+                    "type": "string"
+                },
+                "instructionmethod": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.CourseSection": {
+            "type": "object",
+            "properties": {
+                "building": {
+                    "$ref": "#/definitions/model.Building"
+                },
+                "buildingid": {
+                    "type": "string"
+                },
+                "buildingname": {
+                    "type": "string"
+                },
+                "days": {
+                    "type": "string"
+                },
+                "endtime": {
+                    "type": "string"
+                },
+                "instructiontype": {
+                    "type": "string"
+                },
+                "instructor": {
+                    "type": "string"
+                },
+                "meeting_dates_or_range": {
+                    "type": "string"
+                },
+                "room": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                }
+            }
+        },
         "model.EmergencyContact": {
             "type": "object",
             "properties": {
@@ -533,6 +718,29 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.GiesCourse": {
+            "type": "object",
+            "properties": {
+                "instructor": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "section": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -707,6 +915,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "problemcode": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TermSession": {
+            "type": "object",
+            "properties": {
+                "is_current": {
+                    "type": "boolean"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "termid": {
                     "type": "string"
                 }
             }

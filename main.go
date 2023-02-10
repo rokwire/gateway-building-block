@@ -18,9 +18,11 @@ import (
 	"apigateway/core"
 	model "apigateway/core/model"
 	contactinfo "apigateway/driven/contactinfo"
+	courses "apigateway/driven/courses"
 	"apigateway/driven/laundry"
 	location "apigateway/driven/location"
 	storage "apigateway/driven/storage"
+	terms "apigateway/driven/terms"
 	driver "apigateway/driver/web"
 	"encoding/json"
 	"fmt"
@@ -61,8 +63,10 @@ func main() {
 	laundryServiceToken := getEnvKey("GATEWAY_LAUNDRYSERVICE_BASICAUTH", true)
 	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
 	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
-	campusInfoAPIKey := getEnvKey("GATEWAY_CONTACTINFO_APIKEY", true)
-	campusAITSEndPoint := getEnvKey("GATEWAY_CONTACTINFO_ENDPOINT", true)
+	// pragma: allowlist nextline secret
+	campusInfoAPIKey := getEnvKey("GATEWAY_CENTRALCAMPUS_APIKEY", true)
+	campusAITSEndPoint := getEnvKey("GATEWAY_CENTRALCAMPUS_ENDPOINT", true)
+	coursesEndPoint := getEnvKey("GATEWAY_GIESCOURSES_ENDPOINT", true)
 
 	//read assets
 	file, _ := ioutil.ReadFile("./assets/assets.json")
@@ -79,6 +83,9 @@ func main() {
 	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI, laundryAssets, laundryServiceToken)
 	locationAdapter := location.NewUIUCWayFinding(wayfindingKey, wayfindingURL)
 	contactAdapter := contactinfo.NewContactAdapter(campusInfoAPIKey, campusAITSEndPoint)
+	giescourseAdapter := courses.NewGiesCourseAdapter(coursesEndPoint)
+	studentCourseAdapter := courses.NewCourseAdapter(campusAITSEndPoint, campusInfoAPIKey)
+	termSessionAdapter := terms.NewTermSessionAdapter()
 
 	err := storageAdapter.Start()
 	if err != nil {
@@ -88,7 +95,7 @@ func main() {
 	log.Printf("MongoDB Started")
 
 	//application
-	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter, contactAdapter)
+	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter, contactAdapter, giescourseAdapter, studentCourseAdapter, termSessionAdapter)
 	application.Start()
 
 	//web adapter

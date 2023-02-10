@@ -74,6 +74,42 @@ definitions:
       name:
         type: string
     type: object
+  model.Course:
+    properties:
+      coursenumber:
+        type: string
+      coursesection:
+        $ref: '#/definitions/model.CourseSection'
+      courseshortname:
+        type: string
+      coursetitle:
+        type: string
+      instructionmethod:
+        type: string
+    type: object
+  model.CourseSection:
+    properties:
+      building:
+        $ref: '#/definitions/model.Building'
+      buildingid:
+        type: string
+      buildingname:
+        type: string
+      days:
+        type: string
+      endtime:
+        type: string
+      instructiontype:
+        type: string
+      instructor:
+        type: string
+      meeting_dates_or_range:
+        type: string
+      room:
+        type: string
+      start_time:
+        type: string
+    type: object
   model.EmergencyContact:
     properties:
       address:
@@ -102,6 +138,21 @@ definitions:
       longitude:
         type: number
       name:
+        type: string
+    type: object
+  model.GiesCourse:
+    properties:
+      instructor:
+        type: string
+      number:
+        type: string
+      section:
+        type: string
+      subject:
+        type: string
+      term:
+        type: string
+      title:
         type: string
     type: object
   model.LaundryDetails:
@@ -217,6 +268,15 @@ definitions:
       problemcode:
         type: string
     type: object
+  model.TermSession:
+    properties:
+      is_current:
+        type: boolean
+      term:
+        type: string
+      termid:
+        type: string
+    type: object
   rest.errorMessage:
     properties:
       message:
@@ -237,6 +297,61 @@ info:
   title: Rokwire Gatewauy Building Block API
   version: 0.1.0
 paths:
+  /courses/giescourses:
+    get:
+      consumes:
+      - application/json
+      operationId: GiesCourses
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.GiesCourse'
+            type: array
+      security:
+      - RokwireAuth ExternalAuth: []
+      summary: Returns a list of registered courses
+      tags:
+      - Client
+  /courses/studentcourses:
+    get:
+      consumes:
+      - application/json
+      operationId: Studentcourses
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: term id
+        in: query
+        name: termid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Course'
+            type: array
+      security:
+      - RokwireAuth ExternalAuth: []
+      summary: Returns a list of registered courses
+      tags:
+      - Client
   /laundry/initrequest:
     get:
       consumes:
@@ -343,6 +458,25 @@ paths:
         emergency contact information for a person
       tags:
       - Client
+  /termsessions/listcurrent:
+    get:
+      consumes:
+      - application/json
+      operationId: TermSession
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.TermSession'
+            type: array
+      security:
+      - RokwireAuth: []
+      summary: Get a list of term sessions centered on the calculated current session
+      tags:
+      - Client
   /token:
     post:
       consumes:
@@ -390,6 +524,14 @@ paths:
         in: query
         name: adaOnly
         type: boolean
+      - description: latitude coordinate of the user
+        in: query
+        name: lat
+        type: number
+      - description: longitude coordinate of the user
+        in: query
+        name: long
+        type: number
       produces:
       - application/json
       responses:
