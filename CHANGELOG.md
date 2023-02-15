@@ -8,21 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Prepare the project to become open source [#2](https://github.com/rokwire/gateway-building-block/issues/2)
 
-## [0.1.0] - 2021-09-03
+## [1.2.3] - 2/15/2023
+### Fixed
+--uiuc_termsessions.go  - fixed wrong term session id being returned for future fall term #8
 ### Added
-- Initial implementation
+### Changed
+## [1.2.2] - 8/8/2022
+### Fixed
+--uiuc_laundryview.go(322) - {"subscription-id": "uic-chicago", "key-type": "primaryKey" } to {"subscription-id": "uiuc", "key-type": "primaryKey" }
+--uiuc_laundryview.go - changed code to handle new data sent by getsubscription vendor call
+--uiuc_laundryview.go - added error handling for missing subscription key or request token
+### Added
+### Changed
 
-## [1.1.0] - 7/21/2022
+## [1.2.1] - 8/4/2022
 ### Fixed
 ### Added
--Endpoint courses/giescourses was added to return current semester classes for gies students
--driven/courses/uiuc_gies_courses.go
--driver/rest/coursesapi.go
--core/model/courses.go
+
 ### Changed
--core/interfaces.go - GetGiesCourses added to Services interface
--core/interfaces.go - Defined GiesCourses interface
--core/services.go - added getGiesCourses implementation to application
+-core/model/courses.go - added CourseReferenceNumber property to CourseSection object
+-core/driven/courses/uiuc_courses.go - map data from campus json to CourseReferenceNumber property
+
 
 ## [1.2.0] - 8/4/2022
 ### Fixed
@@ -34,7 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -driven/terms/uiuc_termsessions.go
 -driver/rest/termsessionapi.go
 -core/model/termsessions.go
-
 
 ### Changed
 -core/interfaces.go - GetStudentCourses added to Services interface
@@ -50,18 +55,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -application.go - added a term session adapter
 -services.go - implemented getStudentCourses and getTermSessions
 
-## [1.2.1] - 8/4/2022
+## [1.1.0] - 7/21/2022
 ### Fixed
 ### Added
-
+-Endpoint courses/giescourses was added to return current semester classes for gies students
+-driven/courses/uiuc_gies_courses.go
+-driver/rest/coursesapi.go
+-core/model/courses.go
 ### Changed
--core/model/courses.go - added CourseReferenceNumber property to CourseSection object
--core/driven/courses/uiuc_courses.go - map data from campus json to CourseReferenceNumber property
+-core/interfaces.go - GetGiesCourses added to Services interface
+-core/interfaces.go - Defined GiesCourses interface
+-core/services.go - added getGiesCourses implementation to application
 
-## [1.2.2] - 8/8/2022
-### Fixed
---uiuc_laundryview.go(322) - {"subscription-id": "uic-chicago", "key-type": "primaryKey" } to {"subscription-id": "uiuc", "key-type": "primaryKey" }
---uiuc_laundryview.go - changed code to handle new data sent by getsubscription vendor call
---uiuc_laundryview.go - added error handling for missing subscription key or request token
+## [0.1.0] - 2021-09-03
 ### Added
-### Changed
+- Initial implementation
+
+
+
+
+

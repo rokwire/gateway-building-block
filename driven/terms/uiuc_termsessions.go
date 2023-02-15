@@ -47,7 +47,7 @@ func (lv *TermSessionAdapter) GetTermSessions() (*[4]model.TermSession, error) {
 		termSessions[1] = model.TermSession{Term: "Spring - " + crntYear, TermID: "1" + crntYear + "1", CurrentTerm: true}
 		termSessions[2] = model.TermSession{Term: "Summer - " + crntYear, TermID: "1" + crntYear + "5", CurrentTerm: false}
 		termSessions[0] = model.TermSession{Term: "Fall - " + pastYear, TermID: "1" + pastYear + "8", CurrentTerm: false}
-		termSessions[3] = model.TermSession{Term: "Fall - " + crntYear, TermID: "1" + crntYear + "1", CurrentTerm: false}
+		termSessions[3] = model.TermSession{Term: "Fall - " + crntYear, TermID: "1" + crntYear + "8", CurrentTerm: false}
 	}
 	return &termSessions, nil
 }
