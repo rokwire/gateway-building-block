@@ -79,7 +79,7 @@ type machinedetail struct {
 	SiteID              string `json:"siteID"`
 }
 
-//CSCLaundryView is a vendor specific structure that implements the Laundry interface
+// CSCLaundryView is a vendor specific structure that implements the Laundry interface
 type CSCLaundryView struct {
 	//configuration information (url, api keys...gets passed into here)
 	APIKey string
@@ -94,13 +94,13 @@ type CSCLaundryView struct {
 	laundryAssets             map[string]model.LaundryDetails
 }
 
-//NewCSCLaundryAdapter returns a vendor specific implementation of the Laundry interface
+// NewCSCLaundryAdapter returns a vendor specific implementation of the Laundry interface
 func NewCSCLaundryAdapter(apikey string, url string, subscriptionkey string, serviceapiurl string, assets map[string]model.LaundryDetails, authToken string) *CSCLaundryView {
 	return &CSCLaundryView{APIKey: apikey, APIUrl: url, ServiceOCPSubscriptionKey: subscriptionkey, ServiceAPIUrl: serviceapiurl, laundryAssets: assets, serviceBasicAuthToken: authToken}
 
 }
 
-//ListRooms lists the laundry rooms
+// ListRooms lists the laundry rooms
 func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 
 	url := lv.APIUrl + "/school/?api_key=" + lv.APIKey + "&method=getRoomData&type=json"
@@ -137,7 +137,7 @@ func (lv *CSCLaundryView) ListRooms() (*model.Organization, error) {
 	return nil, err
 }
 
-//GetLaundryRoom returns the room details along with the list of machines in that room
+// GetLaundryRoom returns the room details along with the list of machines in that room
 func (lv *CSCLaundryView) GetLaundryRoom(roomid string) (*model.RoomDetail, error) {
 
 	url := lv.APIUrl + "/room/?api_key=" + lv.APIKey + "&method=getAppliances&location=" + roomid + "&type=json"
@@ -186,7 +186,7 @@ func (lv *CSCLaundryView) getLocationData(roomid string) *model.LaundryDetails {
 	return &model.LaundryDetails{Latitude: 0, Longitude: 0, Floor: 0}
 }
 
-//InitServiceRequest gets machine request details needed to initialize a laundry service request
+// InitServiceRequest gets machine request details needed to initialize a laundry service request
 func (lv *CSCLaundryView) InitServiceRequest(machineID string) (*model.MachineRequestDetail, error) {
 
 	err := lv.getServiceSubscriptionKey()
@@ -213,7 +213,7 @@ func (lv *CSCLaundryView) InitServiceRequest(machineID string) (*model.MachineRe
 	return mrd, nil
 }
 
-//SubmitServiceRequest submits a request for a machine
+// SubmitServiceRequest submits a request for a machine
 func (lv *CSCLaundryView) SubmitServiceRequest(machineid string, problemCode string, comments string, firstName string, lastName string, phone string, email string) (*model.ServiceRequestResult, error) {
 
 	err := lv.getServiceSubscriptionKey()

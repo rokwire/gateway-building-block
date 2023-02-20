@@ -26,7 +26,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-//Adapter entity
+// Adapter entity
 type Adapter struct {
 	host string
 	port string
@@ -116,7 +116,7 @@ func (we Adapter) serveDocUI() http.Handler {
 	return httpSwagger.Handler(httpSwagger.URL(url))
 }
 
-//functions with no authentication at all
+// functions with no authentication at all
 func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
@@ -138,7 +138,7 @@ func (we Adapter) tokenAuthWrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-//NewWebAdapter creates new WebAdapter instance
+// NewWebAdapter creates new WebAdapter instance
 func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *TokenAuth) Adapter {
 
 	apisHandler := rest.NewApisHandler(app)
@@ -155,7 +155,7 @@ func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *T
 		contactapiHandler: contactapiHandler, coursesapiHandler: coursesapiHandler, termsapiHandler: termsapiHandler}
 }
 
-//AppListener implements core.ApplicationListener interface
+// AppListener implements core.ApplicationListener interface
 type AppListener struct {
 	adapter *Adapter
 }

@@ -20,17 +20,17 @@ import (
 	"time"
 )
 
-//TermSessionAdapter is a uiuc specific structure that implements the term session interface
+// TermSessionAdapter is a uiuc specific structure that implements the term session interface
 type TermSessionAdapter struct {
 }
 
-//NewTermSessionAdapter returns a vendor specific implementation of the contanct information interface
+// NewTermSessionAdapter returns a vendor specific implementation of the contanct information interface
 func NewTermSessionAdapter() *TermSessionAdapter {
 	return &TermSessionAdapter{}
 
 }
 
-//GetTermSessions returns a list of term sessions to the client
+// GetTermSessions returns a list of term sessions to the client
 func (lv *TermSessionAdapter) GetTermSessions() (*[4]model.TermSession, error) {
 	var termSessions [4]model.TermSession
 	//if beginning of June make fall term default, spring semester has ended

@@ -29,7 +29,7 @@ type cacheUser struct {
 	lastUsage time.Time
 }
 
-//TokenAuth used to encapsualte the tokenauth type from the core auth library
+// TokenAuth used to encapsualte the tokenauth type from the core auth library
 type TokenAuth struct {
 	tokenAuth *tokenauth.TokenAuth
 }
@@ -55,7 +55,7 @@ func printDeletedAccountIDs(accountIDs []string) error {
 	return nil
 }
 
-//NewTokenAuth creats a token auth instance
+// NewTokenAuth creats a token auth instance
 func NewTokenAuth(serviceHost string, coreHost string) *TokenAuth {
 	serviceID := "gateway"
 

@@ -14,7 +14,7 @@
 
 package model
 
-//Entrance represents the information returned when the closest entrance of a building is requested
+// Entrance represents the information returned when the closest entrance of a building is requested
 type Entrance struct {
 	ID           string
 	Name         string
@@ -25,7 +25,7 @@ type Entrance struct {
 	Longitude    float32
 }
 
-//Building represents the information returned when a requst for a building's details is made
+// Building represents the information returned when a requst for a building's details is made
 type Building struct {
 	ID          string
 	Name        string
