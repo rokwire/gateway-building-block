@@ -122,19 +122,19 @@ type studentTermCourseInfo struct {
 	CourseRegistration    []courseRegistration `json:"courseRegistration"`
 }
 
-//StudentCourseAdapter is a vendor specific structure that implements the GiesCourse lookup interface
+// StudentCourseAdapter is a vendor specific structure that implements the GiesCourse lookup interface
 type StudentCourseAdapter struct {
 	CourseAPIEndpoint string
 	CourseAPIKey      string
 }
 
-//NewCourseAdapter returns a vendor specific implementation of the Course lookup interface
+// NewCourseAdapter returns a vendor specific implementation of the Course lookup interface
 func NewCourseAdapter(url string, apikey string) *StudentCourseAdapter {
 	return &StudentCourseAdapter{CourseAPIEndpoint: url, CourseAPIKey: apikey}
 
 }
 
-//newCourse maps the campus course data to the course data sent back to the app.
+// newCourse maps the campus course data to the course data sent back to the app.
 func newCourse(cr courseRegistration, courseSectionSessionIndex int) *model.Course {
 	ret := model.Course{}
 	ret.Number = cr.CourseSection.CourseReferenceNumber
@@ -149,7 +149,7 @@ func newCourse(cr courseRegistration, courseSectionSessionIndex int) *model.Cour
 	return &ret
 }
 
-//newCourseSection maps the coursesectionsession data from campus to the coursesection data sent back to the app
+// newCourseSection maps the coursesectionsession data from campus to the coursesection data sent back to the app
 func newCourseSection(cs courseSectionSession, crn string) *model.CourseSection {
 	ret := model.CourseSection{}
 	ret.BuildingName = cs.ValidBuilding.Description
@@ -203,7 +203,7 @@ func newCourseSection(cs courseSectionSession, crn string) *model.CourseSection 
 	return &ret
 }
 
-//GetStudentCourses returns a list of courses for the given tudent
+// GetStudentCourses returns a list of courses for the given tudent
 func (lv *StudentCourseAdapter) GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error) {
 
 	finalURL := lv.CourseAPIEndpoint + "/student-registration/student-enrollment-query/v2_0/" + uin + "/" + termid

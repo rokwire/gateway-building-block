@@ -35,12 +35,12 @@ type course struct {
 	Instructor string `json:"Instructor"`
 }
 
-//GiesCourseAdapter is a vendor specific structure that implements the GiesCourse lookup interface
+// GiesCourseAdapter is a vendor specific structure that implements the GiesCourse lookup interface
 type GiesCourseAdapter struct {
 	APIEndpoint string
 }
 
-//NewGiesCourseAdapter returns a vendor specific implementation of the Course lookup interface
+// NewGiesCourseAdapter returns a vendor specific implementation of the Course lookup interface
 func NewGiesCourseAdapter(url string) *GiesCourseAdapter {
 	return &GiesCourseAdapter{APIEndpoint: url}
 
@@ -57,7 +57,7 @@ func newGiesCourse(cr course) *model.GiesCourse {
 	return &ret
 }
 
-//GetGiesCourses returns a list of courses for the given GIES student
+// GetGiesCourses returns a list of courses for the given GIES student
 func (lv *GiesCourseAdapter) GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error) {
 
 	finalURL := lv.APIEndpoint + "/" + uin

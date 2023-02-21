@@ -17,7 +17,7 @@
 
 package model
 
-//GiesCourse represents the elements of a course returned for Gies students
+// GiesCourse represents the elements of a course returned for Gies students
 type GiesCourse struct {
 	Term       string `json:"term"`
 	Subject    string `json:"subject"`
@@ -27,7 +27,7 @@ type GiesCourse struct {
 	Instructor string `json:"instructor"`
 }
 
-//CourseSection represents the elements of a course section
+// CourseSection represents the elements of a course section
 type CourseSection struct {
 	Days                  string   `json:"days"`
 	MeetingDateOrRange    string   `json:"meeting_dates_or_range"`
@@ -42,7 +42,7 @@ type CourseSection struct {
 	CourseReferenceNumber string   `json:"courseReferenceNumber"`
 }
 
-//Course represents the full elements of a course
+// Course represents the full elements of a course
 type Course struct {
 	Title             string        `json:"coursetitle"`
 	ShortName         string        `json:"courseshortname"`

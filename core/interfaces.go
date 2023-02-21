@@ -107,7 +107,7 @@ type Storage interface {
 	StoreRecord(name string) error
 }
 
-//Laundry is used by core to request data from the laundry provider
+// Laundry is used by core to request data from the laundry provider
 type Laundry interface {
 	ListRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
@@ -115,29 +115,29 @@ type Laundry interface {
 	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
 }
 
-//BuildingLocation is used by core to request data from the building location/entrance provider
+// BuildingLocation is used by core to request data from the building location/entrance provider
 type BuildingLocation interface {
 	GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Building, error)
 	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
 	GetBuildings() (*[]model.Building, error)
 }
 
-//ContactInformation is used by core to request data from the contact information provider
+// ContactInformation is used by core to request data from the contact information provider
 type ContactInformation interface {
 	GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error)
 }
 
-//GiesCourses is used by core to request data from teh geis course provider
+// GiesCourses is used by core to request data from teh geis course provider
 type GiesCourses interface {
 	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
 }
 
-//StudentCourses is used by core to request data from the course data provider
+// StudentCourses is used by core to request data from the course data provider
 type StudentCourses interface {
 	GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error)
 }
 
-//TermSessions is used by core to request data from the term sessions data provider
+// TermSessions is used by core to request data from the term sessions data provider
 type TermSessions interface {
 	GetTermSessions() (*[4]model.TermSession, error)
 }

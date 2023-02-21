@@ -106,13 +106,13 @@ type campusPerson struct {
 	EmergencyContacts []emergencyContact `json:"emergencyContact"`
 }
 
-//ContactAdapter is a vendor specific structure that implements the contanct information interface
+// ContactAdapter is a vendor specific structure that implements the contanct information interface
 type ContactAdapter struct {
 	APIKey      string
 	APIEndpoint string
 }
 
-//NewContactAdapter returns a vendor specific implementation of the contanct information interface
+// NewContactAdapter returns a vendor specific implementation of the contanct information interface
 func NewContactAdapter(apikey string, url string) *ContactAdapter {
 	return &ContactAdapter{APIKey: apikey, APIEndpoint: url}
 
@@ -173,7 +173,7 @@ func newPerson(cr *campusPerson) (*model.Person, error) {
 	return &ret, nil
 }
 
-//GetContactInformation returns a contact information object for a student
+// GetContactInformation returns a contact information object for a student
 func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error) {
 
 	finalURL := lv.APIEndpoint + "/person/contact-summary-query/" + uin

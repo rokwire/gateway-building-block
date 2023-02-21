@@ -17,7 +17,7 @@
 
 package model
 
-//TermSession represents the elements of a term session
+// TermSession represents the elements of a term session
 type TermSession struct {
 	Term        string `json:"term"`
 	TermID      string `json:"termid"`
