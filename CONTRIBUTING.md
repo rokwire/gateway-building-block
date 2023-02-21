@@ -42,4 +42,4 @@ Each repository will have at least one maintainer who will be responsible for re
 
 ### Documentation
 
-Developer documentation is available in the [README](README.md) and the [Wiki](https://github.com/rokwire/gateway-building-block/wiki). We describe the various API endpoints using the OpenAPI specification. This API documentation is available for your reference at https://api-dev.rokwire.illinois.edu/gateway/api/doc/ui/index.html.
+Developer documentation is available in the [README](README.md) and the [Wiki](https://github.com/rokwire/gateway-building-block/wiki). We describe the various API endpoints using the OpenAPI specification. This API documentation is available for your reference at https://api.rokwire.illinois.edu/gateway/api/doc/ui/index.html.

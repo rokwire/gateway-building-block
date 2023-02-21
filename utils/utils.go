@@ -1,19 +1,16 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package utils
 
@@ -29,18 +26,18 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-//Filter represents find filter for finding entities by the their fields
+// Filter represents find filter for finding entities by the their fields
 type Filter struct {
 	Items []FilterItem
 }
 
-//FilterItem represents find filter pair - field/value
+// FilterItem represents find filter pair - field/value
 type FilterItem struct {
 	Field string
 	Value []string
 }
 
-//ConstructFilter constructs Filter from the http request params
+// ConstructFilter constructs Filter from the http request params
 func ConstructFilter(r *http.Request) *Filter {
 	values := r.URL.Query()
 	if len(values) == 0 {
@@ -58,14 +55,14 @@ func ConstructFilter(r *http.Request) *Filter {
 	return &filter
 }
 
-//ModifyHTMLContent removes all not web href links. It also remove web links which points to pdf document
-//For example:
-//<a href="mailto:email@abc.abc">email@abc.abc</a> -> email@abc.abc
-//<a href="ftp://server/file">Some text</a> -> Some text
-//<a href="tel:1234">1234</a> -> 1234
+// ModifyHTMLContent removes all not web href links. It also remove web links which points to pdf document
+// For example:
+// <a href="mailto:email@abc.abc">email@abc.abc</a> -> email@abc.abc
+// <a href="ftp://server/file">Some text</a> -> Some text
+// <a href="tel:1234">1234</a> -> 1234
 //
-//<a href="https://humanresources.illinois.edu/assets/docs/COVID-19-Pay-Continuation-Protocol-Final-3-22-2020.pdf">the university's pay continuation protocol</a> ->
-//the university's pay continuation protocol(https://humanresources.illinois.edu/assets/docs/COVID-19-Pay-Continuation-Protocol-Final-3-22-2020.pdf)
+// <a href="https://humanresources.illinois.edu/assets/docs/COVID-19-Pay-Continuation-Protocol-Final-3-22-2020.pdf">the university's pay continuation protocol</a> ->
+// the university's pay continuation protocol(https://humanresources.illinois.edu/assets/docs/COVID-19-Pay-Continuation-Protocol-Final-3-22-2020.pdf)
 func ModifyHTMLContent(input string) string {
 	reader := strings.NewReader(input)
 	doc, err := goquery.NewDocumentFromReader(reader)
@@ -117,7 +114,7 @@ func ModifyHTMLContent(input string) string {
 	return final
 }
 
-//LogRequest logs the request as hide some header fields because of security reasons
+// LogRequest logs the request as hide some header fields because of security reasons
 func LogRequest(req *http.Request) {
 	if req == nil {
 		return
@@ -147,7 +144,7 @@ func LogRequest(req *http.Request) {
 	log.Printf("%s %s %s", method, path, header)
 }
 
-//GetLogUUIDValue prepares UUID to be logged.
+// GetLogUUIDValue prepares UUID to be logged.
 func GetLogUUIDValue(identifier string) string {
 	if len(identifier) < 26 {
 		return fmt.Sprintf("bad identifier - %s", identifier)
@@ -157,7 +154,7 @@ func GetLogUUIDValue(identifier string) string {
 	return fmt.Sprintf("%s***", sub)
 }
 
-//GetLogValue prepares a sensitive data to be logged.
+// GetLogValue prepares a sensitive data to be logged.
 func GetLogValue(value string) string {
 	if len(value) <= 3 {
 		return "***"
@@ -166,7 +163,7 @@ func GetLogValue(value string) string {
 	return fmt.Sprintf("***%s", last3)
 }
 
-//Equal compares two slices
+// Equal compares two slices
 func Equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
@@ -179,7 +176,7 @@ func Equal(a, b []string) bool {
 	return true
 }
 
-//EqualPointers compares two pointers slices
+// EqualPointers compares two pointers slices
 func EqualPointers(a, b *[]string) bool {
 	if a == nil && b == nil {
 		return true //equals
@@ -195,7 +192,7 @@ func EqualPointers(a, b *[]string) bool {
 	return Equal(*a, *b)
 }
 
-//GetInt gives the value which this pointer points. Gives 0 if the pointer is nil
+// GetInt gives the value which this pointer points. Gives 0 if the pointer is nil
 func GetInt(v *int) int {
 	if v == nil {
 		return 0
@@ -203,7 +200,7 @@ func GetInt(v *int) int {
 	return *v
 }
 
-//GetString gives the value which this pointer points. Gives empty string if the pointer is nil
+// GetString gives the value which this pointer points. Gives empty string if the pointer is nil
 func GetString(v *string) string {
 	if v == nil {
 		return ""
@@ -211,7 +208,7 @@ func GetString(v *string) string {
 	return *v
 }
 
-//GetTime gives the value which this pointer points. Gives empty string if the pointer is nil
+// GetTime gives the value which this pointer points. Gives empty string if the pointer is nil
 func GetTime(time *time.Time) string {
 	if time == nil {
 		return ""
@@ -219,7 +216,7 @@ func GetTime(time *time.Time) string {
 	return fmt.Sprintf("%s", time)
 }
 
-//SortVersions sorts the versions list. The format is x.x.x or x.x which is the short for x.x.0
+// SortVersions sorts the versions list. The format is x.x.x or x.x which is the short for x.x.0
 func SortVersions(versions []string) {
 	//sort
 	sort.Slice(versions, func(i, j int) bool {
@@ -229,7 +226,7 @@ func SortVersions(versions []string) {
 	})
 }
 
-//IsVersionLess checks if v1 is less than v2. The format is x.x.x or x.x which is the short for x.x.0
+// IsVersionLess checks if v1 is less than v2. The format is x.x.x or x.x which is the short for x.x.0
 func IsVersionLess(v1 string, v2 string) bool {
 	var v1Major, v1Minor, v1Patch int
 	var v2Major, v2Minor, v2Patch int

@@ -1,19 +1,16 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package contactinfo
 
@@ -109,13 +106,13 @@ type campusPerson struct {
 	EmergencyContacts []emergencyContact `json:"emergencyContact"`
 }
 
-//ContactAdapter is a vendor specific structure that implements the contanct information interface
+// ContactAdapter is a vendor specific structure that implements the contanct information interface
 type ContactAdapter struct {
 	APIKey      string
 	APIEndpoint string
 }
 
-//NewContactAdapter returns a vendor specific implementation of the contanct information interface
+// NewContactAdapter returns a vendor specific implementation of the contanct information interface
 func NewContactAdapter(apikey string, url string) *ContactAdapter {
 	return &ContactAdapter{APIKey: apikey, APIEndpoint: url}
 
@@ -176,10 +173,10 @@ func newPerson(cr *campusPerson) (*model.Person, error) {
 	return &ret, nil
 }
 
-//GetContactInformation returns a contact information object for a student
+// GetContactInformation returns a contact information object for a student
 func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error) {
 
-	finalURL := lv.APIEndpoint + "/" + uin
+	finalURL := lv.APIEndpoint + "/person/contact-summary-query/" + uin
 
 	if mode != "0" {
 		finalURL = lv.APIEndpoint + "/mock/123456789"

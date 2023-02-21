@@ -1,19 +1,16 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package buildinglocation
 
@@ -69,19 +66,19 @@ type serverLocationData struct {
 	Buildings []campusBuilding `json:"results"`
 }
 
-//UIUCWayFinding is a vendor specific structure that implements the BuildingLocation interface
+// UIUCWayFinding is a vendor specific structure that implements the BuildingLocation interface
 type UIUCWayFinding struct {
 	APIKey string
 	APIUrl string
 }
 
-//NewUIUCWayFinding returns a new instance of a UIUCWayFinding struct
+// NewUIUCWayFinding returns a new instance of a UIUCWayFinding struct
 func NewUIUCWayFinding(apikey string, apiurl string) *UIUCWayFinding {
 	return &UIUCWayFinding{APIKey: apikey, APIUrl: apiurl}
 }
 
-//NewBuilding creates a wayfinding.Building instance from a campusBuilding,
-//including all active entrances for the building
+// NewBuilding creates a wayfinding.Building instance from a campusBuilding,
+// including all active entrances for the building
 func NewBuilding(bldg campusBuilding) *model.Building {
 	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude}
 	newBldg.Entrances = make([]model.Entrance, 0)
@@ -93,7 +90,7 @@ func NewBuilding(bldg campusBuilding) *model.Building {
 	return &newBldg
 }
 
-//NewBuildingList returns a list of wayfinding buildings created frmo a list of campus building objects.
+// NewBuildingList returns a list of wayfinding buildings created frmo a list of campus building objects.
 func NewBuildingList(bldgList *[]campusBuilding) *[]model.Building {
 	retList := make([]model.Building, len(*bldgList))
 	for i := 0; i < len(*bldgList); i++ {
@@ -104,13 +101,13 @@ func NewBuildingList(bldgList *[]campusBuilding) *[]model.Building {
 	return &retList
 }
 
-//NewEntrance creates a wayfinding.Entrance instance from a campusEntrance object
+// NewEntrance creates a wayfinding.Entrance instance from a campusEntrance object
 func NewEntrance(ent campusEntrance) *model.Entrance {
 	newEnt := model.Entrance{ID: ent.UUID, Name: ent.Name, ADACompliant: ent.ADACompliant, Available: ent.Available, ImageURL: ent.ImageURL, Latitude: ent.Latitude, Longitude: ent.Longitude}
 	return &newEnt
 }
 
-//GetEntrance returns the active entrance closest to the user's position that meets the ADA Accessibility filter requirement
+// GetEntrance returns the active entrance closest to the user's position that meets the ADA Accessibility filter requirement
 func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Entrance, error) {
 	lat := fmt.Sprintf("%f", latitude)
 	long := fmt.Sprintf("%f", longitude)
@@ -136,7 +133,7 @@ func (uwf *UIUCWayFinding) GetEntrance(bldgID string, adaAccessibleOnly bool, la
 	return nil, nil
 }
 
-//GetBuildings returns a list of all buildings
+// GetBuildings returns a list of all buildings
 func (uwf *UIUCWayFinding) GetBuildings() (*[]model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
 	parameters := "{\"v\": 2}"
@@ -149,10 +146,19 @@ func (uwf *UIUCWayFinding) GetBuildings() (*[]model.Building, error) {
 	return returnList, nil
 }
 
-//GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
-func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*model.Building, error) {
+// GetBuilding returns the requested building with all of its entrances that meet the ADA accessibility filter
+func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64) (*model.Building, error) {
 	url := uwf.APIUrl + "/ccf"
-	parameters := "{\"v\": 2}"
+	lat := fmt.Sprintf("%f", latitude)
+	long := fmt.Sprintf("%f", longitude)
+
+	parameters := ""
+	if latitude == 0 && longitude == 0 {
+		parameters = "{\"v\": 2, \"ranged\": true, \"point\": {\"latitude\": " + lat + ", \"longitude\": " + long + "}}"
+	} else {
+		parameters = "{\"v\": 2}"
+	}
+
 	bldSelection := "\"number\": \"" + bldgID + "\""
 	adaSelection := ""
 	if adaAccessibleOnly {
@@ -167,9 +173,9 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool) (*
 	return NewBuilding((*cmpBldg)[0]), nil
 }
 
-//the entrance list coming back from a ranged query to the API is sorted closest to farthest from
-//the user's coordinates. The first entrance in the list that is active and matches the ADA filter
-//will be the one to return
+// the entrance list coming back from a ranged query to the API is sorted closest to farthest from
+// the user's coordinates. The first entrance in the list that is active and matches the ADA filter
+// will be the one to return
 func (uwf *UIUCWayFinding) closestEntrance(bldg campusBuilding) *campusEntrance {
 	for _, n := range bldg.Entrances {
 		if n.Available {
@@ -215,8 +221,12 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, queryString string,
 	}
 
 	if res.StatusCode == 400 {
-		fmt.Println(string(body))
 		return nil, errors.New("Bad request to api end point")
+	}
+
+	//used to indicate no building found
+	if res.StatusCode == 202 {
+		return nil, errors.New("Building not found")
 	}
 
 	data := serverLocationData{}

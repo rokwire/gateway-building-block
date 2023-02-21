@@ -1,19 +1,16 @@
-/*
- *   Copyright (c) 2020 Board of Trustees of the University of Illinois.
- *   All rights reserved.
-
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
-
- *   http://www.apache.org/licenses/LICENSE-2.0
-
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// Copyright 2022 Board of Trustees of the University of Illinois.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 package web
 
@@ -29,7 +26,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-//Adapter entity
+// Adapter entity
 type Adapter struct {
 	host string
 	port string
@@ -39,6 +36,8 @@ type Adapter struct {
 	laundryapiHandler  rest.LaundryApisHandler
 	buildingapiHandler rest.BuildingAPIHandler
 	contactapiHandler  rest.ContactInfoApisHandler
+	coursesapiHandler  rest.CourseApisHandler
+	termsapiHandler    rest.TermSessionAPIHandler
 	tokenAuth          *TokenAuth
 	app                *core.Application
 }
@@ -99,6 +98,11 @@ func (we Adapter) Start() {
 
 	mainRouter.HandleFunc("/person/contactinfo", we.tokenAuthWrapFunc(we.contactapiHandler.GetContactInfo)).Methods("GET")
 
+	mainRouter.HandleFunc("/courses/giescourses", we.tokenAuthWrapFunc(we.coursesapiHandler.GetGiesCourses)).Methods("GET")
+	mainRouter.HandleFunc("/courses/studentcourses", we.tokenAuthWrapFunc(we.coursesapiHandler.GetStudentcourses)).Methods("GET")
+
+	mainRouter.HandleFunc("/termsessions/listcurrent", we.tokenAuthWrapFunc(we.termsapiHandler.GetTermSessions)).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":"+we.port, router))
 }
 
@@ -112,7 +116,7 @@ func (we Adapter) serveDocUI() http.Handler {
 	return httpSwagger.Handler(httpSwagger.URL(url))
 }
 
-//functions with no authentication at all
+// functions with no authentication at all
 func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		utils.LogRequest(req)
@@ -134,7 +138,7 @@ func (we Adapter) tokenAuthWrapFunc(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-//NewWebAdapter creates new WebAdapter instance
+// NewWebAdapter creates new WebAdapter instance
 func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *TokenAuth) Adapter {
 
 	apisHandler := rest.NewApisHandler(app)
@@ -142,13 +146,16 @@ func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *T
 	laundryapiHandler := rest.NewLaundryApisHandler(app)
 	buildingapiHandler := rest.NewBuildingAPIHandler(app)
 	contactapiHandler := rest.NewContactInfoApisHandler(app)
+	coursesapiHandler := rest.NewCourseApisHandler(app)
+	termsapiHandler := rest.NewTermSessionAPIHandler(app)
+
 	return Adapter{host: host, port: port,
 		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler,
 		buildingapiHandler: buildingapiHandler, tokenAuth: tokenAuth,
-		contactapiHandler: contactapiHandler}
+		contactapiHandler: contactapiHandler, coursesapiHandler: coursesapiHandler, termsapiHandler: termsapiHandler}
 }
 
-//AppListener implements core.ApplicationListener interface
+// AppListener implements core.ApplicationListener interface
 type AppListener struct {
 	adapter *Adapter
 }
