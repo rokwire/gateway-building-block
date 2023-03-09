@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Prepare the project to become open source [#2](https://github.com/rokwire/gateway-building-block/issues/2)
+
+## 1.2.6 - 3/9/23
+### Fixed
+--Security vulnerability in golang.org/x/text/language
+--Security vulnerability in golang.org/x/crypto
+--Security vulnerability in golang/org/x/net
+
 ## 1.2.4 - 2/21/23  
 ### Fixed
 --Security vulnerability in Go prior to 1.19.1. Switched project to 1.20.1 and docker image to golang:1.20.1-buster
