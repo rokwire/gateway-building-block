@@ -14,7 +14,16 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeAssets type
+	TypeAssets logutils.MessageDataType = "assets"
+)
+
 // Asset holds the asset information from assets.json
 type Asset struct {
-	Laundry LaundryAssets `json:"laundry"`
+	Laundry LaundryAssets `json:"laundry" bson:"laundry"`
 }

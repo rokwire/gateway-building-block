@@ -12,29 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package contactinfo
+package uiuc
 
 import (
-	model "apigateway/core/model"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+	model "application/core/model"
 )
 
-type simpleType struct {
+// SimpleType contains a common data structure used in some properties of the campus data
+type SimpleType struct {
 	Code        string `json:"code"`
 	Description string `json:"description"`
 }
 
-type campusUserData struct {
+// CampusUserData represents the full data coming back from campus
+type CampusUserData struct {
 	Object  string         `json:"object"`
 	Version string         `json:"version"`
-	People  []campusPerson `json:"list"`
+	People  []CampusPerson `json:"list"`
 }
 
-type name struct {
+// Name represents the fields campus uses to represent a person's name
+type Name struct {
 	Pidm      int    `json:"pidm"`
 	Uin       string `json:"uin"`
 	LastName  string `json:"lastName"`
@@ -42,28 +40,30 @@ type name struct {
 	NameType  string `json:"type"`
 }
 
-type address struct {
+// Address represents the campus definition of a person's address
+type Address struct {
 	GUID            int        `json:"guid"`
 	Pidm            int        `json:"pidm"`
 	FromDate        string     `json:"fromDate"`
 	ActivityDate    string     `json:"activityDate"`
-	Type            simpleType `json:"type"`
+	Type            SimpleType `json:"type"`
 	SequenceNum     int        `json:"sequenceNum"`
 	StreetLine1     string     `json:"streetLine1"`
 	City            string     `json:"city"`
-	State           simpleType `json:"state"`
+	State           SimpleType `json:"state"`
 	ZipCode         string     `json:"zipCode"`
-	County          simpleType `json:"county"`
+	County          SimpleType `json:"county"`
 	EffectiveStatus string     `json:"effectiveStatus"`
 }
 
-type phone struct {
+// Phone represents the canpus definitiono of a person's phone number
+type Phone struct {
 	GUID                  int        `json:"guid"`
 	Pidm                  int        `json:"pidm"`
 	SequenceNum           int        `json:"sequenceNum"`
-	Type                  simpleType `json:"type"`
+	Type                  SimpleType `json:"type"`
 	ActivityDate          string     `json:"activityDate"`
-	LinkedAddressType     simpleType `json:"linkedAddressType"`
+	LinkedAddressType     SimpleType `json:"linkedAddressType"`
 	LinkedAddressSequence int        `json:"linkedAddressSequence"`
 	AreaCode              string     `json:"areaCode"`
 	PhoneNumber           string     `json:"phoneNumber"`
@@ -71,54 +71,48 @@ type phone struct {
 	EffectiveStatus       string     `json:"effectiveStatus"`
 }
 
-type emergencyContactName struct {
+// EmergencyContactName represents the campus definition of an EmergencyContact name
+type EmergencyContactName struct {
 	LastName  string `json:"lastName"`
 	FirstName string `json:"firstName"`
 }
 
-type emergencyPhone struct {
+// EmergencyPhone represents the campus definition of an emergency phone number
+type EmergencyPhone struct {
 	PhoneArea   string `json:"areaCode"`
 	PhoneNumber string `json:"phoneNumber"`
 }
 
-type emergencyAddress struct {
-	Type    simpleType `json:"type"`
+// EmergencyAddress represents the campus definition of an emergency contact address
+type EmergencyAddress struct {
+	Type    SimpleType `json:"type"`
 	Street1 string     `json:"streetLine1"`
 	City    string     `json:"city"`
-	State   simpleType `json:"state"`
+	State   SimpleType `json:"state"`
 	ZipCode string     `json:"zipCode"`
 }
 
-type emergencyContact struct {
+// EmergencyContact represetnts the campus definition of a person's emergency contact person
+type EmergencyContact struct {
 	GUID         int                  `json:"guid"`
 	Pidm         int                  `json:"pidm"`
 	Priority     string               `json:"priority"`
-	Relationship simpleType           `json:"relationship"`
-	Name         emergencyContactName `json:"name"`
-	Phone        emergencyPhone       `json:"phone"`
-	Address      emergencyAddress     `json:"address"`
+	Relationship SimpleType           `json:"relationship"`
+	Name         EmergencyContactName `json:"name"`
+	Phone        EmergencyPhone       `json:"phone"`
+	Address      EmergencyAddress     `json:"address"`
 }
 
-type campusPerson struct {
-	Names             []name             `json:"name"`
-	Addresses         []address          `json:"address"`
-	Phone             []phone            `json:"phone"`
-	EmergencyContacts []emergencyContact `json:"emergencyContact"`
+// CampusPerson represents the campus definitioin of a person's contact information
+type CampusPerson struct {
+	Names             []Name             `json:"name"`
+	Addresses         []Address          `json:"address"`
+	Phone             []Phone            `json:"phone"`
+	EmergencyContacts []EmergencyContact `json:"emergencyContact"`
 }
 
-// ContactAdapter is a vendor specific structure that implements the contanct information interface
-type ContactAdapter struct {
-	APIKey      string
-	APIEndpoint string
-}
-
-// NewContactAdapter returns a vendor specific implementation of the contanct information interface
-func NewContactAdapter(apikey string, url string) *ContactAdapter {
-	return &ContactAdapter{APIKey: apikey, APIEndpoint: url}
-
-}
-
-func newPerson(cr *campusPerson) (*model.Person, error) {
+// NewPerson constructs an app formatted person object from the campus representation
+func NewPerson(cr *CampusPerson) (*model.Person, error) {
 	ret := model.Person{}
 
 	for i := 0; i < len(cr.Names); i++ {
@@ -171,86 +165,4 @@ func newPerson(cr *campusPerson) (*model.Person, error) {
 	}
 
 	return &ret, nil
-}
-
-// GetContactInformation returns a contact information object for a student
-func (lv *ContactAdapter) GetContactInformation(uin string, accessToken string, mode string) (*model.Person, int, error) {
-
-	finalURL := lv.APIEndpoint + "/person/contact-summary-query/" + uin
-
-	if mode != "0" {
-		finalURL = lv.APIEndpoint + "/mock/123456789"
-	}
-
-	campusData, statusCode, err := lv.getData(finalURL, accessToken)
-	if err != nil {
-		return nil, statusCode, err
-	}
-
-	if len(campusData.People) == 0 {
-		return nil, 404, errors.New("No contact data found")
-	}
-
-	retValue, err := newPerson(&campusData.People[0])
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-	return retValue, statusCode, nil
-}
-
-func (lv *ContactAdapter) getData(targetURL string, accessToken string) (*campusUserData, int, error) {
-	method := "GET"
-
-	client := &http.Client{}
-	req, err := http.NewRequest(method, targetURL, nil)
-
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Ocp-Apim-Subscription-Key", lv.APIKey)
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, res.StatusCode, err
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, res.StatusCode, err
-	}
-
-	if res.StatusCode == 401 {
-		return nil, res.StatusCode, errors.New(res.Status)
-	}
-
-	if res.StatusCode == 403 {
-		return nil, res.StatusCode, errors.New(res.Status)
-	}
-
-	if res.StatusCode == 400 {
-		return nil, res.StatusCode, errors.New("Bad request to api end point")
-	}
-
-	if res.StatusCode == 406 {
-		return nil, res.StatusCode, errors.New("Server returned 406: possible uin claim mismatch")
-	}
-
-	//campus api returns a 502 when there is no banner contact data for the uin
-	if res.StatusCode == 502 {
-		return nil, 404, errors.New(res.Status)
-	}
-	if res.StatusCode == 200 {
-		data := campusUserData{}
-		err = json.Unmarshal(body, &data)
-
-		if err != nil {
-			return nil, res.StatusCode, err
-		}
-		return &data, res.StatusCode, nil
-	}
-
-	return nil, res.StatusCode, errors.New("Error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
-
 }

@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package core
 
 import (
-	"github.com/rokwire/logging-library-go/v2/logutils"
+	"application/core/model"
 )
 
-const (
-	//TypeShibbolethUser type
-	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
-)
+// appSystem contains system implementations
+type appSystem struct {
+	app *Application
+}
 
-//////////////////////////
+// GetExample gets an Example by ID
+func (a appSystem) GetExample(orgID string, appID string, id string) (*model.Example, error) {
+	return a.app.shared.getExample(orgID, appID, id)
+}
 
-// ShibbolethUser represents shibboleth auth entity
-type ShibbolethUser struct {
-	Uin        *string   `json:"uiucedu_uin" bson:"uin"`
-	Email      *string   `json:"email" bson:"email"`
-	Phone      *string   `json:"phone" bson:"phone"`
-	Membership *[]string `json:"uiucedu_is_member_of,omitempty" bson:"membership,omitempty"`
-} //@name ShibbolethUser
+// newAppSystem creates new appSystem
+func newAppSystem(app *Application) appSystem {
+	return appSystem{app: app}
+}

@@ -14,20 +14,29 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeLaundryAsset type
+	TypeLaundryAsset logutils.MessageDataType = "laundryasset"
+)
+
 // LaundryAssets represents the laundry elements of assets.json
 type LaundryAssets struct {
-	Assets []LaundryAsset `json:"locations"`
+	Assets []LaundryAsset `json:"locations" bson:"locations"`
 }
 
 // LaundryAsset represents a single laundry room asset
 type LaundryAsset struct {
-	LocationID string         `json:"laundry_location"`
-	Details    LaundryDetails `json:"location_details"`
+	LocationID string         `json:"laundry_location" bson:"laundry_location"`
+	Details    LaundryDetails `json:"location_details" bson:"laundry_details"`
 }
 
 // LaundryDetails represents the location details of a single laundry room asset
 type LaundryDetails struct {
-	Latitude  float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	Floor     int     `json:"floor"`
+	Latitude  float32 `json:"latitude" bson:"lattitude"`
+	Longitude float32 `json:"longitude" bson:"longitude"`
+	Floor     int     `json:"floor" bson:"floor"`
 }

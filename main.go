@@ -15,20 +15,14 @@
 package main
 
 import (
-	"apigateway/core"
-	model "apigateway/core/model"
-	contactinfo "apigateway/driven/contactinfo"
-	courses "apigateway/driven/courses"
-	"apigateway/driven/laundry"
-	location "apigateway/driven/location"
-	storage "apigateway/driven/storage"
-	terms "apigateway/driven/terms"
-	driver "apigateway/driver/web"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
+	"application/core"
+	"application/driven/storage"
+	"application/driver/web"
+	"strings"
+
+	"github.com/rokwire/core-auth-library-go/v3/authservice"
+	"github.com/rokwire/core-auth-library-go/v3/envloader"
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
 var (
@@ -38,96 +32,58 @@ var (
 	Build string
 )
 
-/*
-func printDeletedAccountIDs(accountIDs []string) error {
-	log.Printf("Deleted account IDs: %v\n", accountIDs)
-	return nil
-}
-*/
-
 func main() {
 	if len(Version) == 0 {
 		Version = "dev"
 	}
 
-	port := getEnvKey("GATEWAY_PORT", true)
+	serviceID := "gateway"
 
-	//mongoDB adapter
-	mongoDBAuth := getEnvKey("GATEWAY_MONGO_AUTH", true)
-	mongoDBName := getEnvKey("GATEWAY_MONGO_DATABASE", true)
-	mongoTimeout := getEnvKey("GATEWAY_MONGO_TIMEOUT", false)
-	laundryKey := getEnvKey("GATEWAY_LAUNDRY_APIKEY", true)
-	laundryAPI := getEnvKey("GATEWAY_LAUNDRY_APIURL", true)
-	luandryServiceKey := getEnvKey("GATEWAY_LAUNDRYSERVICE_APIKEY", true)
-	laundryServiceAPI := getEnvKey("GATEWAY_LAUNDRYSERVICE_API", true)
-	laundryServiceToken := getEnvKey("GATEWAY_LAUNDRYSERVICE_BASICAUTH", true)
-	wayfindingURL := getEnvKey("GATEWAY_WAYFINDING_APIURL", true)
-	wayfindingKey := getEnvKey("GATEWAY_WAYFINDING_APIKEY", true)
-	campusInfoAPIKey := getEnvKey("GATEWAY_CENTRALCAMPUS_APIKEY", true)
-	campusAITSEndPoint := getEnvKey("GATEWAY_CENTRALCAMPUS_ENDPOINT", true)
-	coursesEndPoint := getEnvKey("GATEWAY_GIESCOURSES_ENDPOINT", true)
+	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}
+	logger := logs.NewLogger(serviceID, &loggerOpts)
+	envLoader := envloader.NewEnvLoader(Version, logger)
 
-	//read assets
-	file, _ := ioutil.ReadFile("./assets/assets.json")
-	assets := model.Asset{}
-	_ = json.Unmarshal([]byte(file), &assets)
-	laundryAssets := make(map[string]model.LaundryDetails)
-
-	for i := 0; i < len(assets.Laundry.Assets); i++ {
-		laundryAsset := assets.Laundry.Assets[i]
-		laundryAssets[laundryAsset.LocationID] = laundryAsset.Details
+	envPrefix := strings.ReplaceAll(strings.ToUpper(serviceID), "-", "_") + "_"
+	port := envLoader.GetAndLogEnvVar(envPrefix+"PORT", false, false)
+	if len(port) == 0 {
+		port = "80"
 	}
 
-	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout)
-	laundryAdapter := laundry.NewCSCLaundryAdapter(laundryKey, laundryAPI, luandryServiceKey, laundryServiceAPI, laundryAssets, laundryServiceToken)
-	locationAdapter := location.NewUIUCWayFinding(wayfindingKey, wayfindingURL)
-	contactAdapter := contactinfo.NewContactAdapter(campusInfoAPIKey, campusAITSEndPoint)
-	giescourseAdapter := courses.NewGiesCourseAdapter(coursesEndPoint)
-	studentCourseAdapter := courses.NewCourseAdapter(campusAITSEndPoint, campusInfoAPIKey)
-	termSessionAdapter := terms.NewTermSessionAdapter()
-
+	// mongoDB adapter
+	mongoDBAuth := envLoader.GetAndLogEnvVar(envPrefix+"MONGO_AUTH", true, true)
+	mongoDBName := envLoader.GetAndLogEnvVar(envPrefix+"MONGO_DATABASE", true, false)
+	mongoTimeout := envLoader.GetAndLogEnvVar(envPrefix+"MONGO_TIMEOUT", false, false)
+	storageAdapter := storage.NewStorageAdapter(mongoDBAuth, mongoDBName, mongoTimeout, logger)
 	err := storageAdapter.Start()
 	if err != nil {
-		log.Fatal("Cannot start the mongoDB adapter - " + err.Error())
+		logger.Fatalf("Cannot start the mongoDB adapter: %v", err)
 	}
 
-	log.Printf("MongoDB Started")
-
-	//application
-	application := core.NewApplication(Version, Build, storageAdapter, laundryAdapter, locationAdapter, contactAdapter, giescourseAdapter, studentCourseAdapter, termSessionAdapter)
+	// application
+	application := core.NewApplication(Version, Build, storageAdapter, logger)
 	application.Start()
 
-	//web adapter
-	host := getEnvKey("GATEWAY_HOST", true)
-	corehost := getEnvKey("GATEWAY_CORE_HOST", true)
-	log.Printf(corehost)
+	// web adapter
+	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
+	coreBBBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CORE_BB_BASE_URL", true, false)
 
-	tokenAuth := driver.NewTokenAuth(host, corehost)
-	fmt.Println("auth setup complete")
+	authService := authservice.AuthService{
+		ServiceID:   serviceID,
+		ServiceHost: baseURL,
+		FirstParty:  true,
+		AuthBaseURL: coreBBBaseURL,
+	}
 
-	log.Printf("Creating web adapter")
-	webAdapter := driver.NewWebAdapter(host, port, application, tokenAuth)
+	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, nil)
+	if err != nil {
+		logger.Fatalf("Error initializing remote service registration loader: %v", err)
+	}
 
-	log.Printf("starting web adapter")
+	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, !strings.HasPrefix(baseURL, "http://localhost"))
+	if err != nil {
+		logger.Fatalf("Error initializing service registration manager: %v", err)
+	}
+
+	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, application, serviceRegManager, logger)
 	webAdapter.Start()
-}
-
-func getEnvKey(key string, required bool) string {
-	//get from the environment
-	value, exist := os.LookupEnv(key)
-	if !exist {
-		if required {
-			log.Fatal("No provided environment variable for " + key)
-		} else {
-			log.Printf("No provided environment variable for " + key)
-		}
-	}
-	printEnvVar(key, value)
-	return value
-}
-
-func printEnvVar(name string, value string) {
-	if Version == "dev" {
-		log.Printf("%s=%s", name, value)
-	}
 }

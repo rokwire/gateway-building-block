@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package core
 
-import (
-	"github.com/rokwire/logging-library-go/v2/logutils"
-)
+// appDefault contains default implementations
+type appDefault struct {
+	app *Application
+}
 
-const (
-	//TypeShibbolethUser type
-	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
-)
+// GetVersion gets the current version of this service
+func (a appDefault) GetVersion() string {
+	return a.app.version
+}
 
-//////////////////////////
-
-// ShibbolethUser represents shibboleth auth entity
-type ShibbolethUser struct {
-	Uin        *string   `json:"uiucedu_uin" bson:"uin"`
-	Email      *string   `json:"email" bson:"email"`
-	Phone      *string   `json:"phone" bson:"phone"`
-	Membership *[]string `json:"uiucedu_is_member_of,omitempty" bson:"membership,omitempty"`
-} //@name ShibbolethUser
+// newAppDefault creates new appDefault
+func newAppDefault(app *Application) appDefault {
+	return appDefault{app: app}
+}

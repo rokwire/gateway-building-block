@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rest
+package core
 
 import (
-	"apigateway/core"
+	"application/core/model"
 )
 
-// AdminApisHandler handles the rest Admin APIs implementation
-type AdminApisHandler struct {
-	app *core.Application
+// appBBs contains BB implementations
+type appBBs struct {
+	app *Application
 }
 
-// NewAdminApisHandler creates new rest Handler instance
-func NewAdminApisHandler(app *core.Application) AdminApisHandler {
-	return AdminApisHandler{app: app}
+// GetExample gets an Example by ID
+func (a appBBs) GetExample(orgID string, appID string, id string) (*model.Example, error) {
+	return a.app.shared.getExample(orgID, appID, id)
+}
+
+// newAppBBs creates new appBBs
+func newAppBBs(app *Application) appBBs {
+	return appBBs{app: app}
 }

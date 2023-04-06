@@ -15,20 +15,22 @@
 package model
 
 import (
+	"time"
+
 	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
 const (
-	//TypeShibbolethUser type
-	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
+	//TypeExample example type
+	TypeExample logutils.MessageDataType = "example"
 )
 
-//////////////////////////
-
-// ShibbolethUser represents shibboleth auth entity
-type ShibbolethUser struct {
-	Uin        *string   `json:"uiucedu_uin" bson:"uin"`
-	Email      *string   `json:"email" bson:"email"`
-	Phone      *string   `json:"phone" bson:"phone"`
-	Membership *[]string `json:"uiucedu_is_member_of,omitempty" bson:"membership,omitempty"`
-} //@name ShibbolethUser
+// Example is a generic Example data type
+type Example struct {
+	ID          string     `json:"id" bson:"_id"`
+	OrgID       string     `json:"org_id" bson:"org_id"`
+	AppID       string     `json:"app_id" bson:"app_id"`
+	Data        string     `json:"data" bson:"data"`
+	DateCreated time.Time  `json:"date_created" bson:"date_created"`
+	DateUpdated *time.Time `json:"date_updated" bson:"date_updated"`
+}

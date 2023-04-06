@@ -14,21 +14,11 @@
 
 package model
 
-import (
-	"github.com/rokwire/logging-library-go/v2/logutils"
-)
+// DefaultStorageListener default storage listener implementation
+type DefaultStorageListener struct{}
 
-const (
-	//TypeShibbolethUser type
-	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
-)
+// OnConfigsUpdated notifies that the configs collection has been updated
+func (d *DefaultStorageListener) OnConfigsUpdated() {}
 
-//////////////////////////
-
-// ShibbolethUser represents shibboleth auth entity
-type ShibbolethUser struct {
-	Uin        *string   `json:"uiucedu_uin" bson:"uin"`
-	Email      *string   `json:"email" bson:"email"`
-	Phone      *string   `json:"phone" bson:"phone"`
-	Membership *[]string `json:"uiucedu_is_member_of,omitempty" bson:"membership,omitempty"`
-} //@name ShibbolethUser
+// OnExamplesUpdated notifies that the examples collection has been updated
+func (d *DefaultStorageListener) OnExamplesUpdated() {}

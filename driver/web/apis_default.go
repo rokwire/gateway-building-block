@@ -12,23 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package web
 
 import (
-	"github.com/rokwire/logging-library-go/v2/logutils"
+	"application/core"
+	"net/http"
+
+	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
-const (
-	//TypeShibbolethUser type
-	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
-)
+// DefaultAPIsHandler handles the default rest APIs implementation
+type DefaultAPIsHandler struct {
+	app *core.Application
+}
 
-//////////////////////////
+func (h DefaultAPIsHandler) version(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	return l.HTTPResponseSuccessMessage(h.app.Default.GetVersion())
+}
 
-// ShibbolethUser represents shibboleth auth entity
-type ShibbolethUser struct {
-	Uin        *string   `json:"uiucedu_uin" bson:"uin"`
-	Email      *string   `json:"email" bson:"email"`
-	Phone      *string   `json:"phone" bson:"phone"`
-	Membership *[]string `json:"uiucedu_is_member_of,omitempty" bson:"membership,omitempty"`
-} //@name ShibbolethUser
+// NewDefaultAPIsHandler creates new default API Handler instance
+func NewDefaultAPIsHandler(app *core.Application) DefaultAPIsHandler {
+	return DefaultAPIsHandler{app: app}
+}

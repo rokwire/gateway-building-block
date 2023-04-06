@@ -14,6 +14,20 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeLaundryServiceSubmission type
+	TypeLaundryServiceSubmission logutils.MessageDataType = "laundryservicerequest"
+)
+
+const (
+	//TypeLaundryRooms type
+	TypeLaundryRooms logutils.MessageDataType = "laundryrooms"
+)
+
 // LaundryRoom represents the basic information returned as part of requesting and organization
 type LaundryRoom struct {
 	ID       int
@@ -66,11 +80,11 @@ type ServiceRequestResult struct {
 
 // ServiceSubmission represents the data required to submit a service request for a laundry machine
 type ServiceSubmission struct {
-	MachineID   *string `json:"machineid"`
-	ProblemCode *string `json:"problemcode"`
-	Comments    *string `json:"comments"`
-	FirstName   *string `json:"firstname"`
-	LastName    *string `json:"lastname"`
-	Phone       *string `json:"phone"`
-	Email       *string `json:"email"`
+	MachineID   *string `json:"machineid" bson:"machineid"`
+	ProblemCode *string `json:"problemcode" bson:"problemcode"`
+	Comments    *string `json:"comments" bson:"comments"`
+	FirstName   *string `json:"firstname" bson:"firstname"`
+	LastName    *string `json:"lastname" bson:"lastname"`
+	Phone       *string `json:"phone" bson:"phone"`
+	Email       *string `json:"email" bson:"email"`
 }

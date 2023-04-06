@@ -12,23 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package storage
 
-import (
-	"github.com/rokwire/logging-library-go/v2/logutils"
-)
+import "application/core/model"
 
-const (
-	//TypeShibbolethUser type
-	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
-)
+type storageListener struct {
+	adapter *Adapter
+	model.DefaultStorageListener
+}
 
-//////////////////////////
-
-// ShibbolethUser represents shibboleth auth entity
-type ShibbolethUser struct {
-	Uin        *string   `json:"uiucedu_uin" bson:"uin"`
-	Email      *string   `json:"email" bson:"email"`
-	Phone      *string   `json:"phone" bson:"phone"`
-	Membership *[]string `json:"uiucedu_is_member_of,omitempty" bson:"membership,omitempty"`
-} //@name ShibbolethUser
+func (s *storageListener) OnConfigsUpdated() {
+	s.adapter.cacheConfigs()
+}

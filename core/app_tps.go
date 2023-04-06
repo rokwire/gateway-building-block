@@ -12,29 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rest
+package core
 
 import (
-	"net/http"
-	"strconv"
+	"application/core/model"
 )
 
-func getStringQueryParam(r *http.Request, paramName string) *string {
-	params, ok := r.URL.Query()[paramName]
-	if ok && len(params[0]) > 0 {
-		value := params[0]
-		return &value
-	}
-	return nil
+// appTPS contains BB implementations
+type appTPS struct {
+	app *Application
 }
 
-func getInt64QueryParam(r *http.Request, paramName string) *int64 {
-	params, ok := r.URL.Query()[paramName]
-	if ok && len(params[0]) > 0 {
-		val, err := strconv.ParseInt(params[0], 0, 64)
-		if err == nil {
-			return &val
-		}
-	}
-	return nil
+// GetExample gets an Example by ID
+func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Example, error) {
+	return a.app.shared.getExample(orgID, appID, id)
+}
+
+// newAppTPS creates new appTPS
+func newAppTPS(app *Application) appTPS {
+	return appTPS{app: app}
 }
