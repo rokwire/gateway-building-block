@@ -128,7 +128,7 @@ func (h BBsAPIsHandler) getAppointmentPeople(l *logs.Log, r *http.Request, claim
 	}
 
 	if unitid == 0 {
-		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("unit_id"), nil, http.StatusBadRequest, false)
 	}
 
 	if len(uin) < 9 {
@@ -146,6 +146,71 @@ func (h BBsAPIsHandler) getAppointmentPeople(l *logs.Log, r *http.Request, claim
 	}
 
 	response, err := json.Marshal(people)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
+}
+
+func (h BBsAPIsHandler) getAppointmentOptions(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	providerid := 0
+	uin := ""
+	unitid := 0
+	peopleid := 0
+
+	reqParams := utils.ConstructFilter(r)
+	for _, v := range reqParams.Items {
+		switch v.Field {
+		case "provider_id":
+			provideridstr := v.Value[0]
+			intvar, err := strconv.Atoi(provideridstr)
+			if err != nil {
+				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+			}
+			providerid = intvar
+		case "unit_id":
+			unitidstr := v.Value[0]
+			intvar, err := strconv.Atoi(unitidstr)
+			if err != nil {
+				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("unit_id"), nil, http.StatusBadRequest, false)
+			}
+			unitid = intvar
+		case "person_id":
+			peopleidstr := v.Value[0]
+			intvar, err := strconv.Atoi(peopleidstr)
+			if err != nil {
+				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("person_id"), nil, http.StatusBadRequest, false)
+			}
+			peopleid = intvar
+		case "external_id":
+			uin = v.Value[0]
+		}
+	}
+
+	if providerid == 0 {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+	}
+
+	if unitid == 0 {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("unit_id"), nil, http.StatusBadRequest, false)
+	}
+
+	if len(uin) < 9 {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("external_id"), nil, http.StatusBadRequest, false)
+	}
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	options, err := h.app.BBs.GetAppointmentOptions(uin, unitid, peopleid, providerid, externalToken)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(options)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
 	}

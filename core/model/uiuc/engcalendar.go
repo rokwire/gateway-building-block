@@ -81,8 +81,8 @@ type EngineeringAdvisorWithSchedule struct {
 
 // EngineeringAdvisorAppointments represents an advisors availability
 type EngineeringAdvisorAppointments struct {
-	TTimeSlots []EngineeringTimeSlot `json:"slotTimes"`
-	Questions  []EngineeringQuestion `json:"questions"`
+	TimeSlots []EngineeringTimeSlot `json:"slots"`
+	Questions []EngineeringQuestion `json:"questions"`
 }
 
 // EngineeringAnswer represnets an answer to an engineering question

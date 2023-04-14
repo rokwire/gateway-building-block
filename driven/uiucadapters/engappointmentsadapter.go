@@ -96,6 +96,43 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitId int, provi
 	return &s, nil
 }
 
+func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitid int, advisorid int, providerid int, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error) {
+	//baseURL := conf.EngAppointmentBaseURL
+	baseURL := "https://myengr.test.engr.illinois.edu/advisingws/api/"
+	finalURL := baseURL + "users/" + uin + "/calendars/" + strconv.FormatInt(int64(unitid), 10) + "/advisors/" + strconv.FormatInt(int64(advisorid), 10) + "/appointments"
+	var headers = make(map[string]string)
+	headers["Authorization"] = "Bearer " + accesstoken
+
+	vendorData, err := lv.getVendorData(finalURL, "GET", headers)
+	if err != nil {
+		return nil, err
+	}
+
+	var options uiuc.EngineeringAdvisorAppointments
+	err = json.Unmarshal(vendorData, &options)
+	if err != nil {
+		return nil, err
+	}
+
+	ts := make([]model.TimeSlot, 0)
+	qu := make([]model.Question, 0)
+
+	for i := 0; i < len(options.TimeSlots); i++ {
+		timeslot := options.TimeSlots[i]
+		t := model.TimeSlot{ID: timeslot.ID, EndTime: timeslot.EndDate, StartTime: timeslot.StartDate, UnitID: unitid, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: false}
+		ts = append(ts, t)
+	}
+
+	for i := 0; i < len(options.Questions); i++ {
+		question := options.Questions[i]
+		q := model.Question{ID: question.ID, ProviderID: providerid, Required: true, Type: question.Type, SelectValues: question.SelectionValues}
+		qu = append(qu, q)
+	}
+
+	returnData := model.AppointmentOptions{Questions: qu, TimeSlots: ts}
+	return &returnData, nil
+}
+
 func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method string, headers map[string]string) ([]byte, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest(method, targetURL, nil)

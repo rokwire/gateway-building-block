@@ -43,7 +43,12 @@ type TimeSlot struct {
 	Capacity   int                    `json:"capacity" bson:"capacity"`
 	Filled     bool                   `json:"filled" bson:"filled"`
 	Details    map[string]interface{} `json:"details" bson:"details"`
-	Questions  []Question             `json:"questions" bson:"questions"`
+}
+
+// AppointmentOptions represents the available timeslots and questions for a unitid/advisorid calendar
+type AppointmentOptions struct {
+	TimeSlots []TimeSlot `json:"time_slots" bson:"time_slots"`
+	Questions []Question `json:"questions" bson:"questions"`
 }
 
 // AppointmentUnit represents units with availalbe appointment integrations

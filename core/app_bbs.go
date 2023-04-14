@@ -50,6 +50,15 @@ func (a appBBs) GetPeople(uin string, unitid int, providerid int, accesstoken st
 
 }
 
+func (a appBBs) GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, accesstoken string) (*model.AppointmentOptions, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, err := a.EngApptAdapter.GetTimeSlots(uin, unitid, peopleid, providerid, accesstoken, conf)
+	if err != nil {
+		return nil, err
+	}
+	return retData, nil
+}
+
 // newAppBBs creates new appBBs
 func newAppBBs(app *Application) appBBs {
 	appBB := appBBs{app: app}

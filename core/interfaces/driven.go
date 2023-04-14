@@ -73,7 +73,7 @@ type WayFinding interface {
 type Appointments interface {
 	GetUnits(uin string, accesstoken string, providerid int, conf *model.EnvConfigData) (*[]model.AppointmentUnit, error)
 	GetPeople(uin string, unitId int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error)
-	//GetTimeSlots(uin string, ownderId int, accesstoken string) (*model.TimeSlot, error)
+	GetTimeSlots(uin string, unitid int, advisorid int, providerid int, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error)
 	//CreateAppointment(uin string, accesstoken string) (string, error)
 	//DeleteAppointment(uin string, accesstoken string) (string, error)
 }
