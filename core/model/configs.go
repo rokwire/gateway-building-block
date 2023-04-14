@@ -58,6 +58,7 @@ type EnvConfigData struct {
 	LaundryServiceKey       string `json:"GATEWAY_LAUNDRYSERVICE_APIKEY" bson:"GATEWAY_LAUNDRYSERVICE_APIKEY"`
 	LaundyrServiceURL       string `json:"GATEWAY_LAUNDRYSERVICE_API" bson:"GATEWAY_LAUNDRYSERVICE_API"`
 	LaundryServiceBasicAuth string `json:"GATEWAY_LAUNDRYSERVICE_BASICAUTH" bson:"GATEWAY_LAUNDRYSERVICE_BASICAUTH"`
+	EngAppointmentBaseURL   string `json:"GATEWAY_APPOINTMENTS_ENGURL" bson:"GATEWAY_APPOINTMENTS_ENGURL"`
 }
 
 // GetConfigData returns a pointer to the given config's Data as the given type T

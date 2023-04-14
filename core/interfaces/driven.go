@@ -68,3 +68,12 @@ type WayFinding interface {
 	GetBuildings(conf *model.EnvConfigData) (*[]model.Building, error)
 	GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Building, error)
 }
+
+// Appointments represents the adapter needed to interace with various appoinment data providers
+type Appointments interface {
+	GetUnits(uin string, accesstoken string, providerid int, conf *model.EnvConfigData) (*[]model.AppointmentUnit, error)
+	GetPeople(uin string, unitId int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error)
+	//GetTimeSlots(uin string, ownderId int, accesstoken string) (*model.TimeSlot, error)
+	//CreateAppointment(uin string, accesstoken string) (string, error)
+	//DeleteAppointment(uin string, accesstoken string) (string, error)
+}

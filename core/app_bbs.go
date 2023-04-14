@@ -15,12 +15,15 @@
 package core
 
 import (
+	"application/core/interfaces"
 	"application/core/model"
+	"application/driven/uiucadapters"
 )
 
 // appBBs contains BB implementations
 type appBBs struct {
-	app *Application
+	app            *Application
+	EngApptAdapter interfaces.Appointments
 }
 
 // GetExample gets an Example by ID
@@ -28,7 +31,28 @@ func (a appBBs) GetExample(orgID string, appID string, id string) (*model.Exampl
 	return a.app.shared.getExample(orgID, appID, id)
 }
 
+func (a appBBs) GetAppointmentUnits(providerid int, uin string, accesstoken string) (*[]model.AppointmentUnit, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, err := a.EngApptAdapter.GetUnits(uin, accesstoken, providerid, conf)
+	if err != nil {
+		return nil, err
+	}
+	return retData, nil
+}
+
+func (a appBBs) GetPeople(uin string, unitid int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, err := a.EngApptAdapter.GetPeople(uin, unitid, providerid, accesstoken, conf)
+	if err != nil {
+		return nil, err
+	}
+	return retData, nil
+
+}
+
 // newAppBBs creates new appBBs
 func newAppBBs(app *Application) appBBs {
-	return appBBs{app: app}
+	appBB := appBBs{app: app}
+	appBB.EngApptAdapter = uiucadapters.NewEngineeringAppontmentsAdapter()
+	return appBB
 }

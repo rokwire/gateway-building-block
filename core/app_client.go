@@ -19,7 +19,7 @@ import (
 	"application/core/model"
 	"application/driven/uiucadapters"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 )
 
 // appClient contains client implementations
@@ -145,7 +145,7 @@ func newAppClient(app *Application) appClient {
 
 	client := appClient{app: app}
 	//read assets
-	file, _ := ioutil.ReadFile("./assets/assets.json")
+	file, _ := os.ReadFile("./assets/assets.json")
 	assets := model.Asset{}
 	_ = json.Unmarshal([]byte(file), &assets)
 	laundryAssets := make(map[string]model.LaundryDetails)
@@ -159,5 +159,5 @@ func newAppClient(app *Application) appClient {
 	client.LaundryAdapter = uiucadapters.NewCSCLaundryAdapter(laundryAssets)
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
 	client.LocationAdapter = uiucadapters.NewUIUCWayFinding()
-	return appClient{app: app}
+	return client
 }

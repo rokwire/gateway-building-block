@@ -17,8 +17,10 @@ package web
 import (
 	"application/core"
 	"application/core/model"
+	utils "application/utils"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
@@ -44,6 +46,106 @@ func (h BBsAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 	}
 
 	response, err := json.Marshal(example)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
+}
+
+func (h BBsAPIsHandler) getAppointmentUnits(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	providerid := 0
+	uin := ""
+	reqParams := utils.ConstructFilter(r)
+	for _, v := range reqParams.Items {
+		if v.Field == "providerid" {
+			provideridstr := v.Value[0]
+			intvar, err := strconv.Atoi(provideridstr)
+			if err != nil {
+				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+			}
+			providerid = intvar
+		}
+		if v.Field == "external_id" {
+			uin = v.Value[0]
+		}
+	}
+
+	if providerid == 0 {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+	}
+
+	if len(uin) < 9 {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("external_id"), nil, http.StatusBadRequest, false)
+	}
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	example, err := h.app.BBs.GetAppointmentUnits(providerid, uin, externalToken)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(example)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
+}
+
+func (h BBsAPIsHandler) getAppointmentPeople(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	providerid := 0
+	uin := ""
+	unitid := 0
+	reqParams := utils.ConstructFilter(r)
+	for _, v := range reqParams.Items {
+		switch v.Field {
+		case "provider_id":
+			provideridstr := v.Value[0]
+			intvar, err := strconv.Atoi(provideridstr)
+			if err != nil {
+				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+			}
+			providerid = intvar
+		case "unit_id":
+			unitidstr := v.Value[0]
+			intvar, err := strconv.Atoi(unitidstr)
+			if err != nil {
+				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("unit_id"), nil, http.StatusBadRequest, false)
+			}
+			unitid = intvar
+		case "external_id":
+			uin = v.Value[0]
+		}
+	}
+
+	if providerid == 0 {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+	}
+
+	if unitid == 0 {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+	}
+
+	if len(uin) < 9 {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("external_id"), nil, http.StatusBadRequest, false)
+	}
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	people, err := h.app.BBs.GetPeople(uin, unitid, providerid, externalToken)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(people)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
 	}

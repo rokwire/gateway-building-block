@@ -59,6 +59,11 @@ type Admin interface {
 // BBs exposes Building Block APIs for the driver adapters
 type BBs interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
+	GetAppointmentUnits(providerid int, uin string, accesstoken string) (*[]model.AppointmentUnit, error)
+	GetPeople(uin string, unitId int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error)
+	//GetTimeSlots(ownderId int) (*model.TimeSlot, error)
+	//CreateAppointment() (string, error)
+	//DeleteAppointment() (string, error)
 }
 
 // TPS exposes third-party service APIs for the driver adapters
