@@ -125,7 +125,7 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitid int, ad
 
 	for i := 0; i < len(options.Questions); i++ {
 		question := options.Questions[i]
-		q := model.Question{ID: question.ID, ProviderID: providerid, Required: true, Type: question.Type, SelectValues: question.SelectionValues}
+		q := model.Question{ID: question.ID, ProviderID: providerid, Required: true, Type: question.Type, SelectValues: question.SelectionValues, Question: question.Title}
 		qu = append(qu, q)
 	}
 

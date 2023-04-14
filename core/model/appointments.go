@@ -30,6 +30,7 @@ type Question struct {
 	Required     bool     `json:"required" bson:"required"`
 	Type         string   `json:"type" bson:"type"`
 	SelectValues []string `json:"select_values" bson:"select_values"`
+	Question     string   `json:"question" bson:"question"`
 }
 
 // TimeSlot represents an avaialable appontment timeslot
