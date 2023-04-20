@@ -18,6 +18,7 @@ import (
 	"application/core/interfaces"
 	"application/core/model"
 	"application/driven/uiucadapters"
+	"time"
 )
 
 // appBBs contains BB implementations
@@ -50,13 +51,22 @@ func (a appBBs) GetPeople(uin string, unitid int, providerid int, accesstoken st
 
 }
 
-func (a appBBs) GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, accesstoken string) (*model.AppointmentOptions, error) {
+func (a appBBs) GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string) (*model.AppointmentOptions, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, err := a.EngApptAdapter.GetTimeSlots(uin, unitid, peopleid, providerid, accesstoken, conf)
+	retData, err := a.EngApptAdapter.GetTimeSlots(uin, unitid, peopleid, providerid, startdate, enddate, accesstoken, conf)
 	if err != nil {
 		return nil, err
 	}
 	return retData, nil
+}
+
+func (a appBBs) CreateAppointment(appt *model.AppointmentPost, accessToken string) (string, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	ret, err := a.EngApptAdapter.CreateAppointment(appt, accessToken, conf)
+	if err != nil {
+		return "", err
+	}
+	return ret, nil
 }
 
 // newAppBBs creates new appBBs

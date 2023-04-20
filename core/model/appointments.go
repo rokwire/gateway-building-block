@@ -15,6 +15,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
@@ -39,8 +41,8 @@ type TimeSlot struct {
 	ProviderID int                    `json:"provider_Id" bson:"provider_Id"`
 	UnitID     int                    `json:"unit_id" bson:"unit_id"`
 	PersonID   int                    `json:"person_id" bson:"person_id"`
-	StartTime  string                 `json:"start_time" bson:"start_time"`
-	EndTime    string                 `json:"end_time" bson:"end_time"`
+	StartTime  time.Time              `json:"start_time" bson:"start_time"`
+	EndTime    time.Time              `json:"end_time" bson:"end_time"`
 	Capacity   int                    `json:"capacity" bson:"capacity"`
 	Filled     bool                   `json:"filled" bson:"filled"`
 	Details    map[string]interface{} `json:"details" bson:"details"`
@@ -70,4 +72,18 @@ type AppointmentPerson struct {
 	NextAvailable string `json:"next_available" bson:"next_available"`
 	Name          string `json:"name" bson:"name"`
 	Notes         string `json:"notes" bson:"notes"`
+}
+
+// AppointmentAnswer represents answer data sent from the appointments building block to the gateway building block
+type AppointmentAnswer struct {
+	QuestionID string `json:"questionId" bson:"questionId"`
+	Value      string `json:"value" bson:"value"`
+}
+
+// AppointmentPost represents the data sent by the appointments building block to the gateway building block
+type AppointmentPost struct {
+	UIN        string              `json:"uin" bson:"uin"`
+	ProviderID int                 `json:"providerId" bson:"providerId"`
+	SlotID     int                 `json:"slotId" bson:"slotId"`
+	Answers    []AppointmentAnswer `json:"answers" bson:"answers"`
 }

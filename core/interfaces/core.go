@@ -16,6 +16,7 @@ package interfaces
 
 import (
 	"application/core/model"
+	"time"
 
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
 )
@@ -60,9 +61,9 @@ type Admin interface {
 type BBs interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
 	GetAppointmentUnits(providerid int, uin string, accesstoken string) (*[]model.AppointmentUnit, error)
-	GetPeople(uin string, unitId int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error)
-	GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, accesstoken string) (*model.AppointmentOptions, error)
-	//CreateAppointment() (string, error)
+	GetPeople(uin string, unitID int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error)
+	GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string) (*model.AppointmentOptions, error)
+	CreateAppointment(appt *model.AppointmentPost, accessToken string) (string, error)
 	//DeleteAppointment() (string, error)
 }
 

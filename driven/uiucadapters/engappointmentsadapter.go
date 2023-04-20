@@ -23,6 +23,8 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 )
 
 // EngineeringAppointmentsAdapter is a college of engineering implementation of the driven/appointments adapter
@@ -38,8 +40,7 @@ func NewEngineeringAppontmentsAdapter() EngineeringAppointmentsAdapter {
 // GetUnits returns a list of courses for the given tudent
 func (lv EngineeringAppointmentsAdapter) GetUnits(uin string, accessToken string, providerid int, conf *model.EnvConfigData) (*[]model.AppointmentUnit, error) {
 
-	//baseURL := conf.EngAppointmentBaseURL
-	baseURL := "https://myengr.test.engr.illinois.edu/advisingws/api/"
+	baseURL := conf.EngAppointmentBaseURL
 	finalURL := baseURL + "users/" + uin + "/calendars"
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accessToken
@@ -67,10 +68,9 @@ func (lv EngineeringAppointmentsAdapter) GetUnits(uin string, accessToken string
 }
 
 // GetPeople returns a list of people with appointment calendars from engineering
-func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitId int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error) {
-	//baseURL := conf.EngAppointmentBaseURL
-	baseURL := "https://myengr.test.engr.illinois.edu/advisingws/api/"
-	finalURL := baseURL + "users/" + uin + "/calendars/" + strconv.FormatInt(int64(unitId), 10) + "/advisors"
+func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitID int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error) {
+	baseURL := conf.EngAppointmentBaseURL
+	finalURL := baseURL + "users/" + uin + "/calendars/" + strconv.FormatInt(int64(unitID), 10) + "/advisors"
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accesstoken
 
@@ -89,17 +89,18 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitId int, provi
 
 	for i := 0; i < len(advisors); i++ {
 		advisor := advisors[i]
-		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitId, Notes: advisor.Message, Name: advisor.Name, NextAvailable: advisor.NextAvailableDate}
+		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitID, Notes: advisor.Message, Name: advisor.Name, NextAvailable: advisor.NextAvailableDate}
 		s = append(s, p)
 	}
 
 	return &s, nil
 }
 
-func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitid int, advisorid int, providerid int, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error) {
-	//baseURL := conf.EngAppointmentBaseURL
-	baseURL := "https://myengr.test.engr.illinois.edu/advisingws/api/"
-	finalURL := baseURL + "users/" + uin + "/calendars/" + strconv.FormatInt(int64(unitid), 10) + "/advisors/" + strconv.FormatInt(int64(advisorid), 10) + "/appointments"
+// GetTimeSlots returns an object consisting of the time slots and questions for a given personid between startdate and enddate
+func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, advisorid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error) {
+	baseURL := conf.EngAppointmentBaseURL
+	//baseURL := "https://myengr.test.engr.illinois.edu/advisingws/api/"
+	finalURL := baseURL + "users/" + uin + "/calendars/" + strconv.FormatInt(int64(unitID), 10) + "/advisors/" + strconv.FormatInt(int64(advisorid), 10) + "/appointments"
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accesstoken
 
@@ -116,11 +117,24 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitid int, ad
 
 	ts := make([]model.TimeSlot, 0)
 	qu := make([]model.Question, 0)
+	if !startdate.IsZero() && !enddate.IsZero() {
 
-	for i := 0; i < len(options.TimeSlots); i++ {
-		timeslot := options.TimeSlots[i]
-		t := model.TimeSlot{ID: timeslot.ID, EndTime: timeslot.EndDate, StartTime: timeslot.StartDate, UnitID: unitid, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: false}
-		ts = append(ts, t)
+		const timeLayout = "2006-01-02T15:04:00"
+		for i := 0; i < len(options.TimeSlots); i++ {
+			timeslot := options.TimeSlots[i]
+			slotEndDate, _ := time.Parse(timeLayout, timeslot.EndDate)
+			slotStartDate, _ := time.Parse(timeLayout, timeslot.StartDate)
+			slotStartDateOnly, _, _ := strings.Cut(timeslot.StartDate, "T")
+			slotEndDateOnly, _, _ := strings.Cut(timeslot.EndDate, "T")
+
+			slotStartDatepart, _ := time.Parse(time.DateOnly, slotStartDateOnly)
+			slotEndDatePart, _ := time.Parse(time.DateOnly, slotEndDateOnly)
+
+			if (slotStartDatepart.Equal(startdate) || slotEndDatePart.Equal(enddate)) || (slotStartDate.After(startdate) && slotStartDate.Before(enddate)) {
+				t := model.TimeSlot{ID: timeslot.ID, EndTime: slotEndDate, StartTime: slotStartDate, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: false}
+				ts = append(ts, t)
+			}
+		}
 	}
 
 	for i := 0; i < len(options.Questions); i++ {
@@ -131,6 +145,11 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitid int, ad
 
 	returnData := model.AppointmentOptions{Questions: qu, TimeSlots: ts}
 	return &returnData, nil
+}
+
+// CreateAppointment creates an appointment in the engieering system.
+func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (string, error) {
+	return "", nil
 }
 
 func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method string, headers map[string]string) ([]byte, error) {

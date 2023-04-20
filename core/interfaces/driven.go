@@ -16,6 +16,7 @@ package interfaces
 
 import (
 	"application/core/model"
+	"time"
 )
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
@@ -72,8 +73,8 @@ type WayFinding interface {
 // Appointments represents the adapter needed to interace with various appoinment data providers
 type Appointments interface {
 	GetUnits(uin string, accesstoken string, providerid int, conf *model.EnvConfigData) (*[]model.AppointmentUnit, error)
-	GetPeople(uin string, unitId int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error)
-	GetTimeSlots(uin string, unitid int, advisorid int, providerid int, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error)
-	//CreateAppointment(uin string, accesstoken string) (string, error)
+	GetPeople(uin string, unitID int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error)
+	GetTimeSlots(uin string, unitid int, advisorid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error)
+	CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (string, error)
 	//DeleteAppointment(uin string, accesstoken string) (string, error)
 }
