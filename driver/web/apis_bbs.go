@@ -20,6 +20,7 @@ import (
 	utils "application/utils"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -54,6 +55,7 @@ func (h BBsAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 	return l.HTTPResponseSuccessJSON(response)
 }
 
+// appointment apis
 func (h BBsAPIsHandler) getAppointmentUnits(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
 	providerid := 0
@@ -99,50 +101,25 @@ func (h BBsAPIsHandler) getAppointmentUnits(l *logs.Log, r *http.Request, claims
 }
 
 func (h BBsAPIsHandler) getAppointmentPeople(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-
-	providerid := 0
-	uin := ""
-	unitid := 0
 	reqParams := utils.ConstructFilter(r)
-	for _, v := range reqParams.Items {
-		switch v.Field {
-		case "provider_id":
-			provideridstr := v.Value[0]
-			intvar, err := strconv.Atoi(provideridstr)
-			if err != nil {
-				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
-			}
-			providerid = intvar
-		case "unit_id":
-			unitidstr := v.Value[0]
-			intvar, err := strconv.Atoi(unitidstr)
-			if err != nil {
-				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("unit_id"), nil, http.StatusBadRequest, false)
-			}
-			unitid = intvar
-		case "external_id":
-			uin = v.Value[0]
-		}
+	reqValues, resp, err := h.checkAppointmentParams(reqParams, r, l)
+	if err != nil {
+		return resp
 	}
 
-	if providerid == 0 {
+	if reqValues.ProviderID == 0 {
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
 	}
 
-	if unitid == 0 {
+	if reqValues.UnitID == 0 {
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("unit_id"), nil, http.StatusBadRequest, false)
 	}
 
-	if len(uin) < 9 {
+	if reqValues.UIN == "" {
 		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("external_id"), nil, http.StatusBadRequest, false)
 	}
 
-	externalToken := r.Header.Get("External-Authorization")
-	if externalToken == "" {
-		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
-	}
-
-	people, err := h.app.BBs.GetPeople(uin, unitid, providerid, externalToken)
+	people, err := h.app.BBs.GetPeople(reqValues.UIN, reqValues.UnitID, reqValues.ProviderID, reqValues.ExternalToken)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
 	}
@@ -158,7 +135,7 @@ func (h BBsAPIsHandler) getAppointmentOptions(l *logs.Log, r *http.Request, clai
 
 	reqParams := utils.ConstructFilter(r)
 
-	reqValues, resp, err := h.checkTimeSlotRequest(reqParams, r, l)
+	reqValues, resp, err := h.checkAppointmentParams(reqParams, r, l)
 	if err != nil {
 		return resp
 	}
@@ -180,17 +157,71 @@ func (h BBsAPIsHandler) getAppointmentOptions(l *logs.Log, r *http.Request, clai
 	return l.HTTPResponseSuccessJSON(response)
 }
 
-/*
 func (h BBsAPIsHandler) createAppointment(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
+
+	var record model.AppointmentPost
+	err = json.Unmarshal(data, &record)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	newAppt, err := h.app.BBs.CreateAppointment(&record, externalToken)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(newAppt)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
 }
-*/
+
+func (h BBsAPIsHandler) deleteAppointment(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	params := mux.Vars(r)
+	id := params["id"]
+	if len(id) <= 0 {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+	}
+
+	reqParams := utils.ConstructFilter(r)
+	reqValues, resp, err := h.checkAppointmentParams(reqParams, r, l)
+	if err != nil {
+		return resp
+	}
+
+	if reqValues.UIN == "" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("external_id"), nil, http.StatusBadRequest, false)
+	}
+
+	if reqValues.ProviderID == 0 {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
+	}
+
+	_, err = h.app.BBs.DeleteAppointment(reqValues.UIN, reqValues.ProviderID, id, reqValues.ExternalToken)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
 
 func (h BBsAPIsHandler) getAppointmentTimeSlots(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
 	reqParams := utils.ConstructFilter(r)
 
-	reqValues, resp, err := h.checkTimeSlotRequest(reqParams, r, l)
+	reqValues, resp, err := h.checkAppointmentParams(reqParams, r, l)
 	if err != nil {
 		return resp
 	}
@@ -216,7 +247,7 @@ func (h BBsAPIsHandler) getAppointmentQuestions(l *logs.Log, r *http.Request, cl
 
 	reqParams := utils.ConstructFilter(r)
 
-	reqValues, resp, err := h.checkTimeSlotRequest(reqParams, r, l)
+	reqValues, resp, err := h.checkAppointmentParams(reqParams, r, l)
 	if err != nil {
 		return resp
 	}
@@ -238,7 +269,7 @@ func (h BBsAPIsHandler) getAppointmentQuestions(l *logs.Log, r *http.Request, cl
 	return l.HTTPResponseSuccessJSON(response)
 }
 
-func (h BBsAPIsHandler) checkTimeSlotRequest(reqParms *utils.Filter, req *http.Request, l *logs.Log) (timeSlotRequest, logs.HTTPResponse, error) {
+func (h BBsAPIsHandler) checkAppointmentParams(reqParms *utils.Filter, req *http.Request, l *logs.Log) (timeSlotRequest, logs.HTTPResponse, error) {
 
 	reqValues := timeSlotRequest{UnitID: 0, ProviderID: 0, UIN: "", PersonID: 0, ExternalToken: ""}
 	externalToken := req.Header.Get("External-Authorization")
@@ -256,6 +287,10 @@ func (h BBsAPIsHandler) checkTimeSlotRequest(reqParms *utils.Filter, req *http.R
 				return reqValues, l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false), err
 			}
 			if intvar == 0 {
+				return reqValues, l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false), errors.New("invalid providerid")
+			}
+			_, ok := h.app.AppointmentAdapters[provideridstr]
+			if !ok {
 				return reqValues, l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false), errors.New("invalid providerid")
 			}
 			reqValues.ProviderID = intvar

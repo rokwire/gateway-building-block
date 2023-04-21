@@ -49,6 +49,8 @@ type Application struct {
 	System  interfaces.System  // expose to the drivers adapters
 	shared  Shared
 
+	AppointmentAdapters map[string]interfaces.Appointments //expose to the different vendor specific appointment adapters
+
 	logger *logs.Logger
 
 	storage interfaces.Storage
@@ -75,8 +77,8 @@ func (a *Application) GetEnvConfigs() (*model.EnvConfigData, error) {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage interfaces.Storage, logger *logs.Logger) *Application {
-	application := Application{version: version, build: build, storage: storage, logger: logger}
+func NewApplication(version string, build string, storage interfaces.Storage, appntAdapters map[string]interfaces.Appointments, logger *logs.Logger) *Application {
+	application := Application{version: version, build: build, storage: storage, logger: logger, AppointmentAdapters: appntAdapters}
 
 	//add the drivers ports/interfaces
 	application.Default = newAppDefault(&application)

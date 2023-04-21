@@ -16,7 +16,9 @@ package main
 
 import (
 	"application/core"
+	"application/core/interfaces"
 	"application/driven/storage"
+	"application/driven/uiucadapters"
 	"application/driver/web"
 	"strings"
 
@@ -39,7 +41,10 @@ func main() {
 
 	serviceID := "gateway"
 
-	loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}
+	//loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}
+	loggerOpts := logs.LoggerOpts{
+		SensitiveHeaders: []string{"External-Authorization"},
+		SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}
 	logger := logs.NewLogger(serviceID, &loggerOpts)
 	envLoader := envloader.NewEnvLoader(Version, logger)
 
@@ -59,8 +64,11 @@ func main() {
 		logger.Fatalf("Cannot start the mongoDB adapter: %v", err)
 	}
 
+	// appointment adapters
+	appointments := make(map[string]interfaces.Appointments)
+	appointments["4"] = uiucadapters.NewEngineeringAppontmentsAdapter()
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, logger)
+	application := core.NewApplication(Version, Build, storageAdapter, appointments, logger)
 	application.Start()
 
 	// web adapter

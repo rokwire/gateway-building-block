@@ -63,8 +63,8 @@ type BBs interface {
 	GetAppointmentUnits(providerid int, uin string, accesstoken string) (*[]model.AppointmentUnit, error)
 	GetPeople(uin string, unitID int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error)
 	GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string) (*model.AppointmentOptions, error)
-	CreateAppointment(appt *model.AppointmentPost, accessToken string) (string, error)
-	//DeleteAppointment() (string, error)
+	CreateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error)
+	DeleteAppointment(uin string, providerid int, sourceid string, accesstoken string) (string, error)
 }
 
 // TPS exposes third-party service APIs for the driver adapters

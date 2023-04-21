@@ -17,10 +17,12 @@ package uiucadapters
 import (
 	model "application/core/model"
 	uiuc "application/core/model/uiuc"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
@@ -45,7 +47,7 @@ func (lv EngineeringAppointmentsAdapter) GetUnits(uin string, accessToken string
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accessToken
 
-	vendorData, err := lv.getVendorData(finalURL, "GET", headers)
+	vendorData, err := lv.getVendorData(finalURL, "GET", headers, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +76,7 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitID int, provi
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accesstoken
 
-	vendorData, err := lv.getVendorData(finalURL, "GET", headers)
+	vendorData, err := lv.getVendorData(finalURL, "GET", headers, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +106,7 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, ad
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accesstoken
 
-	vendorData, err := lv.getVendorData(finalURL, "GET", headers)
+	vendorData, err := lv.getVendorData(finalURL, "GET", headers, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +133,7 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, ad
 			slotEndDatePart, _ := time.Parse(time.DateOnly, slotEndDateOnly)
 
 			if (slotStartDatepart.Equal(startdate) || slotEndDatePart.Equal(enddate)) || (slotStartDate.After(startdate) && slotStartDate.Before(enddate)) {
-				t := model.TimeSlot{ID: timeslot.ID, EndTime: slotEndDate, StartTime: slotStartDate, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: false}
+				t := model.TimeSlot{ID: timeslot.ID, EndTime: slotEndDate, StartTime: slotStartDate, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: 0}
 				ts = append(ts, t)
 			}
 		}
@@ -148,13 +150,76 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, ad
 }
 
 // CreateAppointment creates an appointment in the engieering system.
-func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (string, error) {
-	return "", nil
+func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error) {
+	baseURL := conf.EngAppointmentBaseURL
+	finalURL := baseURL + "Appointment"
+	var headers = make(map[string]string)
+	headers["Authorization"] = "Bearer " + accesstoken
+	headers["Content-Type"] = "application/json"
+
+	slotid, err := strconv.Atoi(appt.SlotID)
+	if err != nil {
+		return nil, err
+	}
+	eap := engAppointmentPost{UIN: appt.UserExternalIDs.UIN, SlotID: slotid}
+	eap.Answers = make([]engAppointmentAnswerPost, 0)
+
+	for i := 0; i < len(appt.Answers); i++ {
+		apptAnswer := appt.Answers[i]
+		for j := 0; j < len(apptAnswer.Values); j++ {
+			engAns := engAppointmentAnswerPost{QuestionID: apptAnswer.QuestionID, Value: apptAnswer.Values[j], UploadID: 0}
+			eap.Answers = append(eap.Answers, engAns)
+		}
+
+	}
+	postData, err := json.Marshal(eap)
+	if err != nil {
+		return nil, err
+	}
+	payload := strings.NewReader(string(postData))
+	_, err = lv.getVendorData(finalURL, "POST", headers, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	retData := model.BuildingBlockAppointment{ProviderID: appt.ProviderID, UnitID: appt.UnitID, PersonID: appt.PersonID, UserExternalIDs: appt.UserExternalIDs, Type: appt.Type, StartTime: appt.StartTime, EndTime: appt.EndTime, SourceID: appt.SlotID}
+
+	return &retData, nil
 }
 
-func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method string, headers map[string]string) ([]byte, error) {
+// DeleteAppointment cancels an appointment in the engineering appointment system
+func (lv EngineeringAppointmentsAdapter) DeleteAppointment(uin string, sourceid string, accesstoken string, conf *model.EnvConfigData) (string, error) {
+	baseURL := conf.EngAppointmentBaseURL
+	finalURL := baseURL + "Appointment/" + sourceid
+
+	payload := &bytes.Buffer{}
+	writer := multipart.NewWriter(payload)
+	_ = writer.WriteField("uin", uin)
+	err := writer.Close()
+	if err != nil {
+		return "", err
+	}
+	var headers = make(map[string]string)
+	headers["Authorization"] = "Bearer " + accesstoken
+	headers["Content-Type"] = writer.FormDataContentType()
+
+	vendorData, err := lv.getVendorData(finalURL, "DELETE", headers, strings.NewReader(payload.String()))
+	if err != nil {
+		return "", err
+	}
+	return string(vendorData), nil
+}
+
+func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method string, headers map[string]string, postdata *strings.Reader) ([]byte, error) {
+
 	client := &http.Client{}
-	req, err := http.NewRequest(method, targetURL, nil)
+
+	var postbody = io.Reader(nil)
+	if postdata != nil {
+		postbody = postdata
+	}
+
+	req, err := http.NewRequest(method, targetURL, postbody)
 
 	if err != nil {
 		return nil, err
@@ -194,10 +259,22 @@ func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method 
 		return nil, errors.New(res.Status + " : " + string(body))
 	}
 
-	if res.StatusCode == 200 || res.StatusCode == 201 {
+	if res.StatusCode == 200 || res.StatusCode == 201 || res.StatusCode == 204 {
 
 		return body, nil
 	}
 
 	return nil, errors.New("error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
+}
+
+type engAppointmentPost struct {
+	UIN     string                     `json:"uin" bson:"uin"`
+	SlotID  int                        `json:"slotId" bson:"slotId"`
+	Answers []engAppointmentAnswerPost `json:"answers" bson:"answers"`
+}
+
+type engAppointmentAnswerPost struct {
+	QuestionID string `json:"questionId" bson:"questionId"`
+	Value      string `json:"value" bson:"value"`
+	UploadID   int    `json:"uploadId" bson:"uploadId"`
 }

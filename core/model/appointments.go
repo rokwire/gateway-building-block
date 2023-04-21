@@ -28,7 +28,7 @@ const (
 // Question represents a question asked as part of an appointmentr request
 type Question struct {
 	ID           string   `json:"id" bson:"id"`
-	ProviderID   int      `json:"provider_Id" bson:"provider_Id"`
+	ProviderID   int      `json:"provider_id" bson:"provider_id"`
 	Required     bool     `json:"required" bson:"required"`
 	Type         string   `json:"type" bson:"type"`
 	SelectValues []string `json:"select_values" bson:"select_values"`
@@ -38,13 +38,13 @@ type Question struct {
 // TimeSlot represents an avaialable appontment timeslot
 type TimeSlot struct {
 	ID         int                    `json:"id" bson:"id"`
-	ProviderID int                    `json:"provider_Id" bson:"provider_Id"`
+	ProviderID int                    `json:"provider_id" bson:"provider_Id"`
 	UnitID     int                    `json:"unit_id" bson:"unit_id"`
 	PersonID   int                    `json:"person_id" bson:"person_id"`
 	StartTime  time.Time              `json:"start_time" bson:"start_time"`
 	EndTime    time.Time              `json:"end_time" bson:"end_time"`
 	Capacity   int                    `json:"capacity" bson:"capacity"`
-	Filled     bool                   `json:"filled" bson:"filled"`
+	Filled     int                    `json:"filled" bson:"filled"`
 	Details    map[string]interface{} `json:"details" bson:"details"`
 }
 
@@ -76,14 +76,36 @@ type AppointmentPerson struct {
 
 // AppointmentAnswer represents answer data sent from the appointments building block to the gateway building block
 type AppointmentAnswer struct {
-	QuestionID string `json:"questionId" bson:"questionId"`
-	Value      string `json:"value" bson:"value"`
+	QuestionID string   `json:"question_id" bson:"question_id"`
+	Values     []string `json:"values" bson:"values"`
+}
+
+// ExternalUserID represents external id fields passed into the building block as part of a post operation
+type ExternalUserID struct {
+	UIN string `json:"uin" bson:"uin"`
 }
 
 // AppointmentPost represents the data sent by the appointments building block to the gateway building block
 type AppointmentPost struct {
-	UIN        string              `json:"uin" bson:"uin"`
-	ProviderID int                 `json:"providerId" bson:"providerId"`
-	SlotID     int                 `json:"slotId" bson:"slotId"`
-	Answers    []AppointmentAnswer `json:"answers" bson:"answers"`
+	ProviderID      string              `json:"provider_id" bson:"provider_id"`
+	UnitID          string              `json:"unit_id" bson:"unit_id"`
+	PersonID        string              `json:"person_id" bson:"person_id"`
+	Type            string              `json:"type" bson:"type"`
+	StartTime       string              `json:"start_time" bson:"start_time"`
+	EndTime         string              `json:"end_time" bson:"end_time"`
+	UserExternalIDs ExternalUserID      `json:"user_external_ids" bson:"user_external_ids"`
+	SlotID          string              `json:"slot_id" bson:"slot_id"`
+	Answers         []AppointmentAnswer `json:"answers" bson:"answers"`
+}
+
+// BuildingBlockAppointment returns the expected appointment structure to the appointments buildnig block
+type BuildingBlockAppointment struct {
+	ProviderID      string         `json:"provider_id" bson:"provider_id"`
+	UnitID          string         `json:"unit_id" bson:"unit_id"`
+	PersonID        string         `json:"person_id" bson:"person_id"`
+	Type            string         `json:"type" bson:"type"`
+	StartTime       string         `json:"start_time" bson:"start_time"`
+	EndTime         string         `json:"end_time" bson:"end_time"`
+	UserExternalIDs ExternalUserID `json:"user_external_ids" bson:"user_external_ids"`
+	SourceID        string         `json:"source_id" bson:"source_id"`
 }

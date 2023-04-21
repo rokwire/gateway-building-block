@@ -15,16 +15,14 @@
 package core
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
-	"application/driven/uiucadapters"
+	"strconv"
 	"time"
 )
 
 // appBBs contains BB implementations
 type appBBs struct {
-	app            *Application
-	EngApptAdapter interfaces.Appointments
+	app *Application
 }
 
 // GetExample gets an Example by ID
@@ -34,7 +32,8 @@ func (a appBBs) GetExample(orgID string, appID string, id string) (*model.Exampl
 
 func (a appBBs) GetAppointmentUnits(providerid int, uin string, accesstoken string) (*[]model.AppointmentUnit, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, err := a.EngApptAdapter.GetUnits(uin, accesstoken, providerid, conf)
+	apptAdapter := a.app.AppointmentAdapters[strconv.Itoa(providerid)]
+	retData, err := apptAdapter.GetUnits(uin, accesstoken, providerid, conf)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +42,8 @@ func (a appBBs) GetAppointmentUnits(providerid int, uin string, accesstoken stri
 
 func (a appBBs) GetPeople(uin string, unitid int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, err := a.EngApptAdapter.GetPeople(uin, unitid, providerid, accesstoken, conf)
+	apptAdapter := a.app.AppointmentAdapters[strconv.Itoa(providerid)]
+	retData, err := apptAdapter.GetPeople(uin, unitid, providerid, accesstoken, conf)
 	if err != nil {
 		return nil, err
 	}
@@ -53,16 +53,28 @@ func (a appBBs) GetPeople(uin string, unitid int, providerid int, accesstoken st
 
 func (a appBBs) GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string) (*model.AppointmentOptions, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, err := a.EngApptAdapter.GetTimeSlots(uin, unitid, peopleid, providerid, startdate, enddate, accesstoken, conf)
+	apptAdapter := a.app.AppointmentAdapters[strconv.Itoa(providerid)]
+	retData, err := apptAdapter.GetTimeSlots(uin, unitid, peopleid, providerid, startdate, enddate, accesstoken, conf)
 	if err != nil {
 		return nil, err
 	}
 	return retData, nil
 }
 
-func (a appBBs) CreateAppointment(appt *model.AppointmentPost, accessToken string) (string, error) {
+func (a appBBs) CreateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	ret, err := a.EngApptAdapter.CreateAppointment(appt, accessToken, conf)
+	apptAdapter := a.app.AppointmentAdapters[appt.ProviderID]
+	ret, err := apptAdapter.CreateAppointment(appt, accessToken, conf)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, accesstoken string) (string, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	apptAdapter := a.app.AppointmentAdapters[strconv.Itoa(providerid)]
+	ret, err := apptAdapter.DeleteAppointment(uin, sourceid, accesstoken, conf)
 	if err != nil {
 		return "", err
 	}
@@ -72,6 +84,5 @@ func (a appBBs) CreateAppointment(appt *model.AppointmentPost, accessToken strin
 // newAppBBs creates new appBBs
 func newAppBBs(app *Application) appBBs {
 	appBB := appBBs{app: app}
-	appBB.EngApptAdapter = uiucadapters.NewEngineeringAppontmentsAdapter()
 	return appBB
 }

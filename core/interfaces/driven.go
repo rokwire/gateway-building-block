@@ -75,6 +75,6 @@ type Appointments interface {
 	GetUnits(uin string, accesstoken string, providerid int, conf *model.EnvConfigData) (*[]model.AppointmentUnit, error)
 	GetPeople(uin string, unitID int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error)
 	GetTimeSlots(uin string, unitid int, advisorid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error)
-	CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (string, error)
-	//DeleteAppointment(uin string, accesstoken string) (string, error)
+	CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error)
+	DeleteAppointment(uin string, sourceid string, accesstoken string, conf *model.EnvConfigData) (string, error)
 }

@@ -1,4 +1,4 @@
-p, get_examples, /identity/api/bbs/examples/*, (GET), Get examples
+p, get_examples, /gateway/api/bbs/examples/*, (GET), Get examples
 p, all_external_appointments, /gateway/api/bbs/appointments/*, (GET|POST|PUT|DELETE), All external appointment management actions
 p, get_external_appointments, /gateway/api/bbs/appointments/*, (GET), Get appointments in external systems
 p, update_external_appointments, /gateway/api/bbs/appointments/*, (GET|POST|PUT), Update appointments in external systems
