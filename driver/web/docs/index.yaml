@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Rokwire Identity Building Block API
+  description: Identity Building Block API Documentation
+  version: 1.0.0
+servers:
+  - url: 'https://api.rokwire.illinois.edu/identity'
+    description: Production server
+  - url: 'https://api-test.rokwire.illinois.edu/identity'
+    description: Test server
+  - url: 'https://api-dev.rokwire.illinois.edu/identity'
+    description: Development server
+  - url: 'http://localhost/identity'
+    description: Local server
+tags:
+  - name: Client
+    description: Client applications APIs.
+  - name: Admin
+    description: Clients administration applications APIs.
+  - name: BBs
+    description: Building Block APIs.
+  - name: TPS
+    description: Third-Party Service APIs.
+  - name: System
+    description: Third-Party Service APIs.
+  - name: Default
+    description: Default APIs.
+paths:  
+  # Default
+  /version:
+    $ref: "./resources/default/version.yaml"
+
+  # Client
+  /api/examples/{id}:
+    $ref: "./resources/client/examples-id.yaml"
+  #/api/laundry/rooms:
+  #  $ref: "./resources/client/laundryrooms.yaml"
+  #/api/laundry/room:
+  #  $ref: "./resources/client/laundryroom.yaml"
+  #/api/laundry/initrequest:
+  #  $ref: "./resources/client/initrequest.yaml"
+  #/api/laundry/requestservice:
+  #  $ref: "./resources/client/requestservice.yaml"
+  #/api/wayfinding/building:
+  #  $ref: "./resources/client/building.yaml"
+  #/api/wayfinding/entrance:
+  #  $ref: "./resources/client/entrance.yaml"
+  #/api/wayfinding/buildings:
+  #  $ref: "./resources/client/buildings.yaml"
+  #/api/person/contactinfo:
+  #  $ref: "./resources/client/contactinfo.yaml"
+  #/api/person/giescourses:
+  #  $ref: "./resources/client/giescourses.yaml"
+  #/api/person/studentcourses:
+  #  $ref: "./resources/client/studentcourses.yaml"
+  #/api/termsessions/listcurrent:
+  #  $ref: "./resources/client/termsessions.yaml"
+  
+  # Admin
+  /api/admin/examples:
+    $ref: "./resources/admin/examples.yaml"
+  /api/admin/examples/{id}:
+    $ref: "./resources/admin/examples-id.yaml"
+  /api/admin/configs:
+    $ref: "./resources/admin/configs.yaml"
+  /api/admin/configs/{id}:
+    $ref: "./resources/admin/configs-id.yaml"
+
+  # BBs
+  /api/bbs/examples/{id}:
+    $ref: "./resources/bbs/examples-id.yaml"
+  /api/bbs/appointments/people:
+    $ref: "./resources/bbs/apptpeople.yaml"
+  /api/bbs/appointments/slots:
+    $ref: "./resources/bbs/apptslots.yaml"
+  /api/bbs/appointments/questions:
+    $ref: "./resources/bbs/apptquestions.yaml"
+  /api/bbs/appointments/qands:
+    $ref: "./resources/bbs/apptqands.yaml"
+  /api/bbs/appointments/:
+    $ref: "./resources/bbs/createappointment.yaml"
+  /api/bbs/appointments/{id}:
+    $ref: "./resources/bbs/delappointment.yaml"
+  
+  # TPS
+  /api/tps/examples/{id}:
+    $ref: "./resources/tps/examples-id.yaml"
+
+  # System
+  /api/system/examples/{id}:
+    $ref: "./resources/system/examples-id.yaml"
+    
+components:
+  securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  schemas:
+    $ref: "./schemas/index.yaml"

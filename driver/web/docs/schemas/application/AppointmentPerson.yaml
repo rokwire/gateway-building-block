@@ -1,0 +1,24 @@
+type: object
+required:
+- id
+- provider_id
+- unit_id
+- next_available
+- name
+- notes
+properties:
+  id:
+    type: string
+    readOnly: true
+  provider_id:
+    type: int
+    readOnly: true
+  unit_id:
+    type: int
+    readOnly: true
+  next_available:
+    type: string
+  name:
+    type: string
+  notes:
+    type: string

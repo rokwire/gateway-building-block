@@ -1,0 +1,15 @@
+# application
+Config:
+  $ref: "./application/Config.yaml"
+EnvConfigData:
+  $ref: "./application/EnvConfigData.yaml"
+Example:
+  $ref: "./application/Example.yaml"
+
+# ADMIN section
+
+## admin configs API
+_admin_req_update-configs:
+  $ref: "./apis/admin/update-configs/Request.yaml"
+
+# end ADMIN section

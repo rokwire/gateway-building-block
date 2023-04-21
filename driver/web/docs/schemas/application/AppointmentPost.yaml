@@ -1,0 +1,42 @@
+type: object
+required:
+- provider_id
+- unit_id
+- person_id
+- type
+- start_time
+- end_time
+- user_external_ids
+- slot_id
+- answers
+properties:
+  provider_id:
+    type: string
+    readOnly: true
+  unit_id:
+    type: string
+    readOnly: true
+  person_id:
+    type: string
+    readOnly: true
+  type:
+    type: stirng
+    readOnly: true
+  start_time:
+    type: stirng
+    readOnly: true
+  end_time:
+    type: string
+    readOnly: true
+  user_external_ids:
+    type: 
+      - $ref: "./ExternalUserID.yaml"
+    readOnly: true
+  slot_id:
+    type: string
+    readOnly: true
+  answers:
+    type: array
+    items:
+      - $ref: "./QuestionAnswer.yaml"
+    readOnly: true 

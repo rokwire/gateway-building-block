@@ -1,0 +1,26 @@
+type: object
+required:
+- id
+- app_id
+- org_id
+- data
+- date_created
+properties:
+  id:
+    type: string
+    readOnly: true
+  org_id:
+    type: string
+    readOnly: true
+  app_id:
+    type: string  
+    readOnly: true
+  data:
+    type: string
+  date_created:
+    type: string
+    readOnly: true
+  date_updated:
+    type: string 
+    nullable: true
+    readOnly: true

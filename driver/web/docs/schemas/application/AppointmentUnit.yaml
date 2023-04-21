@@ -1,0 +1,24 @@
+type: object
+required:
+- id
+- provider_id
+- name
+- location
+- hours_of_operation
+- details
+properties:
+  id:
+    type: int
+    readOnly: true
+  provider_id:
+    type: int
+    readOnly: true
+  name:
+    type: string
+    readOnly: true
+  location:
+    type: string
+  hours_of_operation:
+    type: string
+  details:
+    type: string

@@ -124,7 +124,6 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, ad
 		const timeLayout = "2006-01-02T15:04:00"
 		for i := 0; i < len(options.TimeSlots); i++ {
 			timeslot := options.TimeSlots[i]
-			slotEndDate, _ := time.Parse(timeLayout, timeslot.EndDate)
 			slotStartDate, _ := time.Parse(timeLayout, timeslot.StartDate)
 			slotStartDateOnly, _, _ := strings.Cut(timeslot.StartDate, "T")
 			slotEndDateOnly, _, _ := strings.Cut(timeslot.EndDate, "T")
@@ -133,7 +132,7 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, ad
 			slotEndDatePart, _ := time.Parse(time.DateOnly, slotEndDateOnly)
 
 			if (slotStartDatepart.Equal(startdate) || slotEndDatePart.Equal(enddate)) || (slotStartDate.After(startdate) && slotStartDate.Before(enddate)) {
-				t := model.TimeSlot{ID: timeslot.ID, EndTime: slotEndDate, StartTime: slotStartDate, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: 0}
+				t := model.TimeSlot{ID: timeslot.ID, EndTime: timeslot.EndDate, StartTime: timeslot.StartDate, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: 0}
 				ts = append(ts, t)
 			}
 		}

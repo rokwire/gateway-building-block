@@ -15,8 +15,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
@@ -41,8 +39,8 @@ type TimeSlot struct {
 	ProviderID int                    `json:"provider_id" bson:"provider_Id"`
 	UnitID     int                    `json:"unit_id" bson:"unit_id"`
 	PersonID   int                    `json:"person_id" bson:"person_id"`
-	StartTime  time.Time              `json:"start_time" bson:"start_time"`
-	EndTime    time.Time              `json:"end_time" bson:"end_time"`
+	StartTime  string                 `json:"start_time" bson:"start_time"`
+	EndTime    string                 `json:"end_time" bson:"end_time"`
 	Capacity   int                    `json:"capacity" bson:"capacity"`
 	Filled     int                    `json:"filled" bson:"filled"`
 	Details    map[string]interface{} `json:"details" bson:"details"`
