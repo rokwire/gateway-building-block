@@ -1,13 +1,13 @@
 type: object
 required:
-- person_id
+- id
 - provider_id
 - unit_id
 - next_available
 - name
 - notes
 properties:
-  pesrson_id:
+  id:
     type: string
     readOnly: true
   provider_id:

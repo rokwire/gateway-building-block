@@ -1,13 +1,13 @@
 type: object
 required:
-- unit_id
+- id
 - provider_id
 - name
 - location
 - hours_of_operation
 - details
 properties:
-  unit_id:
+  id:
     type: int
     readOnly: true
   provider_id:

@@ -1,13 +1,13 @@
 type: object
 required:
-- question_id
+- id
 - provider_id
 - required
 - type
 - select_values
 - question
 properties:
-  question_id:
+  id:
     type: string
     readOnly: true
   provider_id:
