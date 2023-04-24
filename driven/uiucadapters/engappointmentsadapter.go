@@ -166,7 +166,14 @@ func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.Appointme
 	for i := 0; i < len(appt.Answers); i++ {
 		apptAnswer := appt.Answers[i]
 		for j := 0; j < len(apptAnswer.Values); j++ {
-			engAns := engAppointmentAnswerPost{QuestionID: apptAnswer.QuestionID, Value: apptAnswer.Values[j], UploadID: 0}
+			finalAnswer := apptAnswer.Values[j]
+			switch finalAnswer {
+			case "true":
+				finalAnswer = "X"
+			case "false":
+				finalAnswer = ""
+			}
+			engAns := engAppointmentAnswerPost{QuestionID: apptAnswer.QuestionID, Value: finalAnswer, UploadID: 0}
 			eap.Answers = append(eap.Answers, engAns)
 		}
 

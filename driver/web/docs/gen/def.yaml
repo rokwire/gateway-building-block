@@ -541,14 +541,14 @@ paths:
               schema:
                 type: object
                 required:
-                  - id
+                  - person_id
                   - provider_id
                   - unit_id
                   - next_available
                   - name
                   - notes
                 properties:
-                  id:
+                  pesrson_id:
                     type: string
                     readOnly: true
                   provider_id:
@@ -638,7 +638,7 @@ paths:
               schema:
                 type: object
                 required:
-                  - id
+                  - slot_id
                   - provider_id
                   - unit_id
                   - person_id
@@ -648,7 +648,7 @@ paths:
                   - filled
                   - details
                 properties:
-                  id:
+                  slot_id:
                     type: int
                     readOnly: true
                   provider_id:
@@ -730,14 +730,14 @@ paths:
                 items:
                   - type: object
                     required:
-                      - id
+                      - question_id
                       - provider_id
                       - required
                       - type
                       - select_values
                       - question
                     properties:
-                      id:
+                      question_id:
                         type: string
                         readOnly: true
                       provider_id:

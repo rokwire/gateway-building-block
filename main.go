@@ -66,7 +66,7 @@ func main() {
 
 	// appointment adapters
 	appointments := make(map[string]interfaces.Appointments)
-	appointments["4"] = uiucadapters.NewEngineeringAppontmentsAdapter()
+	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter()
 	// application
 	application := core.NewApplication(Version, Build, storageAdapter, appointments, logger)
 	application.Start()

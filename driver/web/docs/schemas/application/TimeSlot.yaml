@@ -1,6 +1,6 @@
 type: object
 required:
-- id
+- slot_id
 - provider_id
 - unit_id
 - person_id
@@ -10,7 +10,7 @@ required:
 - filled
 - details
 properties:
-  id:
+  slot_id:
     type: int
     readOnly: true
   provider_id:
