@@ -505,7 +505,8 @@ paths:
       description: |
         Gets a list of people with calendars inside of a unit
 
-        **Auth:** Requires valid first-party service account token with `get_examples` permission
+        **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+         Requires the External-Authorization header containing the oidc access token from the campus provider
       security:
         - bearerAuth: []
       parameters:
@@ -541,14 +542,14 @@ paths:
               schema:
                 type: object
                 required:
-                  - person_id
+                  - id
                   - provider_id
                   - unit_id
                   - next_available
                   - name
                   - notes
                 properties:
-                  pesrson_id:
+                  id:
                     type: string
                     readOnly: true
                   provider_id:
@@ -638,7 +639,7 @@ paths:
               schema:
                 type: object
                 required:
-                  - slot_id
+                  - id
                   - provider_id
                   - unit_id
                   - person_id
@@ -648,7 +649,7 @@ paths:
                   - filled
                   - details
                 properties:
-                  slot_id:
+                  id:
                     type: int
                     readOnly: true
                   provider_id:
@@ -730,14 +731,14 @@ paths:
                 items:
                   - type: object
                     required:
-                      - question_id
+                      - id
                       - provider_id
                       - required
                       - type
                       - select_values
                       - question
                     properties:
-                      question_id:
+                      id:
                         type: string
                         readOnly: true
                       provider_id:
