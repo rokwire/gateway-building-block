@@ -1,11 +1,11 @@
 get:
   tags:
   - BBs
-  summary: Gets People with Calendars
+  summary: Gets the list of units (calendars) for a provider id
   description: |
-    Gets a list of people with calendars inside of a unit
+    Gets the list of units (calendars) for a provider id
 
-    **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+    **Auth:** Requires valid first-party service account token with `get_external_appointments` permission 
      Requires the External-Authorization header containing the oidc access token from the campus provider
   security:
     - bearerAuth: []
@@ -26,21 +26,13 @@ get:
     explode: false
     schema:
       type: string
-  - name: unit_id
-    in: query
-    description: External id identifying the unit the calendar entries belong to
-    required: true
-    style: simple
-    explode: false
-    schema:
-      type: string
   responses:
     200:
       description: Success
       content:
         application/json:
           schema:
-            $ref: "../../schemas/application/AppointmentPerson.yaml"
+            $ref: "../../schemas/application/AppointmentUnit.yaml"
     400:
       description: Bad request
     401:

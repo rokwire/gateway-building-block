@@ -58,37 +58,18 @@ func (h BBsAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 // appointment apis
 func (h BBsAPIsHandler) getAppointmentUnits(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
-	providerid := 0
-	uin := ""
 	reqParams := utils.ConstructFilter(r)
-	for _, v := range reqParams.Items {
-		if v.Field == "providerid" {
-			provideridstr := v.Value[0]
-			intvar, err := strconv.Atoi(provideridstr)
-			if err != nil {
-				return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
-			}
-			providerid = intvar
-		}
-		if v.Field == "external_id" {
-			uin = v.Value[0]
-		}
+
+	reqValues, resp, err := h.checkAppointmentParams(reqParams, r, l)
+	if err != nil {
+		return resp
 	}
 
-	if providerid == 0 {
-		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false)
-	}
-
-	if len(uin) < 9 {
+	if len(reqValues.UIN) != 9 {
 		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("external_id"), nil, http.StatusBadRequest, false)
 	}
 
-	externalToken := r.Header.Get("External-Authorization")
-	if externalToken == "" {
-		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
-	}
-
-	example, err := h.app.BBs.GetAppointmentUnits(providerid, uin, externalToken)
+	example, err := h.app.BBs.GetAppointmentUnits(reqValues.ProviderID, reqValues.UIN, reqValues.ExternalToken)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
 	}
@@ -331,6 +312,9 @@ func (h BBsAPIsHandler) checkAppointmentParams(reqParms *utils.Filter, req *http
 		}
 	}
 
+	if reqValues.ProviderID == 0 {
+		return reqValues, l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("provider_id"), nil, http.StatusBadRequest, false), errors.New("missing provider_id")
+	}
 	return reqValues, l.HTTPResponseSuccess(), nil
 
 }
