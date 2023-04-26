@@ -62,7 +62,7 @@ func (lv EngineeringAppointmentsAdapter) GetUnits(uin string, accessToken string
 
 	for i := 0; i < len(calendars); i++ {
 		calendar := calendars[i]
-		au := model.AppointmentUnit{ID: calendar.ID, ProviderID: providerid, Name: calendar.Name, Location: "", HoursOfOperation: "", Details: ""}
+		au := model.AppointmentUnit{ID: calendar.ID, ProviderID: providerid, Name: calendar.Name, Location: "", HoursOfOperation: "", Details: "", NextAvailable: "", ImageURL: ""}
 		s = append(s, au)
 	}
 
@@ -91,7 +91,7 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitID int, provi
 
 	for i := 0; i < len(advisors); i++ {
 		advisor := advisors[i]
-		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitID, Notes: advisor.Message, Name: advisor.Name, NextAvailable: advisor.NextAvailableDate}
+		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitID, Notes: advisor.Message, Name: advisor.Name, NextAvailable: advisor.NextAvailableDate, ImageURL: ""}
 		s = append(s, p)
 	}
 

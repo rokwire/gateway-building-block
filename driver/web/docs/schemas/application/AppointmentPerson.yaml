@@ -6,6 +6,7 @@ required:
 - next_available
 - name
 - notes
+- image_url
 properties:
   id:
     type: string
@@ -21,4 +22,6 @@ properties:
   name:
     type: string
   notes:
+    type: string
+  image_url:
     type: string

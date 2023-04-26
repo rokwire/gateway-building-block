@@ -6,6 +6,8 @@ required:
 - location
 - hours_of_operation
 - details
+- next_available
+- image_url
 properties:
   id:
     type: int
@@ -21,4 +23,8 @@ properties:
   hours_of_operation:
     type: string
   details:
+    type: string
+  next_available:
+    type: string
+  image_url:
     type: string

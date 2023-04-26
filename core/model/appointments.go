@@ -59,7 +59,9 @@ type AppointmentUnit struct {
 	Name             string `json:"name" bson:"name"`
 	Location         string `json:"location" bson:"location"`
 	HoursOfOperation string `json:"hours_of_operation" bson:"hours_of_operation"`
-	Details          string `json:"details" bason:"details"`
+	Details          string `json:"details" bson:"details"`
+	NextAvailable    string `json:"next_available" bson:"next_available"`
+	ImageURL         string `json:"image_url" bson:"image_url"`
 }
 
 // AppointmentPerson represents a person who is accepting appointments
@@ -70,6 +72,7 @@ type AppointmentPerson struct {
 	NextAvailable string `json:"next_available" bson:"next_available"`
 	Name          string `json:"name" bson:"name"`
 	Notes         string `json:"notes" bson:"notes"`
+	ImageURL      string `json:"image_url" bson:"image_url"`
 }
 
 // AppointmentAnswer represents answer data sent from the appointments building block to the gateway building block

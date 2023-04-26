@@ -69,6 +69,8 @@ paths:
   # BBs
   /api/bbs/examples/{id}:
     $ref: "./resources/bbs/examples-id.yaml"
+  /api/bbs/appointments/units:
+    $ref: "./resources/bbs/apptunits.yaml"
   /api/bbs/appointments/people:
     $ref: "./resources/bbs/apptpeople.yaml"
   /api/bbs/appointments/slots:
