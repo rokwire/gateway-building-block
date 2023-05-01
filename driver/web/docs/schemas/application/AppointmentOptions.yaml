@@ -1,0 +1,15 @@
+type: object
+required:
+- time_slots
+- questions
+properties:
+  time_slots:
+    type: array
+    items:
+      - $ref: "./TimeSlot.yaml"
+    readOnly: true
+  questions:
+    type: array
+    items:
+      - $ref: "./Question.yaml"
+    readOnly: true

@@ -14,33 +14,80 @@
 
 package core
 
+import (
+	"application/core/interfaces"
+	"application/core/model"
+
+	"github.com/rokwire/core-auth-library-go/v3/authutils"
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+type storageListener struct {
+	app *Application
+	model.DefaultStorageListener
+}
+
+// OnExampleUpdated notifies that the example collection has changed
+func (s *storageListener) OnExampleUpdated() {
+	s.app.logger.Infof("OnExampleUpdated")
+
+	// TODO: Implement listener
+}
+
 // Application represents the core application code based on hexagonal architecture
 type Application struct {
 	version string
 	build   string
 
-	Services Services // expose to the drivers adapters
+	Default interfaces.Default // expose to the drivers adapters
+	Client  interfaces.Client  // expose to the drivers adapters
+	Admin   interfaces.Admin   // expose to the drivers adapters
+	BBs     interfaces.BBs     // expose to the drivers adapters
+	TPS     interfaces.TPS     // expose to the drivers adapters
+	System  interfaces.System  // expose to the drivers adapters
+	shared  Shared
 
-	storage              Storage
-	laundry              Laundry
-	locationAdapter      BuildingLocation
-	contactInfoAdapter   ContactInformation
-	giesCourseAdapter    GiesCourses
-	studentcourseAdapter StudentCourses
-	termsessionAdapter   TermSessions
+	AppointmentAdapters map[string]interfaces.Appointments //expose to the different vendor specific appointment adapters
+
+	logger *logs.Logger
+
+	storage interfaces.Storage
 }
 
 // Start starts the core part of the application
-func (app *Application) Start() {
+func (a *Application) Start() {
+	//set storage listener
+	storageListener := storageListener{app: a}
+	a.storage.RegisterStorageListener(&storageListener)
+}
+
+// GetEnvConfigs retrieves the cached database env configs
+func (a *Application) GetEnvConfigs() (*model.EnvConfigData, error) {
+	// Load env configs from database
+	config, err := a.storage.FindConfig(model.ConfigTypeEnv, authutils.AllApps, authutils.AllOrgs)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionGet, model.TypeConfig, nil, err)
+	}
+	if config == nil {
+		return nil, errors.ErrorData(logutils.StatusMissing, model.TypeConfig, &logutils.FieldArgs{"type": model.ConfigTypeEnv, "app_id": authutils.AllApps, "org_id": authutils.AllOrgs})
+	}
+	return model.GetConfigData[model.EnvConfigData](*config)
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage Storage, laundry Laundry, bldgloc BuildingLocation, contacts ContactInformation, gcAdapter GiesCourses, scAdapter StudentCourses, tsAdapter TermSessions) *Application {
-
-	application := Application{version: version, build: build, storage: storage, laundry: laundry, locationAdapter: bldgloc, contactInfoAdapter: contacts, giesCourseAdapter: gcAdapter, studentcourseAdapter: scAdapter, termsessionAdapter: tsAdapter}
+func NewApplication(version string, build string, storage interfaces.Storage, appntAdapters map[string]interfaces.Appointments, logger *logs.Logger) *Application {
+	application := Application{version: version, build: build, storage: storage, logger: logger, AppointmentAdapters: appntAdapters}
 
 	//add the drivers ports/interfaces
-	application.Services = &servicesImpl{app: &application}
+	application.Default = newAppDefault(&application)
+	application.Client = newAppClient(&application)
+	application.Admin = newAppAdmin(&application)
+	application.BBs = newAppBBs(&application)
+	application.TPS = newAppTPS(&application)
+	application.System = newAppSystem(&application)
+	application.shared = newAppShared(&application)
 
 	return &application
 }

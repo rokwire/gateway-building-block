@@ -1,0 +1,21 @@
+required:
+  - type
+  - all_apps
+  - all_orgs
+  - system
+  - data
+type: object
+properties:
+  type:
+    type: string
+  all_apps:
+    writeOnly: true
+    type: boolean
+  all_orgs:
+    writeOnly: true
+    type: boolean
+  system:
+    type: boolean
+  data:
+    anyOf:
+      - $ref: "../../../application/EnvConfigData.yaml"

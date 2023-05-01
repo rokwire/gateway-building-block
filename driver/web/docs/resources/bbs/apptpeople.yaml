@@ -1,0 +1,49 @@
+get:
+  tags:
+  - BBs
+  summary: Gets People with Calendars
+  description: |
+    Gets a list of people with calendars inside of a unit
+
+    **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+     Requires the External-Authorization header containing the oidc access token from the campus provider
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: external_id
+    in: query
+    description: External system id of person making the request
+    required: true
+    style: simple
+    explode: false
+    schema:
+      type: string
+  - name: provider_id
+    in: query
+    description: Rokwire provider id of the organization tracking/providing appointment data
+    required: true
+    style: simple
+    explode: false
+    schema:
+      type: string
+  - name: unit_id
+    in: query
+    description: External id identifying the unit the calendar entries belong to
+    required: true
+    style: simple
+    explode: false
+    schema:
+      type: string
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/AppointmentPerson.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

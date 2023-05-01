@@ -1,0 +1,17 @@
+p, all_admin_identity, /identity/api/admin/*, (GET)|(POST)|(PUT)|(DELETE), All identity admin actions
+
+p, all_examples, /identity/api/admin/examples, (POST), All example admin actions
+p, all_examples, /identity/api/admin/examples/*, (GET)|(PUT)|(DELETE),
+p, get_examples, /identity/api/admin/examples/*, (GET), Get examples
+p, update_examples, /identity/api/admin/examples, (POST), Update examples
+p, update_examples, /identity/api/admin/examples/*, (GET)|(PUT),
+p, delete_examples, /identity/api/admin/examples/*, (GET)|(DELETE),
+
+p, all_configs_identity, /identity/api/admin/configs/*, (GET)|(PUT)|(DELETE), All identity config admin actions
+p, all_configs_identity, /identity/api/admin/configs, (GET)|(POST),
+p, get_configs_identity, /identity/api/admin/configs/*, (GET), Get identity configs
+p, get_configs_identity, /identity/api/admin/configs, (GET),
+p, update_configs_identity, /identity/api/admin/configs/*, (GET)|(PUT), Update identity configs
+p, update_configs_identity, /identity/api/admin/configs, (GET)|(POST),
+p, delete_configs_identity, /identity/api/admin/configs/*, (GET)|(DELETE), Delete identity configs
+p, delete_configs_identity, /identity/api/admin/configs, (GET),

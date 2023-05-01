@@ -17,9 +17,18 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeTermSession type
+	TypeTermSession logutils.MessageDataType = "termsessions"
+)
+
 // TermSession represents the elements of a term session
 type TermSession struct {
-	Term        string `json:"term"`
-	TermID      string `json:"termid"`
-	CurrentTerm bool   `json:"is_current"`
+	Term        string `json:"term" bson:"term"`
+	TermID      string `json:"termid" bson:"termid"`
+	CurrentTerm bool   `json:"is_current" bson:"is_current"`
 }

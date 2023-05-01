@@ -14,6 +14,15 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeBuilding type
+	TypeBuilding logutils.MessageDataType = "building"
+)
+
 // Entrance represents the information returned when the closest entrance of a building is requested
 type Entrance struct {
 	ID           string

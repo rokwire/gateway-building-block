@@ -15,147 +15,202 @@
 package web
 
 import (
-	"apigateway/core"
-	"apigateway/driver/web/rest"
-	"apigateway/utils"
+	"application/core"
+	"bytes"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
+	"time"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/gorilla/mux"
+	"github.com/rokwire/core-auth-library-go/v3/authservice"
+	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
+
+	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/logging-library-go/v2/logutils"
+
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // Adapter entity
 type Adapter struct {
-	host string
-	port string
+	baseURL   string
+	port      string
+	serviceID string
 
-	apisHandler        rest.ApisHandler
-	adminApisHandler   rest.AdminApisHandler
-	laundryapiHandler  rest.LaundryApisHandler
-	buildingapiHandler rest.BuildingAPIHandler
-	contactapiHandler  rest.ContactInfoApisHandler
-	coursesapiHandler  rest.CourseApisHandler
-	termsapiHandler    rest.TermSessionAPIHandler
-	tokenAuth          *TokenAuth
-	app                *core.Application
+	auth *Auth
+
+	cachedYamlDoc []byte
+
+	defaultAPIsHandler DefaultAPIsHandler
+	clientAPIsHandler  ClientAPIsHandler
+	adminAPIsHandler   AdminAPIsHandler
+	bbsAPIsHandler     BBsAPIsHandler
+	tpsAPIsHandler     TPSAPIsHandler
+	systemAPIsHandler  SystemAPIsHandler
+
+	app *core.Application
+
+	logger *logs.Logger
 }
 
-// @title Rokwire Gatewauy Building Block API
-// @description Rokwire Rokwire Building Block API Documentation.
-// @version 0.1.0
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host localhost
-// @BasePath /gateway/api
-// @schemes https
-
-// @securityDefinitions.apikey RokwireAuth
-// @in header
-// @name ROKWIRE-API-KEY
-
-//@securityDefinitions.accesskey ExternalAuth
-//@in header
-//@name External-Authorization
-
-// @securityDefinitions.apikey InternalAuth
-// @in header
-// @name INTERNAL-API-KEY
-
-// @securityDefinitions.apikey UserAuth
-// @in header (add client id token with Bearer prefix to the Authorization value)
-// @name Authorization
-
-// @securityDefinitions.apikey AdminUserAuth
-// @in header (add admin id token with Bearer prefix to the Authorization value)
-// @name Authorization
+type handlerFunc = func(*logs.Log, *http.Request, *tokenauth.Claims) logs.HTTPResponse
 
 // Start starts the module
-func (we Adapter) Start() {
+func (a Adapter) Start() {
 
 	router := mux.NewRouter().StrictSlash(true)
 
 	// handle apis
-	//do i need a different adapter for each "endpoint" (laundry, courselist, wayfinding, etc)
-	//or can I set different routers for different router path prefixise (/laundry, /courselist, ...)
-	//still learning the gorilla mux library
-	mainRouter := router.PathPrefix("/gateway/api").Subrouter()
-	mainRouter.PathPrefix("/doc/ui").Handler(we.serveDocUI())
-	mainRouter.HandleFunc("/doc", we.serveDoc)
-	mainRouter.HandleFunc("/version", we.wrapFunc(we.apisHandler.Version)).Methods("GET")
+	baseRouter := router.PathPrefix("/" + a.serviceID).Subrouter()
+	baseRouter.PathPrefix("/doc/ui").Handler(a.serveDocUI())
+	baseRouter.HandleFunc("/doc", a.serveDoc)
+	baseRouter.HandleFunc("/version", a.wrapFunc(a.defaultAPIsHandler.version, nil)).Methods("GET")
+
+	mainRouter := baseRouter.PathPrefix("/api").Subrouter()
 
 	// Client APIs
-	mainRouter.HandleFunc("/record", we.tokenAuthWrapFunc(we.apisHandler.StoreRecord)).Methods("POST")
-	mainRouter.HandleFunc("/laundry/rooms", we.tokenAuthWrapFunc(we.laundryapiHandler.GetLaundryRooms)).Methods("GET")
-	mainRouter.HandleFunc("/laundry/room", we.tokenAuthWrapFunc(we.laundryapiHandler.GetRoomDetails)).Methods("GET")
-	mainRouter.HandleFunc("/laundry/initrequest", we.tokenAuthWrapFunc(we.laundryapiHandler.InitServiceRequest)).Methods("GET")
-	mainRouter.HandleFunc("/laundry/requestservice", we.tokenAuthWrapFunc(we.laundryapiHandler.SubmitServiceRequest)).Methods("POST")
+	mainRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.clientAPIsHandler.getExample, a.auth.client.Permissions)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/rooms", a.wrapFunc(a.clientAPIsHandler.getLaundryRooms, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/room", a.wrapFunc(a.clientAPIsHandler.getRoomDetails, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/initrequest", a.wrapFunc(a.clientAPIsHandler.initServiceRequest, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/reqeustservice", a.wrapFunc(a.clientAPIsHandler.submitServiceRequest, nil)).Methods("GET")
 
-	mainRouter.HandleFunc("/wayfinding/building", we.tokenAuthWrapFunc(we.buildingapiHandler.GetBuilding)).Methods("GET")
-	mainRouter.HandleFunc("/wayfinding/entrance", we.tokenAuthWrapFunc(we.buildingapiHandler.GetEntrance)).Methods("GET")
-	mainRouter.HandleFunc("/wayfinding/buildings", we.tokenAuthWrapFunc(we.buildingapiHandler.GetBuildings)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/building", a.wrapFunc(a.clientAPIsHandler.getBuilding, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/entrance", a.wrapFunc(a.clientAPIsHandler.getEntrance, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/buildings", a.wrapFunc(a.clientAPIsHandler.getBuildings, a.auth.client.User)).Methods("GET")
 
-	mainRouter.HandleFunc("/person/contactinfo", we.tokenAuthWrapFunc(we.contactapiHandler.GetContactInfo)).Methods("GET")
+	mainRouter.HandleFunc("/person/contactinfo", a.wrapFunc(a.clientAPIsHandler.getContactInfo, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/courses/giescourses", a.wrapFunc(a.clientAPIsHandler.getGiesCourses, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/courses/studentcourses", a.wrapFunc(a.clientAPIsHandler.getStudentCourses, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/termsessions/listcurrent", a.wrapFunc(a.clientAPIsHandler.getTermSessions, a.auth.client.User)).Methods("GET")
 
-	mainRouter.HandleFunc("/courses/giescourses", we.tokenAuthWrapFunc(we.coursesapiHandler.GetGiesCourses)).Methods("GET")
-	mainRouter.HandleFunc("/courses/studentcourses", we.tokenAuthWrapFunc(we.coursesapiHandler.GetStudentcourses)).Methods("GET")
+	// Admin APIs
+	adminRouter := mainRouter.PathPrefix("/admin").Subrouter()
+	adminRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.adminAPIsHandler.getExample, a.auth.admin.Permissions)).Methods("GET")
+	adminRouter.HandleFunc("/examples", a.wrapFunc(a.adminAPIsHandler.createExample, a.auth.admin.Permissions)).Methods("POST")
+	adminRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.adminAPIsHandler.updateExample, a.auth.admin.Permissions)).Methods("PUT")
+	adminRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.adminAPIsHandler.deleteExample, a.auth.admin.Permissions)).Methods("DELETE")
 
-	mainRouter.HandleFunc("/termsessions/listcurrent", we.tokenAuthWrapFunc(we.termsapiHandler.GetTermSessions)).Methods("GET")
+	adminRouter.HandleFunc("/configs/{id}", a.wrapFunc(a.adminAPIsHandler.getConfig, a.auth.admin.Permissions)).Methods("GET")
+	adminRouter.HandleFunc("/configs", a.wrapFunc(a.adminAPIsHandler.getConfigs, a.auth.admin.Permissions)).Methods("GET")
+	adminRouter.HandleFunc("/configs", a.wrapFunc(a.adminAPIsHandler.createConfig, a.auth.admin.Permissions)).Methods("POST")
+	adminRouter.HandleFunc("/configs/{id}", a.wrapFunc(a.adminAPIsHandler.updateConfig, a.auth.admin.Permissions)).Methods("PUT")
+	adminRouter.HandleFunc("/configs/{id}", a.wrapFunc(a.adminAPIsHandler.deleteConfig, a.auth.admin.Permissions)).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":"+we.port, router))
+	// BB APIs
+	bbsRouter := mainRouter.PathPrefix("/bbs").Subrouter()
+	bbsRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.bbsAPIsHandler.getExample, a.auth.bbs.Permissions)).Methods("GET")
+	bbsRouter.HandleFunc("/appointments/units", a.wrapFunc(a.bbsAPIsHandler.getAppointmentUnits, a.auth.bbs.Permissions)).Methods("GET")
+	bbsRouter.HandleFunc("/appointments/people", a.wrapFunc(a.bbsAPIsHandler.getAppointmentPeople, a.auth.bbs.Permissions)).Methods("GET")
+	bbsRouter.HandleFunc("/appointments/slots", a.wrapFunc(a.bbsAPIsHandler.getAppointmentTimeSlots, a.auth.bbs.Permissions)).Methods("GET")
+	bbsRouter.HandleFunc("/appointments/questions", a.wrapFunc(a.bbsAPIsHandler.getAppointmentQuestions, a.auth.bbs.Permissions)).Methods("GET")
+	bbsRouter.HandleFunc("/appointments/qands", a.wrapFunc(a.bbsAPIsHandler.getAppointmentOptions, a.auth.bbs.Permissions)).Methods("GET")
+	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.createAppointment, a.auth.bbs.Permissions)).Methods("POST")
+	bbsRouter.HandleFunc("/appointments/{id}", a.wrapFunc(a.bbsAPIsHandler.deleteAppointment, a.auth.bbs.Permissions)).Methods("DELETE")
+	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.updateAppointment, a.auth.bbs.Permissions)).Methods("PUT")
+
+	// TPS APIs
+	tpsRouter := mainRouter.PathPrefix("/tps").Subrouter()
+	tpsRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.tpsAPIsHandler.getExample, a.auth.tps.Permissions)).Methods("GET")
+
+	// System APIs
+	systemRouter := mainRouter.PathPrefix("/system").Subrouter()
+	systemRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.systemAPIsHandler.getExample, a.auth.system.Permissions)).Methods("GET")
+
+	a.logger.Fatalf("Error serving: %v", http.ListenAndServe(":"+a.port, router))
 }
 
-func (we Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
+func (a Adapter) serveDoc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("access-control-allow-origin", "*")
-	http.ServeFile(w, r, "./docs/swagger.yaml")
-}
 
-func (we Adapter) serveDocUI() http.Handler {
-	url := fmt.Sprintf("%s/api/doc", we.host)
-	return httpSwagger.Handler(httpSwagger.URL(url))
-}
-
-// functions with no authentication at all
-func (we Adapter) wrapFunc(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		utils.LogRequest(req)
-
-		handler(w, req)
+	if a.cachedYamlDoc != nil {
+		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(a.cachedYamlDoc)))
+	} else {
+		http.ServeFile(w, r, "./driver/web/docs/gen/def.yaml")
 	}
 }
 
-func (we Adapter) tokenAuthWrapFunc(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		//authenticate token
-		authenticated, _ := we.tokenAuth.Check(req)
+func (a Adapter) serveDocUI() http.Handler {
+	url := fmt.Sprintf("%s/doc", a.baseURL)
+	return httpSwagger.Handler(httpSwagger.URL(url))
+}
 
-		if authenticated {
-			handler(w, req)
-			return
+func loadDocsYAML(baseServerURL string) ([]byte, error) {
+	data, _ := os.ReadFile("./driver/web/docs/gen/def.yaml")
+	yamlMap := yaml.MapSlice{}
+	err := yaml.Unmarshal(data, &yamlMap)
+	if err != nil {
+		return nil, err
+	}
+
+	for index, item := range yamlMap {
+		if item.Key == "servers" {
+			var serverList []interface{}
+			if baseServerURL != "" {
+				serverList = []interface{}{yaml.MapSlice{yaml.MapItem{Key: "url", Value: baseServerURL}}}
+			}
+
+			item.Value = serverList
+			yamlMap[index] = item
+			break
 		}
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	}
+
+	yamlDoc, err := yaml.Marshal(&yamlMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return yamlDoc, nil
+}
+
+func (a Adapter) wrapFunc(handler handlerFunc, authorization tokenauth.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		logObj := a.logger.NewRequestLog(req)
+
+		logObj.RequestReceived()
+
+		var response logs.HTTPResponse
+		if authorization != nil {
+			responseStatus, claims, err := authorization.Check(req)
+			if err != nil {
+				logObj.SendHTTPResponse(w, logObj.HTTPResponseErrorAction(logutils.ActionValidate, logutils.TypeRequest, nil, err, responseStatus, true))
+				return
+			}
+
+			if claims != nil {
+				logObj.SetContext("account_id", claims.Subject)
+			}
+			response = handler(logObj, req, claims)
+		} else {
+			response = handler(logObj, req, nil)
+		}
+
+		logObj.SendHTTPResponse(w, response)
+		logObj.RequestComplete()
 	}
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(host string, port string, app *core.Application, tokenAuth *TokenAuth) Adapter {
+func NewWebAdapter(baseURL string, port string, serviceID string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
+	yamlDoc, err := loadDocsYAML(baseURL)
+	if err != nil {
+		logger.Fatalf("error parsing docs yaml - %s", err.Error())
+	}
 
-	apisHandler := rest.NewApisHandler(app)
-	adminApisHandler := rest.NewAdminApisHandler(app)
-	laundryapiHandler := rest.NewLaundryApisHandler(app)
-	buildingapiHandler := rest.NewBuildingAPIHandler(app)
-	contactapiHandler := rest.NewContactInfoApisHandler(app)
-	coursesapiHandler := rest.NewCourseApisHandler(app)
-	termsapiHandler := rest.NewTermSessionAPIHandler(app)
+	auth, err := NewAuth(serviceRegManager)
+	if err != nil {
+		logger.Fatalf("error creating auth - %s", err.Error())
+	}
 
-	return Adapter{host: host, port: port,
-		apisHandler: apisHandler, adminApisHandler: adminApisHandler, app: app, laundryapiHandler: laundryapiHandler,
-		buildingapiHandler: buildingapiHandler, tokenAuth: tokenAuth,
-		contactapiHandler: contactapiHandler, coursesapiHandler: coursesapiHandler, termsapiHandler: termsapiHandler}
-}
-
-// AppListener implements core.ApplicationListener interface
-type AppListener struct {
-	adapter *Adapter
+	defaultAPIsHandler := NewDefaultAPIsHandler(app)
+	clientAPIsHandler := NewClientAPIsHandler(app)
+	adminAPIsHandler := NewAdminAPIsHandler(app)
+	bbsAPIsHandler := NewBBsAPIsHandler(app)
+	tpsAPIsHandler := NewTPSAPIsHandler(app)
+	return Adapter{baseURL: baseURL, port: port, serviceID: serviceID, cachedYamlDoc: yamlDoc, auth: auth, defaultAPIsHandler: defaultAPIsHandler,
+		clientAPIsHandler: clientAPIsHandler, adminAPIsHandler: adminAPIsHandler, bbsAPIsHandler: bbsAPIsHandler, tpsAPIsHandler: tpsAPIsHandler, app: app, logger: logger}
 }

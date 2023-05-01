@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Prepare the project to become open source [#2](https://github.com/rokwire/gateway-building-block/issues/2)
 
+## 2.0.3 - 5/1/23
+### Added
+--appointments end points and interfaces
+
+### Changed
+--updated old code to new building block template model
+
+
 ## 1.2.6 - 3/9/23
 ### Fixed
 --Security vulnerability in golang.org/x/text/language

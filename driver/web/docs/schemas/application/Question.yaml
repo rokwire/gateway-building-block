@@ -1,0 +1,29 @@
+type: object
+required:
+- id
+- provider_id
+- required
+- type
+- select_values
+- question
+properties:
+  id:
+    type: string
+    readOnly: true
+  provider_id:
+    type: int
+    readOnly: true
+  required:
+    type: bool
+    readOnly: true
+  type:
+    type: string
+    readOnly: true
+  select_values:
+    type: array
+    items:
+      type: string
+    readOnly: true
+  question:
+    type: string
+    readOnly: true
