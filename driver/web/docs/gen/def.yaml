@@ -942,6 +942,36 @@ paths:
         content:
           application/json:
             schema:
+              $ref: '#/paths/~1api~1bbs~1appointments~1/put/requestBody/content/application~1json/schema'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1api~1bbs~1appointments~1/put/responses/200/content/application~1json/schema'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - BBs
+      summary: updates an appointment in the specified provider system and returns the appointment data to the client
+      description: |
+        Updates an appointment in the specified provider system and returns the appointment data to the clients.
+        For an upate, the source_id field in the request body is required.
+
+        **Auth:** Requires valid first-party service account token with `update_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
               type: object
               required:
                 - provider_id
@@ -953,6 +983,7 @@ paths:
                 - user_external_ids
                 - slot_id
                 - answers
+              optional: _source_id
               properties:
                 provider_id:
                   type: string
@@ -983,6 +1014,9 @@ paths:
                           readOnly: true
                   readOnly: true
                 slot_id:
+                  type: string
+                  readOnly: true
+                source_id:
                   type: string
                   readOnly: true
                 answers:

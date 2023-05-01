@@ -168,6 +168,36 @@ func (h BBsAPIsHandler) createAppointment(l *logs.Log, r *http.Request, claims *
 	return l.HTTPResponseSuccessJSON(response)
 }
 
+func (h BBsAPIsHandler) updateAppointment(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
+
+	var record model.AppointmentPost
+	err = json.Unmarshal(data, &record)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	newAppt, err := h.app.BBs.UpdateAppointment(&record, externalToken)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(newAppt)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
+}
+
 func (h BBsAPIsHandler) deleteAppointment(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
 	params := mux.Vars(r)

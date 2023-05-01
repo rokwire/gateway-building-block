@@ -97,6 +97,7 @@ type AppointmentPost struct {
 	UserExternalIDs ExternalUserID      `json:"user_external_ids" bson:"user_external_ids"`
 	SlotID          string              `json:"slot_id" bson:"slot_id"`
 	Answers         []AppointmentAnswer `json:"answers" bson:"answers"`
+	SourceID        string              `json:"source_id" bson:"source_id"`
 }
 
 // BuildingBlockAppointment returns the expected appointment structure to the appointments buildnig block

@@ -193,6 +193,34 @@ func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.Appointme
 	return &retData, nil
 }
 
+// UpdateAppointment updates an appointment in the engieering system.
+func (lv EngineeringAppointmentsAdapter) UpdateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error) {
+
+	slotid, err := strconv.Atoi(appt.SlotID)
+	if err != nil {
+		return nil, err
+	}
+
+	sourceid, err := strconv.Atoi(appt.SourceID)
+	if err != nil {
+		return nil, err
+	}
+
+	if sourceid != slotid {
+		_, err = lv.DeleteAppointment(appt.UserExternalIDs.UIN, appt.SourceID, accesstoken, conf)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	ret, err := lv.CreateAppointment(appt, accesstoken, conf)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+}
+
 // DeleteAppointment cancels an appointment in the engineering appointment system
 func (lv EngineeringAppointmentsAdapter) DeleteAppointment(uin string, sourceid string, accesstoken string, conf *model.EnvConfigData) (string, error) {
 	baseURL := conf.EngAppointmentBaseURL

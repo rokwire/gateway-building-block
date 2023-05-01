@@ -110,6 +110,7 @@ func (a Adapter) Start() {
 	bbsRouter.HandleFunc("/appointments/qands", a.wrapFunc(a.bbsAPIsHandler.getAppointmentOptions, a.auth.bbs.Permissions)).Methods("GET")
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.createAppointment, a.auth.bbs.Permissions)).Methods("POST")
 	bbsRouter.HandleFunc("/appointments/{id}", a.wrapFunc(a.bbsAPIsHandler.deleteAppointment, a.auth.bbs.Permissions)).Methods("DELETE")
+	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.updateAppointment, a.auth.bbs.Permissions)).Methods("PUT")
 
 	// TPS APIs
 	tpsRouter := mainRouter.PathPrefix("/tps").Subrouter()

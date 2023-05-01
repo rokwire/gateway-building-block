@@ -9,6 +9,8 @@ required:
 - user_external_ids
 - slot_id
 - answers
+optional:
+  _source_id
 properties:
   provider_id:
     type: string
@@ -33,6 +35,9 @@ properties:
       - $ref: "./ExternalUserID.yaml"
     readOnly: true
   slot_id:
+    type: string
+    readOnly: true
+  source_id:
     type: string
     readOnly: true
   answers:

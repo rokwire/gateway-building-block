@@ -77,4 +77,5 @@ type Appointments interface {
 	GetTimeSlots(uin string, unitid int, advisorid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error)
 	CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error)
 	DeleteAppointment(uin string, sourceid string, accesstoken string, conf *model.EnvConfigData) (string, error)
+	UpdateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error)
 }

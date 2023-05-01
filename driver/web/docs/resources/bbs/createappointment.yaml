@@ -27,3 +27,33 @@ post:
       description: Unauthorized
     500:
       description: Internal error
+put:
+  tags:
+  - BBs
+  summary: updates an appointment in the specified provider system and returns the appointment data to the client
+  description: |
+    Updates an appointment in the specified provider system and returns the appointment data to the clients.
+    For an upate, the source_id field in the request body is required.
+
+    **Auth:** Requires valid first-party service account token with `update_external_appointments` permission
+    Requires the External-Authorization header containing the oidc access token from the campus provider
+  security:
+    - bearerAuth: []
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/application/AppointmentPost.yaml"
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/BuildingBlockAppointment.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

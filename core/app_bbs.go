@@ -71,6 +71,16 @@ func (a appBBs) CreateAppointment(appt *model.AppointmentPost, accessToken strin
 	return ret, nil
 }
 
+func (a appBBs) UpdateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	apptAdapter := a.app.AppointmentAdapters[appt.ProviderID]
+	ret, err := apptAdapter.UpdateAppointment(appt, accessToken, conf)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
 func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, accesstoken string) (string, error) {
 	conf, _ := a.app.GetEnvConfigs()
 	apptAdapter := a.app.AppointmentAdapters[strconv.Itoa(providerid)]
