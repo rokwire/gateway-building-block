@@ -14,6 +14,15 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeShibbolethUser type
+	TypeShibbolethUser logutils.MessageDataType = "shibboleth_user"
+)
+
 //////////////////////////
 
 // ShibbolethUser represents shibboleth auth entity

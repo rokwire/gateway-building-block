@@ -15,9 +15,16 @@
 package storage
 
 import (
+	"application/core/interfaces"
 	"context"
-	"log"
 	"time"
+
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/logging-library-go/v2/logutils"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -30,17 +37,21 @@ type database struct {
 
 	db       *mongo.Database
 	dbClient *mongo.Client
+	logger   *logs.Logger
 
-	dinings *collectionWrapper
+	configs  *collectionWrapper
+	examples *collectionWrapper
+
+	listeners []interfaces.StorageListener
 }
 
-func (m *database) start() error {
+func (d *database) start() error {
 
-	log.Println("database -> start")
+	d.logger.Info("database -> start")
 
 	//connect to the database
-	clientOptions := options.Client().ApplyURI(m.mongoDBAuth)
-	connectContext, cancel := context.WithTimeout(context.Background(), m.mongoTimeout)
+	clientOptions := options.Client().ApplyURI(d.mongoDBAuth)
+	connectContext, cancel := context.WithTimeout(context.Background(), d.mongoTimeout)
 	client, err := mongo.Connect(connectContext, clientOptions)
 	cancel()
 	if err != nil {
@@ -48,7 +59,7 @@ func (m *database) start() error {
 	}
 
 	//ping the database
-	pingContext, cancel := context.WithTimeout(context.Background(), m.mongoTimeout)
+	pingContext, cancel := context.WithTimeout(context.Background(), d.mongoTimeout)
 	err = client.Ping(pingContext, nil)
 	cancel()
 	if err != nil {
@@ -56,56 +67,62 @@ func (m *database) start() error {
 	}
 
 	//apply checks
-	db := client.Database(m.mongoDBName)
+	db := client.Database(d.mongoDBName)
 
-	dinings := &collectionWrapper{database: m, coll: db.Collection("dinings")}
-	err = m.applyDiningsChecks(dinings)
+	configs := &collectionWrapper{database: d, coll: db.Collection("configs")}
+	err = d.applyConfigsChecks(configs)
 	if err != nil {
 		return err
 	}
 
-	//asign the db, db client and the collections
-	m.db = db
-	m.dbClient = client
-
-	m.dinings = dinings
-
-	return nil
-}
-
-// Create indexes if need
-func (m *database) applyDiningsChecks(users *collectionWrapper) error {
-	log.Println("apply dining checks.....")
-
-	indexes, _ := users.ListIndexes()
-	indexMapping := map[string]interface{}{}
-	if indexes != nil {
-		for _, index := range indexes {
-			name := index["name"].(string)
-			indexMapping[name] = index
-		}
+	examples := &collectionWrapper{database: d, coll: db.Collection("examples")}
+	err = d.applyExamplesChecks(examples)
+	if err != nil {
+		return err
 	}
 
-	/*
-		if indexMapping["field_1"] == nil {
-			err := users.AddIndex(
-				bson.D{
-					primitive.E{Key: "field_id", Value: 1},
-				}, true)
-			if err != nil {
-				return err
-			}
-		}*/
+	//assign the db, db client and the collections
+	d.db = db
+	d.dbClient = client
 
-	log.Println("apply dining passed")
+	d.configs = configs
+	d.examples = examples
+
+	go d.configs.Watch(nil, d.logger)
+
 	return nil
 }
 
-func (m *database) onDataChanged(changeDoc map[string]interface{}) {
+func (d *database) applyConfigsChecks(configs *collectionWrapper) error {
+	d.logger.Info("apply configs checks.....")
+
+	err := configs.AddIndex(nil, bson.D{primitive.E{Key: "type", Value: 1}, primitive.E{Key: "app_id", Value: 1}, primitive.E{Key: "org_id", Value: 1}}, true)
+	if err != nil {
+		return err
+	}
+
+	d.logger.Info("apply configs passed")
+	return nil
+}
+
+func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
+	d.logger.Info("apply examples checks.....")
+
+	//add compound unique index - org_id + app_id
+	err := examples.AddIndex(nil, bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionCreate, "index", nil, err)
+	}
+
+	d.logger.Info("apply examples passed")
+	return nil
+}
+
+func (d *database) onDataChanged(changeDoc map[string]interface{}) {
 	if changeDoc == nil {
 		return
 	}
-	log.Printf("onDataChanged: %+v\n", changeDoc)
+	d.logger.Infof("onDataChanged: %+v\n", changeDoc)
 	ns := changeDoc["ns"]
 	if ns == nil {
 		return
@@ -113,9 +130,18 @@ func (m *database) onDataChanged(changeDoc map[string]interface{}) {
 	nsMap := ns.(map[string]interface{})
 	coll := nsMap["coll"]
 
-	if "configs" == coll {
-		log.Println("configs collection changed")
-	} else {
-		log.Println("other collection changed")
+	switch coll {
+	case "configs":
+		d.logger.Info("configs collection changed")
+
+		for _, listener := range d.listeners {
+			go listener.OnConfigsUpdated()
+		}
+	case "examples":
+		d.logger.Info("examples collection changed")
+
+		for _, listener := range d.listeners {
+			go listener.OnExamplesUpdated()
+		}
 	}
 }

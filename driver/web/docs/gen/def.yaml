@@ -1,0 +1,1297 @@
+openapi: 3.0.3
+info:
+  title: Rokwire Identity Building Block API
+  description: Identity Building Block API Documentation
+  version: 1.0.0
+servers:
+  - url: 'https://api.rokwire.illinois.edu/identity'
+    description: Production server
+  - url: 'https://api-test.rokwire.illinois.edu/identity'
+    description: Test server
+  - url: 'https://api-dev.rokwire.illinois.edu/identity'
+    description: Development server
+  - url: 'http://localhost/identity'
+    description: Local server
+tags:
+  - name: Client
+    description: Client applications APIs.
+  - name: Admin
+    description: Clients administration applications APIs.
+  - name: BBs
+    description: Building Block APIs.
+  - name: TPS
+    description: Third-Party Service APIs.
+  - name: System
+    description: Third-Party Service APIs.
+  - name: Default
+    description: Default APIs.
+paths:
+  /version:
+    get:
+      tags:
+        - Default
+      summary: Get version
+      description: |
+        Gets current version of this service
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: v1.0.0
+        '500':
+          description: Internal error
+  '/api/examples/{id}':
+    get:
+      tags:
+        - Client
+      summary: Gets example
+      description: |
+        Gets example record
+
+        **Auth:** Requires valid user token with `get_examples` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to retrieve
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/admin/examples:
+    post:
+      tags:
+        - Admin
+      summary: Create example
+      description: |
+        Creates new example record
+
+        **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: New example content
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Example'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/api/admin/examples/{id}':
+    get:
+      tags:
+        - Admin
+      summary: Gets example
+      description: |
+        Gets example record
+
+        **Auth:** Requires valid admin token with one of the following permissions:
+        - `get_examples`
+        - `update_examples`
+        - `delete_examples`
+        - `all_examples`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to retrieve
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - Admin
+      summary: Update example
+      description: |
+        Updates example record
+
+        **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: New example content
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Example'
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    delete:
+      tags:
+        - Admin
+      summary: Delete example
+      description: |
+        Deletes example record
+
+        **Auth:** Requires valid admin token with `delete_examples` or `all_examples` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to delete
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/admin/configs:
+    get:
+      tags:
+        - Admin
+      summary: Get configs
+      description: |
+        Get existing configs by search parameters
+
+        **Auth:** Requires valid admin token with one of the following permissions:
+        - `get_configs_identity`
+        - `update_configs_identity`
+        - `delete_configs_identity`
+        - `all_configs_identity`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          description: config type
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Config'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    post:
+      tags:
+        - Admin
+      summary: Create config
+      description: |
+        Creates a new config
+
+        **Auth:** Requires valid admin token with one of the following permissions:
+        - `update_configs_identity`
+        - `all_configs_identity`
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+            examples:
+              system:
+                summary: System-wide config
+                value:
+                  type: config_type
+                  all_apps: true
+                  all_orgs: true
+                  system: true
+                  data:
+                    example_env: example
+              org_admin:
+                summary: Organization-wide config
+                value:
+                  type: config_type
+                  all_apps: true
+                  all_orgs: false
+                  system: false
+                  data:
+                    example_env: example
+              app_org_specific:
+                summary: Application organization specific config
+                value:
+                  type: config_type
+                  all_apps: false
+                  all_orgs: false
+                  system: false
+                  data:
+                    example_env: example
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/api/admin/configs/{id}':
+    get:
+      tags:
+        - Admin
+      summary: Get config
+      description: |
+        Gets config record
+
+        **Auth:** Requires valid admin token with one of the following permissions:
+        - `get_configs_identity`
+        - `update_configs_identity`
+        - `delete_configs_identity`
+        - `all_configs_identity`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of config to retrieve
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - Admin
+      summary: Update config
+      description: |
+        Updates existing config record
+
+        **Auth:** Requires valid admin token with one of the following permissions:
+        - `update_configs_identity`
+        - `all_configs_identity`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of config to update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: New config content
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+            examples:
+              system:
+                summary: System-wide config
+                value:
+                  type: config_type
+                  all_apps: true
+                  all_orgs: true
+                  system: true
+                  data:
+                    example_env: example
+              org_admin:
+                summary: Organization-wide config
+                value:
+                  type: config_type
+                  all_apps: true
+                  all_orgs: false
+                  system: false
+                  data:
+                    example_env: example
+              app_org_specific:
+                summary: Application organization specific config
+                value:
+                  type: config_type
+                  all_apps: false
+                  all_orgs: false
+                  system: false
+                  data:
+                    example_env: example
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    delete:
+      tags:
+        - Admin
+      summary: Delete config
+      description: |
+        Deletes config record
+
+        **Auth:** Requires valid admin token with one of the following permissions:
+        - `delete_configs_identity`
+        - `all_configs_identity`
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of config to delete
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/api/bbs/examples/{id}':
+    get:
+      tags:
+        - BBs
+      summary: Gets example
+      description: |
+        Gets example record
+
+        **Auth:** Requires valid first-party service account token with `get_examples` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to retrieve
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/bbs/appointments/units:
+    get:
+      tags:
+        - BBs
+      summary: Gets the list of units (calendars) for a provider id
+      description: |
+        Gets the list of units (calendars) for a provider id
+
+        **Auth:** Requires valid first-party service account token with `get_external_appointments` permission 
+         Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: external_id
+          in: query
+          description: External system id of person making the request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          description: Rokwire provider id of the organization tracking/providing appointment data
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - provider_id
+                  - name
+                  - location
+                  - hours_of_operation
+                  - details
+                  - next_available
+                  - image_url
+                properties:
+                  id:
+                    type: int
+                    readOnly: true
+                  provider_id:
+                    type: int
+                    readOnly: true
+                  name:
+                    type: string
+                    readOnly: true
+                  location:
+                    type: string
+                  hours_of_operation:
+                    type: string
+                  details:
+                    type: string
+                  next_available:
+                    type: string
+                  image_url:
+                    type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/bbs/appointments/people:
+    get:
+      tags:
+        - BBs
+      summary: Gets People with Calendars
+      description: |
+        Gets a list of people with calendars inside of a unit
+
+        **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+         Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: external_id
+          in: query
+          description: External system id of person making the request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          description: Rokwire provider id of the organization tracking/providing appointment data
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: unit_id
+          in: query
+          description: External id identifying the unit the calendar entries belong to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - provider_id
+                  - unit_id
+                  - next_available
+                  - name
+                  - notes
+                  - image_url
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                  provider_id:
+                    type: int
+                    readOnly: true
+                  unit_id:
+                    type: int
+                    readOnly: true
+                  next_available:
+                    type: string
+                  name:
+                    type: string
+                  notes:
+                    type: string
+                  image_url:
+                    type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/bbs/appointments/slots:
+    get:
+      tags:
+        - BBs
+      summary: Gets available time slots on a calendar
+      description: |
+        Gets a list of available time slots between two dates on a unit calendar
+
+        **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: external_id
+          in: query
+          description: External system id of person making the request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          description: Rokwire provider id of the organization tracking/providing appointment data
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: unit_id
+          in: query
+          description: External id identifying the unit the calendar entries belong to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: person_id
+          in: query
+          description: External id identifying the advisor the calendar entry belongs to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The first date to look for available slots (yyyy-mm-dd). Required if end_time is provided.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The last date to look for available slots (yyyy-mm-dd) Required if start_time is provided
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - provider_id
+                  - unit_id
+                  - person_id
+                  - start_time
+                  - end_time
+                  - capacity
+                  - filled
+                  - details
+                properties:
+                  id:
+                    type: int
+                    readOnly: true
+                  provider_id:
+                    type: int
+                    readOnly: true
+                  unit_id:
+                    type: int
+                    readOnly: true
+                  person_id:
+                    type: int
+                  start_time:
+                    type: string
+                  end_time:
+                    type: string
+                  capacity:
+                    type: int
+                  filled:
+                    type: int
+                  details:
+                    type: map
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/bbs/appointments/questions:
+    get:
+      tags:
+        - BBs
+      summary: Gets the questions to ask when making an appointment
+      description: |
+        Gets a list of the questions to ask when a user requests an appointment for a particular time slot.
+
+        **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: external_id
+          in: query
+          description: External system id of person making the request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          description: Rokwire provider id of the organization tracking/providing appointment data
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: unit_id
+          in: query
+          description: External id identifying the unit the calendar entries belong to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: person_id
+          in: query
+          description: External id identifying the advisor the calendar entry belongs to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - type: object
+                    required:
+                      - id
+                      - provider_id
+                      - required
+                      - type
+                      - select_values
+                      - question
+                    properties:
+                      id:
+                        type: string
+                        readOnly: true
+                      provider_id:
+                        type: int
+                        readOnly: true
+                      required:
+                        type: bool
+                        readOnly: true
+                      type:
+                        type: string
+                        readOnly: true
+                      select_values:
+                        type: array
+                        items:
+                          type: string
+                        readOnly: true
+                      question:
+                        type: string
+                        readOnly: true
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/bbs/appointments/qands:
+    get:
+      tags:
+        - BBs
+      summary: Gets available time slots on a calendar
+      description: |
+        Gets a list of available time slots between two dates on a unit calendar
+
+        **Auth:** Requires valid first-party service account token with `get_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: external_id
+          in: query
+          description: External system id of person making the request
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          description: Rokwire provider id of the organization tracking/providing appointment data
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: unit_id
+          in: query
+          description: External id identifying the unit the calendar entries belong to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: person_id
+          in: query
+          description: External id identifying the advisor the calendar entry belongs to
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The first date to look for available slots (yyyy-mm-dd). Required if end_time is provided.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The last date to look for available slots (yyyy-mm-dd) Required if start_time is provided
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - time_slots
+                  - questions
+                properties:
+                  time_slots:
+                    type: array
+                    items:
+                      - $ref: '#/paths/~1api~1bbs~1appointments~1slots/get/responses/200/content/application~1json/schema'
+                    readOnly: true
+                  questions:
+                    type: array
+                    items:
+                      - $ref: '#/paths/~1api~1bbs~1appointments~1questions/get/responses/200/content/application~1json/schema/items/0'
+                    readOnly: true
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/bbs/appointments/:
+    post:
+      tags:
+        - BBs
+      summary: Creates an appointment in the specified provider system and returns the appointment data to the client
+      description: |
+        Posts an appointment request to the specified provider calendar. Returns the appointment data back to the client. 
+
+        **Auth:** Requires valid first-party service account token with `update_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/paths/~1api~1bbs~1appointments~1/put/requestBody/content/application~1json/schema'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1api~1bbs~1appointments~1/put/responses/200/content/application~1json/schema'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    put:
+      tags:
+        - BBs
+      summary: updates an appointment in the specified provider system and returns the appointment data to the client
+      description: |
+        Updates an appointment in the specified provider system and returns the appointment data to the clients.
+        For an upate, the source_id field in the request body is required.
+
+        **Auth:** Requires valid first-party service account token with `update_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - provider_id
+                - unit_id
+                - person_id
+                - type
+                - start_time
+                - end_time
+                - user_external_ids
+                - slot_id
+                - answers
+              optional: _source_id
+              properties:
+                provider_id:
+                  type: string
+                  readOnly: true
+                unit_id:
+                  type: string
+                  readOnly: true
+                person_id:
+                  type: string
+                  readOnly: true
+                type:
+                  type: stirng
+                  readOnly: true
+                start_time:
+                  type: stirng
+                  readOnly: true
+                end_time:
+                  type: string
+                  readOnly: true
+                user_external_ids:
+                  type:
+                    - type: object
+                      required:
+                        - uin
+                      properties:
+                        uin:
+                          type: string
+                          readOnly: true
+                  readOnly: true
+                slot_id:
+                  type: string
+                  readOnly: true
+                source_id:
+                  type: string
+                  readOnly: true
+                answers:
+                  type: array
+                  items:
+                    - type: object
+                      required:
+                        - question_id
+                        - values
+                      properties:
+                        question_id:
+                          type: string
+                          readOnly: true
+                        values:
+                          type: array
+                          items:
+                            type: string
+                          readOnly: true
+                  readOnly: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - provider_id
+                  - unit_id
+                  - person_id
+                  - type
+                  - start_time
+                  - end_time
+                  - user_external_ids
+                  - source_id
+                  - answers
+                properties:
+                  provider_id:
+                    type: string
+                    readOnly: true
+                  unit_id:
+                    type: string
+                    readOnly: true
+                  person_id:
+                    type: string
+                    readOnly: true
+                  type:
+                    type: stirng
+                    readOnly: true
+                  start_time:
+                    type: stirng
+                    readOnly: true
+                  end_time:
+                    type: string
+                    readOnly: true
+                  user_external_ids:
+                    type:
+                      '-$ref': ./ExternalUserID.yaml
+                    readOnly: true
+                  source_id:
+                    type: string
+                    readOnly: true
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/api/bbs/appointments/{id}':
+    delete:
+      tags:
+        - BBs
+      summary: Deletes an appointment in the specified provider system.
+      description: |
+        Deletes an appointment request in the specified provider calendar.
+
+        **Auth:** Requires valid first-party service account token with `update_external_appointments` permission
+        Requires the External-Authorization header containing the oidc access token from the campus provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: source id of the appointment
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: external_id
+          in: query
+          description: Users UIN
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: provider_id
+          in: query
+          description: Rokwire provider id of the organization tracking/providing appointment data
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/api/tps/examples/{id}':
+    get:
+      tags:
+        - TPS
+      summary: Gets example
+      description: |
+        Gets example record
+
+        **Auth:** Requires valid third-party service account token with `get_examples` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to retrieve
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  '/api/system/examples/{id}':
+    get:
+      tags:
+        - System
+      summary: Gets example
+      description: |
+        Gets example record
+
+        **Auth:** Requires valid admin token with `get_examples` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of example to retrieve
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Config:
+      required:
+        - id
+        - type
+        - app_id
+        - org_id
+        - system
+        - data
+        - date_created
+        - date_updated
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+        type:
+          type: string
+        app_id:
+          readOnly: true
+          type: string
+        org_id:
+          readOnly: true
+          type: string
+        system:
+          type: boolean
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/EnvConfigData'
+        date_created:
+          readOnly: true
+          type: string
+        date_updated:
+          readOnly: true
+          type: string
+          nullable: true
+    EnvConfigData:
+      type: object
+      required:
+        - example_env
+      properties:
+        example_env:
+          type: string
+    Example:
+      type: object
+      required:
+        - id
+        - app_id
+        - org_id
+        - data
+        - date_created
+      properties:
+        id:
+          type: string
+          readOnly: true
+        org_id:
+          type: string
+          readOnly: true
+        app_id:
+          type: string
+          readOnly: true
+        data:
+          type: string
+        date_created:
+          type: string
+          readOnly: true
+        date_updated:
+          type: string
+          nullable: true
+          readOnly: true
+    _admin_req_update-configs:
+      required:
+        - type
+        - all_apps
+        - all_orgs
+        - system
+        - data
+      type: object
+      properties:
+        type:
+          type: string
+        all_apps:
+          writeOnly: true
+          type: boolean
+        all_orgs:
+          writeOnly: true
+          type: boolean
+        system:
+          type: boolean
+        data:
+          anyOf:
+            - $ref: '#/components/schemas/EnvConfigData'

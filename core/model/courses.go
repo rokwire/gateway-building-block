@@ -17,36 +17,50 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeGiesCourse type
+	TypeGiesCourse logutils.MessageDataType = "giescourse"
+)
+
+const (
+	//TypeCourseData type
+	TypeCourseData logutils.MessageDataType = "coursedata"
+)
+
 // GiesCourse represents the elements of a course returned for Gies students
 type GiesCourse struct {
-	Term       string `json:"term"`
-	Subject    string `json:"subject"`
-	Number     string `json:"number"`
-	Section    string `json:"section"`
-	Title      string `json:"title"`
-	Instructor string `json:"instructor"`
+	Term       string `json:"term" bson:"term"`
+	Subject    string `json:"subject" bson:"subject"`
+	Number     string `json:"number" bson:"number"`
+	Section    string `json:"section" bson:"section"`
+	Title      string `json:"title" bson:"title"`
+	Instructor string `json:"instructor" bson:"instructor"`
 }
 
 // CourseSection represents the elements of a course section
 type CourseSection struct {
-	Days                  string   `json:"days"`
-	MeetingDateOrRange    string   `json:"meeting_dates_or_range"`
-	Room                  string   `json:"room"`
-	BuildingName          string   `json:"buildingname"`
-	BuildingID            string   `json:"buildingid"`
-	InstructionType       string   `json:"instructiontype"`
-	Instructor            string   `json:"instructor"`
-	StartTime             string   `json:"start_time"`
-	EndTime               string   `json:"endtime"`
-	Location              Building `json:"building"`
-	CourseReferenceNumber string   `json:"courseReferenceNumber"`
+	Days                  string   `json:"days" bson:"days"`
+	MeetingDateOrRange    string   `json:"meeting_dates_or_range" bson:"meeting_dates_or_range"`
+	Room                  string   `json:"room" bson:"room"`
+	BuildingName          string   `json:"buildingname" bson:"buildingname"`
+	BuildingID            string   `json:"buildingid" bson:"buildingid"`
+	InstructionType       string   `json:"instructiontype" bson:"instructiontype"`
+	Instructor            string   `json:"instructor" bson:"instructor"`
+	StartTime             string   `json:"start_time" bson:"start_time"`
+	EndTime               string   `json:"endtime" bson:"endtime"`
+	Location              Building `json:"building" bson:"building"`
+	CourseReferenceNumber string   `json:"courseReferenceNumber" bson:"courseReferenceNumber"`
 }
 
 // Course represents the full elements of a course
 type Course struct {
-	Title             string        `json:"coursetitle"`
-	ShortName         string        `json:"courseshortname"`
-	Number            string        `json:"coursenumber"`
-	InstructionMethod string        `json:"instructionmethod"`
-	Section           CourseSection `json:"coursesection"`
+	Title             string        `json:"coursetitle" bson:"coursetitle"`
+	ShortName         string        `json:"courseshortname" bson:"courseshortname"`
+	Number            string        `json:"coursenumber" bson:"coursenumber"`
+	InstructionMethod string        `json:"instructionmethod" bson:"instructionmethod"`
+	Section           CourseSection `json:"coursesection" bson:"coursesection"`
 }

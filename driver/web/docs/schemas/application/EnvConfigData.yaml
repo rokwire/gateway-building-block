@@ -1,0 +1,6 @@
+type: object
+required:
+- example_env
+properties:
+  example_env:
+    type: string

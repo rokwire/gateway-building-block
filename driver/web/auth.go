@@ -15,76 +15,172 @@
 package web
 
 import (
-	"fmt"
-	"log"
 	"net/http"
-	"time"
 
-	"github.com/rokwire/core-auth-library-go/authservice"
-	"github.com/rokwire/core-auth-library-go/tokenauth"
-	"github.com/rokwire/logging-library-go/logs"
+	"github.com/rokwire/core-auth-library-go/v3/authorization"
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logutils"
+
+	"github.com/rokwire/core-auth-library-go/v3/authservice"
+	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
 )
 
-type cacheUser struct {
-	lastUsage time.Time
+// Auth handler
+type Auth struct {
+	client tokenauth.Handlers
+	admin  tokenauth.Handlers
+	bbs    tokenauth.Handlers
+	tps    tokenauth.Handlers
+	system tokenauth.Handlers
 }
 
-// TokenAuth used to encapsualte the tokenauth type from the core auth library
-type TokenAuth struct {
-	tokenAuth *tokenauth.TokenAuth
-}
-
-// Check checks the request contains a valid Core access token
-func (auth TokenAuth) Check(r *http.Request) (bool, *tokenauth.Claims) {
-	claims, err := auth.tokenAuth.CheckRequestTokens(r)
+// NewAuth creates new auth handler
+func NewAuth(serviceRegManager *authservice.ServiceRegManager) (*Auth, error) {
+	client, err := newClientAuth(serviceRegManager)
 	if err != nil {
-		log.Printf("auth -> coreAuthCheck: FAILED to validate token: %s", err.Error())
-		return false, nil
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "client auth", nil, err)
+	}
+	clientHandlers := tokenauth.NewHandlers(client)
+
+	admin, err := newAdminAuth(serviceRegManager)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "admin auth", nil, err)
+	}
+	adminHandlers := tokenauth.NewHandlers(admin)
+
+	bbs, err := newBBsAuth(serviceRegManager)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "bbs auth", nil, err)
+	}
+	bbsHandlers := tokenauth.NewHandlers(bbs)
+
+	tps, err := newTPSAuth(serviceRegManager)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "tps auth", nil, err)
+	}
+	tpsHandlers := tokenauth.NewHandlers(tps)
+
+	system, err := newSystemAuth(serviceRegManager)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "system auth", nil, err)
+	}
+	systemHandlers := tokenauth.NewHandlers(system)
+
+	auth := Auth{
+		client: clientHandlers,
+		admin:  adminHandlers,
+		bbs:    bbsHandlers,
+		tps:    tpsHandlers,
+		system: systemHandlers,
+	}
+	return &auth, nil
+}
+
+///////
+
+func newClientAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth.StandardHandler, error) {
+	clientPermissionAuth := authorization.NewCasbinStringAuthorization("driver/web/client_permission_policy.csv")
+	clientScopeAuth := authorization.NewCasbinScopeAuthorization("driver/web/client_scope_policy.csv", serviceRegManager.AuthService.ServiceID)
+	clientTokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, clientPermissionAuth, clientScopeAuth)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "client token auth", nil, err)
 	}
 
-	if claims != nil {
-		if claims.Valid() == nil {
-			return true, claims
+	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
+		if claims.Admin {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "admin claim", nil)
 		}
+		if claims.System {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "system claim", nil)
+		}
+
+		return http.StatusOK, nil
 	}
-	return false, nil
+
+	auth := tokenauth.NewScopeHandler(clientTokenAuth, check)
+	return auth, nil
 }
 
-func printDeletedAccountIDs(accountIDs []string) error {
-	log.Printf("Deleted account IDs: %v\n", accountIDs)
-	return nil
+func newAdminAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth.StandardHandler, error) {
+	adminPermissionAuth := authorization.NewCasbinStringAuthorization("driver/web/admin_permission_policy.csv")
+	adminTokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, adminPermissionAuth, nil)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "admin token auth", nil, err)
+	}
+
+	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
+		if !claims.Admin {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "admin claim", nil)
+		}
+
+		return http.StatusOK, nil
+	}
+
+	auth := tokenauth.NewStandardHandler(adminTokenAuth, check)
+	return auth, nil
 }
 
-// NewTokenAuth creats a token auth instance
-func NewTokenAuth(serviceHost string, coreHost string) *TokenAuth {
-	serviceID := "gateway"
-
-	config := authservice.RemoteAuthDataLoaderConfig{
-		AuthServicesHost: coreHost,
-	}
-
-	logger := logs.NewLogger(serviceID, nil)
-	dataLoader, err := authservice.NewRemoteAuthDataLoader(config, []string{"gateway"}, logger)
-
+func newBBsAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth.StandardHandler, error) {
+	bbsPermissionAuth := authorization.NewCasbinStringAuthorization("driver/web/bbs_permission_policy.csv")
+	bbsTokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, bbsPermissionAuth, nil)
 	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
+		return nil, errors.WrapErrorAction(logutils.ActionStart, "bbs token auth", nil, err)
 	}
 
-	authHost := fmt.Sprintf("%s/bbs/service-regs", coreHost)
-	fmt.Println(authHost)
-	hostArray := make([]string, 1)
-	hostArray[0] = authHost
-	authService, err := authservice.NewAuthService(serviceID, serviceHost, dataLoader)
+	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
+		if !claims.Service {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "service claim", nil)
+		}
 
+		if !claims.FirstParty {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "first party claim", nil)
+		}
+
+		return http.StatusOK, nil
+	}
+
+	auth := tokenauth.NewStandardHandler(bbsTokenAuth, check)
+	return auth, nil
+}
+
+func newTPSAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth.StandardHandler, error) {
+	tpsPermissionAuth := authorization.NewCasbinStringAuthorization("driver/web/tps_permission_policy.csv")
+	tpsTokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, tpsPermissionAuth, nil)
 	if err != nil {
-		log.Fatalf("Error initializing auth service: %v", err)
+		return nil, errors.WrapErrorAction(logutils.ActionStart, "tps token auth", nil, err)
 	}
 
-	tokenAuth, err := tokenauth.NewTokenAuth(true, authService, nil, nil)
+	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
+		if !claims.Service {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "service claim", nil)
+		}
+
+		if claims.FirstParty {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "first party claim", nil)
+		}
+
+		return http.StatusOK, nil
+	}
+
+	auth := tokenauth.NewStandardHandler(tpsTokenAuth, check)
+	return auth, nil
+}
+
+func newSystemAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth.StandardHandler, error) {
+	systemPermissionAuth := authorization.NewCasbinStringAuthorization("driver/web/system_permission_policy.csv")
+	systemTokenAuth, err := tokenauth.NewTokenAuth(true, serviceRegManager, systemPermissionAuth, nil)
 	if err != nil {
-		log.Fatalf("auth -> newAuth: FAILED to init token auth: %s", err.Error())
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, "system token auth", nil, err)
 	}
 
-	auth := TokenAuth{tokenAuth: tokenAuth}
-	return &auth
+	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
+		if !claims.System {
+			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "system claim", nil)
+		}
+
+		return http.StatusOK, nil
+	}
+
+	auth := tokenauth.NewStandardHandler(systemTokenAuth, check)
+	return auth, nil
 }

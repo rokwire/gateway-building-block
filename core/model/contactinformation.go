@@ -14,15 +14,24 @@
 
 package model
 
+import (
+	"github.com/rokwire/logging-library-go/v2/logutils"
+)
+
+const (
+	//TypeContactInfo type
+	TypeContactInfo logutils.MessageDataType = "contactInfo"
+)
+
 // Person represents the basic structure returned to the caller when contanct information is requested
 type Person struct {
-	UIN               string             `json:"uin"`
-	FirstName         string             `json:"firstName"`
-	LastName          string             `json:"lastName"`
-	PreferredName     string             `json:"preferred"`
-	MailingAddress    Address            `json:"mailingAddress"`
-	PermAddress       Address            `json:"permanentAddress"`
-	EmergencyContacts []EmergencyContact `json:"emergencycontacts"`
+	UIN               string             `json:"uin" bson:"uin"`
+	FirstName         string             `json:"firstName" bson:"firstName"`
+	LastName          string             `json:"lastName" bson:"lastName"`
+	PreferredName     string             `json:"preferred" bson:"preferred"`
+	MailingAddress    Address            `json:"mailingAddress" bson:"mailingAddress"`
+	PermAddress       Address            `json:"permanentAddress" bson:"permanentAddress"`
+	EmergencyContacts []EmergencyContact `json:"emergencycontacts" bson:"emergencycontacts"`
 }
 
 // AddressType is used as an enumeration for address types
