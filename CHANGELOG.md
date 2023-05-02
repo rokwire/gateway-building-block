@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Prepare the project to become open source [#2](https://github.com/rokwire/gateway-building-block/issues/2)
 
+## 2.0.4 - 5/2/23
+### Changed
+--Convert time slot and advisor times to UTC
+--filter units by college code (based on provider_id)
+
 ## 2.0.3 - 5/1/23
 ### Added
 --appointments end points and interfaces
