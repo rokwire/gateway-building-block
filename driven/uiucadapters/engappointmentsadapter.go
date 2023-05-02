@@ -94,6 +94,10 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitID int, provi
 
 	for i := 0; i < len(advisors); i++ {
 		advisor := advisors[i]
+		if advisor.NextAvailableDate != "" {
+			nextAvailableDate, _ := lv.convertTimeToUTCString(advisor.NextAvailableDate)
+			advisor.NextAvailableDate = nextAvailableDate
+		}
 		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitID, Notes: advisor.Message, Name: advisor.Name, NumAvailableSlots: advisor.AvailableSlots, NextAvailable: advisor.NextAvailableDate, ImageURL: ""}
 		s = append(s, p)
 	}
@@ -135,7 +139,9 @@ func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, ad
 			slotEndDatePart, _ := time.Parse(time.DateOnly, slotEndDateOnly)
 
 			if (slotStartDatepart.Equal(startdate) || slotEndDatePart.Equal(enddate)) || (slotStartDate.After(startdate) && slotStartDate.Before(enddate)) {
-				t := model.TimeSlot{ID: timeslot.ID, EndTime: timeslot.EndDate, StartTime: timeslot.StartDate, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: 0}
+				finalStart, _ := lv.convertTimeToUTCString(timeslot.StartDate)
+				finalEnd, _ := lv.convertTimeToUTCString(timeslot.EndDate)
+				t := model.TimeSlot{ID: timeslot.ID, EndTime: finalEnd, StartTime: finalStart, UnitID: unitID, ProviderID: providerid, PersonID: advisorid, Capacity: 1, Filled: 0}
 				ts = append(ts, t)
 			}
 		}
@@ -302,6 +308,28 @@ func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method 
 	}
 
 	return nil, errors.New("error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
+}
+
+func (lv EngineeringAppointmentsAdapter) convertTimeToUTC(orgDate string) (time.Time, error) {
+	//all appointment times from engineering come in this format
+	const timeLayout = "2006-01-02T15:04:00"
+	loc, _ := time.LoadLocation("America/Chicago")
+	orgDateasDate, err := time.ParseInLocation(timeLayout, orgDate, loc)
+	if err != nil {
+		return time.Now(), err
+	}
+	return orgDateasDate.UTC(), nil
+}
+
+func (lv EngineeringAppointmentsAdapter) convertTimeToUTCString(orgDate string) (string, error) {
+	//all appointment times from engineering come in this format
+	const timeLayout = "2006-01-02T15:04:00"
+	loc, _ := time.LoadLocation("America/Chicago")
+	orgDateasDate, err := time.ParseInLocation(timeLayout, orgDate, loc)
+	if err != nil {
+		return "", err
+	}
+	return orgDateasDate.UTC().Format(time.RFC3339), nil
 }
 
 type engAppointmentPost struct {
