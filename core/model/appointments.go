@@ -54,25 +54,29 @@ type AppointmentOptions struct {
 
 // AppointmentUnit represents units with availalbe appointment integrations
 type AppointmentUnit struct {
-	ID               int    `json:"id" bson:"id"`
-	ProviderID       int    `json:"provider_id" bson:"provider_id"`
-	Name             string `json:"name" bson:"name"`
-	Location         string `json:"location" bson:"location"`
-	HoursOfOperation string `json:"hours_of_operation" bson:"hours_of_operation"`
-	Details          string `json:"details" bson:"details"`
-	NextAvailable    string `json:"next_available" bson:"next_available"`
-	ImageURL         string `json:"image_url" bson:"image_url"`
+	ID                 int    `json:"id" bson:"id"`
+	ProviderID         int    `json:"provider_id" bson:"provider_id"`
+	Name               string `json:"name" bson:"name"`
+	Location           string `json:"location" bson:"location"`
+	HoursOfOperation   string `json:"hours_of_operation" bson:"hours_of_operation"`
+	Details            string `json:"details" bson:"details"`
+	NextAvailable      string `json:"next_available" bson:"next_available"`
+	ImageURL           string `json:"image_url" bson:"image_url"`
+	NumAvailablePeople int    `json:"num_available_people" bson:"num_available_people"`
+	CollegeName        string `json:"college_name" bson:"college_name"`
+	CollegeCode        string `json:"college_code" bson:"college_code"`
 }
 
 // AppointmentPerson represents a person who is accepting appointments
 type AppointmentPerson struct {
-	ID            string `json:"id" bson:"id"`
-	ProviderID    int    `json:"provider_id" bson:"provider_id"`
-	UnitID        int    `json:"unit_id" bson:"unit_id"`
-	NextAvailable string `json:"next_available" bson:"next_available"`
-	Name          string `json:"name" bson:"name"`
-	Notes         string `json:"notes" bson:"notes"`
-	ImageURL      string `json:"image_url" bson:"image_url"`
+	ID                string `json:"id" bson:"id"`
+	ProviderID        int    `json:"provider_id" bson:"provider_id"`
+	UnitID            int    `json:"unit_id" bson:"unit_id"`
+	NextAvailable     string `json:"next_available" bson:"next_available"`
+	Name              string `json:"name" bson:"name"`
+	Notes             string `json:"notes" bson:"notes"`
+	ImageURL          string `json:"image_url" bson:"image_url"`
+	NumAvailableSlots int    `json:"number_available_slots" bson:"number_available_slots"`
 }
 
 // AppointmentAnswer represents answer data sent from the appointments building block to the gateway building block

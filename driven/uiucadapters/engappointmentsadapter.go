@@ -31,11 +31,12 @@ import (
 
 // EngineeringAppointmentsAdapter is a college of engineering implementation of the driven/appointments adapter
 type EngineeringAppointmentsAdapter struct {
+	collegeCode string
 }
 
 // NewEngineeringAppontmentsAdapter returns a vendor specific implementation of the Appointments interface
-func NewEngineeringAppontmentsAdapter() EngineeringAppointmentsAdapter {
-	return EngineeringAppointmentsAdapter{}
+func NewEngineeringAppontmentsAdapter(collegeCode string) EngineeringAppointmentsAdapter {
+	return EngineeringAppointmentsAdapter{collegeCode: collegeCode}
 
 }
 
@@ -62,8 +63,10 @@ func (lv EngineeringAppointmentsAdapter) GetUnits(uin string, accessToken string
 
 	for i := 0; i < len(calendars); i++ {
 		calendar := calendars[i]
-		au := model.AppointmentUnit{ID: calendar.ID, ProviderID: providerid, Name: calendar.Name, Location: "", HoursOfOperation: "", Details: "", NextAvailable: "", ImageURL: ""}
-		s = append(s, au)
+		if calendar.CollegeCode == lv.collegeCode {
+			au := model.AppointmentUnit{ID: calendar.ID, ProviderID: providerid, Name: calendar.Name, Location: "", HoursOfOperation: "", Details: "", NextAvailable: "", ImageURL: "", NumAvailablePeople: calendar.NumAvailableAdvisors, CollegeCode: calendar.CollegeCode, CollegeName: calendar.CollegeName}
+			s = append(s, au)
+		}
 	}
 
 	return &s, nil
@@ -91,7 +94,7 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitID int, provi
 
 	for i := 0; i < len(advisors); i++ {
 		advisor := advisors[i]
-		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitID, Notes: advisor.Message, Name: advisor.Name, NextAvailable: advisor.NextAvailableDate, ImageURL: ""}
+		p := model.AppointmentPerson{ID: advisor.ID, ProviderID: providerid, UnitID: unitID, Notes: advisor.Message, Name: advisor.Name, NumAvailableSlots: advisor.AvailableSlots, NextAvailable: advisor.NextAvailableDate, ImageURL: ""}
 		s = append(s, p)
 	}
 
