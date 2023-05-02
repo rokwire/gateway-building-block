@@ -19,8 +19,11 @@ package uiuc
 
 // EngineeringCalendar represents an entry in the engineering calendar list
 type EngineeringCalendar struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID                   int    `json:"id"`
+	Name                 string `json:"name"`
+	CollegeCode          string `json:"collegeCode"`
+	CollegeName          string `json:"collegeName"`
+	NumAvailableAdvisors int    `json:"numberAvailableAdvisors"`
 }
 
 // EngineeringAdvisor represents an advisor with calendar entries on a given calendar
