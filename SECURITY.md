@@ -6,7 +6,8 @@ Patches for **Gateway Building Block** in this repository will only be applied t
 | ------- | ------------------ |
 | 1.0.0   |                    |
 | 1.2.6   |                    |
-| 2.0.3   | :white_check_mark: |
+| 2.0.3   |                    |
+| 2.0.4   | :white_check_mark: |
 
 ## Reporting a Bug or Vulnerability
 
