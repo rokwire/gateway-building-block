@@ -23,6 +23,11 @@ const (
 	TypeAppointments logutils.MessageDataType = "appointments"
 )
 
+const (
+	//TypeAppointmentHost type
+	TypeAppointmentHost logutils.MessageDataType = "appointment host"
+)
+
 // Question represents a question asked as part of an appointmentr request
 type Question struct {
 	ID           string   `json:"id" bson:"id"`
@@ -44,6 +49,12 @@ type TimeSlot struct {
 	Capacity   int                    `json:"capacity" bson:"capacity"`
 	Filled     int                    `json:"filled" bson:"filled"`
 	Details    map[string]interface{} `json:"details" bson:"details"`
+}
+
+// AppointmentHost represents the person hosting an appointment
+type AppointmentHost struct {
+	FirstName string `json:"first_name" bson:"first_name"`
+	LastName  string `json:"last_name" bson:"last_name"`
 }
 
 // AppointmentOptions represents the available timeslots and questions for a unitid/advisorid calendar
@@ -106,12 +117,13 @@ type AppointmentPost struct {
 
 // BuildingBlockAppointment returns the expected appointment structure to the appointments buildnig block
 type BuildingBlockAppointment struct {
-	ProviderID      string         `json:"provider_id" bson:"provider_id"`
-	UnitID          string         `json:"unit_id" bson:"unit_id"`
-	PersonID        string         `json:"person_id" bson:"person_id"`
-	Type            string         `json:"type" bson:"type"`
-	StartTime       string         `json:"start_time" bson:"start_time"`
-	EndTime         string         `json:"end_time" bson:"end_time"`
-	UserExternalIDs ExternalUserID `json:"user_external_ids" bson:"user_external_ids"`
-	SourceID        string         `json:"source_id" bson:"source_id"`
+	ProviderID      string          `json:"provider_id" bson:"provider_id"`
+	UnitID          string          `json:"unit_id" bson:"unit_id"`
+	PersonID        string          `json:"person_id" bson:"person_id"`
+	Type            string          `json:"type" bson:"type"`
+	StartTime       string          `json:"start_time" bson:"start_time"`
+	EndTime         string          `json:"end_time" bson:"end_time"`
+	UserExternalIDs ExternalUserID  `json:"user_external_ids" bson:"user_external_ids"`
+	SourceID        string          `json:"source_id" bson:"source_id"`
+	Host            AppointmentHost `json:"host" bson:"host"`
 }

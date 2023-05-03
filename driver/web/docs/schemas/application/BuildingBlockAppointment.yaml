@@ -8,7 +8,7 @@ required:
 - end_time
 - user_external_ids
 - source_id
-- answers
+- host
 properties:
   provider_id:
     type: string
@@ -35,3 +35,6 @@ properties:
   source_id:
     type: string
     readOnly: true
+  host:
+    type:
+      -$ref: "./AppointmentHost.yaml"

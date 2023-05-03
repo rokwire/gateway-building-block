@@ -19,7 +19,6 @@ import (
 	uiuc "application/core/model/uiuc"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -27,6 +26,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
 // EngineeringAppointmentsAdapter is a college of engineering implementation of the driven/appointments adapter
@@ -108,7 +110,6 @@ func (lv EngineeringAppointmentsAdapter) GetPeople(uin string, unitID int, provi
 // GetTimeSlots returns an object consisting of the time slots and questions for a given personid between startdate and enddate
 func (lv EngineeringAppointmentsAdapter) GetTimeSlots(uin string, unitID int, advisorid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error) {
 	baseURL := conf.EngAppointmentBaseURL
-	//baseURL := "https://myengr.test.engr.illinois.edu/advisingws/api/"
 	finalURL := baseURL + "users/" + uin + "/calendars/" + strconv.FormatInt(int64(unitID), 10) + "/advisors/" + strconv.FormatInt(int64(advisorid), 10) + "/appointments"
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accesstoken
@@ -169,6 +170,18 @@ func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.Appointme
 	if err != nil {
 		return nil, err
 	}
+
+	//set up the return data. Do this first so if get host information failes we can return the error to the client before creating a new appointment record
+	//create the new appointment to return to the building block
+	//as part of that, we need the host information, we need a call to engineering based on the unit id
+	retData := model.BuildingBlockAppointment{ProviderID: appt.ProviderID, UnitID: appt.UnitID, PersonID: appt.PersonID, UserExternalIDs: appt.UserExternalIDs, Type: appt.Type, StartTime: appt.StartTime, EndTime: appt.EndTime, SourceID: appt.SlotID}
+	hostData, err := lv.getAppointmentHost(appt.UserExternalIDs.UIN, appt.UnitID, appt.PersonID, accesstoken, conf)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeAppointmentHost, nil, err)
+	}
+	retData.Host = *hostData
+
+	//create post data to send to engineering and post it
 	eap := engAppointmentPost{UIN: appt.UserExternalIDs.UIN, SlotID: slotid}
 	eap.Answers = make([]engAppointmentAnswerPost, 0)
 
@@ -192,18 +205,20 @@ func (lv EngineeringAppointmentsAdapter) CreateAppointment(appt *model.Appointme
 		return nil, err
 	}
 	payload := strings.NewReader(string(postData))
+
 	_, err = lv.getVendorData(finalURL, "POST", headers, payload)
 	if err != nil {
-		return nil, err
+		return nil, errors.WrapErrorAction(logutils.ActionCreate, model.TypeAppointments, nil, err)
 	}
-
-	retData := model.BuildingBlockAppointment{ProviderID: appt.ProviderID, UnitID: appt.UnitID, PersonID: appt.PersonID, UserExternalIDs: appt.UserExternalIDs, Type: appt.Type, StartTime: appt.StartTime, EndTime: appt.EndTime, SourceID: appt.SlotID}
-
 	return &retData, nil
 }
 
 // UpdateAppointment updates an appointment in the engieering system.
 func (lv EngineeringAppointmentsAdapter) UpdateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error) {
+
+	if appt.SourceID == "" {
+		return nil, errors.WrapErrorData(logutils.StatusInvalid, model.TypeAppointments, nil, errors.New("source_id of the original appointment missing"))
+	}
 
 	slotid, err := strconv.Atoi(appt.SlotID)
 	if err != nil {
@@ -251,6 +266,32 @@ func (lv EngineeringAppointmentsAdapter) DeleteAppointment(uin string, sourceid 
 		return "", err
 	}
 	return string(vendorData), nil
+}
+
+func (lv EngineeringAppointmentsAdapter) getAppointmentHost(uin string, unitid string, personid string, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentHost, error) {
+	baseURL := conf.EngAppointmentBaseURL
+	finalURL := baseURL + "users/" + uin + "/calendars/" + unitid + "/advisors/" + personid
+	var headers = make(map[string]string)
+	headers["Authorization"] = "Bearer " + accesstoken
+
+	adv, err := lv.getVendorData(finalURL, "GET", headers, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var advisor uiuc.EngineeringAdvisorWithSchedule
+	err = json.Unmarshal(adv, &advisor)
+	if err != nil {
+		return nil, err
+	}
+
+	lastNameSuffix := ","
+	nameParts := strings.Fields(advisor.Name)
+	lastName := strings.TrimSuffix(nameParts[0], lastNameSuffix)
+	firstName := nameParts[1]
+
+	host := model.AppointmentHost{FirstName: firstName, LastName: lastName}
+	return &host, nil
 }
 
 func (lv EngineeringAppointmentsAdapter) getVendorData(targetURL string, method string, headers map[string]string, postdata *strings.Reader) ([]byte, error) {
