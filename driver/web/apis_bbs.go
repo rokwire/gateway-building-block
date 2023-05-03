@@ -188,7 +188,7 @@ func (h BBsAPIsHandler) updateAppointment(l *logs.Log, r *http.Request, claims *
 
 	newAppt, err := h.app.BBs.UpdateAppointment(&record, externalToken)
 	if err != nil {
-		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
+		return l.HTTPResponseErrorAction(logutils.ActionUpdate, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
 	}
 
 	response, err := json.Marshal(newAppt)

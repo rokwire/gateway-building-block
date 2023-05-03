@@ -23,6 +23,11 @@ const (
 	TypeAppointments logutils.MessageDataType = "appointments"
 )
 
+const (
+	//TypeAppointmentHost type
+	TypeAppointmentHost logutils.MessageDataType = "appointment host"
+)
+
 // Question represents a question asked as part of an appointmentr request
 type Question struct {
 	ID           string   `json:"id" bson:"id"`
@@ -46,6 +51,12 @@ type TimeSlot struct {
 	Details    map[string]interface{} `json:"details" bson:"details"`
 }
 
+// AppointmentHost represents the person hosting an appointment
+type AppointmentHost struct {
+	FirstName string `json:"first_name" bson:"first_name"`
+	LastName  string `json:"last_name" bson:"last_name"`
+}
+
 // AppointmentOptions represents the available timeslots and questions for a unitid/advisorid calendar
 type AppointmentOptions struct {
 	TimeSlots []TimeSlot `json:"time_slots" bson:"time_slots"`
@@ -54,25 +65,29 @@ type AppointmentOptions struct {
 
 // AppointmentUnit represents units with availalbe appointment integrations
 type AppointmentUnit struct {
-	ID               int    `json:"id" bson:"id"`
-	ProviderID       int    `json:"provider_id" bson:"provider_id"`
-	Name             string `json:"name" bson:"name"`
-	Location         string `json:"location" bson:"location"`
-	HoursOfOperation string `json:"hours_of_operation" bson:"hours_of_operation"`
-	Details          string `json:"details" bson:"details"`
-	NextAvailable    string `json:"next_available" bson:"next_available"`
-	ImageURL         string `json:"image_url" bson:"image_url"`
+	ID                 int    `json:"id" bson:"id"`
+	ProviderID         int    `json:"provider_id" bson:"provider_id"`
+	Name               string `json:"name" bson:"name"`
+	Location           string `json:"location" bson:"location"`
+	HoursOfOperation   string `json:"hours_of_operation" bson:"hours_of_operation"`
+	Details            string `json:"details" bson:"details"`
+	NextAvailable      string `json:"next_available" bson:"next_available"`
+	ImageURL           string `json:"image_url" bson:"image_url"`
+	NumAvailablePeople int    `json:"num_available_people" bson:"num_available_people"`
+	CollegeName        string `json:"college_name" bson:"college_name"`
+	CollegeCode        string `json:"college_code" bson:"college_code"`
 }
 
 // AppointmentPerson represents a person who is accepting appointments
 type AppointmentPerson struct {
-	ID            string `json:"id" bson:"id"`
-	ProviderID    int    `json:"provider_id" bson:"provider_id"`
-	UnitID        int    `json:"unit_id" bson:"unit_id"`
-	NextAvailable string `json:"next_available" bson:"next_available"`
-	Name          string `json:"name" bson:"name"`
-	Notes         string `json:"notes" bson:"notes"`
-	ImageURL      string `json:"image_url" bson:"image_url"`
+	ID                string `json:"id" bson:"id"`
+	ProviderID        int    `json:"provider_id" bson:"provider_id"`
+	UnitID            int    `json:"unit_id" bson:"unit_id"`
+	NextAvailable     string `json:"next_available" bson:"next_available"`
+	Name              string `json:"name" bson:"name"`
+	Notes             string `json:"notes" bson:"notes"`
+	ImageURL          string `json:"image_url" bson:"image_url"`
+	NumAvailableSlots int    `json:"number_available_slots" bson:"number_available_slots"`
 }
 
 // AppointmentAnswer represents answer data sent from the appointments building block to the gateway building block
@@ -102,12 +117,13 @@ type AppointmentPost struct {
 
 // BuildingBlockAppointment returns the expected appointment structure to the appointments buildnig block
 type BuildingBlockAppointment struct {
-	ProviderID      string         `json:"provider_id" bson:"provider_id"`
-	UnitID          string         `json:"unit_id" bson:"unit_id"`
-	PersonID        string         `json:"person_id" bson:"person_id"`
-	Type            string         `json:"type" bson:"type"`
-	StartTime       string         `json:"start_time" bson:"start_time"`
-	EndTime         string         `json:"end_time" bson:"end_time"`
-	UserExternalIDs ExternalUserID `json:"user_external_ids" bson:"user_external_ids"`
-	SourceID        string         `json:"source_id" bson:"source_id"`
+	ProviderID      string          `json:"provider_id" bson:"provider_id"`
+	UnitID          string          `json:"unit_id" bson:"unit_id"`
+	PersonID        string          `json:"person_id" bson:"person_id"`
+	Type            string          `json:"type" bson:"type"`
+	StartTime       string          `json:"start_time" bson:"start_time"`
+	EndTime         string          `json:"end_time" bson:"end_time"`
+	UserExternalIDs ExternalUserID  `json:"user_external_ids" bson:"user_external_ids"`
+	SourceID        string          `json:"source_id" bson:"source_id"`
+	Host            AppointmentHost `json:"host" bson:"host"`
 }
