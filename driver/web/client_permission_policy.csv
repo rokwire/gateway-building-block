@@ -1,1 +1,1 @@
-p, get_examples, /identity/api/examples/*, (GET), Get examples
+p, get_examples, /gateway/api/examples/*, (GET), Get examples
