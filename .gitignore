@@ -3,3 +3,5 @@ bin/
 build/
 .vscode/
 assets/
+run.sh
+env.list
