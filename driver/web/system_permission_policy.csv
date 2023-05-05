@@ -1,8 +1,8 @@
-p, all_system_identity, /identity/api/system/*, (GET)|(POST)|(PUT)|(DELETE), All identity system admin actions
+p, all_system_gateway, /gateway/api/system/*, (GET)|(POST)|(PUT)|(DELETE), All gateway system admin actions
 
-p, all_examples, /identity/api/system/examples, (POST), All example system actions
-p, all_examples, /identity/api/system/examples/*, (GET)|(PUT)|(DELETE),
-p, get_examples, /identity/api/system/examples/*, (GET), Get examples
-p, update_examples, /identity/api/system/examples, (POST), Update examples
-p, update_examples, /identity/api/system/examples/*, (GET)|(PUT),
-p, delete_examples, /identity/api/system/examples/*, (GET)|(DELETE),
+p, all_examples, /gateway/api/system/examples, (POST), All example system actions
+p, all_examples, /gateway/api/system/examples/*, (GET)|(PUT)|(DELETE),
+p, get_examples, /gateway/api/system/examples/*, (GET), Get examples
+p, update_examples, /gateway/api/system/examples, (POST), Update examples
+p, update_examples, /gateway/api/system/examples/*, (GET)|(PUT),
+p, delete_examples, /gateway/api/system/examples/*, (GET)|(DELETE),

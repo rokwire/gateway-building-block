@@ -1,16 +1,16 @@
 openapi: 3.0.3
 info:
-  title: Rokwire Identity Building Block API
-  description: Identity Building Block API Documentation
+  title: Rokwire Gateway Building Block API
+  description: Gateway Building Block API Documentation
   version: 2.0.6
 servers:
-  - url: 'https://api.rokwire.illinois.edu/identity'
+  - url: 'https://api.rokwire.illinois.edu/gateway'
     description: Production server
-  - url: 'https://api-test.rokwire.illinois.edu/identity'
+  - url: 'https://api-test.rokwire.illinois.edu/gateway'
     description: Test server
-  - url: 'https://api-dev.rokwire.illinois.edu/identity'
+  - url: 'https://api-dev.rokwire.illinois.edu/gateway'
     description: Development server
-  - url: 'http://localhost/identity'
+  - url: 'http://localhost/gateway'
     description: Local server
 tags:
   - name: Client
@@ -233,10 +233,10 @@ paths:
         Get existing configs by search parameters
 
         **Auth:** Requires valid admin token with one of the following permissions:
-        - `get_configs_identity`
-        - `update_configs_identity`
-        - `delete_configs_identity`
-        - `all_configs_identity`
+        - `get_configs_gateway`
+        - `update_configs_gateway`
+        - `delete_configs_gateway`
+        - `all_configs_gateway`
       security:
         - bearerAuth: []
       parameters:
@@ -271,8 +271,8 @@ paths:
         Creates a new config
 
         **Auth:** Requires valid admin token with one of the following permissions:
-        - `update_configs_identity`
-        - `all_configs_identity`
+        - `update_configs_gateway`
+        - `all_configs_gateway`
       security:
         - bearerAuth: []
       requestBody:
@@ -331,10 +331,10 @@ paths:
         Gets config record
 
         **Auth:** Requires valid admin token with one of the following permissions:
-        - `get_configs_identity`
-        - `update_configs_identity`
-        - `delete_configs_identity`
-        - `all_configs_identity`
+        - `get_configs_gateway`
+        - `update_configs_gateway`
+        - `delete_configs_gateway`
+        - `all_configs_gateway`
       security:
         - bearerAuth: []
       parameters:
@@ -367,8 +367,8 @@ paths:
         Updates existing config record
 
         **Auth:** Requires valid admin token with one of the following permissions:
-        - `update_configs_identity`
-        - `all_configs_identity`
+        - `update_configs_gateway`
+        - `all_configs_gateway`
       security:
         - bearerAuth: []
       parameters:
@@ -437,8 +437,8 @@ paths:
         Deletes config record
 
         **Auth:** Requires valid admin token with one of the following permissions:
-        - `delete_configs_identity`
-        - `all_configs_identity`
+        - `delete_configs_gateway`
+        - `all_configs_gateway`
       security:
         - bearerAuth: []
       parameters:
