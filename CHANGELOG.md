@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Prepare for deployment in OpenShift [#379](https://github.com/rokwire/groups-building-block/issues/379)
 ## [2.0.7] - 2023-05-05
 ### Fixed
 - Fix permissions [#26](https://github.com/rokwire/gateway-building-block/issues/26)
