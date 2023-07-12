@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Prepare for deployment in OpenShift [#379](https://github.com/rokwire/groups-building-block/issues/379)
+- Prepare for deployment in OpenShift [#28](https://github.com/rokwire/gateway-building-block/issues/28)
+
 ## [2.0.7] - 2023-05-05
 ### Fixed
 - Fix permissions [#26](https://github.com/rokwire/gateway-building-block/issues/26)
