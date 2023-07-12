@@ -41,7 +41,6 @@ func main() {
 
 	serviceID := "gateway"
 
-	//loggerOpts := logs.LoggerOpts{SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}
 	loggerOpts := logs.LoggerOpts{
 		SensitiveHeaders: []string{"External-Authorization"},
 		SuppressRequests: logs.NewStandardHealthCheckHTTPRequestProperties(serviceID + "/version")}

@@ -1,0 +1,12 @@
+{
+    "app_secret": {
+        "GATEWAY_MONGO_AUTH": "<mongo auth url>"
+    },
+    "app_config":{
+        "GATEWAY_PORT": "5000",
+        "GATEWAY_MONGO_DATABASE": "<mongo database>",
+        "GATEWAY_MONGO_TIMEOUT": "",
+        "GATEWAY_BASE_URL": "<base url>",
+        "GATEWAY_CORE_BB_BASE_URL": "<core bb base url>"
+    }
+}

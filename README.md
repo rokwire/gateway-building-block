@@ -35,6 +35,8 @@ GATEWAY_WAYFINDING_APIURL | < url > | yes | Base URL for building location API e
 GATEWAY_CORE_HOST | < url > | yes | Core BB host URL
 GATEWAY_CONTACTINFO_APIKEY | < string > | yes | API key used to access campus student information apis
 GATEWAY_CONTACTINFO_ENDPOINT | < url > | yes | Base URL to the campus student information apis
+GATEWAY_BASE_URL | < url > | yes | Base URL for the gateway
+GATEWAY_CORE_BB_BASE_URL | < url > | yes | Base URL for the core
 
 ### Run Application
 
