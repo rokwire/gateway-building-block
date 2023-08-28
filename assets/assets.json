@@ -1,0 +1,39 @@
+{
+"laundry": {
+"locations": [
+    {"laundry_location": "589877048",  "location_details": {"longitude":-88.22088,  "latitude":40.104416, "floor":0}},
+    {"laundry_location": "589877054", "location_details":{"longitude":-88.237941, "latitude":40.102036, "floor":0}},
+    {"laundry_location": "589877017",  "location_details":{"longitude":-88.237941, "latitude":40.102036, "floor":0}},
+    {"laundry_location": "589877019", "location_details":{"longitude":-88.222941, "latitude":40.105977, "floor":0}},
+    {"laundry_location": "589877004", "location_details":{"longitude":-88.234041, "latitude":40.103841, "floor":0}},
+    {"laundry_location": "589877022",  "location_details":{"longitude":-88.221658, "latitude":40.111014, "floor":0}},
+    {"laundry_location": "589877043", "location_details":{"longitude":-88.221658, "latitude":40.111014, "floor":0}},
+    {"laundry_location": "589877003", "location_details":{"longitude":-88.221665, "latitude":40.099275, "floor":0}},
+    {"laundry_location": "589877021", "location_details":{"longitude":-88.220323, "latitude":40.099124, "floor":0}},
+    {"laundry_location": "589877044", "location_details":{"longitude":-88.223707, "latitude":40.109995, "floor":0}},
+    {"laundry_location": "589877027", "location_details":{"longitude":-88.223707, "latitude":40.109995, "floor":0}},
+    {"laundry_location": "589877026", "location_details":{"longitude":-88.237834, "latitude":40.102821, "floor":0}},
+    {"laundry_location": "589877032",  "location_details":{"longitude":-88.220951, "latitude":40.110287, "floor":0}},
+    {"laundry_location": "589877030", "location_details":{"longitude":-88.22174,  "latitude":40.109602, "floor":0}},
+    {"laundry_location": "589877031", "location_details":{"longitude":-88.220382, "latitude":40.104371, "floor":0}},
+    {"laundry_location": "589877038", "location_details":{"longitude":-88.220382, "latitude":40.104371, "floor":0}},
+    {"laundry_location": "589877057", "location_details":{"longitude":-88.237296, "latitude":40.104108, "floor":0}},
+    {"laundry_location": "589877036", "location_details":{"longitude":-88.237296, "latitude":40.104108, "floor":0}},
+    {"laundry_location": "589877037", "location_details":{"longitude":-88.237296, "latitude":40.104108, "floor":0}},
+    {"laundry_location": "589877040", "location_details":{"longitude":-88.214132, "latitude":40.096854, "floor":0}},
+    {"laundry_location": "589877041", "location_details":{"longitude":-88.214132, "latitude":40.096854, "floor":0}},
+    {"laundry_location": "589877023", "location_details":{"longitude":-88.221113, "latitude":40.099810, "floor":0}},
+    {"laundry_location": "589877046", "location_details":{"longitude":-88.219809, "latitude":40.100422, "floor":0}},
+    {"laundry_location": "589877024", "location_details":{"longitude":-88.220893, "latitude":40.100385, "floor":0}},
+    {"laundry_location": "589877008", "location_details":{"longitude":-88.219788, "latitude":40.099835, "floor":0}},
+    {"laundry_location": "589877009",  "location_details":{"longitude":-88.236672, "latitude":40.102274, "floor":0}},
+    {"laundry_location": "589877052", "location_details":{"longitude":-88.232349, "latitude":40.107331, "floor":0}},
+    {"laundry_location": "589877051", "location_details":{"longitude":-88.232349, "latitude":40.107331, "floor":0}},
+    {"laundry_location": "589877015", "location_details":{"longitude":-88.235126, "latitude":40.102377, "floor":0}},
+    {"laundry_location": "589877002", "location_details":{"longitude":-88.233621, "latitude":40.102012, "floor":0}},
+    {"laundry_location": "589877058", "location_details":{"longitude":-88.233655, "latitude":40.102035, "floor":0}},
+    {"laundry_location": "589877061", "location_details":{"longitude":-88.23819,  "latitude":40.103971, "floor":0}},
+    {"laundry_location": "589877028", "location_details":{"longitude":-88.235365, "latitude":40.103287, "floor":0}}
+]
+}
+}
