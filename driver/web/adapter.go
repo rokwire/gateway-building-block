@@ -87,6 +87,8 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/courses/studentcourses", a.wrapFunc(a.clientAPIsHandler.getStudentCourses, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/termsessions/listcurrent", a.wrapFunc(a.clientAPIsHandler.getTermSessions, a.auth.client.User)).Methods("GET")
 
+	mainRouter.HandleFunc("/successteam", a.wrapFunc(a.clientAPIsHandler.getStudentSuccessTeam, a.auth.client.User)).Methods("GET")
+
 	// Admin APIs
 	adminRouter := mainRouter.PathPrefix("/admin").Subrouter()
 	adminRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.adminAPIsHandler.getExample, a.auth.admin.Permissions)).Methods("GET")

@@ -79,3 +79,8 @@ type Appointments interface {
 	DeleteAppointment(uin string, sourceid string, accesstoken string, conf *model.EnvConfigData) (string, error)
 	UpdateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error)
 }
+
+// SuccessTeam represents the adapter needed to interface with the various assignedstaff end points to create the user's success team
+type SuccessTeam interface {
+	GetSuccessTeam(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
+}

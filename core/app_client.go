@@ -24,11 +24,12 @@ import (
 
 // appClient contains client implementations
 type appClient struct {
-	app             *Application
-	Courseadapter   interfaces.Courses
-	LocationAdapter interfaces.WayFinding
-	LaundryAdapter  interfaces.LaundryService
-	ContactAdapter  interfaces.Contact
+	app                *Application
+	Courseadapter      interfaces.Courses
+	LocationAdapter    interfaces.WayFinding
+	LaundryAdapter     interfaces.LaundryService
+	ContactAdapter     interfaces.Contact
+	SuccessTeamAdapter interfaces.SuccessTeam
 }
 
 // GetExample gets an Example by ID
@@ -140,6 +141,16 @@ func (a appClient) GetTermSessions() (*[4]model.TermSession, error) {
 	return retData, nil
 }
 
+func (a appClient) GetSuccessTeam(uin string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, accesstoken, conf)
+	if err != nil {
+		return nil, status, err
+	}
+	return retData, status, nil
+
+}
+
 // newAppClient creates new appClient
 func newAppClient(app *Application) appClient {
 
@@ -159,5 +170,6 @@ func newAppClient(app *Application) appClient {
 	client.LaundryAdapter = uiucadapters.NewCSCLaundryAdapter(laundryAssets)
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
 	client.LocationAdapter = uiucadapters.NewUIUCWayFinding()
+	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter()
 	return client
 }
