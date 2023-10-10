@@ -28,7 +28,7 @@ import (
 type SuccessTeamAdapter struct {
 }
 
-// SuccessTeamAdapter returns a vendor specific implementation of the success team adapter
+// NewSuccessTeamAdapter returns a vendor specific implementation of the success team adapter
 func NewSuccessTeamAdapter() SuccessTeamAdapter {
 	return SuccessTeamAdapter{}
 
@@ -55,7 +55,7 @@ func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, accessToken string, con
 	return &retValue, status, nil
 }
 
-func (lv SuccessTeamAdapter) getPCPData(targetURL string, accessToken string) (*uiuc.PrimaryCareProvider, int, error) {
+func (sta SuccessTeamAdapter) getPCPData(targetURL string, accessToken string) (*uiuc.PrimaryCareProvider, int, error) {
 	method := "GET"
 
 	client := &http.Client{}
