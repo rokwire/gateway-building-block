@@ -54,6 +54,25 @@ func (h ClientAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *toke
 	return l.HTTPResponseSuccessJSON(response)
 }
 
+func (h ClientAPIsHandler) getUnitCalendar(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	params := mux.Vars(r)
+	id := params["id"]
+	if len(id) <= 0 {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+	}
+
+	calendars, err := h.app.Client.GetUnitCalendars(claims.OrgID, claims.AppID, id)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(calendars)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
+}
+
 // GetBuilding returns an the building matching the provided building id
 // @Summary Get the requested building with all of its available entrances filterd by the ADA only flag
 // @Tags Client

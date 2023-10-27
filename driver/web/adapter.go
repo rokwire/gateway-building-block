@@ -73,6 +73,7 @@ func (a Adapter) Start() {
 
 	// Client APIs
 	mainRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.clientAPIsHandler.getExample, a.auth.client.Permissions)).Methods("GET")
+	mainRouter.HandleFunc("/calendars/{id}", a.wrapFunc(a.clientAPIsHandler.getUnitCalendar, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/rooms", a.wrapFunc(a.clientAPIsHandler.getLaundryRooms, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/room", a.wrapFunc(a.clientAPIsHandler.getRoomDetails, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/initrequest", a.wrapFunc(a.clientAPIsHandler.initServiceRequest, a.auth.client.User)).Methods("GET")

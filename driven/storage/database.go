@@ -39,8 +39,9 @@ type database struct {
 	dbClient *mongo.Client
 	logger   *logs.Logger
 
-	configs  *collectionWrapper
-	examples *collectionWrapper
+	configs       *collectionWrapper
+	examples      *collectionWrapper
+	unitcalendars *collectionWrapper
 
 	listeners []interfaces.StorageListener
 }
@@ -81,12 +82,15 @@ func (d *database) start() error {
 		return err
 	}
 
+	unitcalendars := &collectionWrapper{database: d, coll: db.Collection("unitcalendars")}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
 
 	d.configs = configs
 	d.examples = examples
+	d.unitcalendars = unitcalendars
 
 	go d.configs.Watch(nil, d.logger)
 

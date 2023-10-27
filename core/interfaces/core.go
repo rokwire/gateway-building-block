@@ -29,6 +29,7 @@ type Default interface {
 // Client exposes client APIs for the driver adapters
 type Client interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
+	GetUnitCalendars(orgID string, appID string, id string) (*[]model.UnitCalendar, error)
 	ListLaundryRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)

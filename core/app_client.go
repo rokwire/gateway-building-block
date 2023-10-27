@@ -37,6 +37,10 @@ func (a appClient) GetExample(orgID string, appID string, id string) (*model.Exa
 	return a.app.shared.getExample(orgID, appID, id)
 }
 
+func (a appClient) GetUnitCalendars(orgID string, appID string, id string) (*[]model.UnitCalendar, error) {
+	return a.app.storage.FindCalendars(orgID, appID, id)
+}
+
 func (a appClient) ListLaundryRooms() (*model.Organization, error) {
 	conf, _ := a.app.GetEnvConfigs()
 	retData, err := a.LaundryAdapter.ListRooms(conf)
