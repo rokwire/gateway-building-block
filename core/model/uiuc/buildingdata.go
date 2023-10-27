@@ -25,8 +25,8 @@ type CampusEntrance struct {
 	ADACompliant bool    `json:"is_ada_compliant"`
 	Available    bool    `json:"is_available_for_use"`
 	ImageURL     string  `json:"image"`
-	Latitude     float32 `json:"latitude"`
-	Longitude    float32 `json:"longitude"`
+	Latitude     float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
 }
 
 // CampusBuilding represents a campus specific building
@@ -43,8 +43,8 @@ type CampusBuilding struct {
 	ImageURL    string           `json:"image"`
 	MailCode    string           `json:"mailcode"`
 	Entrances   []CampusEntrance `json:"entrances"`
-	Latitude    float32          `json:"building_centroid_latitude"`
-	Longitude   float32          `json:"building_centroid_longitude"`
+	Latitude    float64          `json:"building_centroid_latitude"`
+	Longitude   float64          `json:"building_centroid_longitude"`
 }
 
 // ServerResponse represents a UIUC specific server response

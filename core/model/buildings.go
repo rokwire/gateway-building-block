@@ -30,8 +30,8 @@ type Entrance struct {
 	ADACompliant bool
 	Available    bool
 	ImageURL     string
-	Latitude     float32
-	Longitude    float32
+	Latitude     float64
+	Longitude    float64
 }
 
 // Building represents the information returned when a requst for a building's details is made
@@ -48,6 +48,6 @@ type Building struct {
 	ImageURL    string
 	MailCode    string
 	Entrances   []Entrance
-	Latitude    float32
-	Longitude   float32
+	Latitude    float64
+	Longitude   float64
 }
