@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	//TypeOrgCalendar Orgazational Calendar
+	//TypeUnitCalendar Orgazational Calendar
 	TypeUnitCalendar logutils.MessageDataType = "unit calendar"
 )
 
