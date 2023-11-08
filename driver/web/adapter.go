@@ -78,9 +78,9 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/laundry/initrequest", a.wrapFunc(a.clientAPIsHandler.initServiceRequest, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/reqeustservice", a.wrapFunc(a.clientAPIsHandler.submitServiceRequest, nil)).Methods("GET")
 
-	mainRouter.HandleFunc("/wayfinding/building", a.wrapFunc(a.clientAPIsHandler.getBuilding, a.auth.client.User)).Methods("GET")
-	mainRouter.HandleFunc("/wayfinding/entrance", a.wrapFunc(a.clientAPIsHandler.getEntrance, a.auth.client.User)).Methods("GET")
-	mainRouter.HandleFunc("/wayfinding/buildings", a.wrapFunc(a.clientAPIsHandler.getBuildings, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/building", a.wrapFunc(a.clientAPIsHandler.getBuilding, a.auth.client.Standard)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/entrance", a.wrapFunc(a.clientAPIsHandler.getEntrance, a.auth.client.Standard)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/buildings", a.wrapFunc(a.clientAPIsHandler.getBuildings, a.auth.client.Standard)).Methods("GET")
 
 	mainRouter.HandleFunc("/person/contactinfo", a.wrapFunc(a.clientAPIsHandler.getContactInfo, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/courses/giescourses", a.wrapFunc(a.clientAPIsHandler.getGiesCourses, a.auth.client.User)).Methods("GET")
