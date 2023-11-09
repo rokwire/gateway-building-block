@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+## [2.0.12]
+### Added
 - changed datatype of lat/long build coordinates to long 64
 - changed auth token type expected by wayfining endpoints from client.auth to client.standard
 
