@@ -1,1 +1,2 @@
 p, get_examples, /gateway/api/examples/*, (GET), Get examples
+p, get_buildings, /gateway/api/wayfinding/*, (GET), Get buildings
