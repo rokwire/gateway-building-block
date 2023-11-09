@@ -13,7 +13,7 @@ The API documentation is available here: https://api.rokwire.illinois.edu/gatewa
 
 MongoDB v4.2.2+
 
-Go v1.16+
+Go v1.21+
 
 ### Environment variables
 The following Environment variables are supported. The service will not start unless those marked as Required are supplied.
@@ -35,6 +35,8 @@ GATEWAY_WAYFINDING_APIURL | < url > | yes | Base URL for building location API e
 GATEWAY_CORE_HOST | < url > | yes | Core BB host URL
 GATEWAY_CONTACTINFO_APIKEY | < string > | yes | API key used to access campus student information apis
 GATEWAY_CONTACTINFO_ENDPOINT | < url > | yes | Base URL to the campus student information apis
+GATEWAY_BASE_URL | < url > | yes | Base URL for the gateway
+GATEWAY_CORE_BB_BASE_URL | < url > | yes | Base URL for the core
 
 ### Run Application
 

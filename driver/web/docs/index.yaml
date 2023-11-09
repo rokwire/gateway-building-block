@@ -1,16 +1,16 @@
 openapi: 3.0.3
 info:
-  title: Rokwire Identity Building Block API
-  description: Identity Building Block API Documentation
-  version: 1.0.0
+  title: Rokwire Gateway Building Block API
+  description: Gateway Building Block API Documentation
+  version: 2.0.12
 servers:
-  - url: 'https://api.rokwire.illinois.edu/identity'
+  - url: 'https://api.rokwire.illinois.edu/gateway'
     description: Production server
-  - url: 'https://api-test.rokwire.illinois.edu/identity'
+  - url: 'https://api-test.rokwire.illinois.edu/gateway'
     description: Test server
-  - url: 'https://api-dev.rokwire.illinois.edu/identity'
+  - url: 'https://api-dev.rokwire.illinois.edu/gateway'
     description: Development server
-  - url: 'http://localhost/identity'
+  - url: 'http://localhost/gateway'
     description: Local server
 tags:
   - name: Client

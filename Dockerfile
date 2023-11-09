@@ -16,6 +16,7 @@ FROM alpine:3.17.2
 RUN apk add --no-cache --update tzdata
 
 COPY --from=builder /app/bin/application /
+COPY --from=builder /app/assets/assets.json /assets/assets.json
 COPY --from=builder /app/driver/web/docs/gen/def.yaml /driver/web/docs/gen/def.yaml
 
 COPY --from=builder /app/driver/web/client_permission_policy.csv /driver/web/client_permission_policy.csv
