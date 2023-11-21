@@ -36,4 +36,5 @@ type SuccessTeamMember struct {
 	Title            string `json:"title" bson:"title"`
 	ExternalLink     string `json:"external_link" bson:"external_link"`
 	ExternalLinkText string `json:"external_link_text" bson:"external_link_text"`
+	TeamMemberID     string `json:"team_member_id" bson:"team_member_id"`
 }

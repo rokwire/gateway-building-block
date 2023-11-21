@@ -37,8 +37,8 @@ func (a appClient) GetExample(orgID string, appID string, id string) (*model.Exa
 	return a.app.shared.getExample(orgID, appID, id)
 }
 
-func (a appClient) GetUnitCalendars(orgID string, appID string, id string) (*[]model.UnitCalendar, error) {
-	return a.app.storage.FindCalendars(orgID, appID, id)
+func (a appClient) GetUnitCalendars(id string) (*[]model.UnitCalendar, error) {
+	return a.app.storage.FindCalendars(id)
 }
 
 func (a appClient) ListLaundryRooms() (*model.Organization, error) {
@@ -145,9 +145,28 @@ func (a appClient) GetTermSessions() (*[4]model.TermSession, error) {
 	return retData, nil
 }
 
-func (a appClient) GetSuccessTeam(uin string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, accesstoken, conf)
+	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, unitid, accesstoken, conf)
+	if err != nil {
+		return nil, status, err
+	}
+	return retData, status, nil
+
+}
+
+func (a appClient) GetPrimaryCareProvider(uin string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, status, err := a.SuccessTeamAdapter.GetPrimaryCareProvider(uin, accesstoken, conf)
+	if err != nil {
+		return nil, status, err
+	}
+	return retData, status, nil
+}
+
+func (a appClient) GetAcademicAdvisors(uin string, unitid string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, status, err := a.SuccessTeamAdapter.GetAcademicAdvisors(uin, unitid, accesstoken, conf)
 	if err != nil {
 		return nil, status, err
 	}
@@ -174,6 +193,6 @@ func newAppClient(app *Application) appClient {
 	client.LaundryAdapter = uiucadapters.NewCSCLaundryAdapter(laundryAssets)
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
 	client.LocationAdapter = uiucadapters.NewUIUCWayFinding()
-	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter()
+	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter(app.storage)
 	return client
 }

@@ -24,14 +24,14 @@ import (
 )
 
 // FindCalendars finds all calendars for a given unit id
-func (a *Adapter) FindCalendars(orgID string, appID string, id string) (*[]model.UnitCalendar, error) {
+func (a *Adapter) FindCalendars(id string) (*[]model.UnitCalendar, error) {
 	//filter := bson.M{"org_id": orgID, "app_id": appID, "unit_id": id}
-	intid, err := strconv.Atoi(id)
+	intid, _ := strconv.Atoi(id)
 	filter := bson.M{"unit_id": intid}
 	//filter := bson.M{}
 
 	var data []model.UnitCalendar
-	err = a.db.unitcalendars.Find(a.context, filter, &data, nil)
+	err := a.db.unitcalendars.Find(a.context, filter, &data, nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}

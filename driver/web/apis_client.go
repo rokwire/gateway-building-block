@@ -62,7 +62,7 @@ func (h ClientAPIsHandler) getUnitCalendar(l *logs.Log, r *http.Request, claims 
 		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypePathParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
 	}
 
-	calendars, err := h.app.Client.GetUnitCalendars(claims.OrgID, claims.AppID, id)
+	calendars, err := h.app.Client.GetUnitCalendars(id)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}
@@ -269,12 +269,60 @@ func (h ClientAPIsHandler) getTermSessions(l *logs.Log, r *http.Request, claims 
 // @Tags Client
 // @ID Successteam
 // @Param id query string true "User ID"
+// @Param unitid query int true "Department ID"
 // @Accept  json
 // @Produce json
-// @Success 200 {object} []model.GiesCourse
+// @Success 200 {object} []model.SuccessTeamMember
 // @Security RokwireAuth ExternalAuth
 // @Router /successteam [get]
 func (h ClientAPIsHandler) getStudentSuccessTeam(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	id := ""
+	deptid := "0"
+	reqParams := utils.ConstructFilter(r)
+	if reqParams != nil {
+		for _, v := range reqParams.Items {
+			switch v.Field {
+			case "id":
+				id = v.Value[0]
+			case "unitid":
+				deptid = v.Value[0]
+			}
+		}
+	}
+
+	if id == "" || id == "null" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+	}
+
+	successTeam, status, err := h.app.Client.GetSuccessTeam(id, deptid, externalToken)
+	if err != nil {
+		return h.setReturnDataOnHTTPError(l, status)
+	}
+
+	resAsJSON, err := json.Marshal(successTeam)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResult, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(resAsJSON)
+}
+
+// GetPrimaryCareProvider returns a list of success team members
+// @Summary Returns a list of success team members for a student
+// @Tags Client
+// @ID Successteam
+// @Param id query string true "User ID"
+// @Accept  json
+// @Produce json
+// @Success 200 {object} []model.SuccessTeamMember
+// @Security RokwireAuth ExternalAuth
+// @Router /successteam [get]
+func (h ClientAPIsHandler) getPrimaryCareProvider(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
 	externalToken := r.Header.Get("External-Authorization")
 	if externalToken == "" {
@@ -296,7 +344,55 @@ func (h ClientAPIsHandler) getStudentSuccessTeam(l *logs.Log, r *http.Request, c
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
 	}
 
-	successTeam, status, err := h.app.Client.GetSuccessTeam(id, externalToken)
+	successTeam, status, err := h.app.Client.GetPrimaryCareProvider(id, externalToken)
+	if err != nil {
+		return h.setReturnDataOnHTTPError(l, status)
+	}
+
+	resAsJSON, err := json.Marshal(successTeam)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResult, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(resAsJSON)
+}
+
+// GetAcademicAdvisors returns a list of success team members
+// @Summary Returns a list of success team members for a student
+// @Tags Client
+// @ID Successteam
+// @Param id query string true "User ID"
+// @Param unitid query int true "Department ID"
+// @Accept  json
+// @Produce json
+// @Success 200 {object} []model.SuccessTeamMember
+// @Security RokwireAuth ExternalAuth
+// @Router /successteam [get]
+func (h ClientAPIsHandler) getAcademicAdvisors(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	externalToken := r.Header.Get("External-Authorization")
+	if externalToken == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeHeader, logutils.StringArgs("external auth token"), nil, http.StatusBadRequest, false)
+	}
+
+	id := ""
+	deptid := ""
+	reqParams := utils.ConstructFilter(r)
+	if reqParams != nil {
+		for _, v := range reqParams.Items {
+			switch v.Field {
+			case "id":
+				id = v.Value[0]
+			case "unitid":
+				deptid = v.Value[0]
+			}
+		}
+	}
+
+	if id == "" || id == "null" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+	}
+
+	successTeam, status, err := h.app.Client.GetAcademicAdvisors(id, deptid, externalToken)
 	if err != nil {
 		return h.setReturnDataOnHTTPError(l, status)
 	}

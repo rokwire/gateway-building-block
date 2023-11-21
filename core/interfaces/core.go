@@ -29,7 +29,7 @@ type Default interface {
 // Client exposes client APIs for the driver adapters
 type Client interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
-	GetUnitCalendars(orgID string, appID string, id string) (*[]model.UnitCalendar, error)
+	GetUnitCalendars(id string) (*[]model.UnitCalendar, error)
 	ListLaundryRooms() (*model.Organization, error)
 	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
 	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)
@@ -41,7 +41,9 @@ type Client interface {
 	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
 	GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error)
 	GetTermSessions() (*[4]model.TermSession, error)
-	GetSuccessTeam(uin string, accessToken string) (*[]model.SuccessTeamMember, int, error)
+	GetSuccessTeam(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
+	GetPrimaryCareProvider(uin string, accessToken string) (*[]model.SuccessTeamMember, int, error)
+	GetAcademicAdvisors(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 }
 
 // Admin exposes administrative APIs for the driver adapters

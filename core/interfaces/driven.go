@@ -36,7 +36,7 @@ type Storage interface {
 	UpdateExample(example model.Example) error
 	DeleteExample(orgID string, appID string, id string) error
 
-	FindCalendars(orgID string, appID string, id string) (*[]model.UnitCalendar, error)
+	FindCalendars(id string) (*[]model.UnitCalendar, error)
 }
 
 // StorageListener represents storage listener
@@ -84,5 +84,7 @@ type Appointments interface {
 
 // SuccessTeam represents the adapter needed to interface with the various assignedstaff end points to create the user's success team
 type SuccessTeam interface {
-	GetSuccessTeam(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
+	GetSuccessTeam(uin string, unitid string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
+	GetPrimaryCareProvider(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
+	GetAcademicAdvisors(uin string, unitid string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 }
