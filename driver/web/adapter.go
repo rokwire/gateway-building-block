@@ -76,7 +76,7 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/laundry/rooms", a.wrapFunc(a.clientAPIsHandler.getLaundryRooms, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/room", a.wrapFunc(a.clientAPIsHandler.getRoomDetails, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/initrequest", a.wrapFunc(a.clientAPIsHandler.initServiceRequest, a.auth.client.User)).Methods("GET")
-	mainRouter.HandleFunc("/laundry/reqeustservice", a.wrapFunc(a.clientAPIsHandler.submitServiceRequest, nil)).Methods("GET")
+	mainRouter.HandleFunc("/laundry/requestservice", a.wrapFunc(a.clientAPIsHandler.submitServiceRequest, nil)).Methods("GET")
 
 	mainRouter.HandleFunc("/wayfinding/building", a.wrapFunc(a.clientAPIsHandler.getBuilding, a.auth.client.Standard)).Methods("GET")
 	mainRouter.HandleFunc("/wayfinding/entrance", a.wrapFunc(a.clientAPIsHandler.getEntrance, a.auth.client.Standard)).Methods("GET")
