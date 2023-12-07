@@ -5,9 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.0.14] - 2023-12-06
+### Fixed
+- fixed typo in adapter.go from /laundry/reqeustservice to /laundry/requestservice
+- changed allowed method on /laundry/requestservice to POST from GET
+
+## [2.0.12]
 ### Added
-- Prepare for deployment in OpenShift [#28](https://github.com/rokwire/gateway-building-block/issues/28)
-- removed assets directory from .gitignore for laundry location data
+- changed datatype of lat/long build coordinates to long 64
+- changed auth token type expected by wayfining endpoints from client.auth to client.standard
 
 ## [2.0.7] - 2023-05-05
 ### Fixed
