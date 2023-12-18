@@ -145,7 +145,7 @@ func (a appClient) GetTermSessions() (*[4]model.TermSession, error) {
 	return retData, nil
 }
 
-func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string) (*model.SuccessTeam, int, error) {
 	conf, _ := a.app.GetEnvConfigs()
 	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, unitid, accesstoken, conf)
 	if err != nil {

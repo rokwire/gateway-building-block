@@ -41,7 +41,7 @@ type Client interface {
 	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
 	GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error)
 	GetTermSessions() (*[4]model.TermSession, error)
-	GetSuccessTeam(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
+	GetSuccessTeam(uin string, unitid string, accessToken string) (*model.SuccessTeam, int, error)
 	GetPrimaryCareProvider(uin string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 }

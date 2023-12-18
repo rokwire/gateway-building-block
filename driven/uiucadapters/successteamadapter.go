@@ -39,22 +39,27 @@ func NewSuccessTeamAdapter(adapter interfaces.Storage) *SuccessTeamAdapter {
 }
 
 // GetSuccessTeam returns a list of
-func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, unitid string, accessToken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error) {
+func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, unitid string, accessToken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error) {
 
-	retValue := make([]model.SuccessTeamMember, 0)
+	var retValue model.SuccessTeam
+
 	pcpdata, status, err := sta.GetPrimaryCareProvider(uin, accessToken, conf)
 
 	if err != nil {
 		return nil, status, err
 	}
 
-	retValue = append(retValue, *pcpdata...)
+	retValue.PrimaryCareProviders = *pcpdata
 
 	advisordata, advstatus, adverr := sta.GetAcademicAdvisors(uin, unitid, accessToken, conf)
 	if adverr != nil {
 		return nil, advstatus, adverr
 	}
-	retValue = append(retValue, *advisordata...)
+
+	if len(*advisordata) == 0 {
+		retValue.AcademicAdvisors = nil
+	}
+	retValue.AcademicAdvisors = *advisordata
 	return &retValue, 200, nil
 }
 
