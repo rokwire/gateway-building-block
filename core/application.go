@@ -54,6 +54,9 @@ type Application struct {
 	logger *logs.Logger
 
 	storage interfaces.Storage
+
+	//events logic
+	eventsLogic eventsLogic
 }
 
 // Start starts the core part of the application
@@ -61,6 +64,8 @@ func (a *Application) Start() {
 	//set storage listener
 	storageListener := storageListener{app: a}
 	a.storage.RegisterStorageListener(&storageListener)
+
+	a.eventsLogic.start()
 }
 
 // GetEnvConfigs retrieves the cached database env configs
@@ -88,6 +93,7 @@ func NewApplication(version string, build string, storage interfaces.Storage, ap
 	application.TPS = newAppTPS(&application)
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
+	application.eventsLogic = newAppEventsLogic(&application)
 
 	return &application
 }

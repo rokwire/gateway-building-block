@@ -39,8 +39,9 @@ type database struct {
 	dbClient *mongo.Client
 	logger   *logs.Logger
 
-	configs  *collectionWrapper
-	examples *collectionWrapper
+	configs      *collectionWrapper
+	examples     *collectionWrapper
+	legacyEvents *collectionWrapper
 
 	listeners []interfaces.StorageListener
 }
@@ -81,12 +82,19 @@ func (d *database) start() error {
 		return err
 	}
 
+	legacyEvents := &collectionWrapper{database: d, coll: db.Collection("legacy_events")}
+	err = d.applyLegacyEventsChecks(legacyEvents)
+	if err != nil {
+		return err
+	}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
 
 	d.configs = configs
 	d.examples = examples
+	d.legacyEvents = legacyEvents
 
 	go d.configs.Watch(nil, d.logger)
 
@@ -115,6 +123,19 @@ func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
 	}
 
 	d.logger.Info("apply examples passed")
+	return nil
+}
+
+func (d *database) applyLegacyEventsChecks(examples *collectionWrapper) error {
+	d.logger.Info("apply legacy_events checks.....")
+
+	//add compound unique index - org_id + app_id
+	err := examples.AddIndex(nil, bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionCreate, "index", nil, err)
+	}
+
+	d.logger.Info("apply legacy_events passed")
 	return nil
 }
 
