@@ -33,3 +33,15 @@ func legacyEventsToStorage(itemsList []model.LegacyEvent) []legacyEvent {
 	}
 	return result
 }
+
+func legacyEventFromStorage(item legacyEvent) model.LegacyEvent {
+	return model.LegacyEvent{ID: item.ID, EventID: item.EventID}
+}
+
+func legacyEventsFromStorage(itemsList []legacyEvent) []model.LegacyEvent {
+	result := make([]model.LegacyEvent, len(itemsList))
+	for index, item := range itemsList {
+		result[index] = legacyEventFromStorage(item)
+	}
+	return result
+}
