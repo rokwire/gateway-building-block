@@ -67,7 +67,10 @@ func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, unitid string, accessTo
 func (sta SuccessTeamAdapter) GetPrimaryCareProvider(uin string, accessToken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error) {
 
 	pcpURL := conf.PCPEndpoint + "/" + uin
-	pcp, status, err := sta.getPCPData(pcpURL, accessToken)
+	var headers = make(map[string]string)
+	headers["access_token"] = accessToken
+
+	pcp, status, err := sta.getPCPData(pcpURL, "GET", headers)
 
 	if err != nil {
 		return nil, status, err
@@ -89,6 +92,7 @@ func (sta SuccessTeamAdapter) GetAcademicAdvisors(uin string, unitid string, acc
 
 	baseURL := conf.EngAppointmentBaseURL
 	finalURL := ""
+	imagebaseURL := conf.ImageEndpoint
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accessToken
 
@@ -118,7 +122,9 @@ func (sta SuccessTeamAdapter) GetAcademicAdvisors(uin string, unitid string, acc
 			advisor := advisors[i]
 			firstName := strings.TrimSpace(strings.Split(advisor.Name, ",")[0])
 			lastName := strings.TrimSpace(strings.Split(advisor.Name, ",")[1])
-			stm := model.SuccessTeamMember{FirstName: firstName, LastName: lastName, Email: "", ExternalLink: "", ExternalLinkText: "", Department: advisor.CalendarName, Title: "Academic Advisor", TeamMemberID: advisor.ID}
+
+			advisorimage, _ := sta.getAdvisorImage(imagebaseURL+"/"+advisor.UIN, accessToken)
+			stm := model.SuccessTeamMember{FirstName: firstName, LastName: lastName, Email: "", ExternalLink: "", ExternalLinkText: "", Department: advisor.CalendarName, Title: "Academic Advisor", TeamMemberID: advisor.ID, Image: advisorimage}
 			s = append(s, stm)
 		}
 
@@ -127,69 +133,114 @@ func (sta SuccessTeamAdapter) GetAcademicAdvisors(uin string, unitid string, acc
 	return &s, 200, nil
 }
 
-func (sta SuccessTeamAdapter) getPCPData(targetURL string, accessToken string) (*uiuc.PrimaryCareProvider, int, error) {
-	method := "GET"
+func (sta SuccessTeamAdapter) getPCPData(targetURL string, method string, headers map[string]string) (*uiuc.PrimaryCareProvider, int, error) {
 
-	client := &http.Client{}
-	req, err := http.NewRequest(method, targetURL, nil)
+	body, status, err := sta.getCampusData(targetURL, method, headers, nil)
+	if err != nil {
+		return nil, 500, err
+	}
 
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, status.StatusCode, err
 	}
 
-	req.Header.Add("access_token", accessToken)
-
-	res, err := client.Do(req)
-	if err != nil {
-		if res == nil {
-			return nil, 500, err
-		}
-		return nil, res.StatusCode, err
-	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, res.StatusCode, err
+	if status.StatusCode == 401 {
+		return nil, status.StatusCode, errors.New(status.StatusMessage)
 	}
 
-	if res.StatusCode == 401 {
-		return nil, res.StatusCode, errors.New(res.Status)
+	if status.StatusCode == 403 {
+		return nil, status.StatusCode, errors.New(status.StatusMessage)
 	}
 
-	if res.StatusCode == 403 {
-		return nil, res.StatusCode, errors.New(res.Status)
+	if status.StatusCode == 400 {
+		return nil, status.StatusCode, errors.New("bad request to api endpoint")
 	}
 
-	if res.StatusCode == 400 {
-		return nil, res.StatusCode, errors.New("bad request to api end point")
+	if status.StatusCode == 406 {
+		return nil, status.StatusCode, errors.New("server returned 406: possible uin claim mismatch")
 	}
 
-	if res.StatusCode == 406 {
-		return nil, res.StatusCode, errors.New("server returned 406: possible uin claim mismatch")
-	}
-	//campus api returns a 502 when there is no course data
-	if res.StatusCode == 502 {
-		return nil, 404, errors.New(res.Status)
-	}
-
-	if res.StatusCode == 200 || res.StatusCode == 203 {
+	if status.StatusCode == 200 || status.StatusCode == 203 {
 		data := uiuc.PrimaryCareProvider{}
-
 		err = json.Unmarshal(body, &data)
 
 		if err != nil {
-			return nil, res.StatusCode, err
+			return nil, status.StatusCode, err
 		}
-		return &data, res.StatusCode, nil
+		return &data, status.StatusCode, nil
 	}
 
-	return nil, res.StatusCode, errors.New("Error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
+	return nil, status.StatusCode, errors.New("Error making request: " + fmt.Sprint(status.StatusCode) + ": " + string(body))
 
+}
+
+func (sta SuccessTeamAdapter) getAdvisorImage(url string, accesstoken string) (string, error) {
+	var headers = make(map[string]string)
+	headers["access_token"] = accesstoken
+
+	body, status, err := sta.getCampusData(url, "POST", headers, nil)
+	if err != nil {
+		return "", err
+	}
+
+	if status.StatusCode == 400 {
+		return "", errors.New(status.StatusMessage + " : " + string(body))
+	}
+	if status.StatusCode == 401 {
+		return "", errors.New(status.StatusMessage + " : " + string(body))
+	}
+
+	if status.StatusCode == 403 {
+		return "", errors.New(status.StatusMessage + ": " + string(body))
+	}
+
+	if status.StatusCode == 404 {
+		return "", nil
+	}
+
+	if status.StatusCode == 200 || status.StatusCode == 201 || status.StatusCode == 204 {
+
+		return string(body), nil
+	}
+
+	return "", errors.New("error making request: " + fmt.Sprint(status.StatusCode) + ": " + string(body))
 }
 
 func (sta SuccessTeamAdapter) getAdvisorData(targetURL string, method string, headers map[string]string, postdata *strings.Reader) ([]byte, error) {
 
+	body, status, err := sta.getCampusData(targetURL, method, headers, postdata)
+	if err != nil {
+		return nil, err
+	}
+
+	if status.StatusCode == 400 {
+		return nil, errors.New(status.StatusMessage + " : " + string(body))
+	}
+	if status.StatusCode == 401 {
+		return nil, errors.New(status.StatusMessage + " : " + string(body))
+	}
+
+	if status.StatusCode == 403 {
+		return nil, errors.New(status.StatusMessage + ": " + string(body))
+	}
+
+	if status.StatusCode == 406 {
+		return nil, errors.New("server returned 406: possible uin claim mismatch")
+	}
+
+	if status.StatusCode == 409 {
+		return nil, errors.New(status.StatusMessage + " : " + string(body))
+	}
+
+	if status.StatusCode == 200 || status.StatusCode == 201 || status.StatusCode == 204 {
+
+		return body, nil
+	}
+
+	return nil, errors.New("error making request: " + fmt.Sprint(status.StatusCode) + ": " + string(body))
+}
+
+func (sta SuccessTeamAdapter) getCampusData(targetURL string, method string, headers map[string]string, postdata *strings.Reader) ([]byte, returnStatus, error) {
 	client := &http.Client{}
 
 	var postbody = io.Reader(nil)
@@ -199,8 +250,12 @@ func (sta SuccessTeamAdapter) getAdvisorData(targetURL string, method string, he
 
 	req, err := http.NewRequest(method, targetURL, postbody)
 
+	rs := returnStatus{StatusCode: 0, StatusMessage: ""}
 	if err != nil {
-		return nil, err
+
+		rs.StatusCode = 500
+		rs.StatusMessage = "Internal Server Error"
+		return nil, rs, err
 	}
 
 	for key, element := range headers {
@@ -209,38 +264,26 @@ func (sta SuccessTeamAdapter) getAdvisorData(targetURL string, method string, he
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		rs.StatusCode = 500
+		rs.StatusMessage = "Internal Server Error"
+		return nil, rs, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		rs.StatusCode = 500
+		rs.StatusMessage = "Internal Server Error"
+		return nil, rs, err
 	}
 
-	if res.StatusCode == 400 {
-		return nil, errors.New(res.Status + " : " + string(body))
-	}
-	if res.StatusCode == 401 {
-		return nil, errors.New(res.Status + " : " + string(body))
-	}
+	rs.StatusCode = res.StatusCode
+	rs.StatusMessage = res.Status
+	return body, rs, nil
 
-	if res.StatusCode == 403 {
-		return nil, errors.New(res.Status + ": " + string(body))
-	}
+}
 
-	if res.StatusCode == 406 {
-		return nil, errors.New("server returned 406: possible uin claim mismatch")
-	}
-
-	if res.StatusCode == 409 {
-		return nil, errors.New(res.Status + " : " + string(body))
-	}
-
-	if res.StatusCode == 200 || res.StatusCode == 201 || res.StatusCode == 204 {
-
-		return body, nil
-	}
-
-	return nil, errors.New("error making request: " + fmt.Sprint(res.StatusCode) + ": " + string(body))
+type returnStatus struct {
+	StatusCode    int
+	StatusMessage string
 }
