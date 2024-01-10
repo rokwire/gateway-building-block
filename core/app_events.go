@@ -79,7 +79,8 @@ func (e eventsLogic) getAllEvents() ([]model.ResponseWS, error) {
 	for _, w := range allevents {
 		if w.PublicEventWS != nil {
 			for _, g := range w.PublicEventWS {
-				event := model.LegacyEvent{CalendarID: g.CalendarId, EventID: g.EventId}
+
+				event := model.LegacyEvent{EventID: g.EventId}
 				legacyEvent = append(legacyEvent, event)
 			}
 		}

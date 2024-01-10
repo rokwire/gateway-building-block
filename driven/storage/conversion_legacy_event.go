@@ -14,11 +14,16 @@
 
 package storage
 
-import "application/core/model"
+import (
+	"application/core/model"
 
-// Event
+	"github.com/google/uuid"
+)
+
+// LegacyEvent
 func legacyEventToStorage(item model.LegacyEvent) legacyEvent {
-	return legacyEvent{CalendarID: item.CalendarID, EventID: item.EventID}
+	ID := uuid.NewString()
+	return legacyEvent{ID: ID, EventID: item.EventID}
 }
 
 func legacyEventsToStorage(itemsList []model.LegacyEvent) []legacyEvent {
