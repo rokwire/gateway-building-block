@@ -20,6 +20,7 @@ import (
 	"github.com/rokwire/logging-library-go/v2/errors"
 	"github.com/rokwire/logging-library-go/v2/logutils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // FindExample finds example by id
@@ -74,19 +75,65 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 
 // InsertExample inserts a new example
 func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
-	records := []interface{}{}
-	for _, event := range legacyEvents {
-		records = append(records, legacyEventToStorage(event))
-		//records := legacyEventsToStorage(legacyEvents)
+	insertRecords := []interface{}{}
+	//updateRecords := []interface{}{}
+	//insertRecords := []interface{}{}
+	var records []model.LegacyEvent
 
-		//_, err := a.db.legacyEvents.InsertMany()
-		if len(records) == 100 {
-			_, err := a.db.legacyEvents.InsertMany(nil, records, nil)
+	for _, event := range legacyEvents {
+		var sda []model.LegacyEvent
+		records = append(records, event)
+
+		if len(records) == 3 {
+			eventsFromWebStorage, err := a.findAllEvents()
 			if err != nil {
 				return err
 			}
-			//		records = []interface{}{}
+
+			for _, w := range eventsFromWebStorage {
+				if w.EventID != event.EventID {
+					sda = append(sda, records...)
+				}
+			}
+
+			insertRecords = append(insertRecords, legacyEventsToStorage(sda))
+			_, err = a.db.legacyEvents.InsertMany(nil, insertRecords, nil)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
+}
+
+// FindCalendarEvents finds events persons by users external ids and event
+func (a *Adapter) findCalendarEvents(eventIDs []string) ([]model.LegacyEvent, error) {
+	filter := bson.D{
+		primitive.E{Key: "eventId", Value: primitive.M{"$in": eventIDs}},
+	}
+
+	var list []legacyEvent
+	err := a.db.legacyEvents.Find(nil, filter, &list, nil)
+
+	if err != nil {
+		return nil, err
+	}
+	resultList := legacyEventsFromStorage(list)
+	return resultList, err
+}
+
+// FindAllEvents finds events persons by users external ids and event
+func (a *Adapter) findAllEvents() ([]model.LegacyEvent, error) {
+	filter := bson.D{
+		primitive.E{},
+	}
+
+	var list []legacyEvent
+	err := a.db.legacyEvents.Find(nil, filter, &list, nil)
+
+	if err != nil {
+		return nil, err
+	}
+	resultList := legacyEventsFromStorage(list)
+	return resultList, err
 }
