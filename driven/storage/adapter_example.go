@@ -79,9 +79,9 @@ func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
 	//updateRecords := []interface{}{}
 	//insertRecords := []interface{}{}
 	var records []model.LegacyEvent
-
+	var insert []model.LegacyEvent
 	for _, event := range legacyEvents {
-		var sda []model.LegacyEvent
+
 		records = append(records, event)
 
 		if len(records) == 3 {
@@ -92,11 +92,11 @@ func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
 
 			for _, w := range eventsFromWebStorage {
 				if w.EventID != event.EventID {
-					sda = append(sda, records...)
+					insert = append(insert, event)
 				}
 			}
 
-			insertRecords = append(insertRecords, legacyEventsToStorage(sda))
+			insertRecords = append(insertRecords, legacyEventsToStorage(insert))
 			_, err = a.db.legacyEvents.InsertMany(nil, insertRecords, nil)
 			if err != nil {
 				return err

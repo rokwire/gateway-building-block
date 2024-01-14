@@ -23,7 +23,15 @@ import (
 // LegacyEvent
 func legacyEventToStorage(item model.LegacyEvent) legacyEvent {
 	ID := uuid.NewString()
-	return legacyEvent{ID: ID, EventID: item.EventID}
+
+	return legacyEvent{ID: ID, AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
+		Subcategory: item.Subcategory, CreatedBy: item.CreatedBy, LongDescription: item.LongDescription, DataModified: item.DataModified,
+		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate, EventID: item.EventID,
+		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, /*Location*/
+		OriginatingCalendarID: item.OriginatingCalendarID, OutlookURL: item.OutlookURL, RecurrenceID: item.RecurrenceID,
+		IsSuperEvent: item.IsSuperEvent, RecurringFlag: item.RecurringFlag, SourceID: item.SourceID, Sponsor: item.Sponsor,
+		StartDate: item.StartDate, Title: item.Title, TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
+		/*SubEvents*/}
 }
 
 func legacyEventsToStorage(itemsList []model.LegacyEvent) []legacyEvent {
@@ -35,7 +43,14 @@ func legacyEventsToStorage(itemsList []model.LegacyEvent) []legacyEvent {
 }
 
 func legacyEventFromStorage(item legacyEvent) model.LegacyEvent {
-	return model.LegacyEvent{ID: item.ID, EventID: item.EventID}
+	return model.LegacyEvent{ID: item.ID, AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
+		Subcategory: item.Subcategory, CreatedBy: item.CreatedBy, LongDescription: item.LongDescription, DataModified: item.DataModified,
+		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate, EventID: item.EventID,
+		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, /*Location*/
+		OriginatingCalendarID: item.OriginatingCalendarID, OutlookURL: item.OutlookURL, RecurrenceID: item.RecurrenceID,
+		IsSuperEvent: item.IsSuperEvent, RecurringFlag: item.RecurringFlag, SourceID: item.SourceID, Sponsor: item.Sponsor,
+		StartDate: item.StartDate, Title: item.Title, TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
+		/*SubEvents*/}
 }
 
 func legacyEventsFromStorage(itemsList []legacyEvent) []model.LegacyEvent {

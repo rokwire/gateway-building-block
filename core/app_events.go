@@ -80,7 +80,31 @@ func (e eventsLogic) getAllEvents() ([]model.ResponseWS, error) {
 		if w.PublicEventWS != nil {
 			for _, g := range w.PublicEventWS {
 
-				event := model.LegacyEvent{EventID: g.EventId}
+				var isVirtual bool
+				if g.VirtualEvent == "false" {
+					isVirtual = false
+				} else if g.VirtualEvent == "true" {
+					isVirtual = true
+				}
+
+				var IsEventFree bool
+				if g.CostFree == "false" {
+					IsEventFree = false
+				} else if g.CostFree == "true" {
+					IsEventFree = true
+				}
+
+				var Recurrence bool
+				if g.Recurrence == "false" {
+					Recurrence = false
+				} else if g.Recurrence == "true" {
+					Recurrence = true
+				}
+
+				event := model.LegacyEvent{RecurringFlag: Recurrence, RegistrationURL: &g.RegistrationURL, TitleURL: &g.TitleURL,
+					LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
+					CalendarID: g.CalendarId, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventId,
+					IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarId, Category: g.EventType}
 				legacyEvent = append(legacyEvent, event)
 			}
 		}
