@@ -75,32 +75,16 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 
 // InsertExample inserts a new example
 func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
-	insertRecords := []interface{}{}
-	//updateRecords := []interface{}{}
-	//insertRecords := []interface{}{}
-	var records []model.LegacyEvent
-	var insert []model.LegacyEvent
+
+	records := []interface{}{}
 	for _, event := range legacyEvents {
-
-		records = append(records, event)
-
-		if len(records) == 3 {
-			eventsFromWebStorage, err := a.findAllEvents()
+		records = append(records, legacyEventToStorage(event))
+		if len(records) == 10 {
+			_, err := a.db.legacyEvents.InsertMany(nil, records, nil)
 			if err != nil {
 				return err
 			}
 
-			for _, w := range eventsFromWebStorage {
-				if w.EventID != event.EventID {
-					insert = append(insert, event)
-				}
-			}
-
-			insertRecords = append(insertRecords, legacyEventsToStorage(insert))
-			_, err = a.db.legacyEvents.InsertMany(nil, insertRecords, nil)
-			if err != nil {
-				return err
-			}
 		}
 	}
 	return nil
