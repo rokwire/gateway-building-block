@@ -20,6 +20,7 @@ import (
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
+	"log"
 	"strings"
 
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
@@ -62,6 +63,10 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Cannot start the mongoDB adapter: %v", err)
 	}
+
+	// events bb adapter
+	eventsBBAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
+	log.Println(eventsBBAPIKey)
 
 	// appointment adapters
 	appointments := make(map[string]interfaces.Appointments)
