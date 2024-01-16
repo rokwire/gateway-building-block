@@ -15,6 +15,7 @@
 package eventsbb
 
 import (
+	"application/core/model"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -37,49 +38,8 @@ func NewEventsBBAdapter(legacyEventsBaseURL, legacyEventsAPIKey string) *Adapter
 	}
 }
 
-// LegacyEvent wrapper
-type LegacyEvent struct {
-	AllDay            bool    `json:"allDay"`
-	CalendarID        string  `json:"calendarId"`
-	Category          string  `json:"category"`
-	Subcategory       string  `json:"subcategory"`
-	CreatedBy         string  `json:"createdBy"`
-	LongDescription   string  `json:"longDescription"`
-	DataModified      string  `json:"dataModified"`
-	DataSourceEventID string  `json:"dataSourceEventId"`
-	DateCreated       string  `json:"dateCreated"`
-	EndDate           *string `json:"endDate"`
-	EventID           string  `json:"eventId"`
-	IcalURL           string  `json:"icalUrl"`
-	ID                string  `json:"id"`
-	ImageURL          *string `json:"imageURL"`
-	IsEventFree       bool    `json:"isEventFree"`
-	IsVirtial         bool    `json:"isVirtual"`
-	Location          *struct {
-		Description string  `json:"description"`
-		Latitude    float64 `json:"latitude"`
-		Longitude   float64 `json:"longitude"`
-	} `json:"location"`
-	OriginatingCalendarID string  `json:"originatingCalendarId"`
-	OutlookURL            string  `json:"outlookUrl"`
-	RecurrenceID          *int    `json:"recurrenceId"`
-	IsSuperEvent          bool    `json:"isSuperEvent"`
-	RecurringFlag         bool    `json:"recurringFlag"`
-	SourceID              string  `json:"sourceId"`
-	Sponsor               string  `json:"sponsor"`
-	StartDate             string  `json:"startDate"`
-	Title                 string  `json:"title"`
-	TitleURL              *string `json:"titleURL"`
-	RegistrationURL       *string `json:"registrationURL"`
-	SubEvents             []struct {
-		ID         string `json:"id"`
-		IsFeatured bool   `json:"isFeatured"`
-		Track      string `json:"track"`
-	} `json:"subEvents"`
-}
-
 // LoadAllLegacyEvents sends notification to a user
-func (na *Adapter) LoadAllLegacyEvents(log *logs.Log) ([]LegacyEvent, error) {
+func (na *Adapter) LoadAllLegacyEvents(log *logs.Log) ([]model.LegacyEvent, error) {
 
 	url := fmt.Sprintf("%s/events", na.baseURL)
 
@@ -107,7 +67,7 @@ func (na *Adapter) LoadAllLegacyEvents(log *logs.Log) ([]LegacyEvent, error) {
 		log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %d", resp.StatusCode)
 		return nil, fmt.Errorf("SendNotification:error with response code != 200")
 	}
-	var list []LegacyEvent
+	var list []model.LegacyEvent
 	err = json.NewDecoder(resp.Body).Decode(&list)
 	if err != nil {
 		log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %d", resp.StatusCode)
