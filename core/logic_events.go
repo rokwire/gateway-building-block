@@ -34,9 +34,11 @@ type eventsLogic struct {
 }
 
 func (e eventsLogic) start() {
-	events, _ := e.getAllEvents()
+	//hold on for now..
+	//events, _ := e.getAllEvents()
 
-	fmt.Println(events)
+	//fmt.Println(events)
+
 }
 
 func (e eventsLogic) getAllEvents() ([]model.ResponseWS, error) {
