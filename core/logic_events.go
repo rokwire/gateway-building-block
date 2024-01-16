@@ -105,8 +105,8 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 
 				event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
 					LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
-					CalendarID: g.CalendarId, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventId,
-					IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarId, Category: g.EventType}
+					CalendarID: g.CalendarID, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventID,
+					IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType}
 				legacyEvent = append(legacyEvent, event)
 			}
 		}
