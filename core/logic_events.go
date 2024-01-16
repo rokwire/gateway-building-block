@@ -101,7 +101,7 @@ func (e eventsLogic) getAllEvents() ([]model.ResponseWS, error) {
 					Recurrence = true
 				}
 
-				event := model.LegacyEvent{RecurringFlag: Recurrence, RegistrationURL: &g.RegistrationURL, TitleURL: &g.TitleURL,
+				event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
 					LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
 					CalendarID: g.CalendarId, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventId,
 					IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarId, Category: g.EventType}

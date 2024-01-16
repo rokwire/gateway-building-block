@@ -30,7 +30,7 @@ func legacyEventToStorage(item model.LegacyEvent) legacyEvent {
 		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, /*Location*/
 		OriginatingCalendarID: item.OriginatingCalendarID, OutlookURL: item.OutlookURL, RecurrenceID: item.RecurrenceID,
 		IsSuperEvent: item.IsSuperEvent, RecurringFlag: item.RecurringFlag, SourceID: item.SourceID, Sponsor: item.Sponsor,
-		StartDate: item.StartDate, Title: item.Title, TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
+		StartDate: item.StartDate, Title: item.Title, //TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
 		/*SubEvents*/}
 }
 
@@ -49,7 +49,7 @@ func legacyEventFromStorage(item legacyEvent) model.LegacyEvent {
 		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, /*Location*/
 		OriginatingCalendarID: item.OriginatingCalendarID, OutlookURL: item.OutlookURL, RecurrenceID: item.RecurrenceID,
 		IsSuperEvent: item.IsSuperEvent, RecurringFlag: item.RecurringFlag, SourceID: item.SourceID, Sponsor: item.Sponsor,
-		StartDate: item.StartDate, Title: item.Title, TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
+		StartDate: item.StartDate, Title: item.Title, //TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
 		/*SubEvents*/}
 }
 
