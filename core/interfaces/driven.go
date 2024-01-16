@@ -17,7 +17,14 @@ package interfaces
 import (
 	"application/core/model"
 	"time"
+
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
+
+// EventsBBAdapter is used by core to communicate with the events BB
+type EventsBBAdapter interface {
+	LoadAllLegacyEvents(log *logs.Log) ([]model.LegacyEvent, error)
+}
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {

@@ -31,15 +31,15 @@ type Adapter struct {
 }
 
 // NewEventsBBAdapter creates new instance
-func NewEventsBBAdapter(legacyEventsBaseURL, legacyEventsAPIKey string) *Adapter {
-	return &Adapter{
+func NewEventsBBAdapter(legacyEventsBaseURL, legacyEventsAPIKey string) Adapter {
+	return Adapter{
 		baseURL: legacyEventsBaseURL,
 		apiKey:  legacyEventsAPIKey, // pragma: allowlist secret
 	}
 }
 
-// LoadAllLegacyEvents sends notification to a user
-func (na *Adapter) LoadAllLegacyEvents(log *logs.Log) ([]model.LegacyEvent, error) {
+// LoadAllLegacyEvents loads all legacy events
+func (na Adapter) LoadAllLegacyEvents(log *logs.Log) ([]model.LegacyEvent, error) {
 
 	url := fmt.Sprintf("%s/events", na.baseURL)
 

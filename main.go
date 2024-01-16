@@ -17,10 +17,10 @@ package main
 import (
 	"application/core"
 	"application/core/interfaces"
+	"application/driven/eventsbb"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
-	"log"
 	"strings"
 
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
@@ -65,14 +65,15 @@ func main() {
 	}
 
 	// events bb adapter
+	eventsBBBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_BASE_URL", true, true)
 	eventsBBAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
-	log.Println(eventsBBAPIKey)
+	eventsBBAdapter := eventsbb.NewEventsBBAdapter(eventsBBBaseURL, eventsBBAPIKey)
 
 	// appointment adapters
 	appointments := make(map[string]interfaces.Appointments)
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, appointments, logger)
+	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, appointments, logger)
 	application.Start()
 
 	// web adapter

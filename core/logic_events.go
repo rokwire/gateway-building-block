@@ -18,6 +18,7 @@
 package core
 
 import (
+	"application/core/interfaces"
 	"application/core/model"
 	"encoding/xml"
 	"fmt"
@@ -31,6 +32,8 @@ import (
 type eventsLogic struct {
 	app    *Application
 	logger *logs.Logger
+
+	eventsBBAdapter interfaces.EventsBBAdapter
 }
 
 func (e eventsLogic) start() {
@@ -119,6 +122,6 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 }
 
 // newAppEventsLogic creates new appShared
-func newAppEventsLogic(app *Application) eventsLogic {
-	return eventsLogic{app: app}
+func newAppEventsLogic(app *Application, eventsBBAdapter interfaces.EventsBBAdapter) eventsLogic {
+	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter}
 }
