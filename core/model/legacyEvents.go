@@ -25,19 +25,20 @@ const (
 	TypeLegacyEvents logutils.MessageDataType = "legacy_events"
 )
 
-type ResponseWS struct {
+// WebToolsEvent represents web tools event
+type WebToolsEvent struct {
 	XMLName       xml.Name `xml:"responseWS"`
 	Text          string   `xml:",chardata"`
 	Deprecated    string   `xml:"deprecated"`
 	MaxPageSize   string   `xml:"maxPageSize"`
 	PublicEventWS []struct {
 		Text                               string `xml:",chardata"`
-		CalendarId                         string `xml:"calendarId"`
+		CalendarID                         string `xml:"calendarId"`
 		CalendarName                       string `xml:"calendarName"`
-		EventId                            string `xml:"eventId"`
+		EventID                            string `xml:"eventId"`
 		Recurrence                         string `xml:"recurrence"`
-		RecurrenceId                       string `xml:"recurrenceId"`
-		OriginatingCalendarId              string `xml:"originatingCalendarId"`
+		RecurrenceID                       string `xml:"recurrenceId"`
+		OriginatingCalendarID              string `xml:"originatingCalendarId"`
 		OriginatingCalendarName            string `xml:"originatingCalendarName"`
 		Title                              string `xml:"title"`
 		TitleURL                           string `xml:"titleURL"`

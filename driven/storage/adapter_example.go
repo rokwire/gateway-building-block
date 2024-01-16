@@ -73,7 +73,7 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 	return nil
 }
 
-// InsertExample inserts a new example
+// SaveLegacyEvents inserts a new example
 func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
 
 	records := []interface{}{}

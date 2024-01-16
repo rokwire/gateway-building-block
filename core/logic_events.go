@@ -41,9 +41,9 @@ func (e eventsLogic) start() {
 
 }
 
-func (e eventsLogic) getAllEvents() ([]model.ResponseWS, error) {
-	var allevents []model.ResponseWS
-	var events []model.ResponseWS
+func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
+	var allevents []model.WebToolsEvent
+	var events []model.WebToolsEvent
 	var legacyEvent []model.LegacyEvent
 	page := 0
 	for {
@@ -59,7 +59,7 @@ func (e eventsLogic) getAllEvents() ([]model.ResponseWS, error) {
 			break
 		}
 
-		var parsed model.ResponseWS
+		var parsed model.WebToolsEvent
 		err = xml.Unmarshal(data, &parsed)
 		if err != nil {
 			log.Printf("error: %s", err)
