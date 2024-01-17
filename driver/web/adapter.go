@@ -73,6 +73,7 @@ func (a Adapter) Start() {
 
 	// Client APIs
 	mainRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.clientAPIsHandler.getExample, a.auth.client.Permissions)).Methods("GET")
+	mainRouter.HandleFunc("/calendars/{id}", a.wrapFunc(a.clientAPIsHandler.getUnitCalendar, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/rooms", a.wrapFunc(a.clientAPIsHandler.getLaundryRooms, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/room", a.wrapFunc(a.clientAPIsHandler.getRoomDetails, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/initrequest", a.wrapFunc(a.clientAPIsHandler.initServiceRequest, a.auth.client.User)).Methods("GET")
@@ -86,6 +87,10 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/courses/giescourses", a.wrapFunc(a.clientAPIsHandler.getGiesCourses, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/courses/studentcourses", a.wrapFunc(a.clientAPIsHandler.getStudentCourses, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/termsessions/listcurrent", a.wrapFunc(a.clientAPIsHandler.getTermSessions, a.auth.client.User)).Methods("GET")
+
+	mainRouter.HandleFunc("/successteam", a.wrapFunc(a.clientAPIsHandler.getStudentSuccessTeam, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/successteam/pcp", a.wrapFunc(a.clientAPIsHandler.getPrimaryCareProvider, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/successteam/advisors", a.wrapFunc(a.clientAPIsHandler.getAcademicAdvisors, a.auth.client.User)).Methods("GET")
 
 	// Admin APIs
 	adminRouter := mainRouter.PathPrefix("/admin").Subrouter()

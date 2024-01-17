@@ -85,7 +85,7 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, la
 	apiURL := conf.WayFindingURL
 	apikey := conf.WayFindingKey
 
-	url := apiURL + "/ccf"
+	url := apiURL + "/ccf/"
 	lat := fmt.Sprintf("%f", latitude)
 	long := fmt.Sprintf("%f", longitude)
 

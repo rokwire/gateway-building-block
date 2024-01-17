@@ -24,16 +24,21 @@ import (
 
 // appClient contains client implementations
 type appClient struct {
-	app             *Application
-	Courseadapter   interfaces.Courses
-	LocationAdapter interfaces.WayFinding
-	LaundryAdapter  interfaces.LaundryService
-	ContactAdapter  interfaces.Contact
+	app                *Application
+	Courseadapter      interfaces.Courses
+	LocationAdapter    interfaces.WayFinding
+	LaundryAdapter     interfaces.LaundryService
+	ContactAdapter     interfaces.Contact
+	SuccessTeamAdapter interfaces.SuccessTeam
 }
 
 // GetExample gets an Example by ID
 func (a appClient) GetExample(orgID string, appID string, id string) (*model.Example, error) {
 	return a.app.shared.getExample(orgID, appID, id)
+}
+
+func (a appClient) GetUnitCalendars(id string) (*[]model.UnitCalendar, error) {
+	return a.app.storage.FindCalendars(id)
 }
 
 func (a appClient) ListLaundryRooms() (*model.Organization, error) {
@@ -140,6 +145,35 @@ func (a appClient) GetTermSessions() (*[4]model.TermSession, error) {
 	return retData, nil
 }
 
+func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string) (*model.SuccessTeam, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, unitid, accesstoken, conf)
+	if err != nil {
+		return nil, status, err
+	}
+	return retData, status, nil
+
+}
+
+func (a appClient) GetPrimaryCareProvider(uin string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, status, err := a.SuccessTeamAdapter.GetPrimaryCareProvider(uin, accesstoken, conf)
+	if err != nil {
+		return nil, status, err
+	}
+	return retData, status, nil
+}
+
+func (a appClient) GetAcademicAdvisors(uin string, unitid string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	retData, status, err := a.SuccessTeamAdapter.GetAcademicAdvisors(uin, unitid, accesstoken, conf)
+	if err != nil {
+		return nil, status, err
+	}
+	return retData, status, nil
+
+}
+
 // newAppClient creates new appClient
 func newAppClient(app *Application) appClient {
 
@@ -159,5 +193,6 @@ func newAppClient(app *Application) appClient {
 	client.LaundryAdapter = uiucadapters.NewCSCLaundryAdapter(laundryAssets)
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
 	client.LocationAdapter = uiucadapters.NewUIUCWayFinding()
+	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter(app.storage)
 	return client
 }

@@ -39,6 +39,7 @@ type EngineeringAdvisor struct {
 	NextAvailableDate string `json:"nextAvailableDate"`
 	Announcement      string `json:"announcement"`
 	AnnouncementDate  string `json:"announcementDate"`
+	UIN               string `json:"uin"`
 }
 
 // EngineeringCalendarAdvisors represents a calendar including all advisors
