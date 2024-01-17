@@ -15,10 +15,10 @@
 package storage
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -32,6 +32,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Adapter implements the Storage interface
@@ -65,7 +66,7 @@ func (a *Adapter) Start() error {
 }
 
 // RegisterStorageListener registers a data change listener with the storage adapter
-func (a *Adapter) RegisterStorageListener(listener interfaces.StorageListener) {
+func (a *Adapter) RegisterStorageListener(listener Listener) {
 	a.db.listeners = append(a.db.listeners, listener)
 }
 
@@ -268,34 +269,44 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 }
 
 // PerformTransaction performs a transaction
-func (a *Adapter) PerformTransaction(transaction func(storage interfaces.Storage) error) error {
+func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction
-	callback := func(sessionContext mongo.SessionContext) (interface{}, error) {
-		adapter := a.withContext(sessionContext)
+	timeout := time.Millisecond * time.Duration(timeoutMilliSeconds)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
-		err := transaction(adapter)
+	opts := &options.SessionOptions{}
+	opts.SetDefaultMaxCommitTime(&timeout)
+
+	err := a.db.dbClient.UseSessionWithOptions(ctx, opts, func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
 		if err != nil {
-			if wrappedErr, ok := err.(*errors.Error); ok && wrappedErr.Internal() != nil {
-				return nil, wrappedErr.Internal()
-			}
-			return nil, err
+			a.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionStart, logutils.TypeTransaction, nil, err)
 		}
 
-		return nil, nil
-	}
+		err = transaction(sessionContext)
+		if err != nil {
+			a.abortTransaction(sessionContext)
+			return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
+		}
 
-	session, err := a.db.dbClient.StartSession()
-	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionStart, "mongo session", nil, err)
-	}
-	context := context.Background()
-	defer session.EndSession(context)
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			a.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionCommit, logutils.TypeTransaction, nil, err)
+		}
+		return nil
+	})
 
-	_, err = session.WithTransaction(context, callback)
+	return err
+}
+
+func (a *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
+	err := sessionContext.AbortTransaction(sessionContext)
 	if err != nil {
-		return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
+		log.Printf("error aborting a transaction - %s", err)
 	}
-	return nil
 }
 
 func filterArgs(filter bson.M) *logutils.FieldArgs {
@@ -319,6 +330,12 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 
 	db := &database{mongoDBAuth: mongoDBAuth, mongoDBName: mongoDBName, mongoTimeout: time.Millisecond * time.Duration(timeout), logger: logger}
 	return &Adapter{db: db, cachedConfigs: cachedConfigs, configsLock: configsLock}
+}
+
+// Listener represents storage listener
+type Listener interface {
+	OnConfigsUpdated()
+	OnExamplesUpdated()
 }
 
 // TransactionContext represents storage transaction interface

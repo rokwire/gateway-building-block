@@ -14,9 +14,140 @@
 
 package core
 
-import "application/core/model"
+import (
+	"application/core/model"
+	"application/driven/storage"
+	"time"
+
+	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
+)
+
+// Default exposes client APIs for the driver adapters
+type Default interface {
+	GetVersion() string
+}
+
+// Client exposes client APIs for the driver adapters
+type Client interface {
+	GetExample(orgID string, appID string, id string) (*model.Example, error)
+	ListLaundryRooms() (*model.Organization, error)
+	GetLaundryRoom(roomid string) (*model.RoomDetail, error)
+	InitServiceRequest(machineid string) (*model.MachineRequestDetail, error)
+	SubmitServiceRequest(machineID string, problemCode string, comments string, firstname string, lastname string, phone string, email string) (*model.ServiceRequestResult, error)
+	GetBuilding(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Building, error)
+	GetEntrance(bldgID string, adaOnly bool, latitude float64, longitude float64) (*model.Entrance, error)
+	GetBuildings() (*[]model.Building, error)
+	GetContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error)
+	GetGiesCourses(uin string, accessToken string) (*[]model.GiesCourse, int, error)
+	GetStudentCourses(uin string, termid string, accessToken string) (*[]model.Course, int, error)
+	GetTermSessions() (*[4]model.TermSession, error)
+}
+
+// Admin exposes administrative APIs for the driver adapters
+type Admin interface {
+	GetExample(orgID string, appID string, id string) (*model.Example, error)
+	CreateExample(example model.Example) (*model.Example, error)
+	UpdateExample(example model.Example) error
+	AppendExample(example model.Example) (*model.Example, error)
+	DeleteExample(orgID string, appID string, id string) error
+
+	GetConfig(id string, claims *tokenauth.Claims) (*model.Config, error)
+	GetConfigs(configType *string, claims *tokenauth.Claims) ([]model.Config, error)
+	CreateConfig(config model.Config, claims *tokenauth.Claims) (*model.Config, error)
+	UpdateConfig(config model.Config, claims *tokenauth.Claims) error
+	DeleteConfig(id string, claims *tokenauth.Claims) error
+}
+
+// BBs exposes Building Block APIs for the driver adapters
+type BBs interface {
+	GetExample(orgID string, appID string, id string) (*model.Example, error)
+	GetAppointmentUnits(providerid int, uin string, accesstoken string) (*[]model.AppointmentUnit, error)
+	GetPeople(uin string, unitID int, providerid int, accesstoken string) (*[]model.AppointmentPerson, error)
+	GetAppointmentOptions(uin string, unitid int, peopleid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string) (*model.AppointmentOptions, error)
+	CreateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error)
+	DeleteAppointment(uin string, providerid int, sourceid string, accesstoken string) (string, error)
+	UpdateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error)
+}
+
+// TPS exposes third-party service APIs for the driver adapters
+type TPS interface {
+	GetExample(orgID string, appID string, id string) (*model.Example, error)
+}
+
+// System exposes system administrative APIs for the driver adapters
+type System interface {
+	GetExample(orgID string, appID string, id string) (*model.Example, error)
+}
 
 // Shared exposes shared APIs for other interface implementations
 type Shared interface {
 	getExample(orgID string, appID string, id string) (*model.Example, error)
+}
+
+// EventsBBAdapter is used by core to communicate with the events BB
+type EventsBBAdapter interface {
+	LoadAllLegacyEvents() ([]model.LegacyEvent, error)
+}
+
+// Storage is used by core to storage data - DB storage adapter, file storage adapter etc
+type Storage interface {
+	RegisterStorageListener(listener storage.Listener)
+	PerformTransaction(func(context storage.TransactionContext) error, int64) error
+
+	FindConfig(configType string, appID string, orgID string) (*model.Config, error)
+	FindConfigByID(id string) (*model.Config, error)
+	FindConfigs(configType *string) ([]model.Config, error)
+	InsertConfig(config model.Config) error
+	UpdateConfig(config model.Config) error
+	DeleteConfig(id string) error
+
+	FindExample(orgID string, appID string, id string) (*model.Example, error)
+	InsertExample(example model.Example) error
+	UpdateExample(example model.Example) error
+	DeleteExample(orgID string, appID string, id string) error
+
+	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
+}
+
+// StorageListener represents storage listener
+type StorageListener interface {
+	OnConfigsUpdated()
+	OnExamplesUpdated()
+}
+
+// Contact represents the adapter needed to pull campus specific contact information
+type Contact interface {
+	GetContactInformation(uin string, accessToken string, mode string, conf *model.EnvConfigData) (*model.Person, int, error)
+}
+
+// Courses represents the Courses adapter needed to pull campus specific course information
+type Courses interface {
+	GetStudentCourses(uin string, termid string, accessToken string, conf *model.EnvConfigData) (*[]model.Course, int, error)
+	GetTermSessions() (*[4]model.TermSession, error)
+	GetGiesCourses(uin string, accessToken string, conf *model.EnvConfigData) (*[]model.GiesCourse, int, error)
+}
+
+// LaundryService represents the adapter needed to interact with vendor specific laundry providers
+type LaundryService interface {
+	ListRooms(conf *model.EnvConfigData) (*model.Organization, error)
+	GetLaundryRoom(roomid string, conf *model.EnvConfigData) (*model.RoomDetail, error)
+	InitServiceRequest(machineID string, conf *model.EnvConfigData) (*model.MachineRequestDetail, error)
+	SubmitServiceRequest(machineid string, problemCode string, comments string, firstName string, lastName string, phone string, email string, conf *model.EnvConfigData) (*model.ServiceRequestResult, error)
+}
+
+// WayFinding represents the adapter needed to interact with vendor specific building locations
+type WayFinding interface {
+	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Entrance, error)
+	GetBuildings(conf *model.EnvConfigData) (*[]model.Building, error)
+	GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Building, error)
+}
+
+// Appointments represents the adapter needed to interace with various appoinment data providers
+type Appointments interface {
+	GetUnits(uin string, accesstoken string, providerid int, conf *model.EnvConfigData) (*[]model.AppointmentUnit, error)
+	GetPeople(uin string, unitID int, providerid int, accesstoken string, conf *model.EnvConfigData) (*[]model.AppointmentPerson, error)
+	GetTimeSlots(uin string, unitid int, advisorid int, providerid int, startdate time.Time, enddate time.Time, accesstoken string, conf *model.EnvConfigData) (*model.AppointmentOptions, error)
+	CreateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error)
+	DeleteAppointment(uin string, sourceid string, accesstoken string, conf *model.EnvConfigData) (string, error)
+	UpdateAppointment(appt *model.AppointmentPost, accesstoken string, conf *model.EnvConfigData) (*model.BuildingBlockAppointment, error)
 }

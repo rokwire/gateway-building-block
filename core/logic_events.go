@@ -18,7 +18,6 @@
 package core
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 	"encoding/xml"
 	"errors"
@@ -35,7 +34,7 @@ type eventsLogic struct {
 	app    *Application
 	logger logs.Logger
 
-	eventsBBAdapter interfaces.EventsBBAdapter
+	eventsBBAdapter EventsBBAdapter
 }
 
 func (e eventsLogic) start() error {
@@ -165,6 +164,6 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 }
 
 // newAppEventsLogic creates new appShared
-func newAppEventsLogic(app *Application, eventsBBAdapter interfaces.EventsBBAdapter, logger logs.Logger) eventsLogic {
+func newAppEventsLogic(app *Application, eventsBBAdapter EventsBBAdapter, logger logs.Logger) eventsLogic {
 	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter, logger: logger}
 }

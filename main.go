@@ -16,7 +16,6 @@ package main
 
 import (
 	"application/core"
-	"application/core/interfaces"
 	"application/driven/eventsbb"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
@@ -70,7 +69,7 @@ func main() {
 	eventsBBAdapter := eventsbb.NewEventsBBAdapter(eventsBBBaseURL, eventsBBAPIKey, logger)
 
 	// appointment adapters
-	appointments := make(map[string]interfaces.Appointments)
+	appointments := make(map[string]core.Appointments)
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
 	// application
 	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, appointments, logger)

@@ -15,7 +15,6 @@
 package core
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 	"application/driven/uiucadapters"
 	"encoding/json"
@@ -25,10 +24,10 @@ import (
 // appClient contains client implementations
 type appClient struct {
 	app             *Application
-	Courseadapter   interfaces.Courses
-	LocationAdapter interfaces.WayFinding
-	LaundryAdapter  interfaces.LaundryService
-	ContactAdapter  interfaces.Contact
+	Courseadapter   Courses
+	LocationAdapter WayFinding
+	LaundryAdapter  LaundryService
+	ContactAdapter  Contact
 }
 
 // GetExample gets an Example by ID

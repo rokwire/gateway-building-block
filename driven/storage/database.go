@@ -15,7 +15,6 @@
 package storage
 
 import (
-	"application/core/interfaces"
 	"context"
 	"time"
 
@@ -43,7 +42,7 @@ type database struct {
 	examples     *collectionWrapper
 	legacyEvents *collectionWrapper
 
-	listeners []interfaces.StorageListener
+	listeners []Listener
 }
 
 func (d *database) start() error {
