@@ -16,6 +16,7 @@ package model
 
 import (
 	"encoding/xml"
+	"time"
 
 	"github.com/rokwire/logging-library-go/v2/logutils"
 )
@@ -134,4 +135,12 @@ type SubEvents struct {
 	ID         string `json:"id"`
 	IsFeatured bool   `json:"isFeatured"`
 	Track      string `json:"track"`
+}
+
+// LegacyEventItem represents legacy event entity which contains legacy event + other sync info
+type LegacyEventItem struct {
+	SyncProcessSource string    `bson:"sync_process_source"` //webtools-direct or events-bb-initial
+	SyncDate          time.Time `bson:"sync_date"`
+
+	Item LegacyEvent `bson:"item"`
 }
