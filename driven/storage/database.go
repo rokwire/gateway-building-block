@@ -104,7 +104,7 @@ func (d *database) start() error {
 func (d *database) applyConfigsChecks(configs *collectionWrapper) error {
 	d.logger.Info("apply configs checks.....")
 
-	err := configs.AddIndex(nil, bson.D{primitive.E{Key: "type", Value: 1}, primitive.E{Key: "app_id", Value: 1}, primitive.E{Key: "org_id", Value: 1}}, true)
+	err := configs.AddIndex(bson.D{primitive.E{Key: "type", Value: 1}, primitive.E{Key: "app_id", Value: 1}, primitive.E{Key: "org_id", Value: 1}}, true)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
 	d.logger.Info("apply examples checks.....")
 
 	//add compound unique index - org_id + app_id
-	err := examples.AddIndex(nil, bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
+	err := examples.AddIndex(bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
 	if err != nil {
 		return errors.WrapErrorAction(logutils.ActionCreate, "index", nil, err)
 	}
@@ -126,16 +126,18 @@ func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
 	return nil
 }
 
-func (d *database) applyLegacyEventsChecks(examples *collectionWrapper) error {
-	d.logger.Info("apply legacy_events checks.....")
+func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) error {
+	d.logger.Info("apply legacy events checks.....")
 
-	//add compound unique index - org_id + app_id
-	err := examples.AddIndex(nil, bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
+	//id
+	err := legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.id", Value: 1}}, true)
 	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionCreate, "index", nil, err)
+		return err
 	}
 
-	d.logger.Info("apply legacy_events passed")
+	//TODO - add other - source event id - calendar id?
+
+	d.logger.Info("legacy events passed")
 	return nil
 }
 

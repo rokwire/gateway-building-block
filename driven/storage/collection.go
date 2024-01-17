@@ -274,11 +274,8 @@ func (collWrapper *collectionWrapper) ListIndexes(ctx context.Context, l *logs.L
 	return list, nil
 }
 
-func (collWrapper *collectionWrapper) AddIndex(ctx context.Context, keys interface{}, unique bool) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*15000)
+func (collWrapper *collectionWrapper) AddIndex(keys interface{}, unique bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*15000)
 	defer cancel()
 
 	index := mongo.IndexModel{Keys: keys}
@@ -293,11 +290,8 @@ func (collWrapper *collectionWrapper) AddIndex(ctx context.Context, keys interfa
 	return err
 }
 
-func (collWrapper *collectionWrapper) AddIndexWithOptions(ctx context.Context, keys interface{}, opt *options.IndexOptions) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*15000)
+func (collWrapper *collectionWrapper) AddIndexWithOptions(keys interface{}, opt *options.IndexOptions) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*15000)
 	defer cancel()
 
 	index := mongo.IndexModel{Keys: keys}
