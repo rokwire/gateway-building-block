@@ -62,12 +62,18 @@ type Application struct {
 }
 
 // Start starts the core part of the application
-func (a *Application) Start() {
+func (a *Application) Start() error {
 	//set storage listener
 	storageListener := storageListener{app: a}
 	a.storage.RegisterStorageListener(&storageListener)
 
-	a.eventsLogic.start()
+	err := a.eventsLogic.start()
+	if err != nil {
+		return err
+	}
+
+	//no error
+	return nil
 }
 
 // GetEnvConfigs retrieves the cached database env configs

@@ -21,6 +21,7 @@ import (
 	"application/core/interfaces"
 	"application/core/model"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -36,18 +37,24 @@ type eventsLogic struct {
 	eventsBBAdapter interfaces.EventsBBAdapter
 }
 
-func (e eventsLogic) start() {
-	//hold on for now..
+func (e eventsLogic) start() error {
+	//hold on for now.. use timer
 	//events, _ := e.getAllEvents()
-
 	//fmt.Println(events)
 
-	events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
+	//TODO - check if imported
+	err := e.importInitialEventsFromEventsBB()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (e eventsLogic) importInitialEventsFromEventsBB() error {
 	//TODO
-
-	log.Println(err)
-	log.Println(events)
-
+	//vents, err := e.eventsBBAdapter.LoadAllLegacyEvents()
+	return errors.New("not implemented")
 }
 
 func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {

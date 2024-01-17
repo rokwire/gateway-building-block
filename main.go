@@ -74,7 +74,10 @@ func main() {
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
 	// application
 	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, appointments, logger)
-	application.Start()
+	err = application.Start()
+	if err != nil {
+		logger.Fatalf("Cannot start the Application module: %v", err)
+	}
 
 	// web adapter
 	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
