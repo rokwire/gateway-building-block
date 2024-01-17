@@ -42,8 +42,11 @@ func (e eventsLogic) start() {
 
 	//fmt.Println(events)
 
-	log := e.logger.NewLog("events_bb_adapter", logs.RequestContext{})
-	e.eventsBBAdapter.LoadAllLegacyEvents(*log)
+	events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
+	//TODO
+
+	log.Println(err)
+	log.Println(events)
 
 }
 

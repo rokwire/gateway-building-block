@@ -28,24 +28,29 @@ import (
 type Adapter struct {
 	baseURL string
 	apiKey  string
+
+	log logs.Log
 }
 
 // NewEventsBBAdapter creates new instance
-func NewEventsBBAdapter(legacyEventsBaseURL, legacyEventsAPIKey string) Adapter {
+func NewEventsBBAdapter(legacyEventsBaseURL, legacyEventsAPIKey string, logger *logs.Logger) Adapter {
+	log := logger.NewLog("events_bb_adapter", logs.RequestContext{})
+
 	return Adapter{
 		baseURL: legacyEventsBaseURL,
 		apiKey:  legacyEventsAPIKey, // pragma: allowlist secret
+		log:     *log,
 	}
 }
 
 // LoadAllLegacyEvents loads all legacy events
-func (na Adapter) LoadAllLegacyEvents(log logs.Log) ([]model.LegacyEvent, error) {
+func (na Adapter) LoadAllLegacyEvents() ([]model.LegacyEvent, error) {
 
 	url := fmt.Sprintf("%s/events", na.baseURL)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Errorf("legacy_events.LoadAllLegacyEvents: error creating load legacy events request - %s", err)
+		na.log.Errorf("legacy_events.LoadAllLegacyEvents: error creating load legacy events request - %s", err)
 		return nil, err
 	}
 	req.Header.Set("ROKWIRE-API-KEY", na.apiKey)
@@ -53,7 +58,7 @@ func (na Adapter) LoadAllLegacyEvents(log logs.Log) ([]model.LegacyEvent, error)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Errorf("legacy_events.LoadAllLegacyEvents: error creating load legacy events request - %s", err)
+		na.log.Errorf("legacy_events.LoadAllLegacyEvents: error creating load legacy events request - %s", err)
 		return nil, err
 	}
 
@@ -62,15 +67,15 @@ func (na Adapter) LoadAllLegacyEvents(log logs.Log) ([]model.LegacyEvent, error)
 	if resp.StatusCode != 200 {
 		errorResponse, _ := io.ReadAll(resp.Body)
 		if errorResponse != nil {
-			log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %s", errorResponse)
+			na.log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %s", errorResponse)
 		}
-		log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %d", resp.StatusCode)
+		na.log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %d", resp.StatusCode)
 		return nil, fmt.Errorf("SendNotification:error with response code != 200")
 	}
 	var list []model.LegacyEvent
 	err = json.NewDecoder(resp.Body).Decode(&list)
 	if err != nil {
-		log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %d", resp.StatusCode)
+		na.log.Errorf("legacy_events.LoadAllLegacyEvents: error with response code - %d", resp.StatusCode)
 		return nil, fmt.Errorf("SendNotification: %s", err)
 	}
 	return list, nil
