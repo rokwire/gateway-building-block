@@ -26,13 +26,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
 type eventsLogic struct {
 	app    *Application
-	logger *logs.Logger
+	logger logs.Logger
 
 	eventsBBAdapter interfaces.EventsBBAdapter
 }
@@ -52,8 +53,31 @@ func (e eventsLogic) start() error {
 }
 
 func (e eventsLogic) importInitialEventsFromEventsBB() error {
+	//load the events
+	events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
+	if err != nil {
+		return err
+	}
+
+	//they cannot be 0
+	eventsCount := len(events)
+	if eventsCount == 0 {
+		return errors.New("cannot have 0 events, there is an error")
+	}
+
+	e.logger.Infof("Got %d events from evetns BB", eventsCount)
+
+	//prepare the list which we will stored
+	syncProcessSource := "events-bb-initial"
+	now := time.Now()
+	resultList := make([]model.LegacyEventItem, eventsCount)
+	for i, le := range events {
+		leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
+		resultList[i] = leItem
+	}
+
 	//TODO
-	//vents, err := e.eventsBBAdapter.LoadAllLegacyEvents()
+
 	return errors.New("not implemented")
 }
 
@@ -135,6 +159,6 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 }
 
 // newAppEventsLogic creates new appShared
-func newAppEventsLogic(app *Application, eventsBBAdapter interfaces.EventsBBAdapter) eventsLogic {
-	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter}
+func newAppEventsLogic(app *Application, eventsBBAdapter interfaces.EventsBBAdapter, logger logs.Logger) eventsLogic {
+	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter, logger: logger}
 }

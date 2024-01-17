@@ -105,7 +105,7 @@ func NewApplication(version string, build string,
 	application.TPS = newAppTPS(&application)
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
-	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter)
+	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, *logger)
 
 	return &application
 }
