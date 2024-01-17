@@ -38,9 +38,10 @@ type database struct {
 	dbClient *mongo.Client
 	logger   *logs.Logger
 
-	configs      *collectionWrapper
-	examples     *collectionWrapper
-	legacyEvents *collectionWrapper
+	globalConfigs *collectionWrapper
+	configs       *collectionWrapper
+	examples      *collectionWrapper
+	legacyEvents  *collectionWrapper
 
 	listeners []Listener
 }
@@ -69,6 +70,12 @@ func (d *database) start() error {
 	//apply checks
 	db := client.Database(d.mongoDBName)
 
+	globalConfigs := &collectionWrapper{database: d, coll: db.Collection("global_configs")}
+	err = d.applyGlobalConfigsChecks(globalConfigs)
+	if err != nil {
+		return err
+	}
+
 	configs := &collectionWrapper{database: d, coll: db.Collection("configs")}
 	err = d.applyConfigsChecks(configs)
 	if err != nil {
@@ -91,12 +98,25 @@ func (d *database) start() error {
 	d.db = db
 	d.dbClient = client
 
+	d.globalConfigs = globalConfigs
 	d.configs = configs
 	d.examples = examples
 	d.legacyEvents = legacyEvents
 
 	go d.configs.Watch(nil, d.logger)
 
+	return nil
+}
+
+func (d *database) applyGlobalConfigsChecks(globalConfigs *collectionWrapper) error {
+	d.logger.Info("apply global configs checks.....")
+
+	err := globalConfigs.AddIndex(bson.D{primitive.E{Key: "key", Value: 1}}, true)
+	if err != nil {
+		return err
+	}
+
+	d.logger.Info("global configs passed")
 	return nil
 }
 
