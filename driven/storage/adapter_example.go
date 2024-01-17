@@ -73,23 +73,6 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 	return nil
 }
 
-// SaveLegacyEvents inserts a new example
-func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
-
-	records := []interface{}{}
-	for _, event := range legacyEvents {
-		records = append(records, legacyEventToStorage(event))
-		if len(records) == 10 {
-			_, err := a.db.legacyEvents.InsertMany(nil, records, nil)
-			if err != nil {
-				return err
-			}
-
-		}
-	}
-	return nil
-}
-
 // FindCalendarEvents finds events persons by users external ids and event
 func (a *Adapter) findCalendarEvents(eventIDs []string) ([]model.LegacyEvent, error) {
 	filter := bson.D{

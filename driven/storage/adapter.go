@@ -251,6 +251,24 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
+// InsertLegacyEvents inserts legacy events
+func (a *Adapter) InsertLegacyEvents(items []model.LegacyEventItem) error {
+
+	//TODO
+	/*	records := []interface{}{}
+		for _, event := range legacyEvents {
+			records = append(records, legacyEventToStorage(event))
+			if len(records) == 10 {
+				_, err := a.db.legacyEvents.InsertMany(nil, records, nil)
+				if err != nil {
+					return err
+				}
+
+			}
+		} */
+	return nil
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(storage interfaces.Storage) error) error {
 	// transaction

@@ -65,7 +65,7 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 		return errors.New("cannot have 0 events, there is an error")
 	}
 
-	e.logger.Infof("Got %d events from evetns BB", eventsCount)
+	e.logger.Infof("Got %d events from events BB", eventsCount)
 
 	//prepare the list which we will stored
 	syncProcessSource := "events-bb-initial"
@@ -76,9 +76,15 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 		resultList[i] = leItem
 	}
 
-	//TODO
+	//insert the initial events
+	err = e.app.storage.InsertLegacyEvents(resultList)
+	if err != nil {
+		return err
+	}
 
-	return errors.New("not implemented")
+	e.logger.Info("Successfuly imported initial events")
+
+	return nil
 }
 
 func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
@@ -152,8 +158,8 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 		}
 	}
 
-	le := e.app.storage.SaveLegacyEvents(legacyEvent)
-	fmt.Println(le)
+	//le := e.app.storage.SaveLegacyEvents(legacyEvent)
+	//fmt.Println(le)
 
 	return allevents, nil
 }

@@ -41,7 +41,7 @@ type Storage interface {
 	UpdateExample(example model.Example) error
 	DeleteExample(orgID string, appID string, id string) error
 
-	SaveLegacyEvents(legacyEvent []model.LegacyEvent) error
+	InsertLegacyEvents(items []model.LegacyEventItem) error
 }
 
 // StorageListener represents storage listener
