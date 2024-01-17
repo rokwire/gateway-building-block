@@ -39,7 +39,7 @@ func NewEventsBBAdapter(legacyEventsBaseURL, legacyEventsAPIKey string) Adapter 
 }
 
 // LoadAllLegacyEvents loads all legacy events
-func (na Adapter) LoadAllLegacyEvents(log *logs.Log) ([]model.LegacyEvent, error) {
+func (na Adapter) LoadAllLegacyEvents(log logs.Log) ([]model.LegacyEvent, error) {
 
 	url := fmt.Sprintf("%s/events", na.baseURL)
 

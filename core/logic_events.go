@@ -42,6 +42,9 @@ func (e eventsLogic) start() {
 
 	//fmt.Println(events)
 
+	log := e.logger.NewLog("events_bb_adapter", logs.RequestContext{})
+	e.eventsBBAdapter.LoadAllLegacyEvents(*log)
+
 }
 
 func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {

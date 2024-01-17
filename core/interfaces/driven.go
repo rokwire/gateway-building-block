@@ -23,7 +23,7 @@ import (
 
 // EventsBBAdapter is used by core to communicate with the events BB
 type EventsBBAdapter interface {
-	LoadAllLegacyEvents(log *logs.Log) ([]model.LegacyEvent, error)
+	LoadAllLegacyEvents(log logs.Log) ([]model.LegacyEvent, error)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
