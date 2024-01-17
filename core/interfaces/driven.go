@@ -16,6 +16,7 @@ package interfaces
 
 import (
 	"application/core/model"
+	"application/driven/storage"
 	"time"
 )
 
@@ -41,7 +42,7 @@ type Storage interface {
 	UpdateExample(example model.Example) error
 	DeleteExample(orgID string, appID string, id string) error
 
-	InsertLegacyEvents(items []model.LegacyEventItem) error
+	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
 }
 
 // StorageListener represents storage listener

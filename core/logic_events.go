@@ -77,7 +77,7 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 	}
 
 	//insert the initial events
-	err = e.app.storage.InsertLegacyEvents(resultList)
+	err = e.app.storage.InsertLegacyEvents(nil, resultList)
 	if err != nil {
 		return err
 	}

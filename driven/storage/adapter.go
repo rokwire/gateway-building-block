@@ -252,20 +252,18 @@ func (a *Adapter) DeleteConfig(id string) error {
 }
 
 // InsertLegacyEvents inserts legacy events
-func (a *Adapter) InsertLegacyEvents(items []model.LegacyEventItem) error {
+func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {
 
-	//TODO
-	/*	records := []interface{}{}
-		for _, event := range legacyEvents {
-			records = append(records, legacyEventToStorage(event))
-			if len(records) == 10 {
-				_, err := a.db.legacyEvents.InsertMany(nil, records, nil)
-				if err != nil {
-					return err
-				}
+	storageItems := make([]interface{}, len(items))
+	for i, p := range items {
+		storageItems[i] = p
+	}
 
-			}
-		} */
+	_, err := a.db.legacyEvents.InsertManyWithContext(context, storageItems, nil)
+	if err != nil {
+		return errors.WrapErrorAction("insert", "legacy events", nil, err)
+	}
+
 	return nil
 }
 
@@ -321,4 +319,9 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 
 	db := &database{mongoDBAuth: mongoDBAuth, mongoDBName: mongoDBName, mongoTimeout: time.Millisecond * time.Duration(timeout), logger: logger}
 	return &Adapter{db: db, cachedConfigs: cachedConfigs, configsLock: configsLock}
+}
+
+// TransactionContext represents storage transaction interface
+type TransactionContext interface {
+	mongo.SessionContext
 }
