@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - WebTools events handling [#39](https://github.com/rokwire/gateway-building-block/issues/39)
+- added successteam end point
+- added successteam/pcp end point
+- added successteam/adivsors end point
 
 ## [2.0.14] - 2023-12-06
 ### Fixed

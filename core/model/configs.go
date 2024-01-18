@@ -59,6 +59,8 @@ type EnvConfigData struct {
 	LaundyrServiceURL       string `json:"GATEWAY_LAUNDRYSERVICE_API" bson:"GATEWAY_LAUNDRYSERVICE_API"`
 	LaundryServiceBasicAuth string `json:"GATEWAY_LAUNDRYSERVICE_BASICAUTH" bson:"GATEWAY_LAUNDRYSERVICE_BASICAUTH"`
 	EngAppointmentBaseURL   string `json:"GATEWAY_APPOINTMENTS_ENGURL" bson:"GATEWAY_APPOINTMENTS_ENGURL"`
+	PCPEndpoint             string `json:"GATEWAY_STUDENTSUCCESS_PCPENDPOINT" bson:"GATEWAY_STUDENTSUCCESS_PCPENDPOINT"`
+	ImageEndpoint           string `json:"GATEWAY_STUDENTSUCCESS_IMAGES" bson:"GATEWAY_STUDENTSUCCESS_IMAGES"`
 }
 
 // GetConfigData returns a pointer to the given config's Data as the given type T

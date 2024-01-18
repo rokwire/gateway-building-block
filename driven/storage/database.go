@@ -42,6 +42,7 @@ type database struct {
 	configs       *collectionWrapper
 	examples      *collectionWrapper
 	legacyEvents  *collectionWrapper
+	unitcalendars *collectionWrapper
 
 	listeners []Listener
 }
@@ -94,6 +95,8 @@ func (d *database) start() error {
 		return err
 	}
 
+	unitcalendars := &collectionWrapper{database: d, coll: db.Collection("unitcalendars")}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
@@ -102,6 +105,7 @@ func (d *database) start() error {
 	d.configs = configs
 	d.examples = examples
 	d.legacyEvents = legacyEvents
+	d.unitcalendars = unitcalendars
 
 	go d.configs.Watch(nil, d.logger)
 
