@@ -141,6 +141,10 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
 
 func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEvent {
 
+	// For Stefan:
+	//apply the needed processing so that to convert the web tools event in legacy event 100% how it happens in the old code!
+
+	/*
 	var isVirtual bool
 	if g.VirtualEvent == "false" {
 		isVirtual = false
@@ -165,9 +169,9 @@ func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEv
 	event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
 		LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
 		CalendarID: g.CalendarID, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventID,
-		IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType}
+		IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType} */
 
-	return event
+	return model.LegacyEvent{}
 }
 
 // newAppEventsLogic creates new appShared
