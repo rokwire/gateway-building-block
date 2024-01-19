@@ -26,68 +26,71 @@ const (
 	TypeLegacyEvents logutils.MessageDataType = "legacy_events"
 )
 
-// WebToolsEventItem represents web tools item
+// WebToolsEventItem represents web tools event wrapper item
 type WebToolsEventItem struct {
-	XMLName       xml.Name `xml:"responseWS"`
-	Text          string   `xml:",chardata"`
-	Deprecated    string   `xml:"deprecated"`
-	MaxPageSize   string   `xml:"maxPageSize"`
-	WebToolsEvent []struct {
-		Text                               string `xml:",chardata"`
-		CalendarID                         string `xml:"calendarId"`
-		CalendarName                       string `xml:"calendarName"`
-		EventID                            string `xml:"eventId"`
-		Recurrence                         string `xml:"recurrence"`
-		RecurrenceID                       string `xml:"recurrenceId"`
-		OriginatingCalendarID              string `xml:"originatingCalendarId"`
-		OriginatingCalendarName            string `xml:"originatingCalendarName"`
-		Title                              string `xml:"title"`
-		TitleURL                           string `xml:"titleURL"`
-		EventType                          string `xml:"eventType"`
-		Sponsor                            string `xml:"sponsor"`
-		DateDisplay                        string `xml:"dateDisplay"`
-		StartDate                          string `xml:"startDate"`
-		EndDate                            string `xml:"endDate"`
-		TimeType                           string `xml:"timeType"`
-		StartTime                          string `xml:"startTime"`
-		EndTime                            string `xml:"endTime"`
-		EndTimeLabel                       string `xml:"endTimeLabel"`
-		InPersonEvent                      string `xml:"inPersonEvent"`
-		Location                           string `xml:"location"`
-		Description                        string `xml:"description"`
-		Speaker                            string `xml:"speaker"`
-		RegistrationLabel                  string `xml:"registrationLabel"`
-		RegistrationURL                    string `xml:"registrationURL"`
-		ContactName                        string `xml:"contactName"`
-		ContactEmail                       string `xml:"contactEmail"`
-		ContactPhone                       string `xml:"contactPhone"`
-		CostFree                           string `xml:"costFree"`
-		Cost                               string `xml:"cost"`
-		CreatedBy                          string `xml:"createdBy"`
-		CreatedDate                        string `xml:"createdDate"`
-		EditedBy                           string `xml:"editedBy"`
-		EditedDate                         string `xml:"editedDate"`
-		Summary                            string `xml:"summary"`
-		AudienceFacultyStaff               string `xml:"audienceFacultyStaff"`
-		AudienceStudents                   string `xml:"audienceStudents"`
-		AudiencePublic                     string `xml:"audiencePublic"`
-		AudienceAlumni                     string `xml:"audienceAlumni"`
-		AudienceParents                    string `xml:"audienceParents"`
-		ShareWithUrbanaEventsInChicagoArea string `xml:"shareWithUrbanaEventsInChicagoArea"`
-		ShareWithResearch                  string `xml:"shareWithResearch"`
-		ShareWithSpeakers                  string `xml:"shareWithSpeakers"`
-		ShareWithIllinoisMobileApp         string `xml:"shareWithIllinoisMobileApp"`
-		ThumbImageUploaded                 string `xml:"thumbImageUploaded"`
-		LargeImageUploaded                 string `xml:"largeImageUploaded"`
-		LargeImageSize                     string `xml:"largeImageSize"`
-		VirtualEvent                       string `xml:"virtualEvent"`
-		VirtualEventURL                    string `xml:"virtualEventURL"`
-		Topic                              []struct {
-			Text string `xml:",chardata"`
-			ID   string `xml:"id"`
-			Name string `xml:"name"`
-		} `xml:"topic"`
-	} `xml:"publicEventWS"`
+	XMLName       xml.Name        `xml:"responseWS"`
+	Text          string          `xml:",chardata"`
+	Deprecated    string          `xml:"deprecated"`
+	MaxPageSize   string          `xml:"maxPageSize"`
+	WebToolsEvent []WebToolsEvent `xml:"publicEventWS"`
+}
+
+// WebToolsEvent represents web tools event entity
+type WebToolsEvent struct {
+	Text                               string `xml:",chardata"`
+	CalendarID                         string `xml:"calendarId"`
+	CalendarName                       string `xml:"calendarName"`
+	EventID                            string `xml:"eventId"`
+	Recurrence                         string `xml:"recurrence"`
+	RecurrenceID                       string `xml:"recurrenceId"`
+	OriginatingCalendarID              string `xml:"originatingCalendarId"`
+	OriginatingCalendarName            string `xml:"originatingCalendarName"`
+	Title                              string `xml:"title"`
+	TitleURL                           string `xml:"titleURL"`
+	EventType                          string `xml:"eventType"`
+	Sponsor                            string `xml:"sponsor"`
+	DateDisplay                        string `xml:"dateDisplay"`
+	StartDate                          string `xml:"startDate"`
+	EndDate                            string `xml:"endDate"`
+	TimeType                           string `xml:"timeType"`
+	StartTime                          string `xml:"startTime"`
+	EndTime                            string `xml:"endTime"`
+	EndTimeLabel                       string `xml:"endTimeLabel"`
+	InPersonEvent                      string `xml:"inPersonEvent"`
+	Location                           string `xml:"location"`
+	Description                        string `xml:"description"`
+	Speaker                            string `xml:"speaker"`
+	RegistrationLabel                  string `xml:"registrationLabel"`
+	RegistrationURL                    string `xml:"registrationURL"`
+	ContactName                        string `xml:"contactName"`
+	ContactEmail                       string `xml:"contactEmail"`
+	ContactPhone                       string `xml:"contactPhone"`
+	CostFree                           string `xml:"costFree"`
+	Cost                               string `xml:"cost"`
+	CreatedBy                          string `xml:"createdBy"`
+	CreatedDate                        string `xml:"createdDate"`
+	EditedBy                           string `xml:"editedBy"`
+	EditedDate                         string `xml:"editedDate"`
+	Summary                            string `xml:"summary"`
+	AudienceFacultyStaff               string `xml:"audienceFacultyStaff"`
+	AudienceStudents                   string `xml:"audienceStudents"`
+	AudiencePublic                     string `xml:"audiencePublic"`
+	AudienceAlumni                     string `xml:"audienceAlumni"`
+	AudienceParents                    string `xml:"audienceParents"`
+	ShareWithUrbanaEventsInChicagoArea string `xml:"shareWithUrbanaEventsInChicagoArea"`
+	ShareWithResearch                  string `xml:"shareWithResearch"`
+	ShareWithSpeakers                  string `xml:"shareWithSpeakers"`
+	ShareWithIllinoisMobileApp         string `xml:"shareWithIllinoisMobileApp"`
+	ThumbImageUploaded                 string `xml:"thumbImageUploaded"`
+	LargeImageUploaded                 string `xml:"largeImageUploaded"`
+	LargeImageSize                     string `xml:"largeImageSize"`
+	VirtualEvent                       string `xml:"virtualEvent"`
+	VirtualEventURL                    string `xml:"virtualEventURL"`
+	Topic                              []struct {
+		Text string `xml:",chardata"`
+		ID   string `xml:"id"`
+		Name string `xml:"name"`
+	} `xml:"topic"`
 }
 
 // LegacyEvent wrapper
