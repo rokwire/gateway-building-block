@@ -145,31 +145,31 @@ func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEv
 	//apply the needed processing so that to convert the web tools event in legacy event 100% how it happens in the old code!
 
 	/*
-	var isVirtual bool
-	if g.VirtualEvent == "false" {
-		isVirtual = false
-	} else if g.VirtualEvent == "true" {
-		isVirtual = true
-	}
+		var isVirtual bool
+		if g.VirtualEvent == "false" {
+			isVirtual = false
+		} else if g.VirtualEvent == "true" {
+			isVirtual = true
+		}
 
-	var IsEventFree bool
-	if g.CostFree == "false" {
-		IsEventFree = false
-	} else if g.CostFree == "true" {
-		IsEventFree = true
-	}
+		var IsEventFree bool
+		if g.CostFree == "false" {
+			IsEventFree = false
+		} else if g.CostFree == "true" {
+			IsEventFree = true
+		}
 
-	var Recurrence bool
-	if g.Recurrence == "false" {
-		Recurrence = false
-	} else if g.Recurrence == "true" {
-		Recurrence = true
-	}
+		var Recurrence bool
+		if g.Recurrence == "false" {
+			Recurrence = false
+		} else if g.Recurrence == "true" {
+			Recurrence = true
+		}
 
-	event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
-		LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
-		CalendarID: g.CalendarID, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventID,
-		IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType} */
+		event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
+	//	LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
+	//	CalendarID: g.CalendarID, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventID,
+	//	IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType} */
 
 	return model.LegacyEvent{}
 }
