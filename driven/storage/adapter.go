@@ -212,7 +212,7 @@ func (a *Adapter) FindGlobalConfig(context TransactionContext, key string) (*mod
 	return &globalConfig, nil
 }
 
-// FindGlobalConfig saves global config
+// SaveGlobalConfig saves global config
 func (a *Adapter) SaveGlobalConfig(context TransactionContext, globalConfig model.GlobalConfigEntry) error {
 	filter := bson.D{primitive.E{Key: "_id", Value: globalConfig.ID}}
 	err := a.db.globalConfigs.ReplaceOneWithContext(context, filter, globalConfig, nil)
