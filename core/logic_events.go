@@ -36,6 +36,10 @@ type eventsLogic struct {
 	logger logs.Logger
 
 	eventsBBAdapter EventsBBAdapter
+
+	//web tools timer
+	dailyWebToolsTimer *time.Timer
+	timerDone          chan bool
 }
 
 func (e eventsLogic) start() error {
@@ -46,9 +50,8 @@ func (e eventsLogic) start() error {
 		return err
 	}
 
-	//hold on for now.. use timer
-	//events, _ := e.getAllEvents()
-	//fmt.Println(events)
+	//2. set up web tools timer
+	go e.setupWebToolsTimer()
 
 	return nil
 }
@@ -124,6 +127,57 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 		e.logger.Info("Successfuly imported initial events")
 	}
 	return nil
+}
+
+func (e eventsLogic) setupWebToolsTimer() {
+	log.Println("Web tools timer")
+
+	//cancel if active
+	if e.dailyWebToolsTimer != nil {
+		log.Println("setupWebToolsTimer -> there is active timer, so cancel it")
+
+		e.timerDone <- true
+		e.dailyWebToolsTimer.Stop()
+	}
+
+	//wait until it is the correct moment from the day
+	location, err := time.LoadLocation("America/Chicago")
+	if err != nil {
+		log.Printf("Error getting location:%s\n", err.Error())
+	}
+	now := time.Now().In(location)
+	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
+
+	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+	desiredMoment := 18000
+
+	var durationInSeconds int
+	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
+	if nowSecondsInDay <= desiredMoment {
+		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
+		durationInSeconds = desiredMoment - nowSecondsInDay
+	} else {
+		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
+		leftToday := 86400 - nowSecondsInDay
+		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
+	}
+	//log.Println(durationInSeconds)
+	//duration := time.Second * time.Duration(20)
+	duration := time.Second * time.Duration(durationInSeconds)
+	log.Printf("setupWebToolsTimer -> first call after %s", duration)
+
+	e.dailyWebToolsTimer = time.NewTimer(duration)
+	select {
+	case <-e.dailyWebToolsTimer.C:
+		log.Println("setupWebToolsTimer -> web tools timer expired")
+		e.dailyWebToolsTimer = nil
+
+		e.getAllEvents()
+	case <-e.timerDone:
+		// timer aborted
+		log.Println("setupWebToolsTimer -> web tools timer aborted")
+		e.dailyWebToolsTimer = nil
+	}
 }
 
 func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
@@ -216,5 +270,6 @@ func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEv
 
 // newAppEventsLogic creates new appShared
 func newAppEventsLogic(app *Application, eventsBBAdapter EventsBBAdapter, logger logs.Logger) eventsLogic {
-	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter, logger: logger}
+	timerDone := make(chan bool)
+	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter, timerDone: timerDone, logger: logger}
 }
