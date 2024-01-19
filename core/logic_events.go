@@ -86,9 +86,9 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 	return nil
 }
 
-func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
-	var allevents []model.WebToolsEvent
-	var events []model.WebToolsEvent
+func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
+	var allevents []model.WebToolsEventItem
+	var events []model.WebToolsEventItem
 	var legacyEvent []model.LegacyEvent
 	page := 0
 	for {
@@ -104,14 +104,14 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 			break
 		}
 
-		var parsed model.WebToolsEvent
+		var parsed model.WebToolsEventItem
 		err = xml.Unmarshal(data, &parsed)
 		if err != nil {
 			log.Printf("error: %s", err)
 			break
 		}
 
-		count := len(parsed.PublicEventWS)
+		count := len(parsed.WebToolsEvent)
 		log.Printf("Events count: %d", count)
 
 		//io.Write(file)
@@ -124,8 +124,8 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 	}
 
 	for _, w := range allevents {
-		if w.PublicEventWS != nil {
-			for _, g := range w.PublicEventWS {
+		if w.WebToolsEvent != nil {
+			for _, g := range w.WebToolsEvent {
 
 				var isVirtual bool
 				if g.VirtualEvent == "false" {
@@ -161,6 +161,37 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEvent, error) {
 	//fmt.Println(le)
 
 	return allevents, nil
+}
+
+func (e eventsLogic) constructLegacyEvents(webToolsEvent model.WebToolsEventItem) model.LegacyEvent {
+	/*g := webToolsEvent.PublicEventWS
+
+	var isVirtual bool
+	if g.VirtualEvent == "false" {
+		isVirtual = false
+	} else if g.VirtualEvent == "true" {
+		isVirtual = true
+	}
+
+	var IsEventFree bool
+	if g.CostFree == "false" {
+		IsEventFree = false
+	} else if g.CostFree == "true" {
+		IsEventFree = true
+	}
+
+	var Recurrence bool
+	if g.Recurrence == "false" {
+		Recurrence = false
+	} else if g.Recurrence == "true" {
+		Recurrence = true
+	}
+
+	event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
+	//	LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
+	//	CalendarID: g.CalendarID, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventID,
+	//	IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType} */
+	return model.LegacyEvent{}
 }
 
 // newAppEventsLogic creates new appShared
