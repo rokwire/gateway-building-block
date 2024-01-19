@@ -54,8 +54,26 @@ func (e eventsLogic) start() error {
 }
 
 func (e eventsLogic) importInitialEventsFromEventsBB() error {
+	importProcessed := false
+
 	//in transaction
 	err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+
+		//first check if need to import
+		config, err := e.app.storage.FindGlobalConfig(context, "initial-legacy-events-import")
+		if err != nil {
+			return err
+		}
+		if config == nil {
+			return errors.New("no initial legacy events import config added")
+		}
+		processed := config.Data["processed"].(bool)
+		if processed {
+			importProcessed = true
+			return nil //no need to execute processing
+		}
+
+		// we make initial import
 
 		//load the events
 		events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
@@ -86,14 +104,25 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 			return err
 		}
 
+		//mark as processed
+		config.Data["processed"] = true
+		err = e.app.storage.SaveGlobalConfig(context, *config)
+		if err != nil {
+			return err
+		}
+
 		return nil
-	}, 15000)
+	}, 60000)
 
 	if err != nil {
 		return err
 	}
 
-	e.logger.Info("Successfuly imported initial events")
+	if importProcessed {
+		e.logger.Info("Initial events already imported")
+	} else {
+		e.logger.Info("Successfuly imported initial events")
+	}
 	return nil
 }
 
