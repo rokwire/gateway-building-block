@@ -54,7 +54,11 @@ func (collWrapper *collectionWrapper) Find(ctx context.Context, filter interface
 	return err
 }
 
-func (collWrapper *collectionWrapper) FindOne(ctx context.Context, filter interface{}, result interface{}, findOptions *options.FindOneOptions) error {
+func (collWrapper *collectionWrapper) FindOne(filter interface{}, result interface{}, findOptions *options.FindOneOptions) error {
+	return collWrapper.FindOneWithContext(context.Background(), filter, result, findOptions)
+}
+
+func (collWrapper *collectionWrapper) FindOneWithContext(ctx context.Context, filter interface{}, result interface{}, findOptions *options.FindOneOptions) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -76,7 +80,11 @@ func (collWrapper *collectionWrapper) FindOne(ctx context.Context, filter interf
 	return nil
 }
 
-func (collWrapper *collectionWrapper) ReplaceOne(ctx context.Context, filter interface{}, replacement interface{}, replaceOptions *options.ReplaceOptions) error {
+func (collWrapper *collectionWrapper) ReplaceOne(filter interface{}, replacement interface{}, replaceOptions *options.ReplaceOptions) error {
+	return collWrapper.ReplaceOneWithContext(context.Background(), filter, replacement, replaceOptions)
+}
+
+func (collWrapper *collectionWrapper) ReplaceOneWithContext(ctx context.Context, filter interface{}, replacement interface{}, replaceOptions *options.ReplaceOptions) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}

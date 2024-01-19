@@ -98,6 +98,9 @@ type Storage interface {
 	RegisterStorageListener(listener storage.Listener)
 	PerformTransaction(func(context storage.TransactionContext) error, int64) error
 
+	FindGlobalConfig(context storage.TransactionContext, key string) (*model.GlobalConfigEntry, error)
+	SaveGlobalConfig(context storage.TransactionContext, globalConfig model.GlobalConfigEntry) error
+
 	FindConfig(configType string, appID string, orgID string) (*model.Config, error)
 	FindConfigByID(id string) (*model.Config, error)
 	FindConfigs(configType *string) ([]model.Config, error)

@@ -16,6 +16,7 @@ package model
 
 // GlobalConfigEntry represents global config entry.
 type GlobalConfigEntry struct {
+	ID   string                 `bson:"_id"`
 	Key  string                 `bson:"key"`
-	Text map[string]interface{} `bson:"data"`
+	Data map[string]interface{} `bson:"data"`
 }

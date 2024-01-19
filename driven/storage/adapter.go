@@ -195,6 +195,33 @@ func (a *Adapter) loadConfigs() ([]model.Config, error) {
 	return configs, nil
 }
 
+// FindGlobalConfig finds global config by key
+func (a *Adapter) FindGlobalConfig(context TransactionContext, key string) (*model.GlobalConfigEntry, error) {
+	var err error
+
+	filter := bson.D{
+		bson.E{Key: "key", Value: key},
+	}
+
+	var globalConfig model.GlobalConfigEntry
+	err = a.db.globalConfigs.FindOneWithContext(context, filter, &globalConfig, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &globalConfig, nil
+}
+
+// FindGlobalConfig saves global config
+func (a *Adapter) SaveGlobalConfig(context TransactionContext, globalConfig model.GlobalConfigEntry) error {
+	filter := bson.D{primitive.E{Key: "_id", Value: globalConfig.ID}}
+	err := a.db.globalConfigs.ReplaceOneWithContext(context, filter, globalConfig, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // FindConfig finds the config for the specified type, appID, and orgID
 func (a *Adapter) FindConfig(configType string, appID string, orgID string) (*model.Config, error) {
 	return a.getCachedConfig("", configType, appID, orgID)
