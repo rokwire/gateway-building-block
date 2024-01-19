@@ -19,6 +19,7 @@ package core
 
 import (
 	"application/core/model"
+	"application/driven/storage"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -38,51 +39,61 @@ type eventsLogic struct {
 }
 
 func (e eventsLogic) start() error {
-	//hold on for now.. use timer
-	//events, _ := e.getAllEvents()
-	//fmt.Println(events)
 
-	//TODO - check if imported
+	//1. check if the initial import must be applied - it happens only once!
 	err := e.importInitialEventsFromEventsBB()
 	if err != nil {
 		return err
 	}
 
+	//hold on for now.. use timer
+	//events, _ := e.getAllEvents()
+	//fmt.Println(events)
+
 	return nil
 }
 
 func (e eventsLogic) importInitialEventsFromEventsBB() error {
-	//load the events
-	events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
-	if err != nil {
-		return err
-	}
+	//in transaction
+	err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 
-	//they cannot be 0
-	eventsCount := len(events)
-	if eventsCount == 0 {
-		return errors.New("cannot have 0 events, there is an error")
-	}
+		//load the events
+		events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
+		if err != nil {
+			return err
+		}
 
-	e.logger.Infof("Got %d events from events BB", eventsCount)
+		//they cannot be 0
+		eventsCount := len(events)
+		if eventsCount == 0 {
+			return errors.New("cannot have 0 events, there is an error")
+		}
 
-	//prepare the list which we will stored
-	syncProcessSource := "events-bb-initial"
-	now := time.Now()
-	resultList := make([]model.LegacyEventItem, eventsCount)
-	for i, le := range events {
-		leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
-		resultList[i] = leItem
-	}
+		e.logger.Infof("Got %d events from events BB", eventsCount)
 
-	//insert the initial events
-	err = e.app.storage.InsertLegacyEvents(nil, resultList)
+		//prepare the list which we will store
+		syncProcessSource := "events-bb-initial"
+		now := time.Now()
+		resultList := make([]model.LegacyEventItem, eventsCount)
+		for i, le := range events {
+			leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
+			resultList[i] = leItem
+		}
+
+		//insert the initial events
+		err = e.app.storage.InsertLegacyEvents(context, resultList)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}, 15000)
+
 	if err != nil {
 		return err
 	}
 
 	e.logger.Info("Successfuly imported initial events")
-
 	return nil
 }
 
