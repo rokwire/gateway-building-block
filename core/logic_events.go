@@ -26,6 +26,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rokwire/logging-library-go/v2/logs"
@@ -234,38 +235,245 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
 }
 
 func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEvent {
+	/*  for pe in XML2JSON:
+	    # decide not to skip if location not exist or empty.
+	    # if not pe.get('location'):
+	    #     continue
+	    entry = dict()
 
-	// For Stefan:
-	//apply the needed processing so that to convert the web tools event in legacy event 100% how it happens in the old code!
+	    if pe['timeType'] == "ALL_DAY":
+	        # skip all day event. (https://github.com/rokwire/events-manager/issues/1086)
+	        continue
 
-	/*
-		var isVirtual bool
-		if g.VirtualEvent == "false" {
-			isVirtual = false
-		} else if g.VirtualEvent == "true" {
-			isVirtual = true
-		}
+	    if pe.get("shareWithIllinoisMobileApp", "false") == "false":
+	        dataSourceEventId = pe.get("eventId", "")
+	        result = find_one(
+	            current_app.config['EVENT_COLLECTION'],
+	            condition={'dataSourceEventId': dataSourceEventId}
+	        )
+	        if result:
+	            notSharedWithMobileList.append(result["_id"])
+	        continue
 
-		var IsEventFree bool
-		if g.CostFree == "false" {
-			IsEventFree = false
-		} else if g.CostFree == "true" {
-			IsEventFree = true
-		}
 
-		var Recurrence bool
-		if g.Recurrence == "false" {
-			Recurrence = false
-		} else if g.Recurrence == "true" {
-			Recurrence = true
-		}
+	    if 'virtualEventURL' in pe:
+	        entry['virtualEventUrl'] = pe['virtualEventURL']
 
-		event := model.LegacyEvent{RecurringFlag: Recurrence, /* RegistrationURL: &g.RegistrationURL,  TitleURL: &g.TitleURL*/
-	//	LongDescription: g.Description, IsEventFree: IsEventFree, AllDay: false, SourceID: "0",
-	//	CalendarID: g.CalendarID, Title: g.Title, Sponsor: g.Sponsor, DataSourceEventID: g.EventID,
-	//	IsVirtial: isVirtual, OriginatingCalendarID: g.OriginatingCalendarID, Category: g.EventType} */
 
-	return model.LegacyEvent{}
+	    # Required Field
+
+	    # find geographical location
+	    skip_google_geoservice = False
+	    if not pe.get('location'):
+	        skip_google_geoservice = True
+	    # flag for checking online event
+	    found_online_event = False
+	    # compare with the existing location
+	    existing_event = find_one(current_app.config['EVENT_COLLECTION'], condition={'dataSourceEventId': entry[
+	        'dataSourceEventId'
+	    ]})
+	    existing_location = existing_event.get('location')
+
+	    # filter out online location
+	    if pe.get('location'):
+	        pe_location_lower_case = pe["location"].lower()
+	        for excluded_location in Config.EXCLUDED_LOCATION:
+	            if excluded_location.lower() in pe_location_lower_case:
+	                skip_google_geoservice = True
+	                found_online_event = True
+	                entry["location"] = {
+	                    "description": pe["location"]
+	                }
+	                break
+
+	    if existing_location:
+	        # mark previouly unidentified online events
+	        if found_online_event:
+	            if existing_location.get('latitude') and existing_location.get('longitude'):
+	                entry["replace_event"] = True
+	        else:
+	            existing_description = existing_location.get('description')
+	            if existing_description == pe.get('location'):
+	                if existing_location.get('latitude') and existing_location.get('longitude'):
+	                    skip_google_geoservice = True
+	                    lat = existing_location.get('latitude')
+	                    lng = existing_location.get('longitude')
+	                    GeoInfo = {
+	                        'latitude': lat,
+	                        'longitude': lng,
+	                        'description': pe['location']
+	                    }
+	                    entry['location'] = GeoInfo
+
+	    if not entry.get('isVirtual') or not skip_google_geoservice:
+	        location = pe.get('location')
+	        calendarName = pe['calendarName']
+	        sponsor = pe['sponsor']
+
+	        if location in predefined_locations:
+	            entry['location'] = predefined_locations[location]
+	            __logger.info("assign predefined geolocation: calendarId: " + str(entry['calendarId']) + ", dataSourceEventId: " + str(entry['dataSourceEventId']))
+	        elif location:
+	            (found, GeoInfo) = search_static_location(calendarName, sponsor, location)
+	            if found:
+	                entry['location'] = GeoInfo
+	            else:
+	                try:
+	                    GeoResponse = gmaps.geocode(address=location+',Urbana', components={'administrative_area': 'Urbana', 'country': "US"})
+	                except googlemaps.exceptions.ApiError as e:
+	                    __logger.error("API Key Error: {}".format(e))
+	                    entry['location'] = {'description': pe['location']}
+	                    xmltoMongoDB.append(entry)
+	                    continue
+
+	                if len(GeoResponse) != 0:
+	                    lat = GeoResponse[0]['geometry']['location']['lat']
+	                    lng = GeoResponse[0]['geometry']['location']['lng']
+	                    GeoInfo = {
+	                        'latitude': lat,
+	                        'longitude': lng,
+	                        'description': pe['location']
+	                    }
+	                    entry['location'] = GeoInfo
+	                else:
+	                    entry['location'] = {'description': pe['location']}
+	                    __logger.error("calendarId: %s, dataSourceEventId: %s,  location: %s geolocation not found" %
+	                          (entry.get('calendarId'), entry.get('dataSourceEventId'), entry.get('location')))
+	        else:
+	            entry['location'] = {
+	                        'description': ""
+	                    }
+	    else:
+	        entry['location'] = {
+	            'description': ""
+	        }
+	    entry_location = entry['location']
+	    if pe['timeType'] == "START_TIME_ONLY":
+	        startDate = pe['startDate']
+	        startTime = pe['startTime']
+	        startDateObj = datetime.strptime(startDate + ' ' + startTime + '', '%m/%d/%Y %I:%M %p')
+	        endDate = pe['endDate']
+	        endDateObj = datetime.strptime(endDate + ' 11:59 pm', '%m/%d/%Y %I:%M %p')
+	        # normalize event datetime to UTC
+	        # TODO: current default time zone is CDT
+	        entry['startDate'] = event_time_conversion.utctime(startDateObj, entry_location.get('latitude', 40.1153287), entry_location.get('longitude', -88.2280659))
+	        entry['endDate'] = event_time_conversion.utctime(endDateObj, entry_location.get('latitude', 40.1153287), entry_location.get('longitude', -88.2280659))
+
+	    elif pe['timeType'] == "START_AND_END_TIME":
+	        startDate = pe['startDate']
+	        startTime = pe['startTime']
+	        endDate = pe['endDate']
+	        endTime = pe['endTime']
+	        startDateObj = datetime.strptime(startDate + ' ' + startTime, '%m/%d/%Y %I:%M %p')
+	        endDateObj = datetime.strptime(endDate + ' ' + endTime, '%m/%d/%Y %I:%M %p')
+	        # normalize event datetime to UTC
+	        # TODO: current default time zone is CDT
+	        entry['startDate'] = event_time_conversion.utctime(startDateObj, entry_location.get('latitude', 40.1153287), entry_location.get('longitude', -88.2280659))
+	        entry['endDate'] = event_time_conversion.utctime(endDateObj, entry_location.get('latitude', 40.1153287), entry_location.get('longitude', -88.2280659))
+
+	    # when time type is None, usually happens in calendar 468
+	    elif pe['timeType'] == "NONE":
+	        entry['allDay'] = True
+	        startDate = pe['startDate']
+	        endDate = pe['endDate']
+	        startDateObj = datetime.strptime(startDate + ' 12:00 am', '%m/%d/%Y %I:%M %p')
+	        endDateObj = datetime.strptime(endDate + ' 11:59 pm', '%m/%d/%Y %I:%M %p')
+	        # normalize event datetime to UTC
+	        # TODO: current default time zone is CDT
+	        entry['startDate'] = event_time_conversion.utctime(startDateObj, entry_location.get('latitude', 40.1153287), entry_location.get('longitude', -88.2280659))
+	        entry['endDate'] = event_time_conversion.utctime(endDateObj, entry_location.get('latitude', 40.1153287), entry_location.get('longitude', -88.2280659))
+
+	    # Optional Field
+
+	    if 'recurrenceId' in pe:
+	        entry['recurrenceId'] = int(pe['recurrenceId'])
+
+	    targetAudience = []
+	    targetAudience.extend(["faculty", "staff"]) if pe['audienceFacultyStaff'] == "true" else None
+	    targetAudience.append("students") if pe['audienceStudents'] == "true" else None
+	    targetAudience.append("public") if pe['audiencePublic'] == "true" else None
+	    targetAudience.append("alumni") if pe['audienceAlumni'] == "true" else None
+	    targetAudience.append("parents") if pe['audienceParents'] == "true" else None
+	    if len(targetAudience) != 0:
+	        entry['targetAudience'] = targetAudience
+
+	    contacts = []
+	    contact = {}
+	    if 'contactName' in pe:
+	        name_list = pe['contactName'].split(' ')
+	        contact['firstName'] = pe['contactName'].split(' ')[0].rstrip(',')
+	        if len(name_list) > 1:
+	            contact['lastName'] = pe['contactName'].split(' ')[1]
+	        else:
+	            contact['lastName'] = ""
+	    if 'contactEmail' in pe:
+	        contact['email'] = pe['contactEmail']
+	    if 'contactPhone' in pe:
+	        contact['phone'] = pe['contactPhone']
+	    contacts.append(contact) if len(contact) != 0 else None
+	    if len(contacts) != 0:
+	        entry['contacts']= contacts
+
+	    # creation information
+	    dateCreatedObj = datetime.strptime(pe['createdDate'] + ' 12:00 am', '%m/%d/%Y %I:%M %p')
+	    entry['dateCreated'] = (dateCreatedObj+timedelta(hours=5)).strftime('%Y-%m-%dT%H:%M:%S')
+	    if 'createdBy' in pe:
+	        entry['createdBy'] = pe['createdBy']
+
+	    # edit information
+	    dataModifiedObj = datetime.strptime(pe['editedDate'] + ' 12:00 am', '%m/%d/%Y %I:%M %p')
+	    entry['dataModified'] = (dataModifiedObj+timedelta(hours=5)).strftime('%Y-%m-%dT%H:%M:%S')
+
+	    xmltoMongoDB.append(entry)
+	__logger.info("Get {} parsed events".format(len(xmltoMongoDB)))
+	__logger.info("Get {} not shareWithIllinoisMobileApp events".format(len(notSharedWithMobileList)))
+	return (xmltoMongoDB, notSharedWithMobileList)
+
+	*/
+
+	var costFree bool
+	if g.CostFree == "false" {
+		costFree = false
+	} else if g.CostFree == "true" {
+		costFree = true
+	}
+
+	var isVirtual bool
+	if g.VirtualEvent == "false" {
+		isVirtual = false
+	} else if g.VirtualEvent == "true" {
+		isVirtual = true
+	}
+
+	var Recurrence bool
+	if g.Recurrence == "false" {
+		Recurrence = false
+	} else if g.Recurrence == "true" {
+		Recurrence = true
+	}
+	icalUrl := fmt.Sprintf("https://calendars.illinois.edu/ical/%s/%s.ics", g.CalendarID, g.EventID)
+	outlookUrl := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
+
+	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
+
+	return model.LegacyEvent{Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
+		Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
+		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalUrl, OutlookURL: outlookUrl,
+		RecurrenceID: recurrenceID}
+}
+
+func recurenceIDtoInt(s string) (*int, error) {
+	// Parse string to int
+	parsedInt, err := strconv.Atoi(s)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a pointer to the parsed integer
+	result := new(int)
+	*result = parsedInt
+
+	return result, nil
 }
 
 // newAppEventsLogic creates new appShared
