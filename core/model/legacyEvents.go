@@ -123,6 +123,7 @@ type LegacyEvent struct {
 	Title                 string          `json:"title" bson:"title"`
 	TitleURL              string          `json:"titleURL" bson:"titleURL"`
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
+	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
 }
 
@@ -146,4 +147,11 @@ type LegacyEventItem struct {
 	SyncDate          time.Time `bson:"sync_date"`
 
 	Item LegacyEvent `bson:"item"`
+}
+
+// ContactLegacy represents event legacy contacts
+type ContactLegacy struct {
+	ContactName  string `json:"contactName" bson:"contactName"`
+	ContactEmail string `json:"contactEmail" bson:"contactEmail"`
+	ContactPhone string `json:"contactPhone" bson:"contactPhone"`
 }
