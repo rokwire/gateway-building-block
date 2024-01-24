@@ -41,8 +41,10 @@ type database struct {
 	globalConfigs *collectionWrapper
 	configs       *collectionWrapper
 	examples      *collectionWrapper
-	legacyEvents  *collectionWrapper
 	unitcalendars *collectionWrapper
+
+	legacyEvents    *collectionWrapper
+	legacyLocations *collectionWrapper
 
 	listeners []Listener
 }
@@ -97,6 +99,12 @@ func (d *database) start() error {
 
 	unitcalendars := &collectionWrapper{database: d, coll: db.Collection("unitcalendars")}
 
+	legacyLocations := &collectionWrapper{database: d, coll: db.Collection("legacy_locations")}
+	err = d.applyLegacyLocationsChecks(legacyEvents)
+	if err != nil {
+		return err
+	}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
@@ -106,6 +114,7 @@ func (d *database) start() error {
 	d.examples = examples
 	d.legacyEvents = legacyEvents
 	d.unitcalendars = unitcalendars
+	d.legacyLocations = legacyLocations
 
 	go d.configs.Watch(nil, d.logger)
 
@@ -161,6 +170,18 @@ func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) erro
 	//TODO - add other - source event id - calendar id?
 
 	d.logger.Info("legacy events passed")
+	return nil
+}
+
+func (d *database) applyLegacyLocationsChecks(locations *collectionWrapper) error {
+	d.logger.Info("apply legacy_locations checks.....")
+
+	err := locations.AddIndex(bson.D{primitive.E{Key: "name", Value: 1}}, false)
+	if err != nil {
+		return err
+	}
+
+	d.logger.Info("legacy legacy_locations passed")
 	return nil
 }
 

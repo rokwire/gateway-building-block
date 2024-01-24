@@ -48,13 +48,25 @@ func (e eventsLogic) start() error {
 	//1. check if the initial import must be applied - it happens only once!
 	err := e.importInitialEventsFromEventsBB()
 	if err != nil {
-		return err
+		//	return err
 	}
 
 	//2. set up web tools timer
 	go e.setupWebToolsTimer()
 
+	//3. initialize event locations db if needs
+	go e.initializeDB()
+
 	return nil
+}
+
+func (e eventsLogic) initializeDB() {
+	e.logger.Info("InitializeLegacyLocations started")
+	defer e.logger.Info("InitializeLegacyLocations ended")
+	err := e.app.storage.InitializeLegacyLocations()
+	if err != nil {
+		e.logger.Errorf("error on initialzing legacy locations db: %s", err)
+	}
 }
 
 func (e eventsLogic) importInitialEventsFromEventsBB() error {
@@ -451,14 +463,14 @@ func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEv
 	} else if g.Recurrence == "true" {
 		Recurrence = true
 	}
-	icalUrl := fmt.Sprintf("https://calendars.illinois.edu/ical/%s/%s.ics", g.CalendarID, g.EventID)
-	outlookUrl := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
+	icalURL := fmt.Sprintf("https://calendars.illinois.edu/ical/%s/%s.ics", g.CalendarID, g.EventID)
+	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
 
 	return model.LegacyEvent{Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
 		Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
-		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalUrl, OutlookURL: outlookUrl,
+		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 		RecurrenceID: recurrenceID}
 }
 
