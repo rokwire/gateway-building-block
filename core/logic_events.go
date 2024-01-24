@@ -48,7 +48,7 @@ func (e eventsLogic) start() error {
 	//1. check if the initial import must be applied - it happens only once!
 	err := e.importInitialEventsFromEventsBB()
 	if err != nil {
-		//	return err
+		return err
 	}
 
 	//2. set up web tools timer
@@ -161,10 +161,10 @@ func (e eventsLogic) setupWebToolsTimer() {
 	now := time.Now().In(location)
 	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
+	//nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+	//desiredMoment := 18000
 
-	var durationInSeconds int
+	/*var durationInSeconds int
 	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
 	if nowSecondsInDay <= desiredMoment {
 		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
@@ -173,10 +173,10 @@ func (e eventsLogic) setupWebToolsTimer() {
 		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+	}*/
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(20)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(0)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	log.Printf("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -467,11 +467,16 @@ func (e eventsLogic) constructLegacyEvents(g model.WebToolsEvent) model.LegacyEv
 	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
+	location := locationToDef(g.Location)
+	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
+	var contacts []model.ContactLegacy
+	contacts = append(contacts, con)
+	contatsLegacy := contactsToDef(contacts)
 
 	return model.LegacyEvent{Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
 		Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
 		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
-		RecurrenceID: recurrenceID}
+		RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy}
 }
 
 func recurenceIDtoInt(s string) (*int, error) {
@@ -486,6 +491,23 @@ func recurenceIDtoInt(s string) (*int, error) {
 	*result = parsedInt
 
 	return result, nil
+}
+
+// Location
+func locationToDef(location string) model.LocationLegacy {
+	return model.LocationLegacy{Description: location}
+}
+
+// Contacts
+func contactToDef(items model.ContactLegacy) model.ContactLegacy {
+	return model.ContactLegacy{ContactName: items.ContactName, ContactEmail: items.ContactEmail, ContactPhone: items.ContactPhone}
+}
+func contactsToDef(items []model.ContactLegacy) []model.ContactLegacy {
+	defs := make([]model.ContactLegacy, len(items))
+	for index := range items {
+		defs[index] = contactToDef(items[index])
+	}
+	return defs
 }
 
 // newAppEventsLogic creates new appShared
