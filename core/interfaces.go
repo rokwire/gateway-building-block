@@ -117,7 +117,10 @@ type Storage interface {
 
 	InitializeLegacyLocations() error
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
+	FindLegacyEvents() ([]model.LegacyEvent, error)
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
+	SaveLegacyEvents(items []model.LegacyEvent) error
+	DeleteLegacyEvents() error
 }
 
 // StorageListener represents storage listener

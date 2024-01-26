@@ -38,3 +38,16 @@ func (a *Adapter) FindCalendars(id string) (*[]model.UnitCalendar, error) {
 
 	return &data, nil
 }
+
+// FindLegacyEvents finds all legacy events
+func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
+	filter := bson.M{}
+
+	var data []model.LegacyEvent
+	err := a.db.legacyEvents.Find(a.context, filter, &data, nil)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
+
+	return data, nil
+}

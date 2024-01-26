@@ -150,8 +150,8 @@ func (collWrapper *collectionWrapper) InsertManyWithContext(ctx context.Context,
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
-	defer cancel()
+	/*ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
+	defer cancel()*/
 
 	result, err := collWrapper.coll.InsertMany(ctx, documents, opts)
 	if err != nil {

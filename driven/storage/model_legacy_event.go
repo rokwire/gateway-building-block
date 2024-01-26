@@ -16,41 +16,41 @@ package storage
 
 // legacyEvent wrapper
 type legacyEvent struct {
-	AllDay            bool    `json:"allDay"`
-	CalendarID        string  `json:"calendarId"`
-	Category          string  `json:"category"`
-	Subcategory       string  `json:"subcategory"`
-	CreatedBy         string  `json:"createdBy"`
-	LongDescription   string  `json:"longDescription"`
-	DataModified      string  `json:"dataModified"`
-	DataSourceEventID string  `json:"dataSourceEventId"`
-	DateCreated       string  `json:"dateCreated"`
-	EndDate           string  `json:"endDate"`
-	EventID           string  `json:"eventId"`
-	IcalURL           string  `json:"icalUrl"`
-	ID                string  `json:"id"`
-	ImageURL          *string `json:"imageURL"`
-	IsEventFree       bool    `json:"isEventFree"`
-	IsVirtial         bool    `json:"isVirtual"`
+	AllDay            bool    `bson:"allDay"`
+	CalendarID        string  `bson:"calendarId"`
+	Category          string  `bson:"category"`
+	Subcategory       string  `bson:"subcategory"`
+	CreatedBy         string  `bson:"createdBy"`
+	LongDescription   string  `bson:"longDescription"`
+	DataModified      string  `bson:"dataModified"`
+	DataSourceEventID string  `bson:"dataSourceEventId"`
+	DateCreated       string  `bson:"dateCreated"`
+	EndDate           string  `bson:"endDate"`
+	EventID           string  `bson:"eventId"`
+	IcalURL           string  `bson:"icalUrl"`
+	ID                string  `bson:"id"`
+	ImageURL          *string `bson:"imageURL"`
+	IsEventFree       bool    `bson:"isEventFree"`
+	IsVirtial         bool    `bson:"isVirtual"`
 	Location          *struct {
-		Description string  `json:"description"`
-		Latitude    float64 `json:"latitude"`
-		Longitude   float64 `json:"longitude"`
-	} `json:"location"`
-	OriginatingCalendarID string  `json:"originatingCalendarId"`
-	OutlookURL            string  `json:"outlookUrl"`
-	RecurrenceID          *int    `json:"recurrenceId"`
-	IsSuperEvent          bool    `json:"isSuperEvent"`
-	RecurringFlag         bool    `json:"recurringFlag"`
-	SourceID              string  `json:"sourceId"`
-	Sponsor               string  `json:"sponsor"`
-	StartDate             string  `json:"startDate"`
-	Title                 string  `json:"title"`
-	TitleURL              *string `json:"titleURL"`
-	RegistrationURL       *string `json:"registrationURL"`
+		Description string  `bson:"description"`
+		Latitude    float64 `bson:"latitude"`
+		Longitude   float64 `bson:"longitude"`
+	} `bson:"location"`
+	OriginatingCalendarID string  `bson:"originatingCalendarId"`
+	OutlookURL            string  `bson:"outlookUrl"`
+	RecurrenceID          *int    `bson:"recurrenceId"`
+	IsSuperEvent          bool    `bson:"isSuperEvent"`
+	RecurringFlag         bool    `bson:"recurringFlag"`
+	SourceID              string  `bson:"sourceId"`
+	Sponsor               string  `bson:"sponsor"`
+	StartDate             string  `bson:"startDate"`
+	Title                 string  `bson:"title"`
+	TitleURL              *string `bson:"titleURL"`
+	RegistrationURL       *string `bson:"registrationURL"`
 	SubEvents             []struct {
-		ID         string `json:"id"`
-		IsFeatured bool   `json:"isFeatured"`
-		Track      string `json:"track"`
-	} `json:"subEvents"`
+		ID         string `bson:"id"`
+		IsFeatured bool   `bson:"isFeatured"`
+		Track      string `bson:"track"`
+	} `bson:"subEvents"`
 }

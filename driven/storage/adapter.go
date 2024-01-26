@@ -295,6 +295,23 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 	return nil
 }
 
+// SaveLegacyEvents inserts legacy events
+func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
+	//	le := legacyEventsToStorage(legacyEvents)
+
+	storageItems := make([]interface{}, len(legacyEvents))
+	for i, p := range legacyEvents {
+		storageItems[i] = p
+	}
+
+	_, err := a.db.legacyEvents.InsertManyWithContext(nil, storageItems, nil)
+	if err != nil {
+		return errors.WrapErrorAction("insert", "legacy events", nil, err)
+	}
+
+	return nil
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction

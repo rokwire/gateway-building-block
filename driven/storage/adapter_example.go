@@ -20,7 +20,6 @@ import (
 	"github.com/rokwire/logging-library-go/v2/errors"
 	"github.com/rokwire/logging-library-go/v2/logutils"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // FindExample finds example by id
@@ -73,34 +72,9 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 	return nil
 }
 
-// FindCalendarEvents finds events persons by users external ids and event
-func (a *Adapter) findCalendarEvents(eventIDs []string) ([]model.LegacyEvent, error) {
-	filter := bson.D{
-		primitive.E{Key: "eventId", Value: primitive.M{"$in": eventIDs}},
-	}
-
-	var list []legacyEvent
-	err := a.db.legacyEvents.Find(nil, filter, &list, nil)
-
-	if err != nil {
-		return nil, err
-	}
-	resultList := legacyEventsFromStorage(list)
-	return resultList, err
-}
-
-// FindAllEvents finds events persons by users external ids and event
-func (a *Adapter) findAllEvents() ([]model.LegacyEvent, error) {
-	filter := bson.D{
-		primitive.E{},
-	}
-
-	var list []legacyEvent
-	err := a.db.legacyEvents.Find(nil, filter, &list, nil)
-
-	if err != nil {
-		return nil, err
-	}
-	resultList := legacyEventsFromStorage(list)
-	return resultList, err
+// DeleteReminder Deletes a reminder
+func (a *Adapter) DeleteLegacyEvents() error {
+	filter := bson.D{}
+	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
+	return err
 }
