@@ -29,6 +29,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -247,7 +248,7 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
 		log.Printf("error: %s", err)
 		return nil, err
 	}
-	if len(findLegacyEvent) > 0 {
+	if len(findLegacyEvent) >= 0 {
 		err = e.app.storage.DeleteLegacyEvents()
 	}
 
@@ -259,7 +260,7 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
 
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEvent {
 
-	//	ID := uuid.NewString()
+	ID := uuid.NewString()
 	var costFree bool
 	if g.CostFree == "false" {
 		costFree = false
@@ -290,7 +291,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEve
 	contacts = append(contacts, con)
 	contatsLegacy := contactsToDef(contacts)
 
-	return model.LegacyEvent{Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
+	return model.LegacyEvent{ID: ID, Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
 		Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
 		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 		RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy}

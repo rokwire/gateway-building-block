@@ -16,14 +16,12 @@ package storage
 
 import (
 	"application/core/model"
-
-	"github.com/google/uuid"
 )
 
 // LegacyEvent
 func legacyEventToStorage(item model.LegacyEvent) legacyEvent {
-	ID := uuid.NewString()
-	return legacyEvent{ID: ID, AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
+
+	return legacyEvent{AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
 		Subcategory: item.Subcategory, CreatedBy: item.CreatedBy, LongDescription: item.LongDescription, DataModified: item.DataModified,
 		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate, EventID: item.EventID,
 		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, Location: (*struct {
@@ -45,7 +43,7 @@ func legacyEventsToStorage(itemsList []model.LegacyEvent) []legacyEvent {
 }
 
 func legacyEventFromStorage(item legacyEvent) model.LegacyEvent {
-	return model.LegacyEvent{ID: item.ID, AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
+	return model.LegacyEvent{AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
 		Subcategory: item.Subcategory, CreatedBy: item.CreatedBy, LongDescription: item.LongDescription, DataModified: item.DataModified,
 		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate, EventID: item.EventID,
 		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, /*Location*/

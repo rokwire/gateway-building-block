@@ -28,7 +28,6 @@ type legacyEvent struct {
 	EndDate           string  `bson:"endDate"`
 	EventID           string  `bson:"eventId"`
 	IcalURL           string  `bson:"icalUrl"`
-	ID                string  `bson:"id"`
 	ImageURL          *string `bson:"imageURL"`
 	IsEventFree       bool    `bson:"isEventFree"`
 	IsVirtial         bool    `bson:"isVirtual"`

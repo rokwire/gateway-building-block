@@ -297,14 +297,13 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 
 // SaveLegacyEvents inserts legacy events
 func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
-	//	le := legacyEventsToStorage(legacyEvents)
 
-	storageItems := make([]interface{}, len(legacyEvents))
-	for i, p := range legacyEvents {
-		storageItems[i] = p
+	records := []interface{}{}
+	for _, event := range legacyEvents {
+		records = append(records, legacyEventToStorage(event))
 	}
 
-	_, err := a.db.legacyEvents.InsertManyWithContext(nil, storageItems, nil)
+	_, err := a.db.legacyEvents.InsertManyWithContext(nil, records, nil)
 	if err != nil {
 		return errors.WrapErrorAction("insert", "legacy events", nil, err)
 	}
