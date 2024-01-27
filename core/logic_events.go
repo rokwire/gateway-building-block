@@ -154,30 +154,30 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.dailyWebToolsTimer.Stop()
 	}
 
-	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
-	if err != nil {
-		log.Printf("Error getting location:%s\n", err.Error())
-	}
-	now := time.Now().In(location)
-	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
+	/*	//wait until it is the correct moment from the day
+		location, err := time.LoadLocation("America/Chicago")
+		if err != nil {
+			log.Printf("Error getting location:%s\n", err.Error())
+		}
+		now := time.Now().In(location)
+		log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
+		nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+		desiredMoment := 18000
 
-	var durationInSeconds int
-	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
-	if nowSecondsInDay <= desiredMoment {
-		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
-		durationInSeconds = desiredMoment - nowSecondsInDay
-	} else {
-		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
-		leftToday := 86400 - nowSecondsInDay
-		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+		var durationInSeconds int
+		log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
+		if nowSecondsInDay <= desiredMoment {
+			log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
+			durationInSeconds = desiredMoment - nowSecondsInDay
+		} else {
+			log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
+			leftToday := 86400 - nowSecondsInDay
+			durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
+		} */
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(0)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	log.Printf("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -196,14 +196,32 @@ func (e eventsLogic) setupWebToolsTimer() {
 
 func (e eventsLogic) processWebToolsEvents() {
 	//load all web tools events
-	allWebToolsEvents, err := e.loadAllWebToolsEvents()
+	allWebToolsEventsItems, err := e.loadAllWebToolsEventsItems()
 	if err != nil {
-		e.logger.Errorf("error on loading web tools events - %s", err)
+		e.logger.Errorf("error on loading web tools events items - %s", err)
+		return
+	}
+	webToolsItemsCount := len(allWebToolsEventsItems)
+	if len(allWebToolsEventsItems) == 0 {
+		e.logger.Error("web tools items are nil")
 		return
 	}
 
+	e.logger.Infof("we loaded %d web tools events items", webToolsItemsCount)
+
+	//get the web tools items
+	allWebToolsEvents := []model.WebToolsEvent{}
+	for _, w := range allWebToolsEventsItems {
+		if w.WebToolsEvent != nil {
+			allWebToolsEvents = append(allWebToolsEvents, w.WebToolsEvent...)
+		}
+	}
+
+	allWebToolsEventsCount := len(allWebToolsEvents)
+	e.logger.Infof("and they have %d web tools events inside", allWebToolsEventsCount)
+
 	//TODO
-	log.Println(allWebToolsEvents)
+
 	/*for _, w := range allevents {
 		if w.WebToolsEvent != nil {
 			for _, g := range w.WebToolsEvent {
@@ -240,11 +258,9 @@ func (e eventsLogic) processWebToolsEvents() {
 	*/
 }
 
-func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEventItem, error) {
+func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsEventItem, error) {
 	var allevents []model.WebToolsEventItem
 	var events []model.WebToolsEventItem
-
-	//	var leg []model.LegacyEvent
 
 	page := 0
 	for {
