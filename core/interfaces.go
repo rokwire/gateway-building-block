@@ -116,12 +116,13 @@ type Storage interface {
 	FindCalendars(id string) (*[]model.UnitCalendar, error)
 
 	InitializeLegacyLocations() error
+	//not used
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
 
-	FindLegacyEvents() ([]model.LegacyEvent, error)
+	//FindLegacyEvents() ([]model.LegacyEvent, error)
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
-	SaveLegacyEvents(items []model.LegacyEvent) error
-	DeleteLegacyEvents() error
+	//SaveLegacyEvents(items []model.LegacyEvent) error
+	//DeleteLegacyEvents() error
 }
 
 // StorageListener represents storage listener

@@ -244,17 +244,17 @@ func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
 				}
 			}
 		}
+		/*
+			findLegacyEvent, err := e.app.storage.FindLegacyEvents()
+			if err != nil {
+				log.Printf("error: %s", err)
+				return err
+			}
+			if len(findLegacyEvent) >= 0 {
+				err = e.app.storage.DeleteLegacyEvents()
+			}
 
-		findLegacyEvent, err := e.app.storage.FindLegacyEvents()
-		if err != nil {
-			log.Printf("error: %s", err)
-			return err
-		}
-		if len(findLegacyEvent) >= 0 {
-			err = e.app.storage.DeleteLegacyEvents()
-		}
-
-		err = e.app.storage.SaveLegacyEvents(legacyEvent)
+			err = e.app.storage.SaveLegacyEvents(legacyEvent) */
 
 		return nil
 	}, 60000)

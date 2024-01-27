@@ -279,6 +279,7 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
+/*
 // FindLegacyEvents finds all legacy events
 func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
@@ -290,7 +291,7 @@ func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
 	}
 
 	return data, nil
-}
+} */
 
 // InsertLegacyEvents inserts legacy events
 func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {
@@ -308,6 +309,7 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 	return nil
 }
 
+/*
 // SaveLegacyEvents inserts legacy events
 func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
 
@@ -329,7 +331,7 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	filter := bson.M{}
 	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
 	return err
-}
+} */
 
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
