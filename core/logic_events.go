@@ -186,7 +186,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		log.Println("setupWebToolsTimer -> web tools timer expired")
 		e.dailyWebToolsTimer = nil
 
-		e.getAllEvents()
+		e.processWebToolsEvents()
 	case <-e.timerDone:
 		// timer aborted
 		log.Println("setupWebToolsTimer -> web tools timer aborted")
@@ -194,75 +194,92 @@ func (e eventsLogic) setupWebToolsTimer() {
 	}
 }
 
-func (e eventsLogic) getAllEvents() ([]model.WebToolsEventItem, error) {
-	//in transaction
-	err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-		var allevents []model.WebToolsEventItem
-		var events []model.WebToolsEventItem
-		var legacyEvent []model.LegacyEvent
-		//	var leg []model.LegacyEvent
-
-		page := 0
-		for {
-			resp, err := http.Get(fmt.Sprintf("https://xml.calendars.illinois.edu/eventXML16/6991.xml?pageNumber=%d", page))
-			if err != nil {
-				log.Printf("error: %s", err)
-				break
-			}
-
-			data, err := io.ReadAll(resp.Body)
-			if err != nil {
-				log.Printf("error: %s", err)
-				break
-			}
-
-			var parsed model.WebToolsEventItem
-			err = xml.Unmarshal(data, &parsed)
-			if err != nil {
-				log.Printf("error: %s", err)
-				break
-			}
-
-			count := len(parsed.WebToolsEvent)
-			log.Printf("Events count: %d", count)
-
-			//io.Write(file)
-			if count == 0 {
-				break
-			}
-			page++
-			events = append(events, parsed)
-			allevents = append(allevents, events...)
-		}
-
-		for _, w := range allevents {
-			if w.WebToolsEvent != nil {
-				for _, g := range w.WebToolsEvent {
-
-					event := e.constructLegacyEvent(g)
-					legacyEvent = append(legacyEvent, event)
-				}
-			}
-		}
-		/*
-			findLegacyEvent, err := e.app.storage.FindLegacyEvents()
-			if err != nil {
-				log.Printf("error: %s", err)
-				return err
-			}
-			if len(findLegacyEvent) >= 0 {
-				err = e.app.storage.DeleteLegacyEvents()
-			}
-
-			err = e.app.storage.SaveLegacyEvents(legacyEvent) */
-
-		return nil
-	}, 60000)
-
+func (e eventsLogic) processWebToolsEvents() {
+	//load all web tools events
+	allWebToolsEvents, err := e.loadAllWebToolsEvents()
 	if err != nil {
-		return nil, err
+		e.logger.Errorf("error on loading web tools events - %s", err)
+		return
 	}
-	return nil, nil
+
+	//TODO
+	log.Println(allWebToolsEvents)
+	/*for _, w := range allevents {
+		if w.WebToolsEvent != nil {
+			for _, g := range w.WebToolsEvent {
+
+				event := e.constructLegacyEvent(g)
+				legacyEvent = append(legacyEvent, event)
+			}
+		}
+	} */
+
+	/*
+	   //in transaction
+	   err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+
+	   			findLegacyEvent, err := e.app.storage.FindLegacyEvents()
+	   			if err != nil {
+	   				log.Printf("error: %s", err)
+	   				return err
+	   			}
+	   			if len(findLegacyEvent) >= 0 {
+	   				err = e.app.storage.DeleteLegacyEvents()
+	   			}
+
+	   			err = e.app.storage.SaveLegacyEvents(legacyEvent)
+
+	   		return nil
+	   	}, 60000)
+
+	   	if err != nil {
+	   		return nil, err
+	   	}
+
+	   return nil, nil
+	*/
+}
+
+func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEventItem, error) {
+	var allevents []model.WebToolsEventItem
+	var events []model.WebToolsEventItem
+
+	//	var leg []model.LegacyEvent
+
+	page := 0
+	for {
+		resp, err := http.Get(fmt.Sprintf("https://xml.calendars.illinois.edu/eventXML16/6991.xml?pageNumber=%d", page))
+		if err != nil {
+			log.Printf("error: %s", err)
+			break
+		}
+
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Printf("error: %s", err)
+			break
+		}
+
+		var parsed model.WebToolsEventItem
+		err = xml.Unmarshal(data, &parsed)
+		if err != nil {
+			log.Printf("error: %s", err)
+			break
+		}
+
+		count := len(parsed.WebToolsEvent)
+		log.Printf("Events count: %d", count)
+
+		//io.Write(file)
+		if count == 0 {
+			break
+		}
+		page++
+		events = append(events, parsed)
+		allevents = append(allevents, events...)
+	}
+
+	return allevents, nil
 }
 
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEvent {
