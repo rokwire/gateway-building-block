@@ -279,6 +279,19 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
+// FindLegacyEvents finds all legacy events
+func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
+	filter := bson.M{}
+
+	var data []model.LegacyEvent
+	err := a.db.legacyEvents.Find(a.context, filter, &data, nil)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
+
+	return data, nil
+}
+
 // InsertLegacyEvents inserts legacy events
 func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {
 
@@ -309,6 +322,13 @@ func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
 	}
 
 	return nil
+}
+
+// DeleteLegacyEvents Deletes a reminder
+func (a *Adapter) DeleteLegacyEvents() error {
+	filter := bson.M{}
+	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
+	return err
 }
 
 // PerformTransaction performs a transaction

@@ -71,10 +71,3 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 
 	return nil
 }
-
-// DeleteLegacyEvents Deletes a reminder
-func (a *Adapter) DeleteLegacyEvents() error {
-	filter := bson.M{}
-	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
-	return err
-}
