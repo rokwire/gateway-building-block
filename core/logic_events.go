@@ -196,29 +196,30 @@ func (e eventsLogic) setupWebToolsTimer() {
 
 func (e eventsLogic) processWebToolsEvents() {
 	//load all web tools events
-	allWebToolsEventsItems, err := e.loadAllWebToolsEventsItems()
+	allWebToolsEvents, err := e.loadAllWebToolsEvents()
 	if err != nil {
-		e.logger.Errorf("error on loading web tools events items - %s", err)
+		e.logger.Errorf("error on loading web tools events - %s", err)
 		return
 	}
-	webToolsItemsCount := len(allWebToolsEventsItems)
-	if len(allWebToolsEventsItems) == 0 {
-		e.logger.Error("web tools items are nil")
+	webToolsCount := len(allWebToolsEvents)
+	if webToolsCount == 0 {
+		e.logger.Error("web tools are nil")
 		return
 	}
 
-	e.logger.Infof("we loaded %d web tools events items", webToolsItemsCount)
+	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
-	//get the web tools items
-	allWebToolsEvents := []model.WebToolsEvent{}
-	for _, w := range allWebToolsEventsItems {
-		if w.WebToolsEvents != nil {
-			allWebToolsEvents = append(allWebToolsEvents, w.WebToolsEvents...)
+	/*
+		//get the web tools items
+		allWebToolsEvents := []model.WebToolsEvent{}
+		for _, w := range allWebToolsEventsItems {
+			if w.WebToolsEvents != nil {
+				allWebToolsEvents = append(allWebToolsEvents, w.WebToolsEvents...)
+			}
 		}
-	}
 
-	allWebToolsEventsCount := len(allWebToolsEvents)
-	e.logger.Infof("and they have %d web tools events inside", allWebToolsEventsCount)
+		allWebToolsEventsCount := len(allWebToolsEvents)
+		e.logger.Infof("and they have %d web tools events inside", allWebToolsEventsCount) */
 
 	//TODO
 
@@ -258,8 +259,8 @@ func (e eventsLogic) processWebToolsEvents() {
 	*/
 }
 
-func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsResponse, error) {
-	allResponses := []model.WebToolsResponse{}
+func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
+	allWebToolsEvents := []model.WebToolsEvent{}
 
 	page := 0
 	for {
@@ -291,10 +292,11 @@ func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsResponse, err
 		}
 		page++
 
-		allResponses = append(allResponses, responseData)
+		currentItems := responseData.WebToolsEvents
+		allWebToolsEvents = append(allWebToolsEvents, currentItems...)
 	}
 
-	return allResponses, nil
+	return allWebToolsEvents, nil
 }
 
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEvent {
