@@ -284,7 +284,7 @@ func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsEventItem, er
 		}
 
 		count := len(parsed.WebToolsEvent)
-		log.Printf("Events count: %d", count)
+		log.Printf("page:%d events count: %d", page, count)
 
 		//io.Write(file)
 		if count == 0 {
