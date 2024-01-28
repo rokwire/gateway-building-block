@@ -258,9 +258,8 @@ func (e eventsLogic) processWebToolsEvents() {
 	*/
 }
 
-func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsEventItem, error) {
-	var allevents []model.WebToolsEventItem
-	var events []model.WebToolsEventItem
+func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsResponse, error) {
+	allResponses := []model.WebToolsResponse{}
 
 	page := 0
 	for {
@@ -276,14 +275,14 @@ func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsEventItem, er
 			break
 		}
 
-		var parsed model.WebToolsEventItem
-		err = xml.Unmarshal(data, &parsed)
+		var responseData model.WebToolsResponse
+		err = xml.Unmarshal(data, &responseData)
 		if err != nil {
 			log.Printf("error: %s", err)
 			break
 		}
 
-		count := len(parsed.WebToolsEvents)
+		count := len(responseData.WebToolsEvents)
 		log.Printf("page:%d events count: %d", page, count)
 
 		//io.Write(file)
@@ -291,11 +290,11 @@ func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsEventItem, er
 			break
 		}
 		page++
-		events = append(events, parsed)
-		allevents = append(allevents, events...)
+
+		allResponses = append(allResponses, responseData)
 	}
 
-	return allevents, nil
+	return allResponses, nil
 }
 
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEvent {

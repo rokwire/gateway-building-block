@@ -26,8 +26,8 @@ const (
 	TypeLegacyEvents logutils.MessageDataType = "legacy_events"
 )
 
-// WebToolsEventItem represents web tools event wrapper item
-type WebToolsEventItem struct {
+// WebToolsResponse represents web tools response item
+type WebToolsResponse struct {
 	XMLName        xml.Name        `xml:"responseWS"`
 	Text           string          `xml:",chardata"`
 	Deprecated     string          `xml:"deprecated"`
