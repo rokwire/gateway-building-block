@@ -28,11 +28,11 @@ const (
 
 // WebToolsEventItem represents web tools event wrapper item
 type WebToolsEventItem struct {
-	XMLName       xml.Name        `xml:"responseWS"`
-	Text          string          `xml:",chardata"`
-	Deprecated    string          `xml:"deprecated"`
-	MaxPageSize   string          `xml:"maxPageSize"`
-	WebToolsEvent []WebToolsEvent `xml:"publicEventWS"`
+	XMLName        xml.Name        `xml:"responseWS"`
+	Text           string          `xml:",chardata"`
+	Deprecated     string          `xml:"deprecated"`
+	MaxPageSize    string          `xml:"maxPageSize"`
+	WebToolsEvents []WebToolsEvent `xml:"publicEventWS"`
 }
 
 // WebToolsEvent represents web tools event entity

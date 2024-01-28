@@ -212,8 +212,8 @@ func (e eventsLogic) processWebToolsEvents() {
 	//get the web tools items
 	allWebToolsEvents := []model.WebToolsEvent{}
 	for _, w := range allWebToolsEventsItems {
-		if w.WebToolsEvent != nil {
-			allWebToolsEvents = append(allWebToolsEvents, w.WebToolsEvent...)
+		if w.WebToolsEvents != nil {
+			allWebToolsEvents = append(allWebToolsEvents, w.WebToolsEvents...)
 		}
 	}
 
@@ -283,7 +283,7 @@ func (e eventsLogic) loadAllWebToolsEventsItems() ([]model.WebToolsEventItem, er
 			break
 		}
 
-		count := len(parsed.WebToolsEvent)
+		count := len(parsed.WebToolsEvents)
 		log.Printf("page:%d events count: %d", page, count)
 
 		//io.Write(file)
