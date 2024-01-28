@@ -209,29 +209,7 @@ func (e eventsLogic) processWebToolsEvents() {
 
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
-	/*
-		//get the web tools items
-		allWebToolsEvents := []model.WebToolsEvent{}
-		for _, w := range allWebToolsEventsItems {
-			if w.WebToolsEvents != nil {
-				allWebToolsEvents = append(allWebToolsEvents, w.WebToolsEvents...)
-			}
-		}
-
-		allWebToolsEventsCount := len(allWebToolsEvents)
-		e.logger.Infof("and they have %d web tools events inside", allWebToolsEventsCount) */
-
 	//TODO
-
-	/*for _, w := range allevents {
-		if w.WebToolsEvent != nil {
-			for _, g := range w.WebToolsEvent {
-
-				event := e.constructLegacyEvent(g)
-				legacyEvent = append(legacyEvent, event)
-			}
-		}
-	} */
 
 	/*
 	   //in transaction
