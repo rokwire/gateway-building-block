@@ -279,7 +279,6 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
-/*
 // FindLegacyEvents finds all legacy events
 func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
@@ -291,7 +290,7 @@ func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
 	}
 
 	return data, nil
-} */
+}
 
 // InsertLegacyEvents inserts legacy events
 func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {

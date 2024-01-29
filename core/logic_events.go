@@ -162,10 +162,10 @@ func (e eventsLogic) setupWebToolsTimer() {
 	now := time.Now().In(location)
 	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
+	//nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+	//desiredMoment := 18000
 
-	var durationInSeconds int
+	/*var durationInSeconds int
 	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
 	if nowSecondsInDay <= desiredMoment {
 		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
@@ -174,10 +174,10 @@ func (e eventsLogic) setupWebToolsTimer() {
 		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+	}*/
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(0)
+	//	duration := time.Second * time.Duration(durationInSeconds)
 	log.Printf("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -212,9 +212,26 @@ func (e eventsLogic) processWebToolsEvents() {
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-
+		legacyEventsFromStorage, err := e.app.storage.FindLegacyEvents()
+		if err != nil {
+			e.logger.Errorf("error on loading events from the storage - %s", err)
+			return nil
+		}
+		var le []model.LegacyEvent
+		for _, webTools := range allWebToolsEvents {
+			for _, legacyEvent := range legacyEventsFromStorage {
+				if webTools.EventID == legacyEvent.DataSourceEventID {
+					le = append(le, legacyEvent)
+				}
+			}
+		}
 		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
-
+		var ids []string
+		for _, w := range le {
+			if w.ID != "" {
+				ids = append(ids, w.ID)
+			}
+		}
 		//2. Once you know which are already in the datatabse then you must remove all of them
 
 		//3. Now you have to convert all allWebToolsEvents into legacy events
