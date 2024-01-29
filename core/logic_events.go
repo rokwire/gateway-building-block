@@ -225,6 +225,7 @@ func (e eventsLogic) processWebToolsEvents() {
 				}
 			}
 		}
+
 		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
 		var dataSourceEventIds []string
 		for _, w := range le {
@@ -232,6 +233,9 @@ func (e eventsLogic) processWebToolsEvents() {
 				dataSourceEventIds = append(dataSourceEventIds, w.DataSourceEventID)
 			}
 		}
+		//PS - you must keep tehm but in map, not list.
+		//key: [dataSourceEventIds] value: [the exisitng legacy id]
+
 		//2. Once you know which are already in the datatabse then you must remove all of them
 		err = e.app.storage.DeleteLegacyEventsByIDs(nil, dataSourceEventIds)
 		if err != nil {
