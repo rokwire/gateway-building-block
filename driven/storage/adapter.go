@@ -332,7 +332,7 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	return err
 } */
 // DeleteLegacyEventsByIDss deletes all items by dataSourceEventIds
-func (a *Adapter) DeleteLegacyEventsByIDs(log *logs.Log, context TransactionContext, dataSourceEventIds []string) error {
+func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, dataSourceEventIds []string) error {
 	filter := bson.D{
 		primitive.E{Key: "dataSourceEventId", Value: primitive.M{"$in": dataSourceEventIds}},
 	}
