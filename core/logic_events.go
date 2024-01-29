@@ -209,32 +209,27 @@ func (e eventsLogic) processWebToolsEvents() {
 
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
-	//TODO
+	//in transaction
+	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 
-	/*
-	   //in transaction
-	   err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+		/*	findLegacyEvent, err := e.app.storage.FindLegacyEvents()
+			if err != nil {
+				log.Printf("error: %s", err)
+				return err
+			}
+			if len(findLegacyEvent) >= 0 {
+				err = e.app.storage.DeleteLegacyEvents()
+			}
 
-	   			findLegacyEvent, err := e.app.storage.FindLegacyEvents()
-	   			if err != nil {
-	   				log.Printf("error: %s", err)
-	   				return err
-	   			}
-	   			if len(findLegacyEvent) >= 0 {
-	   				err = e.app.storage.DeleteLegacyEvents()
-	   			}
+			err = e.app.storage.SaveLegacyEvents(legacyEvent) */
 
-	   			err = e.app.storage.SaveLegacyEvents(legacyEvent)
+		return nil
+	}, 60000)
 
-	   		return nil
-	   	}, 60000)
-
-	   	if err != nil {
-	   		return nil, err
-	   	}
-
-	   return nil, nil
-	*/
+	if err != nil {
+		e.logger.Errorf("error performing transaction - %s", err)
+		return
+	}
 }
 
 func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
