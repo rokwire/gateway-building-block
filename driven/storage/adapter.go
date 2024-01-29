@@ -283,6 +283,32 @@ func (a *Adapter) DeleteConfig(id string) error {
 func (a *Adapter) FindLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
 
+	//PS: this will not work. Look at the database to see the format of the stored files. There are:
+
+	/*{
+		"_id": {
+		  "$oid": "65b569c2136df109bc59d530"
+		},
+		"sync_process_source": "events-bb-initial",
+		"sync_date": {
+		  "$date": {
+			"$numberLong": "1706387906512"
+		  }
+		},
+		"item": {
+		  "allDay": false,
+		  ...
+
+		}
+	  } */
+
+	//but not
+
+	/*{
+		"allDay": false,
+		...
+
+	  }*/
 	var data []model.LegacyEvent
 	err := a.db.legacyEvents.Find(a.context, filter, &data, nil)
 	if err != nil {
