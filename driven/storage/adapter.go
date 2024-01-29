@@ -331,6 +331,14 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
 	return err
 } */
+// DeleteLegacyEventsByIDss deletes all items by dataSourceEventIds
+func (a *Adapter) DeleteLegacyEventsByIDs(log *logs.Log, context TransactionContext, dataSourceEventIds []string) error {
+	filter := bson.D{
+		primitive.E{Key: "dataSourceEventId", Value: primitive.M{"$in": dataSourceEventIds}},
+	}
+	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	return err
+}
 
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
