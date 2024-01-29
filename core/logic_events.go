@@ -213,6 +213,8 @@ func (e eventsLogic) processWebToolsEvents() {
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
 
+		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
+
 		//2. Once you know which are already in the datatabse then you must remove all of them
 
 		//3. Now you have to convert all allWebToolsEvents into legacy events
