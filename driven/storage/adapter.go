@@ -359,6 +359,8 @@ func (a *Adapter) DeleteLegacyEvents() error {
 } */
 // DeleteLegacyEventsByIDss deletes all items by dataSourceEventIds
 func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, dataSourceEventIds []string) error {
+
+	//PS - check the format in the database. It is "item.dataSourceEventId"
 	filter := bson.D{
 		primitive.E{Key: "dataSourceEventId", Value: primitive.M{"$in": dataSourceEventIds}},
 	}
