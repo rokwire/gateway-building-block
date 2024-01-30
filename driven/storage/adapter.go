@@ -331,11 +331,16 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	return err
 } */
 // DeleteLegacyEventsByIDss deletes all items by dataSourceEventIds
-func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, dataSourceEventIds []string) error {
+func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[string]string) error {
+
+	var valueIds []string
+	for _, value := range Ids {
+		valueIds = append(valueIds, value)
+	}
 
 	//PS - check the format in the database. It is "item.dataSourceEventId"
 	filter := bson.D{
-		primitive.E{Key: "dataSourceEventId", Value: primitive.M{"$in": dataSourceEventIds}},
+		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
 	}
 	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
 	return err

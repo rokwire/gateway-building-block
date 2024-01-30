@@ -234,14 +234,13 @@ func (e eventsLogic) processWebToolsEvents() {
 				existingLegacyIdsMap[w.Item.ID] = w.Item.ID
 			}
 		}
-		fmt.Println(existingLegacyIdsMap)
 
 		//2. Once you know which are already in the datatabse then you must remove all of them
-		/*err = e.app.storage.DeleteLegacyEventsByIDs(nil, dataSourceEventIds)
+		err = e.app.storage.DeleteLegacyEventsByIDs(nil, existingLegacyIdsMap)
 		if err != nil {
 			e.logger.Errorf("error on deleting events from the storage - %s", err)
 			return nil
-		}*/
+		}
 
 		//3. Now you have to convert all allWebToolsEvents into legacy events
 
