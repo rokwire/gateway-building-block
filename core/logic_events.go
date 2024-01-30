@@ -234,9 +234,6 @@ func (e eventsLogic) processWebToolsEvents() {
 				existingLegacyIdsMap[w.Item.ID] = w.Item.ID
 			}
 		}
-
-		//PS - you must keep tehm but in map, not list.
-		//key: [dataSourceEventIds] value: [the exisitng legacy id]
 		fmt.Println(existingLegacyIdsMap)
 
 		//2. Once you know which are already in the datatabse then you must remove all of them
