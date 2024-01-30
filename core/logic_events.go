@@ -230,8 +230,8 @@ func (e eventsLogic) processWebToolsEvents() {
 		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
 		existingLegacyIdsMap := make(map[string]string)
 		for _, w := range leExist {
-			if w.Item.DataSourceEventID != "" {
-				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.DataSourceEventID
+			if w.Item.ID != "" {
+				existingLegacyIdsMap[w.Item.ID] = w.Item.ID
 			}
 		}
 
