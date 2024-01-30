@@ -212,36 +212,39 @@ func (e eventsLogic) processWebToolsEvents() {
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-		legacyEventsFromStorage, err := e.app.storage.FindLegacyEvents()
+		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItem()
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
 			return nil
 		}
-		var le []model.LegacyEvent
-		for _, webTools := range allWebToolsEvents {
-			for _, legacyEvent := range legacyEventsFromStorage {
-				if webTools.EventID == legacyEvent.DataSourceEventID {
-					le = append(le, legacyEvent)
+
+		var leExist []model.LegacyEventItem
+		for _, w := range allWebToolsEvents {
+			for _, l := range legacyEventItemFromStorage {
+				if w.EventID == l.Item.DataSourceEventID {
+					leExist = append(leExist, l)
 				}
 			}
 		}
 
 		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
-		var dataSourceEventIds []string
-		for _, w := range le {
-			if w.ID != "" {
-				dataSourceEventIds = append(dataSourceEventIds, w.DataSourceEventID)
+		existingLegacyIdsMap := make(map[string]string)
+		for _, w := range leExist {
+			if w.Item.DataSourceEventID != "" {
+				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.DataSourceEventID
 			}
 		}
+
 		//PS - you must keep tehm but in map, not list.
 		//key: [dataSourceEventIds] value: [the exisitng legacy id]
+		fmt.Println(existingLegacyIdsMap)
 
 		//2. Once you know which are already in the datatabse then you must remove all of them
-		err = e.app.storage.DeleteLegacyEventsByIDs(nil, dataSourceEventIds)
+		/*err = e.app.storage.DeleteLegacyEventsByIDs(nil, dataSourceEventIds)
 		if err != nil {
 			e.logger.Errorf("error on deleting events from the storage - %s", err)
 			return nil
-		}
+		}*/
 
 		//3. Now you have to convert all allWebToolsEvents into legacy events
 

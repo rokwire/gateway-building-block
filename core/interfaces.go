@@ -119,7 +119,7 @@ type Storage interface {
 	//not used
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
 
-	FindLegacyEvents() ([]model.LegacyEvent, error)
+	FindLegacyEventItem() ([]model.LegacyEventItem, error)
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, dataSourceEventIds []string) error
 	//SaveLegacyEvents(items []model.LegacyEvent) error
