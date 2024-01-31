@@ -330,7 +330,7 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	return err
 }
 
-// DeleteLegacyEventsByIDss deletes all items by dataSourceEventIds
+// DeleteLegacyEventsByIDs deletes all items by dataSourceEventIds
 func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[string]string) error {
 
 	var valueIds []string
