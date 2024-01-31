@@ -29,7 +29,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -221,7 +220,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		var leExist []model.LegacyEventItem
 		for _, w := range allWebToolsEvents {
 			for _, l := range legacyEventItemFromStorage {
-				if w.EventID == l.Item.DataSourceEventID || l.Item.DataSourceEventID == "" || w.EventID == "" {
+				if w.EventID == l.Item.DataSourceEventID {
 					leExist = append(leExist, l)
 				}
 			}
@@ -230,23 +229,37 @@ func (e eventsLogic) processWebToolsEvents() {
 		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
 		existingLegacyIdsMap := make(map[string]string)
 		for _, w := range leExist {
-			if w.Item.ID != "" {
-				existingLegacyIdsMap[w.Item.ID] = w.Item.ID
+			if w.Item.DataSourceEventID != "" {
+				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
 			}
 		}
-		fmt.Println(existingLegacyIdsMap)
 
 		//2. Once you know which are already in the datatabse then you must remove all of them
-		/*	err = e.app.storage.DeleteLegacyEventsByIDs(nil, existingLegacyIdsMap)
-			if err != nil {
-				e.logger.Errorf("error on deleting events from the storage - %s", err)
-				return nil
-			}*/
+		err = e.app.storage.DeleteLegacyEventsByIDs(nil, existingLegacyIdsMap)
+		if err != nil {
+			e.logger.Errorf("error on deleting events from the storage - %s", err)
+			return nil
+		}
 
 		//3. Now you have to convert all allWebToolsEvents into legacy events
+		var ID string
+		var legacyEvents []model.LegacyEventItem
+		for _, wt := range allWebToolsEvents {
+			for dataSourceEventID, id := range existingLegacyIdsMap {
+				if dataSourceEventID == wt.EventID {
+					ID = id
+					legacyEventItem := e.constructLegacyEvent(wt, ID)
+					legacyEvents = append(legacyEvents, legacyEventItem)
+				}
+			}
+		}
 
 		//4. Store all them in the database
-
+		err = e.app.storage.SaveLegacyEvents(legacyEvents)
+		if err != nil {
+			e.logger.Errorf("error on saving events to the storage - %s", err)
+			return nil
+		}
 		// It is all!
 
 		//* keep the already exisiting events IDS THE SAME!
@@ -300,9 +313,10 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEvent {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string) model.LegacyEventItem {
+	syncProcessSource := "events-bb-initial"
+	now := time.Now()
 
-	ID := uuid.NewString()
 	var costFree bool
 	if g.CostFree == "false" {
 		costFree = false
@@ -333,23 +347,30 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent) model.LegacyEve
 	contacts = append(contacts, con)
 	contatsLegacy := contactsToDef(contacts)
 
-	return model.LegacyEvent{ID: ID, Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
-		Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
-		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
-		RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy}
+	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
+		Item: model.LegacyEvent{ID: id, Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
+			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
+			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
+			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
+			DataSourceEventID: g.EventID, StartDate: g.StartDate}}
 }
 
-func (e eventsLogic) consLegacyEvent(g model.LegacyEvent) model.LegacyEvent {
+func (e eventsLogic) consLegacyEventItem(g model.LegacyEventItem) model.LegacyEventItem {
 
-	return model.LegacyEvent{Category: g.Category, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: g.IsVirtial, DataModified: g.EventID,
-		Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: g.IsEventFree, LongDescription: g.LongDescription,
-		TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: g.RecurringFlag, IcalURL: g.IcalURL, OutlookURL: g.OutlookURL,
-		RecurrenceID: g.RecurrenceID, Location: g.Location, Contacts: g.Contacts}
+	return model.LegacyEventItem{SyncProcessSource: g.SyncProcessSource, SyncDate: g.SyncDate,
+		Item: model.LegacyEvent{AllDay: g.Item.AllDay, CalendarID: g.Item.CalendarID, Category: g.Item.Category,
+			Subcategory: g.Item.Subcategory, CreatedBy: g.Item.CreatedBy, LongDescription: g.Item.LongDescription,
+			DataModified: g.Item.DataModified, DataSourceEventID: g.Item.DataSourceEventID, DateCreated: g.Item.DateCreated,
+			EndDate: g.Item.EndDate, EventID: g.Item.EventID, IcalURL: g.Item.IcalURL, IsEventFree: g.Item.IsEventFree,
+			IsVirtial: g.Item.IsVirtial, Location: g.Item.Location, OriginatingCalendarID: g.Item.OriginatingCalendarID,
+			OutlookURL: g.Item.OutlookURL, RecurrenceID: g.Item.RecurrenceID, IsSuperEvent: g.Item.IsSuperEvent,
+			RecurringFlag: g.Item.RecurringFlag, SourceID: g.Item.SourceID, Sponsor: g.Item.Sponsor, StartDate: g.Item.StartDate,
+			Title: g.Item.Title, TitleURL: g.Item.TitleURL, RegistrationURL: g.Item.RegistrationURL, Contacts: g.Item.Contacts, SubEvents: g.Item.SubEvents}}
 }
-func (e eventsLogic) consLegacyEvents(items []model.LegacyEvent) []model.LegacyEvent {
-	defs := make([]model.LegacyEvent, len(items))
+func (e eventsLogic) consLegacyEventsItems(items []model.LegacyEventItem) []model.LegacyEventItem {
+	defs := make([]model.LegacyEventItem, len(items))
 	for index := range items {
-		defs[index] = e.consLegacyEvent(items[index])
+		defs[index] = e.consLegacyEventItem(items[index])
 	}
 	return defs
 }

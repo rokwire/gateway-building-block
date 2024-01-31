@@ -307,13 +307,12 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 	return nil
 }
 
-/*
 // SaveLegacyEvents inserts legacy events
-func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEvent) error {
+func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEventItem) error {
 
 	records := []interface{}{}
 	for _, event := range legacyEvents {
-		records = append(records, legacyEventToStorage(event))
+		records = append(records, consLegacyEvent(event))
 	}
 
 	_, err := a.db.legacyEvents.InsertManyWithContext(nil, records, nil)
@@ -329,7 +328,8 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	filter := bson.M{}
 	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
 	return err
-} */
+}
+
 // DeleteLegacyEventsByIDss deletes all items by dataSourceEventIds
 func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[string]string) error {
 

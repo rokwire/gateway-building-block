@@ -16,30 +16,27 @@ package storage
 
 import (
 	"application/core/model"
+
+	"github.com/google/uuid"
 )
 
-// LegacyEvent
-func legacyEventToStorage(item model.LegacyEvent) legacyEvent {
+func consLegacyEvent(g model.LegacyEventItem) model.LegacyEventItem {
+	var id string
+	if g.Item.ID != "" {
+		id = g.Item.ID
+	} else {
+		id = uuid.NewString()
 
-	return legacyEvent{AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
-		Subcategory: item.Subcategory, CreatedBy: item.CreatedBy, LongDescription: item.LongDescription, DataModified: item.DataModified,
-		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate, EventID: item.EventID,
-		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, Location: (*struct {
-			Description string  "bson:\"description\""
-			Latitude    float64 "bson:\"latitude\""
-			Longitude   float64 "bson:\"longitude\""
-		})(item.Location),
-		OriginatingCalendarID: item.OriginatingCalendarID, OutlookURL: item.OutlookURL, RecurrenceID: item.RecurrenceID,
-		IsSuperEvent: item.IsSuperEvent, RecurringFlag: item.RecurringFlag, SourceID: item.SourceID, Sponsor: item.Sponsor,
-		StartDate: item.StartDate, Title: item.Title, TitleURL: &item.TitleURL, RegistrationURL: &item.RegistrationURL}
-}
-
-func legacyEventsToStorage(itemsList []model.LegacyEvent) []legacyEvent {
-	result := make([]legacyEvent, len(itemsList))
-	for index, item := range itemsList {
-		result[index] = legacyEventToStorage(item)
 	}
-	return result
+	return model.LegacyEventItem{SyncProcessSource: g.SyncProcessSource, SyncDate: g.SyncDate,
+		Item: model.LegacyEvent{ID: id, AllDay: g.Item.AllDay, CalendarID: g.Item.CalendarID, Category: g.Item.Category,
+			Subcategory: g.Item.Subcategory, CreatedBy: g.Item.CreatedBy, LongDescription: g.Item.LongDescription,
+			DataModified: g.Item.DataModified, DataSourceEventID: g.Item.DataSourceEventID, DateCreated: g.Item.DateCreated,
+			EndDate: g.Item.EndDate, EventID: g.Item.EventID, IcalURL: g.Item.IcalURL, IsEventFree: g.Item.IsEventFree,
+			IsVirtial: g.Item.IsVirtial, Location: g.Item.Location, OriginatingCalendarID: g.Item.OriginatingCalendarID,
+			OutlookURL: g.Item.OutlookURL, RecurrenceID: g.Item.RecurrenceID, IsSuperEvent: g.Item.IsSuperEvent,
+			RecurringFlag: g.Item.RecurringFlag, SourceID: g.Item.SourceID, Sponsor: g.Item.Sponsor, StartDate: g.Item.StartDate,
+			Title: g.Item.Title, TitleURL: g.Item.TitleURL, RegistrationURL: g.Item.RegistrationURL, Contacts: g.Item.Contacts, SubEvents: g.Item.SubEvents}}
 }
 
 func legacyEventFromStorage(item legacyEvent) model.LegacyEvent {
