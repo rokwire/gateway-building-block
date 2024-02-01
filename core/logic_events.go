@@ -97,6 +97,12 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 			return err
 		}
 
+		itemsMap := map[string]bool{}
+
+		for _, item := range events {
+			itemsMap[item.DataSourceEventID] = true
+		}
+
 		//they cannot be 0
 		eventsCount := len(events)
 		if eventsCount == 0 {
