@@ -97,12 +97,6 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 			return err
 		}
 
-		itemsMap := map[string]bool{}
-
-		for _, item := range events {
-			itemsMap[item.DataSourceEventID] = true
-		}
-
 		//they cannot be 0
 		eventsCount := len(events)
 		if eventsCount == 0 {
@@ -111,11 +105,28 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 
 		e.logger.Infof("Got %d events from events BB", eventsCount)
 
+		//there are a lot of duplicate items, so we need to fix them
+		uniqueItemsMap := map[string]bool{}
+		for _, item := range events {
+			if len(item.DataSourceEventID) > 0 {
+				uniqueItemsMap[item.DataSourceEventID] = true
+			}
+		}
+		fixedEvents := []model.LegacyEvent{}
+		for dataSourceEventID, _ := range uniqueItemsMap {
+			foundedItem := e.findItem(dataSourceEventID, events)
+			if foundedItem != nil {
+				fixedEvents = append(fixedEvents, *foundedItem)
+			}
+		}
+
+		e.logger.Infof("Got %d events after the events fix", len(fixedEvents))
+
 		//prepare the list which we will store
 		syncProcessSource := "events-bb-initial"
 		now := time.Now()
-		resultList := make([]model.LegacyEventItem, eventsCount)
-		for i, le := range events {
+		resultList := make([]model.LegacyEventItem, len(fixedEvents))
+		for i, le := range fixedEvents {
 			leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
 			resultList[i] = leItem
 		}
@@ -144,6 +155,15 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 		e.logger.Info("Initial events already imported")
 	} else {
 		e.logger.Info("Successfuly imported initial events")
+	}
+	return nil
+}
+
+func (e eventsLogic) findItem(dataSourceID string, events []model.LegacyEvent) *model.LegacyEvent {
+	for _, item := range events {
+		if dataSourceID == item.DataSourceEventID {
+			return &item
+		}
 	}
 	return nil
 }
