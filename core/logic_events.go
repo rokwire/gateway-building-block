@@ -281,14 +281,12 @@ func (e eventsLogic) processWebToolsEvents() {
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
-		return errors.New("errorrrrr")
-
-		/*	//4. Store all them in the database
-			err = e.app.storage.SaveLegacyEvents(legacyEvents)
-			if err != nil {
-				e.logger.Errorf("error on saving events to the storage - %s", err)
-				return nil
-			} */
+		//4. Store all them in the database
+		err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
+		if err != nil {
+			e.logger.Errorf("error on saving events to the storage - %s", err)
+			return nil
+		}
 		// It is all!
 
 		//* keep the already exisiting events IDS THE SAME!

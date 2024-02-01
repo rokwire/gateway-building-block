@@ -307,22 +307,6 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 	return nil
 }
 
-// SaveLegacyEvents inserts legacy events
-func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEventItem) error {
-
-	records := []interface{}{}
-	for _, event := range legacyEvents {
-		records = append(records, consLegacyEvent(event))
-	}
-
-	_, err := a.db.legacyEvents.InsertManyWithContext(nil, records, nil)
-	if err != nil {
-		return errors.WrapErrorAction("insert", "legacy events", nil, err)
-	}
-
-	return nil
-}
-
 // DeleteLegacyEvents Deletes a reminder
 func (a *Adapter) DeleteLegacyEvents() error {
 	filter := bson.M{}
