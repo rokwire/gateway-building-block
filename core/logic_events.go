@@ -267,6 +267,8 @@ func (e eventsLogic) processWebToolsEvents() {
 			return nil
 		}
 
+		return errors.New("errorrrrr")
+
 		/*	//3. Now you have to convert all allWebToolsEvents into legacy events
 			var ID string
 			var legacyEvents []model.LegacyEventItem
@@ -340,7 +342,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 }
 
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string) model.LegacyEventItem {
-	syncProcessSource := "events-bb-initial"
+	syncProcessSource := "webtools-direct"
 	now := time.Now()
 
 	var costFree bool
