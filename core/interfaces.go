@@ -71,6 +71,7 @@ type BBs interface {
 	CreateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error)
 	DeleteAppointment(uin string, providerid int, sourceid string, accesstoken string) (string, error)
 	UpdateAppointment(appt *model.AppointmentPost, accessToken string) (*model.BuildingBlockAppointment, error)
+	GetLegacyEvents() ([]model.LegacyEvent, error)
 }
 
 // TPS exposes third-party service APIs for the driver adapters
@@ -124,6 +125,7 @@ type Storage interface {
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	SaveLegacyEvents(items []model.LegacyEventItem) error
 	//DeleteLegacyEvents() error
+	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 }
 
 // StorageListener represents storage listener

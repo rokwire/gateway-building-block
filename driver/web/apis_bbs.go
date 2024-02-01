@@ -20,6 +20,7 @@ import (
 	utils "application/utils"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -347,6 +348,15 @@ func (h BBsAPIsHandler) checkAppointmentParams(reqParms *utils.Filter, req *http
 	}
 	return reqValues, l.HTTPResponseSuccess(), nil
 
+}
+
+func (h BBsAPIsHandler) getLegacyEvent(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	legacyEvents, err := h.app.BBs.GetLegacyEvents()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
+	}
+	fmt.Println(legacyEvents)
+	return l.HTTPResponseSuccess()
 }
 
 // NewBBsAPIsHandler creates new Building Block API handler instance

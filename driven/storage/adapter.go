@@ -346,6 +346,13 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 	return err
 }
 
+// DeleteLegacyEvents Deletes a reminder
+func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
+	filter := bson.M{}
+	err := a.db.legacyEvents.Find(nil, filter, nil, nil)
+	return nil, err
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction
