@@ -1134,6 +1134,31 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/bbs/events:
+    get:
+      tags:
+        - BBs
+      summary: Gets all legacy events
+      description: |
+        Gets all legacy events
+      deprecated: true
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LegacyEvent'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   '/api/tps/examples/{id}':
     get:
       tags:
@@ -1276,6 +1301,102 @@ components:
           type: string
           nullable: true
           readOnly: true
+    ContactLegacy:
+      type: object
+      properties:
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        contactPhone:
+          type: string
+    LegacyEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        all_day:
+          type: boolean
+        calendar_id:
+          type: string
+        category:
+          type: string
+        subcategocy:
+          type: string
+        createdBy:
+          type: string
+        longDescription:
+          type: string
+        dataModified:
+          type: string
+        dataSourceEventId:
+          type: string
+        dateCreated:
+          type: string
+        endDate:
+          type: string
+        event_id:
+          type: string
+        icalURL:
+          type: string
+        imageURL:
+          type: string
+          nullable: true
+        isEventFree:
+          type: boolean
+        isVirtual:
+          type: boolean
+        originating_calendar_id:
+          type: string
+        outlookUrl:
+          type: string
+        recurrence_id:
+          type: string
+        isSuperEvent:
+          type: boolean
+        recurringFlag:
+          type: boolean
+        source_id:
+          type: string
+        sponsor:
+          type: string
+        startDate:
+          type: string
+        title:
+          type: string
+        titleUrl:
+          type: string
+        registrationURL:
+          type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactLegacy'
+        subeEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubEvents'
+        location:
+          items:
+            $ref: '#/components/schemas/LocationLegacy'
+    LocationLegacy:
+      type: object
+      properties:
+        description:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+    SubEvents:
+      type: object
+      properties:
+        id:
+          type: string
+        isFeatured:
+          type: boolean
+        track:
+          type: string
     _admin_req_update-configs:
       required:
         - type
