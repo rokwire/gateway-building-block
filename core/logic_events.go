@@ -245,11 +245,6 @@ func (e eventsLogic) processWebToolsEvents() {
 
 		var leExist []model.LegacyEventItem
 		for _, w := range allWebToolsEvents {
-
-			if len(w.EventID) == 0 {
-				continue //skip if there is no identifier
-			}
-
 			for _, l := range legacyEventItemFromStorage {
 				if w.EventID == l.Item.DataSourceEventID {
 					leExist = append(leExist, l)
