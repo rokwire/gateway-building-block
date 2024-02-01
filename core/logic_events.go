@@ -29,6 +29,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -234,6 +235,8 @@ func (e eventsLogic) processWebToolsEvents() {
 
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
+	now := time.Now()
+
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
@@ -267,22 +270,20 @@ func (e eventsLogic) processWebToolsEvents() {
 			return nil
 		}
 
+		//3. Now you have to convert all allWebToolsEvents into legacy events
+		newLegacyEvents := []model.LegacyEventItem{}
+		for _, wt := range allWebToolsEvents {
+
+			//prepare the id
+			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
+
+			le := e.constructLegacyEvent(wt, id, now)
+			newLegacyEvents = append(newLegacyEvents, le)
+		}
+
 		return errors.New("errorrrrr")
 
-		/*	//3. Now you have to convert all allWebToolsEvents into legacy events
-			var ID string
-			var legacyEvents []model.LegacyEventItem
-			for _, wt := range allWebToolsEvents {
-				for dataSourceEventID, id := range existingLegacyIdsMap {
-					if dataSourceEventID == wt.EventID {
-						ID = id
-						legacyEventItem := e.constructLegacyEvent(wt, ID)
-						legacyEvents = append(legacyEvents, legacyEventItem)
-					}
-				}
-			}
-
-			//4. Store all them in the database
+		/*	//4. Store all them in the database
 			err = e.app.storage.SaveLegacyEvents(legacyEvents)
 			if err != nil {
 				e.logger.Errorf("error on saving events to the storage - %s", err)
@@ -298,6 +299,14 @@ func (e eventsLogic) processWebToolsEvents() {
 	if err != nil {
 		e.logger.Errorf("error performing transaction - %s", err)
 		return
+	}
+}
+
+func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
+	if value, exists := existingLegacyIdsMap[currentWTEventID]; exists {
+		return value
+	} else {
+		return uuid.NewString()
 	}
 }
 
@@ -341,9 +350,8 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
-	now := time.Now()
 
 	var costFree bool
 	if g.CostFree == "false" {
