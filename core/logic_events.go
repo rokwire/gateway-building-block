@@ -161,22 +161,22 @@ func (e eventsLogic) setupWebToolsTimer() {
 	now := time.Now().In(location)
 	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
+	/*	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+		desiredMoment := 18000
 
-	var durationInSeconds int
-	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
-	if nowSecondsInDay <= desiredMoment {
-		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
-		durationInSeconds = desiredMoment - nowSecondsInDay
-	} else {
-		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
-		leftToday := 86400 - nowSecondsInDay
-		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+		var durationInSeconds int
+		log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
+		if nowSecondsInDay <= desiredMoment {
+			log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
+			durationInSeconds = desiredMoment - nowSecondsInDay
+		} else {
+			log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
+			leftToday := 86400 - nowSecondsInDay
+			durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
+		} */
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(0)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(0)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	log.Printf("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -219,6 +219,11 @@ func (e eventsLogic) processWebToolsEvents() {
 
 		var leExist []model.LegacyEventItem
 		for _, w := range allWebToolsEvents {
+
+			if len(w.EventID) == 0 {
+				continue //skip if there is no identifier
+			}
+
 			for _, l := range legacyEventItemFromStorage {
 				if w.EventID == l.Item.DataSourceEventID {
 					leExist = append(leExist, l)
