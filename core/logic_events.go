@@ -114,7 +114,7 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 			}
 		}
 		fixedEvents := []model.LegacyEvent{}
-		for dataSourceEventID, _ := range uniqueItemsMap {
+		for dataSourceEventID := range uniqueItemsMap {
 			foundedItem := e.findItem(dataSourceEventID, events)
 			if foundedItem != nil {
 				fixedEvents = append(fixedEvents, *foundedItem)
@@ -303,9 +303,8 @@ func (e eventsLogic) processWebToolsEvents() {
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
 	if value, exists := existingLegacyIdsMap[currentWTEventID]; exists {
 		return value
-	} else {
-		return uuid.NewString()
 	}
+	return uuid.NewString()
 }
 
 func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
