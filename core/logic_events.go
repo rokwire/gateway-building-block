@@ -237,7 +237,7 @@ func (e eventsLogic) processWebToolsEvents() {
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItem()
+		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
 			return nil
@@ -261,31 +261,31 @@ func (e eventsLogic) processWebToolsEvents() {
 		}
 
 		//2. Once you know which are already in the datatabse then you must remove all of them
-		err = e.app.storage.DeleteLegacyEventsByIDs(nil, existingLegacyIdsMap)
+		err = e.app.storage.DeleteLegacyEventsByIDs(context, existingLegacyIdsMap)
 		if err != nil {
 			e.logger.Errorf("error on deleting events from the storage - %s", err)
 			return nil
 		}
 
-		//3. Now you have to convert all allWebToolsEvents into legacy events
-		var ID string
-		var legacyEvents []model.LegacyEventItem
-		for _, wt := range allWebToolsEvents {
-			for dataSourceEventID, id := range existingLegacyIdsMap {
-				if dataSourceEventID == wt.EventID {
-					ID = id
-					legacyEventItem := e.constructLegacyEvent(wt, ID)
-					legacyEvents = append(legacyEvents, legacyEventItem)
+		/*	//3. Now you have to convert all allWebToolsEvents into legacy events
+			var ID string
+			var legacyEvents []model.LegacyEventItem
+			for _, wt := range allWebToolsEvents {
+				for dataSourceEventID, id := range existingLegacyIdsMap {
+					if dataSourceEventID == wt.EventID {
+						ID = id
+						legacyEventItem := e.constructLegacyEvent(wt, ID)
+						legacyEvents = append(legacyEvents, legacyEventItem)
+					}
 				}
 			}
-		}
 
-		//4. Store all them in the database
-		err = e.app.storage.SaveLegacyEvents(legacyEvents)
-		if err != nil {
-			e.logger.Errorf("error on saving events to the storage - %s", err)
-			return nil
-		}
+			//4. Store all them in the database
+			err = e.app.storage.SaveLegacyEvents(legacyEvents)
+			if err != nil {
+				e.logger.Errorf("error on saving events to the storage - %s", err)
+				return nil
+			} */
 		// It is all!
 
 		//* keep the already exisiting events IDS THE SAME!
