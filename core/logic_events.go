@@ -381,13 +381,61 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	modifiedDate := e.formatDate(g.EditedDate)
 	createdDate := e.formatDate(g.CreatedDate)
 
+	//start date + end date (+all day)
+	allDay := false
+
+	timeType := g.TimeType
+	//latitude := location.Latitude
+	//longitude := location.Longitude
+
+	var startDate, startTime, endDate, endTime string
+	var startDateObj, endDateObj time.Time
+
+	if timeType == "START_TIME_ONLY" {
+		startDate = g.StartDate
+		startTime = g.StartTime
+		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
+		startDateObj, _ = time.Parse("01/02/2006 03:04 PM", startDateTimeStr)
+
+		endDate = g.EndDate
+		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
+		endDateObj, _ = time.Parse("01/02/2006 03:04 PM", endDateTimeStr)
+	} else if timeType == "START_AND_END_TIME" {
+		startDate = g.StartDate
+		startTime = g.StartTime
+		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
+		startDateObj, _ = time.Parse("01/02/2006 03:04 PM", startDateTimeStr)
+
+		endDate = g.EndDate
+		endTime = g.EndTime
+		endDateTimeStr := fmt.Sprintf("%s %s", endDate, endTime)
+		endDateObj, _ = time.Parse("01/02/2006 03:04 PM", endDateTimeStr)
+	} else if timeType == "NONE" {
+		allDay = true
+
+		startDate = g.StartDate
+		endDate = g.EndDate
+		startDateTimeStr := fmt.Sprintf("%s 12:00 am", startDate)
+		startDateObj, _ = time.Parse("01/02/2006 03:04 PM", startDateTimeStr)
+
+		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
+		endDateObj, _ = time.Parse("01/02/2006 03:04 PM", endDateTimeStr)
+	}
+
+	startDateStr := startDateObj.Format("Mon, 02 Jan 2006 15:04:05 MST")
+	endDateStr := endDateObj.Format("Mon, 02 Jan 2006 15:04:05 MST")
+
+	//utcStartDate := startDateObj.UTC()
+	//utcEndDate := endDateObj.UTC()
+	//end - start date + end date (+all day)
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
-			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
+			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
-			DataSourceEventID: g.EventID, StartDate: g.StartDate}}
+			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr}}
 }
 
 func (e eventsLogic) formatDate(wtDate string) string {
