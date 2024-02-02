@@ -106,18 +106,23 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 
 		e.logger.Infof("Got %d events from events BB", eventsCount)
 
-		//there are a lot of duplicate items, so we need to fix them
-		uniqueItemsMap := map[string]bool{}
-		for _, item := range events {
-			if len(item.DataSourceEventID) > 0 {
-				uniqueItemsMap[item.DataSourceEventID] = true
-			}
-		}
+		//there are a lot of duplicate items(dataSourceEventId), so we need to fix them
 		fixedEvents := []model.LegacyEvent{}
-		for dataSourceEventID := range uniqueItemsMap {
-			foundedItem := e.findItem(dataSourceEventID, events)
-			if foundedItem != nil {
-				fixedEvents = append(fixedEvents, *foundedItem)
+		addedItemMap := map[string]bool{}
+		for _, item := range events {
+			if len(item.DataSourceEventID) == 0 {
+				//there are a lot of such items absiously they are used, so add them
+				fixedEvents = append(fixedEvents, item)
+			} else {
+				if _, exists := addedItemMap[item.DataSourceEventID]; exists {
+					e.logger.Infof("Already added %s, so do nothing", item.DataSourceEventID)
+				} else {
+					//not added, so adding it
+					fixedEvents = append(fixedEvents, item)
+
+					//mark it as added
+					addedItemMap[item.DataSourceEventID] = true
+				}
 			}
 		}
 
@@ -160,15 +165,6 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 	return nil
 }
 
-func (e eventsLogic) findItem(dataSourceID string, events []model.LegacyEvent) *model.LegacyEvent {
-	for _, item := range events {
-		if dataSourceID == item.DataSourceEventID {
-			return &item
-		}
-	}
-	return nil
-}
-
 func (e eventsLogic) setupWebToolsTimer() {
 	log.Println("Web tools timer")
 
@@ -179,31 +175,31 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.timerDone <- true
 		e.dailyWebToolsTimer.Stop()
 	}
+	/*
+		//wait until it is the correct moment from the day
+		location, err := time.LoadLocation("America/Chicago")
+		if err != nil {
+			log.Printf("Error getting location:%s\n", err.Error())
+		}
+		now := time.Now().In(location)
+		log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
-	if err != nil {
-		log.Printf("Error getting location:%s\n", err.Error())
-	}
-	now := time.Now().In(location)
-	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
+		nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+		desiredMoment := 18000
 
-	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
-
-	var durationInSeconds int
-	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
-	if nowSecondsInDay <= desiredMoment {
-		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
-		durationInSeconds = desiredMoment - nowSecondsInDay
-	} else {
-		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
-		leftToday := 86400 - nowSecondsInDay
-		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+		var durationInSeconds int
+		log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
+		if nowSecondsInDay <= desiredMoment {
+			log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
+			durationInSeconds = desiredMoment - nowSecondsInDay
+		} else {
+			log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
+			leftToday := 86400 - nowSecondsInDay
+			durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
+		}*/
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(0)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(0)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	log.Printf("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
