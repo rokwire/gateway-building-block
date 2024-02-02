@@ -406,27 +406,6 @@ func (e eventsLogic) formatDate(wtDate string) string {
 	return result
 }
 
-/*
-func (e eventsLogic) consLegacyEventItem(g model.LegacyEventItem) model.LegacyEventItem {
-
-	return model.LegacyEventItem{SyncProcessSource: g.SyncProcessSource, SyncDate: g.SyncDate,
-		Item: model.LegacyEvent{AllDay: g.Item.AllDay, CalendarID: g.Item.CalendarID, Category: g.Item.Category,
-			Subcategory: g.Item.Subcategory, CreatedBy: g.Item.CreatedBy, LongDescription: g.Item.LongDescription,
-			DataModified: g.Item.DataModified, DataSourceEventID: g.Item.DataSourceEventID, DateCreated: g.Item.DateCreated,
-			EndDate: g.Item.EndDate, EventID: g.Item.EventID, IcalURL: g.Item.IcalURL, IsEventFree: g.Item.IsEventFree,
-			IsVirtial: g.Item.IsVirtial, Location: g.Item.Location, OriginatingCalendarID: g.Item.OriginatingCalendarID,
-			OutlookURL: g.Item.OutlookURL, RecurrenceID: g.Item.RecurrenceID, IsSuperEvent: g.Item.IsSuperEvent,
-			RecurringFlag: g.Item.RecurringFlag, SourceID: g.Item.SourceID, Sponsor: g.Item.Sponsor, StartDate: g.Item.StartDate,
-			Title: g.Item.Title, TitleURL: g.Item.TitleURL, RegistrationURL: g.Item.RegistrationURL, Contacts: g.Item.Contacts, SubEvents: g.Item.SubEvents}}
-}
-func (e eventsLogic) consLegacyEventsItems(items []model.LegacyEventItem) []model.LegacyEventItem {
-	defs := make([]model.LegacyEventItem, len(items))
-	for index := range items {
-		defs[index] = e.consLegacyEventItem(items[index])
-	}
-	return defs
-} */
-
 func recurenceIDtoInt(s string) (*int, error) {
 	// Parse string to int
 	parsedInt, err := strconv.Atoi(s)
