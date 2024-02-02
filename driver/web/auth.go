@@ -32,10 +32,11 @@ type Auth struct {
 	bbs    tokenauth.Handlers
 	tps    tokenauth.Handlers
 	system tokenauth.Handlers
+	apiKey ApiKey
 }
 
 // NewAuth creates new auth handler
-func NewAuth(serviceRegManager *authservice.ServiceRegManager) (*Auth, error) {
+func NewAuth(serviceRegManager *authservice.ServiceRegManager, apiKey string) (*Auth, error) {
 	client, err := newClientAuth(serviceRegManager)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionCreate, "client auth", nil, err)
@@ -65,6 +66,7 @@ func NewAuth(serviceRegManager *authservice.ServiceRegManager) (*Auth, error) {
 		return nil, errors.WrapErrorAction(logutils.ActionCreate, "system auth", nil, err)
 	}
 	systemHandlers := tokenauth.NewHandlers(system)
+	gatewayApiKey := newApiKeyAuth(apiKey)
 
 	auth := Auth{
 		client: clientHandlers,
@@ -72,6 +74,7 @@ func NewAuth(serviceRegManager *authservice.ServiceRegManager) (*Auth, error) {
 		bbs:    bbsHandlers,
 		tps:    tpsHandlers,
 		system: systemHandlers,
+		apiKey: gatewayApiKey,
 	}
 	return &auth, nil
 }
@@ -183,4 +186,38 @@ func newSystemAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth
 
 	auth := tokenauth.NewStandardHandler(systemTokenAuth, check)
 	return auth, nil
+}
+
+///////
+
+// ApiKey handling the ApiKey from other BBs
+type ApiKey struct {
+	apiKey string
+}
+
+func newApiKeyAuth(apiKey string) ApiKey {
+	return ApiKey{apiKey: apiKey}
+}
+
+// Check verifies the internal API key
+func (auth ApiKey) Check(req *http.Request) (int, *tokenauth.Claims, error) {
+	apiKey := req.Header.Get("GATEWAY_EVENTS_BB_ROKWIRE_API_KEY")
+
+	//check if there is api key in the header
+	if len(apiKey) == 0 {
+		//no key, so return 400
+		return http.StatusBadRequest, nil, errors.New("Bad Request")
+	}
+
+	if auth.apiKey != apiKey {
+		//not exist, so return 401
+		return http.StatusUnauthorized, nil, errors.New("Unauthorized")
+	}
+
+	return http.StatusOK, nil, nil
+}
+
+// GetTokenAuth returns nil
+func (auth ApiKey) GetTokenAuth() *tokenauth.TokenAuth {
+	return nil
 }
