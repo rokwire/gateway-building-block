@@ -372,7 +372,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
-	location := locationToDef(g.Location)
+	location := constructLocation(g.Location)
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
 	contacts = append(contacts, con)
@@ -420,79 +420,62 @@ func recurenceIDtoInt(s string) (*int, error) {
 	return result, nil
 }
 
-// Location
-func locationToDef(location string) model.LocationLegacy {
-	var description string
-	var latitude float32
-	var longitude float32
-	if location != "" {
-		description = location
-		latitude = 0
-		longitude = 0
-	} else if location == "Davenport 109A" {
-		description = location
+func constructLocation(location string) model.LocationLegacy {
+	description := location
+	latitude := 0.0
+	longitude := 0.0
+
+	if location == "Davenport 109A" {
 		latitude = 40.107335
 		longitude = -88.226069
 	} else if location == "Nevada Dance Studio (905 W. Nevada St.)" {
 		latitude = 40.105825
 		longitude = -88.219873
-		description = location
 	} else if location == "18th Ave Library, 175 W 18th Ave, Room 205, Oklahoma City, OK" {
 		latitude = 36.102183
 		longitude = -97.111245
-		description = location
 	} else if location == "Champaign County Fairgrounds" {
 		latitude = 40.1202191
 		longitude = -88.2178757
-		description = location
 	} else if location == "Student Union SLC Conference room" {
 		latitude = 39.727282
 		longitude = -89.617477
-		description = location
 	} else if location == "Armory, room 172 (the Innovation Studio)" {
 		latitude = 40.104749
 		longitude = -88.23195
-		description = location
 	} else if location == "Student Union Room 235" {
 		latitude = 39.727282
 		longitude = -89.617477
-		description = location
 	} else if location == "Uni 206, 210, 211" {
 		latitude = 40.11314
 		longitude = -88.225259
-		description = location
 	} else if location == "Uni 205, 206, 210" {
 		latitude = 40.11314
 		longitude = -88.225259
-		description = location
 	} else if location == "Southern Historical Association Combs Chandler 30" {
 		latitude = 38.258116
 		longitude = -85.756139
-		description = location
 	} else if location == "St. Louis, MO" {
 		latitude = 38.694237
 		longitude = -90.4493
-		description = location
 	} else if location == "Student Union SLC" {
 		latitude = 39.727282
 		longitude = -89.617477
-		description = location
 	} else if location == "Purdue University, West Lafayette, Indiana" {
 		latitude = 40.425012
 		longitude = -86.912645
-		description = location
 	} else if location == "MP 7" {
 		latitude = 40.100803
 		longitude = -88.23604
-		description = location
 	} else if location == "116 Roger Adams Lab" {
 		latitude = 40.107741
 		longitude = -88.224943
-		description = location
 	} else if location == "2700 Campus Way 45221" {
-		description = location
 		latitude = 39.131894
 		longitude = -84.519143
+	} else if location == "The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL" {
+		latitude = 40.1047044
+		longitude = -88.22901039999999
 	}
 
 	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
