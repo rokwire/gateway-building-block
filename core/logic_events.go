@@ -378,12 +378,32 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	contacts = append(contacts, con)
 	contatsLegacy := contactsToDef(contacts)
 
+	modifiedDate := e.formatDate(g.EditedDate)
+	createdDate := e.formatDate(g.CreatedDate)
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
-		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
+		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
+			DataModified: modifiedDate, DateCreated: createdDate,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: g.StartDate}}
+}
+
+func (e eventsLogic) formatDate(wtDate string) string {
+	dateFormat := "1/2/2006"
+	timeFormat := "3:04 pm"
+
+	wtDateTime := wtDate + " 12:00 am"
+	dataObj, err := time.Parse(dateFormat+" "+timeFormat, wtDateTime)
+	if err != nil {
+		return ""
+	}
+
+	dataObj = dataObj.Add(5 * time.Hour)
+
+	result := dataObj.Format("2006-01-02T15:04:05")
+	return result
 }
 
 /*
