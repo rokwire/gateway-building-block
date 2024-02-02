@@ -385,52 +385,49 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	allDay := false
 
 	timeType := g.TimeType
-	//latitude := location.Latitude
-	//longitude := location.Longitude
 
 	var startDate, startTime, endDate, endTime string
 	var startDateObj, endDateObj time.Time
 
-	if g.EventID == "33479681" {
-		log.Println("33479681")
+	chicagoLocation, err := time.LoadLocation("America/Chicago")
+	if err != nil {
+		e.logger.Errorf("cannot get timezone - America/Chicago")
 	}
 
 	if timeType == "START_TIME_ONLY" {
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, _ = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
+		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
 
 		endDate = g.EndDate
 		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObj, _ = time.Parse("1/2/2006 3:04 pm", endDateTimeStr)
+		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
 	} else if timeType == "START_AND_END_TIME" {
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, _ = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
+		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
 
 		endDate = g.EndDate
 		endTime = g.EndTime
 		endDateTimeStr := fmt.Sprintf("%s %s", endDate, endTime)
-		endDateObj, _ = time.Parse("1/2/2006 3:04 pm", endDateTimeStr)
+		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
 	} else if timeType == "NONE" {
 		allDay = true
 
 		startDate = g.StartDate
 		endDate = g.EndDate
 		startDateTimeStr := fmt.Sprintf("%s 12:00 am", startDate)
-		startDateObj, _ = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
+		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
 
 		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObj, _ = time.Parse("1/2/2006 3:04 pm", endDateTimeStr)
+		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
 	}
 
-	startDateStr := startDateObj.Format("Mon, 02 Jan 2006 15:04:05 GMT")
-	endDateStr := endDateObj.Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	startDateStr := startDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	endDateStr := endDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
 
-	//utcStartDate := startDateObj.UTC()
-	//utcEndDate := endDateObj.UTC()
 	//end - start date + end date (+all day)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
