@@ -279,11 +279,11 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
-// FindLegacyEventItem finds all legacy events
-func (a *Adapter) FindLegacyEventItem() ([]model.LegacyEventItem, error) {
+// FindLegacyEventItems finds all legacy events
+func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.LegacyEventItem, error) {
 	filter := bson.M{}
 	var data []model.LegacyEventItem
-	err := a.db.legacyEvents.Find(a.context, filter, &data, nil)
+	err := a.db.legacyEvents.Find(context, filter, &data, nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}
@@ -300,22 +300,6 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 	}
 
 	_, err := a.db.legacyEvents.InsertManyWithContext(context, storageItems, nil)
-	if err != nil {
-		return errors.WrapErrorAction("insert", "legacy events", nil, err)
-	}
-
-	return nil
-}
-
-// SaveLegacyEvents inserts legacy events
-func (a *Adapter) SaveLegacyEvents(legacyEvents []model.LegacyEventItem) error {
-
-	records := []interface{}{}
-	for _, event := range legacyEvents {
-		records = append(records, consLegacyEvent(event))
-	}
-
-	_, err := a.db.legacyEvents.InsertManyWithContext(nil, records, nil)
 	if err != nil {
 		return errors.WrapErrorAction("insert", "legacy events", nil, err)
 	}

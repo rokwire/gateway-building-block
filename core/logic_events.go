@@ -29,6 +29,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -105,11 +106,33 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 
 		e.logger.Infof("Got %d events from events BB", eventsCount)
 
+		//there are a lot of duplicate items(dataSourceEventId), so we need to fix them
+		fixedEvents := []model.LegacyEvent{}
+		addedItemMap := map[string]bool{}
+		for _, item := range events {
+			if len(item.DataSourceEventID) == 0 {
+				//there are a lot of such items absiously they are used, so add them
+				fixedEvents = append(fixedEvents, item)
+			} else {
+				if _, exists := addedItemMap[item.DataSourceEventID]; exists {
+					e.logger.Infof("Already added %s, so do nothing", item.DataSourceEventID)
+				} else {
+					//not added, so adding it
+					fixedEvents = append(fixedEvents, item)
+
+					//mark it as added
+					addedItemMap[item.DataSourceEventID] = true
+				}
+			}
+		}
+
+		e.logger.Infof("Got %d events after the events fix", len(fixedEvents))
+
 		//prepare the list which we will store
 		syncProcessSource := "events-bb-initial"
 		now := time.Now()
-		resultList := make([]model.LegacyEventItem, eventsCount)
-		for i, le := range events {
+		resultList := make([]model.LegacyEventItem, len(fixedEvents))
+		for i, le := range fixedEvents {
 			leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
 			resultList[i] = leItem
 		}
@@ -152,16 +175,16 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.timerDone <- true
 		e.dailyWebToolsTimer.Stop()
 	}
+	/*
+		//wait until it is the correct moment from the day
+		location, err := time.LoadLocation("America/Chicago")
+		if err != nil {
+			log.Printf("Error getting location:%s\n", err.Error())
+		}
+		now := time.Now().In(location)
+		log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
-	if err != nil {
-		log.Printf("Error getting location:%s\n", err.Error())
-	}
-	now := time.Now().In(location)
-	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
-
-	/*	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+		nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
 		desiredMoment := 18000
 
 		var durationInSeconds int
@@ -173,7 +196,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 			log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
 			leftToday := 86400 - nowSecondsInDay
 			durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-		} */
+		}*/
 	//log.Println(durationInSeconds)
 	duration := time.Second * time.Duration(0)
 	//duration := time.Second * time.Duration(durationInSeconds)
@@ -208,10 +231,12 @@ func (e eventsLogic) processWebToolsEvents() {
 
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
+	now := time.Now()
+
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItem()
+		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
 			return nil
@@ -219,11 +244,6 @@ func (e eventsLogic) processWebToolsEvents() {
 
 		var leExist []model.LegacyEventItem
 		for _, w := range allWebToolsEvents {
-
-			if len(w.EventID) == 0 {
-				continue //skip if there is no identifier
-			}
-
 			for _, l := range legacyEventItemFromStorage {
 				if w.EventID == l.Item.DataSourceEventID {
 					leExist = append(leExist, l)
@@ -240,27 +260,25 @@ func (e eventsLogic) processWebToolsEvents() {
 		}
 
 		//2. Once you know which are already in the datatabse then you must remove all of them
-		err = e.app.storage.DeleteLegacyEventsByIDs(nil, existingLegacyIdsMap)
+		err = e.app.storage.DeleteLegacyEventsByIDs(context, existingLegacyIdsMap)
 		if err != nil {
 			e.logger.Errorf("error on deleting events from the storage - %s", err)
 			return nil
 		}
 
 		//3. Now you have to convert all allWebToolsEvents into legacy events
-		var ID string
-		var legacyEvents []model.LegacyEventItem
+		newLegacyEvents := []model.LegacyEventItem{}
 		for _, wt := range allWebToolsEvents {
-			for dataSourceEventID, id := range existingLegacyIdsMap {
-				if dataSourceEventID == wt.EventID {
-					ID = id
-					legacyEventItem := e.constructLegacyEvent(wt, ID)
-					legacyEvents = append(legacyEvents, legacyEventItem)
-				}
-			}
+
+			//prepare the id
+			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
+
+			le := e.constructLegacyEvent(wt, id, now)
+			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
 		//4. Store all them in the database
-		err = e.app.storage.SaveLegacyEvents(legacyEvents)
+		err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
 		if err != nil {
 			e.logger.Errorf("error on saving events to the storage - %s", err)
 			return nil
@@ -276,6 +294,13 @@ func (e eventsLogic) processWebToolsEvents() {
 		e.logger.Errorf("error performing transaction - %s", err)
 		return
 	}
+}
+
+func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
+	if value, exists := existingLegacyIdsMap[currentWTEventID]; exists {
+		return value
+	}
+	return uuid.NewString()
 }
 
 func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
@@ -318,9 +343,8 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string) model.LegacyEventItem {
-	syncProcessSource := "events-bb-initial"
-	now := time.Now()
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time) model.LegacyEventItem {
+	syncProcessSource := "webtools-direct"
 
 	var costFree bool
 	if g.CostFree == "false" {
