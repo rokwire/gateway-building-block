@@ -391,6 +391,11 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	var startDate, startTime, endDate, endTime string
 	var startDateObj, endDateObj time.Time
 
+	if g.EventID == "33479681" {
+		log.Println("33479681")
+	}
+
+	var err error
 	if timeType == "START_TIME_ONLY" {
 		startDate = g.StartDate
 		startTime = g.StartTime
@@ -404,7 +409,10 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, _ = time.Parse("01/02/2006 03:04 PM", startDateTimeStr)
+		startDateObj, err = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
+		if err != nil {
+			log.Println("33479681")
+		}
 
 		endDate = g.EndDate
 		endTime = g.EndTime
