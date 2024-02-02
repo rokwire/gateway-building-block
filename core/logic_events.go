@@ -346,6 +346,8 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
+	createdBy := g.CreatedBy
+
 	var costFree bool
 	if g.CostFree == "false" {
 		costFree = false
@@ -377,13 +379,14 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	contatsLegacy := contactsToDef(contacts)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
-		Item: model.LegacyEvent{ID: id, Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
+		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: g.StartDate}}
 }
 
+/*
 func (e eventsLogic) consLegacyEventItem(g model.LegacyEventItem) model.LegacyEventItem {
 
 	return model.LegacyEventItem{SyncProcessSource: g.SyncProcessSource, SyncDate: g.SyncDate,
@@ -402,7 +405,7 @@ func (e eventsLogic) consLegacyEventsItems(items []model.LegacyEventItem) []mode
 		defs[index] = e.consLegacyEventItem(items[index])
 	}
 	return defs
-}
+} */
 
 func recurenceIDtoInt(s string) (*int, error) {
 	// Parse string to int
