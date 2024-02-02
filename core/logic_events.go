@@ -395,43 +395,39 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 		log.Println("33479681")
 	}
 
-	var err error
 	if timeType == "START_TIME_ONLY" {
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, _ = time.Parse("01/02/2006 03:04 PM", startDateTimeStr)
+		startDateObj, _ = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
 
 		endDate = g.EndDate
 		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObj, _ = time.Parse("01/02/2006 03:04 PM", endDateTimeStr)
+		endDateObj, _ = time.Parse("1/2/2006 3:04 pm", endDateTimeStr)
 	} else if timeType == "START_AND_END_TIME" {
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, err = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
-		if err != nil {
-			log.Println("33479681")
-		}
+		startDateObj, _ = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
 
 		endDate = g.EndDate
 		endTime = g.EndTime
 		endDateTimeStr := fmt.Sprintf("%s %s", endDate, endTime)
-		endDateObj, _ = time.Parse("01/02/2006 03:04 PM", endDateTimeStr)
+		endDateObj, _ = time.Parse("1/2/2006 3:04 pm", endDateTimeStr)
 	} else if timeType == "NONE" {
 		allDay = true
 
 		startDate = g.StartDate
 		endDate = g.EndDate
 		startDateTimeStr := fmt.Sprintf("%s 12:00 am", startDate)
-		startDateObj, _ = time.Parse("01/02/2006 03:04 PM", startDateTimeStr)
+		startDateObj, _ = time.Parse("1/2/2006 3:04 pm", startDateTimeStr)
 
 		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObj, _ = time.Parse("01/02/2006 03:04 PM", endDateTimeStr)
+		endDateObj, _ = time.Parse("1/2/2006 3:04 pm", endDateTimeStr)
 	}
 
-	startDateStr := startDateObj.Format("Mon, 02 Jan 2006 15:04:05 MST")
-	endDateStr := endDateObj.Format("Mon, 02 Jan 2006 15:04:05 MST")
+	startDateStr := startDateObj.Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	endDateStr := endDateObj.Format("Mon, 02 Jan 2006 15:04:05 GMT")
 
 	//utcStartDate := startDateObj.UTC()
 	//utcEndDate := endDateObj.UTC()
