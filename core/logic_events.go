@@ -175,31 +175,31 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.timerDone <- true
 		e.dailyWebToolsTimer.Stop()
 	}
-	/*
-		//wait until it is the correct moment from the day
-		location, err := time.LoadLocation("America/Chicago")
-		if err != nil {
-			log.Printf("Error getting location:%s\n", err.Error())
-		}
-		now := time.Now().In(location)
-		log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-		nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-		desiredMoment := 18000
+	//wait until it is the correct moment from the day
+	location, err := time.LoadLocation("America/Chicago")
+	if err != nil {
+		log.Printf("Error getting location:%s\n", err.Error())
+	}
+	now := time.Now().In(location)
+	log.Printf("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-		var durationInSeconds int
-		log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
-		if nowSecondsInDay <= desiredMoment {
-			log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
-			durationInSeconds = desiredMoment - nowSecondsInDay
-		} else {
-			log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
-			leftToday := 86400 - nowSecondsInDay
-			durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-		}*/
+	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+	desiredMoment := 18000
+
+	var durationInSeconds int
+	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
+	if nowSecondsInDay <= desiredMoment {
+		log.Println("setupWebToolsTimer -> not web tools process today, so the first process will be today")
+		durationInSeconds = desiredMoment - nowSecondsInDay
+	} else {
+		log.Println("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
+		leftToday := 86400 - nowSecondsInDay
+		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
+	}
 	//log.Println(durationInSeconds)
-	duration := time.Second * time.Duration(0)
-	//duration := time.Second * time.Duration(durationInSeconds)
+	//duration := time.Second * time.Duration(0)
+	duration := time.Second * time.Duration(durationInSeconds)
 	log.Printf("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -346,6 +346,8 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
+	createdBy := g.CreatedBy
+
 	var costFree bool
 	if g.CostFree == "false" {
 		costFree = false
@@ -370,38 +372,87 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
-	location := locationToDef(g.Location)
+	location := constructLocation(g.Location)
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
 	contacts = append(contacts, con)
 	contatsLegacy := contactsToDef(contacts)
 
+	modifiedDate := e.formatDate(g.EditedDate)
+	createdDate := e.formatDate(g.CreatedDate)
+
+	//start date + end date (+all day)
+	allDay := false
+
+	timeType := g.TimeType
+
+	var startDate, startTime, endDate, endTime string
+	var startDateObj, endDateObj time.Time
+
+	chicagoLocation, err := time.LoadLocation("America/Chicago")
+	if err != nil {
+		e.logger.Errorf("cannot get timezone - America/Chicago")
+	}
+
+	if timeType == "START_TIME_ONLY" {
+		startDate = g.StartDate
+		startTime = g.StartTime
+		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
+		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+
+		endDate = g.EndDate
+		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
+		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+	} else if timeType == "START_AND_END_TIME" {
+		startDate = g.StartDate
+		startTime = g.StartTime
+		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
+		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+
+		endDate = g.EndDate
+		endTime = g.EndTime
+		endDateTimeStr := fmt.Sprintf("%s %s", endDate, endTime)
+		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+	} else if timeType == "NONE" {
+		allDay = true
+
+		startDate = g.StartDate
+		endDate = g.EndDate
+		startDateTimeStr := fmt.Sprintf("%s 12:00 am", startDate)
+		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+
+		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
+		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+	}
+
+	startDateStr := startDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	endDateStr := endDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+
+	//end - start date + end date (+all day)
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
-		Item: model.LegacyEvent{ID: id, Category: g.EventType, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual, DataModified: g.EventID,
-			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: false, IsEventFree: costFree, LongDescription: g.Description,
+		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
+			DataModified: modifiedDate, DateCreated: createdDate,
+			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
-			DataSourceEventID: g.EventID, StartDate: g.StartDate}}
+			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr}}
 }
 
-func (e eventsLogic) consLegacyEventItem(g model.LegacyEventItem) model.LegacyEventItem {
+func (e eventsLogic) formatDate(wtDate string) string {
+	dateFormat := "1/2/2006"
+	timeFormat := "3:04 pm"
 
-	return model.LegacyEventItem{SyncProcessSource: g.SyncProcessSource, SyncDate: g.SyncDate,
-		Item: model.LegacyEvent{AllDay: g.Item.AllDay, CalendarID: g.Item.CalendarID, Category: g.Item.Category,
-			Subcategory: g.Item.Subcategory, CreatedBy: g.Item.CreatedBy, LongDescription: g.Item.LongDescription,
-			DataModified: g.Item.DataModified, DataSourceEventID: g.Item.DataSourceEventID, DateCreated: g.Item.DateCreated,
-			EndDate: g.Item.EndDate, EventID: g.Item.EventID, IcalURL: g.Item.IcalURL, IsEventFree: g.Item.IsEventFree,
-			IsVirtial: g.Item.IsVirtial, Location: g.Item.Location, OriginatingCalendarID: g.Item.OriginatingCalendarID,
-			OutlookURL: g.Item.OutlookURL, RecurrenceID: g.Item.RecurrenceID, IsSuperEvent: g.Item.IsSuperEvent,
-			RecurringFlag: g.Item.RecurringFlag, SourceID: g.Item.SourceID, Sponsor: g.Item.Sponsor, StartDate: g.Item.StartDate,
-			Title: g.Item.Title, TitleURL: g.Item.TitleURL, RegistrationURL: g.Item.RegistrationURL, Contacts: g.Item.Contacts, SubEvents: g.Item.SubEvents}}
-}
-func (e eventsLogic) consLegacyEventsItems(items []model.LegacyEventItem) []model.LegacyEventItem {
-	defs := make([]model.LegacyEventItem, len(items))
-	for index := range items {
-		defs[index] = e.consLegacyEventItem(items[index])
+	wtDateTime := wtDate + " 12:00 am"
+	dataObj, err := time.Parse(dateFormat+" "+timeFormat, wtDateTime)
+	if err != nil {
+		return ""
 	}
-	return defs
+
+	dataObj = dataObj.Add(5 * time.Hour)
+
+	result := dataObj.Format("2006-01-02T15:04:05")
+	return result
 }
 
 func recurenceIDtoInt(s string) (*int, error) {
@@ -418,79 +469,62 @@ func recurenceIDtoInt(s string) (*int, error) {
 	return result, nil
 }
 
-// Location
-func locationToDef(location string) model.LocationLegacy {
-	var description string
-	var latitude float32
-	var longitude float32
-	if location != "" {
-		description = location
-		latitude = 0
-		longitude = 0
-	} else if location == "Davenport 109A" {
-		description = location
+func constructLocation(location string) model.LocationLegacy {
+	description := location
+	latitude := 0.0
+	longitude := 0.0
+
+	if location == "Davenport 109A" {
 		latitude = 40.107335
 		longitude = -88.226069
 	} else if location == "Nevada Dance Studio (905 W. Nevada St.)" {
 		latitude = 40.105825
 		longitude = -88.219873
-		description = location
 	} else if location == "18th Ave Library, 175 W 18th Ave, Room 205, Oklahoma City, OK" {
 		latitude = 36.102183
 		longitude = -97.111245
-		description = location
 	} else if location == "Champaign County Fairgrounds" {
 		latitude = 40.1202191
 		longitude = -88.2178757
-		description = location
 	} else if location == "Student Union SLC Conference room" {
 		latitude = 39.727282
 		longitude = -89.617477
-		description = location
 	} else if location == "Armory, room 172 (the Innovation Studio)" {
 		latitude = 40.104749
 		longitude = -88.23195
-		description = location
 	} else if location == "Student Union Room 235" {
 		latitude = 39.727282
 		longitude = -89.617477
-		description = location
 	} else if location == "Uni 206, 210, 211" {
 		latitude = 40.11314
 		longitude = -88.225259
-		description = location
 	} else if location == "Uni 205, 206, 210" {
 		latitude = 40.11314
 		longitude = -88.225259
-		description = location
 	} else if location == "Southern Historical Association Combs Chandler 30" {
 		latitude = 38.258116
 		longitude = -85.756139
-		description = location
 	} else if location == "St. Louis, MO" {
 		latitude = 38.694237
 		longitude = -90.4493
-		description = location
 	} else if location == "Student Union SLC" {
 		latitude = 39.727282
 		longitude = -89.617477
-		description = location
 	} else if location == "Purdue University, West Lafayette, Indiana" {
 		latitude = 40.425012
 		longitude = -86.912645
-		description = location
 	} else if location == "MP 7" {
 		latitude = 40.100803
 		longitude = -88.23604
-		description = location
 	} else if location == "116 Roger Adams Lab" {
 		latitude = 40.107741
 		longitude = -88.224943
-		description = location
 	} else if location == "2700 Campus Way 45221" {
-		description = location
 		latitude = 39.131894
 		longitude = -84.519143
+	} else if location == "The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL" {
+		latitude = 40.1047044
+		longitude = -88.22901039999999
 	}
 
 	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
