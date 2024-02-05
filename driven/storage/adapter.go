@@ -342,15 +342,8 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	//this processing should happen in the core module, not here
 	var legacyEvents []model.LegacyEvent
 	for _, l := range list {
-		le := model.LegacyEvent{AllDay: l.Item.AllDay, CalendarID: l.Item.CalendarID, Category: l.Item.Category,
-			Subcategory: l.Item.Subcategory, CreatedBy: l.Item.CreatedBy, LongDescription: l.Item.LongDescription,
-			DataModified: l.Item.DataModified, DataSourceEventID: l.Item.DataSourceEventID, DateCreated: l.Item.DateCreated,
-			EndDate: l.Item.EndDate, EventID: l.Item.EventID, IcalURL: l.Item.IcalURL, ID: l.Item.ID, ImageURL: l.Item.ImageURL,
-			IsEventFree: l.Item.IsEventFree, IsVirtial: l.Item.IsVirtial, Location: l.Item.Location, OriginatingCalendarID: l.Item.OriginatingCalendarID,
-			OutlookURL: l.Item.OutlookURL, RecurrenceID: l.Item.RecurrenceID, IsSuperEvent: l.Item.IsSuperEvent, RecurringFlag: l.Item.RecurringFlag,
-			SourceID: l.Item.SourceID, Sponsor: l.Item.Sponsor, StartDate: l.Item.StartDate, Title: l.Item.Title, TitleURL: l.Item.TitleURL,
-			RegistrationURL: l.Item.RegistrationURL, Contacts: l.Item.Contacts, SubEvents: l.Item.SubEvents,
-		}
+		le := l.Item
+
 		legacyEvents = append(legacyEvents, le)
 	}
 
