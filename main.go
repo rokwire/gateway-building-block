@@ -81,7 +81,7 @@ func main() {
 	// web adapter
 	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
 	coreBBBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CORE_BB_BASE_URL", true, false)
-	gatewayApiKey := envLoader.GetAndLogEnvVar("GATEWAY_EVENTS_BB_ROKWIRE_API_KEY", true, false)
+	gatewayApiKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, false)
 
 	authService := authservice.AuthService{
 		ServiceID:   serviceID,
