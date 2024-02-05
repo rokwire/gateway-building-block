@@ -330,7 +330,7 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 	return err
 }
 
-// DeleteLegacyEvents Deletes a reminder
+// FindAllLegacyEvents finds all legacy events
 func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
 	var list []model.LegacyEventItem
