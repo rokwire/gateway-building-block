@@ -32,7 +32,7 @@ type Auth struct {
 	bbs    tokenauth.Handlers
 	tps    tokenauth.Handlers
 	system tokenauth.Handlers
-	apiKey ApiKey
+	apiKey APIKey
 }
 
 // NewAuth creates new auth handler
@@ -66,7 +66,7 @@ func NewAuth(serviceRegManager *authservice.ServiceRegManager, apiKey string) (*
 		return nil, errors.WrapErrorAction(logutils.ActionCreate, "system auth", nil, err)
 	}
 	systemHandlers := tokenauth.NewHandlers(system)
-	gatewayApiKey := newApiKeyAuth(apiKey)
+	rokwireAPIKey := newAPIKeyAuth(apiKey)
 
 	auth := Auth{
 		client: clientHandlers,
@@ -74,7 +74,7 @@ func NewAuth(serviceRegManager *authservice.ServiceRegManager, apiKey string) (*
 		bbs:    bbsHandlers,
 		tps:    tpsHandlers,
 		system: systemHandlers,
-		apiKey: gatewayApiKey,
+		apiKey: rokwireAPIKey,
 	}
 	return &auth, nil
 }
@@ -190,17 +190,17 @@ func newSystemAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth
 
 ///////
 
-// ApiKey handling the ApiKey from other BBs
-type ApiKey struct {
+// APIKey handling the APIKey from other BBs
+type APIKey struct {
 	apiKey string
 }
 
-func newApiKeyAuth(apiKey string) ApiKey {
-	return ApiKey{apiKey: apiKey}
+func newAPIKeyAuth(apiKey string) APIKey {
+	return APIKey{apiKey: apiKey}
 }
 
 // Check verifies the internal API key
-func (auth ApiKey) Check(req *http.Request) (int, *tokenauth.Claims, error) {
+func (auth APIKey) Check(req *http.Request) (int, *tokenauth.Claims, error) {
 	apiKey := req.Header.Get("GATEWAY_EVENTS_BB_ROKWIRE_API_KEY")
 
 	//check if there is api key in the header
@@ -218,6 +218,6 @@ func (auth ApiKey) Check(req *http.Request) (int, *tokenauth.Claims, error) {
 }
 
 // GetTokenAuth returns nil
-func (auth ApiKey) GetTokenAuth() *tokenauth.TokenAuth {
+func (auth APIKey) GetTokenAuth() *tokenauth.TokenAuth {
 	return nil
 }
