@@ -335,6 +335,9 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
 	var list []model.LegacyEventItem
 	err := a.db.legacyEvents.Find(a.context, filter, &list, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	var legacyEvents []model.LegacyEvent
 	for _, l := range list {
