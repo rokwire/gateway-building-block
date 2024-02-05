@@ -90,6 +90,16 @@ func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, a
 	}
 	return ret, nil
 }
+func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
+
+	leEvents, err := a.app.storage.FindAllLegacyEvents()
+	if err != nil {
+		return nil, err
+	}
+
+	return leEvents, nil
+
+}
 
 // newAppBBs creates new appBBs
 func newAppBBs(app *Application) appBBs {

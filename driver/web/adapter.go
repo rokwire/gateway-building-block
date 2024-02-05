@@ -50,6 +50,7 @@ type Adapter struct {
 	bbsAPIsHandler     BBsAPIsHandler
 	tpsAPIsHandler     TPSAPIsHandler
 	systemAPIsHandler  SystemAPIsHandler
+	apiKeyHandler      APIKeyHandler
 
 	app *core.Application
 
@@ -116,6 +117,9 @@ func (a Adapter) Start() {
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.createAppointment, a.auth.bbs.Permissions)).Methods("POST")
 	bbsRouter.HandleFunc("/appointments/{id}", a.wrapFunc(a.bbsAPIsHandler.deleteAppointment, a.auth.bbs.Permissions)).Methods("DELETE")
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.updateAppointment, a.auth.bbs.Permissions)).Methods("PUT")
+
+	//use api key!!!
+	bbsRouter.HandleFunc("/events", a.wrapFunc(a.apiKeyHandler.getLegacyEvents, a.auth.apiKey)).Methods("GET")
 
 	// TPS APIs
 	tpsRouter := mainRouter.PathPrefix("/tps").Subrouter()
@@ -200,13 +204,13 @@ func (a Adapter) wrapFunc(handler handlerFunc, authorization tokenauth.Handler) 
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(baseURL string, port string, serviceID string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
+func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
 	yamlDoc, err := loadDocsYAML(baseURL)
 	if err != nil {
 		logger.Fatalf("error parsing docs yaml - %s", err.Error())
 	}
 
-	auth, err := NewAuth(serviceRegManager)
+	auth, err := NewAuth(serviceRegManager, apiKey)
 	if err != nil {
 		logger.Fatalf("error creating auth - %s", err.Error())
 	}
@@ -216,6 +220,8 @@ func NewWebAdapter(baseURL string, port string, serviceID string, app *core.Appl
 	adminAPIsHandler := NewAdminAPIsHandler(app)
 	bbsAPIsHandler := NewBBsAPIsHandler(app)
 	tpsAPIsHandler := NewTPSAPIsHandler(app)
+	apiKeyHandler := NewAPIKeyHandler(app)
 	return Adapter{baseURL: baseURL, port: port, serviceID: serviceID, cachedYamlDoc: yamlDoc, auth: auth, defaultAPIsHandler: defaultAPIsHandler,
-		clientAPIsHandler: clientAPIsHandler, adminAPIsHandler: adminAPIsHandler, bbsAPIsHandler: bbsAPIsHandler, tpsAPIsHandler: tpsAPIsHandler, app: app, logger: logger}
+		clientAPIsHandler: clientAPIsHandler, adminAPIsHandler: adminAPIsHandler, bbsAPIsHandler: bbsAPIsHandler,
+		tpsAPIsHandler: tpsAPIsHandler, app: app, apiKeyHandler: apiKeyHandler, logger: logger}
 }

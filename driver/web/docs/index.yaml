@@ -83,6 +83,8 @@ paths:
     $ref: "./resources/bbs/createappointment.yaml"
   /api/bbs/appointments/{id}:
     $ref: "./resources/bbs/delappointment.yaml"
+  /api/bbs/events:
+    $ref: "./resources/bbs/legacyEvents.yaml"  
   
   # TPS
   /api/tps/examples/{id}:

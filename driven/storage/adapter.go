@@ -330,6 +330,26 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 	return err
 }
 
+// FindAllLegacyEvents finds all legacy events
+func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
+	filter := bson.M{}
+	var list []model.LegacyEventItem
+	err := a.db.legacyEvents.Find(a.context, filter, &list, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	//this processing should happen in the core module, not here
+	var legacyEvents []model.LegacyEvent
+	for _, l := range list {
+		le := l.Item
+
+		legacyEvents = append(legacyEvents, le)
+	}
+
+	return legacyEvents, err
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction
