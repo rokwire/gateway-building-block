@@ -339,6 +339,7 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 		return nil, err
 	}
 
+	//this processing should happen in the core module, not here
 	var legacyEvents []model.LegacyEvent
 	for _, l := range list {
 		le := model.LegacyEvent{AllDay: l.Item.AllDay, CalendarID: l.Item.CalendarID, Category: l.Item.Category,
