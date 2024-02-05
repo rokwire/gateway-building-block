@@ -30,7 +30,7 @@ type APIKeyHandler struct {
 	app *core.Application
 }
 
-func (h APIKeyHandler) getLegacyEvent(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+func (h APIKeyHandler) getLegacyEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	legacyEvents, err := h.app.BBs.GetLegacyEvents()
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
