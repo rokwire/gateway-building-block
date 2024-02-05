@@ -117,6 +117,8 @@ func (a Adapter) Start() {
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.createAppointment, a.auth.bbs.Permissions)).Methods("POST")
 	bbsRouter.HandleFunc("/appointments/{id}", a.wrapFunc(a.bbsAPIsHandler.deleteAppointment, a.auth.bbs.Permissions)).Methods("DELETE")
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.updateAppointment, a.auth.bbs.Permissions)).Methods("PUT")
+
+	//use api key!!!
 	bbsRouter.HandleFunc("/events", a.wrapFunc(a.apiKeyHandler.getLegacyEvents, a.auth.apiKey)).Methods("GET")
 
 	// TPS APIs
