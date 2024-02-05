@@ -201,7 +201,7 @@ func newAPIKeyAuth(apiKey string) APIKey {
 
 // Check verifies the internal API key
 func (auth APIKey) Check(req *http.Request) (int, *tokenauth.Claims, error) {
-	apiKey := req.Header.Get("GATEWAY_EVENTS_BB_ROKWIRE_API_KEY")
+	apiKey := req.Header.Get("ROKWIRE-API-KEY")
 
 	//check if there is api key in the header
 	if len(apiKey) == 0 {
