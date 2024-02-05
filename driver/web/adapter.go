@@ -217,7 +217,7 @@ func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string,
 	adminAPIsHandler := NewAdminAPIsHandler(app)
 	bbsAPIsHandler := NewBBsAPIsHandler(app)
 	tpsAPIsHandler := NewTPSAPIsHandler(app)
-	apiKeyHandler := NewApiKeyHandler(app)
+	apiKeyHandler := NewAPIKeyHandler(app)
 	return Adapter{baseURL: baseURL, port: port, serviceID: serviceID, cachedYamlDoc: yamlDoc, auth: auth, defaultAPIsHandler: defaultAPIsHandler,
 		clientAPIsHandler: clientAPIsHandler, adminAPIsHandler: adminAPIsHandler, bbsAPIsHandler: bbsAPIsHandler,
 		tpsAPIsHandler: tpsAPIsHandler, app: app, apiKeyHandler: apiKeyHandler, logger: logger}
