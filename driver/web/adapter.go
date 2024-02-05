@@ -50,7 +50,7 @@ type Adapter struct {
 	bbsAPIsHandler     BBsAPIsHandler
 	tpsAPIsHandler     TPSAPIsHandler
 	systemAPIsHandler  SystemAPIsHandler
-	apiKeyHandler      ApiKeyHandler
+	apiKeyHandler      APIKeyHandler
 
 	app *core.Application
 

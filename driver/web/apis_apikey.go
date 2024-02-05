@@ -25,12 +25,12 @@ import (
 	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
-// InternalApisHandler handles the rest Admin APIs implementation
-type ApiKeyHandler struct {
+// APIKeyHandler handles api key
+type APIKeyHandler struct {
 	app *core.Application
 }
 
-func (h ApiKeyHandler) getLegacyEvent(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+func (h APIKeyHandler) getLegacyEvent(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	legacyEvents, err := h.app.BBs.GetLegacyEvents()
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeAppointments, nil, err, http.StatusInternalServerError, true)
@@ -42,7 +42,7 @@ func (h ApiKeyHandler) getLegacyEvent(l *logs.Log, r *http.Request, claims *toke
 	return l.HTTPResponseSuccessJSON(response)
 }
 
-// NewApiKeyHandler creates new rest Handler instance
-func NewApiKeyHandler(app *core.Application) ApiKeyHandler {
-	return ApiKeyHandler{app: app}
+// NewAPIKeyHandler creates new api key handler
+func NewAPIKeyHandler(app *core.Application) APIKeyHandler {
+	return APIKeyHandler{app: app}
 }
