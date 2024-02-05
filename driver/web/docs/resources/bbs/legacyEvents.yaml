@@ -3,8 +3,7 @@ get:
   - BBs
   summary: Gets all legacy events
   description: |
-    Gets all legacy events
-  deprecated: true  
+    Gets all legacy events 
   security:
     - bearerAuth: []          
   responses:
