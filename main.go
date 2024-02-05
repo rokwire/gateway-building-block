@@ -81,7 +81,7 @@ func main() {
 	// web adapter
 	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
 	coreBBBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CORE_BB_BASE_URL", true, false)
-	gatewayApiKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, false)
+	rokwireAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, false)
 
 	authService := authservice.AuthService{
 		ServiceID:   serviceID,
@@ -100,6 +100,6 @@ func main() {
 		logger.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
-	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, gatewayApiKey, application, serviceRegManager, logger)
+	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, logger)
 	webAdapter.Start()
 }
