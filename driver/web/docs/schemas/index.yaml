@@ -5,6 +5,14 @@ EnvConfigData:
   $ref: "./application/EnvConfigData.yaml"
 Example:
   $ref: "./application/Example.yaml"
+ContactLegacy:
+  $ref: "./application/ContactLegacy.yaml"  
+LegacyEvent:
+  $ref: "./application/LegacyEvent.yaml"  
+LocationLegacy:
+  $ref: "./application/LocationLegacy.yaml"   
+SubEvents:
+  $ref: "./application/SubEvents.yaml"   
 
 # ADMIN section
 

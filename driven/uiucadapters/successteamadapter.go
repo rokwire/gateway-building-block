@@ -15,7 +15,6 @@
 package uiucadapters
 
 import (
-	"application/core/interfaces"
 	model "application/core/model"
 	uiuc "application/core/model/uiuc"
 	"encoding/json"
@@ -29,17 +28,16 @@ import (
 
 // SuccessTeamAdapter is a vendor specific structure that implements the UIUC success team
 type SuccessTeamAdapter struct {
-	StorageAdapter interfaces.Storage
 }
 
 // NewSuccessTeamAdapter returns a vendor specific implementation of the success team adapter
-func NewSuccessTeamAdapter(adapter interfaces.Storage) *SuccessTeamAdapter {
-	successteamadapter := SuccessTeamAdapter{StorageAdapter: adapter}
+func NewSuccessTeamAdapter() *SuccessTeamAdapter {
+	successteamadapter := SuccessTeamAdapter{}
 	return &successteamadapter
 }
 
 // GetSuccessTeam returns a list of
-func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, unitid string, accessToken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error) {
+func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, calendars *[]model.UnitCalendar, accessToken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error) {
 
 	var retValue model.SuccessTeam
 
@@ -51,7 +49,7 @@ func (sta SuccessTeamAdapter) GetSuccessTeam(uin string, unitid string, accessTo
 
 	retValue.PrimaryCareProviders = *pcpdata
 
-	advisordata, advstatus, adverr := sta.GetAcademicAdvisors(uin, unitid, accessToken, conf)
+	advisordata, advstatus, adverr := sta.GetAcademicAdvisors(uin, calendars, accessToken, conf)
 	if adverr != nil {
 		return nil, advstatus, adverr
 	}
@@ -88,19 +86,13 @@ func (sta SuccessTeamAdapter) GetPrimaryCareProvider(uin string, accessToken str
 }
 
 // GetAcademicAdvisors returns a list of
-func (sta SuccessTeamAdapter) GetAcademicAdvisors(uin string, unitid string, accessToken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error) {
+func (sta SuccessTeamAdapter) GetAcademicAdvisors(uin string, calendars *[]model.UnitCalendar, accessToken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error) {
 
 	baseURL := conf.EngAppointmentBaseURL
 	finalURL := ""
 	imagebaseURL := conf.ImageEndpoint
 	var headers = make(map[string]string)
 	headers["Authorization"] = "Bearer " + accessToken
-
-	calendars, err := sta.StorageAdapter.FindCalendars(unitid)
-
-	if err != nil {
-		return nil, 500, err
-	}
 
 	s := make([]model.SuccessTeamMember, 0)
 

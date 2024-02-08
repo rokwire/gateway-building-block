@@ -1,0 +1,68 @@
+type: object
+properties:
+  id:
+    type: string
+  all_day:
+    type: boolean
+  calendar_id:
+    type: string
+  category:
+    type: string
+  subcategocy:
+    type: string
+  createdBy:
+    type: string
+  longDescription:
+    type: string  
+  dataModified:
+    type: string 
+  dataSourceEventId:
+    type: string    
+  dateCreated:
+    type: string   
+  endDate:
+    type: string 
+  event_id:
+    type: string  
+  icalURL:
+    type: string 
+  imageURL:
+    type: string 
+    nullable: true 
+  isEventFree:
+    type: boolean
+  isVirtual:
+    type: boolean 
+  originating_calendar_id:
+    type: string    
+  outlookUrl:
+    type: string
+  recurrence_id:
+    type: string 
+  isSuperEvent:
+    type: boolean  
+  recurringFlag:
+    type: boolean  
+  source_id:
+    type: string
+  sponsor:
+    type: string  
+  startDate:
+    type: string
+  title:
+    type: string 
+  titleUrl:
+    type: string          
+  registrationURL:
+    type: string  
+  contacts:
+    type: array
+    items:
+      $ref: "./ContactLegacy.yaml"
+  subeEvents:
+    type: array
+    items:
+      $ref: "./SubEvents.yaml"    
+  location:
+    items:
+      $ref: "./LocationLegacy.yaml"     

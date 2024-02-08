@@ -1,0 +1,8 @@
+type: object
+properties:
+  id:
+    type: string
+  isFeatured:
+    type: boolean
+  track:
+    type: string

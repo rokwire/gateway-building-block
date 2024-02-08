@@ -27,7 +27,7 @@ func (a *Adapter) FindExample(orgID string, appID string, id string) (*model.Exa
 	filter := bson.M{"org_id": orgID, "app_id": appID, "_id": id}
 
 	var data *model.Example
-	err := a.db.examples.FindOne(a.context, filter, &data, nil)
+	err := a.db.examples.FindOneWithContext(a.context, filter, &data, nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(filter), err)
 	}

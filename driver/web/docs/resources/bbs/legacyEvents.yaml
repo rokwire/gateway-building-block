@@ -1,0 +1,23 @@
+get:
+  tags:
+  - BBs
+  summary: Gets all legacy events
+  description: |
+    Gets all legacy events 
+  security:
+    - bearerAuth: []          
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/LegacyEvent.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error   

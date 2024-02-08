@@ -15,9 +15,9 @@
 package core
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 	"application/driven/uiucadapters"
+
 	"encoding/json"
 	"os"
 )
@@ -25,11 +25,11 @@ import (
 // appClient contains client implementations
 type appClient struct {
 	app                *Application
-	Courseadapter      interfaces.Courses
-	LocationAdapter    interfaces.WayFinding
-	LaundryAdapter     interfaces.LaundryService
-	ContactAdapter     interfaces.Contact
-	SuccessTeamAdapter interfaces.SuccessTeam
+	Courseadapter      Courses
+	LocationAdapter    WayFinding
+	LaundryAdapter     LaundryService
+	ContactAdapter     Contact
+	SuccessTeamAdapter SuccessTeam
 }
 
 // GetExample gets an Example by ID
@@ -147,7 +147,13 @@ func (a appClient) GetTermSessions() (*[4]model.TermSession, error) {
 
 func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string) (*model.SuccessTeam, int, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, unitid, accesstoken, conf)
+
+	calendars, err := a.app.storage.FindCalendars(unitid)
+	if err != nil {
+		return nil, 500, err
+	}
+
+	retData, status, err := a.SuccessTeamAdapter.GetSuccessTeam(uin, calendars, accesstoken, conf)
 	if err != nil {
 		return nil, status, err
 	}
@@ -166,7 +172,13 @@ func (a appClient) GetPrimaryCareProvider(uin string, accesstoken string) (*[]mo
 
 func (a appClient) GetAcademicAdvisors(uin string, unitid string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
 	conf, _ := a.app.GetEnvConfigs()
-	retData, status, err := a.SuccessTeamAdapter.GetAcademicAdvisors(uin, unitid, accesstoken, conf)
+
+	calendars, err := a.app.storage.FindCalendars(unitid)
+	if err != nil {
+		return nil, 500, err
+	}
+
+	retData, status, err := a.SuccessTeamAdapter.GetAcademicAdvisors(uin, calendars, accesstoken, conf)
 	if err != nil {
 		return nil, status, err
 	}
@@ -193,6 +205,6 @@ func newAppClient(app *Application) appClient {
 	client.LaundryAdapter = uiucadapters.NewCSCLaundryAdapter(laundryAssets)
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
 	client.LocationAdapter = uiucadapters.NewUIUCWayFinding()
-	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter(app.storage)
+	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter()
 	return client
 }

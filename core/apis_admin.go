@@ -15,7 +15,6 @@
 package core
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 	"time"
 
@@ -53,7 +52,7 @@ func (a appAdmin) UpdateExample(example model.Example) error {
 
 // AppendExample appends to the data in an example - Example of transaction usage
 func (a appAdmin) AppendExample(example model.Example) (*model.Example, error) {
-	now := time.Now()
+	/*now := time.Now()
 	var newExample *model.Example
 	transaction := func(storage interfaces.Storage) error {
 		oldExample, err := storage.FindExample(example.OrgID, example.AppID, example.ID)
@@ -78,7 +77,8 @@ func (a appAdmin) AppendExample(example model.Example) (*model.Example, error) {
 		return nil, errors.WrapErrorAction(logutils.ActionCommit, logutils.TypeTransaction, nil, err)
 	}
 
-	return newExample, nil
+	return newExample, nil */
+	return nil, nil
 }
 
 // DeleteExample deletes an Example by ID

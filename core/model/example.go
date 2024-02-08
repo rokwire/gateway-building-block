@@ -23,6 +23,9 @@ import (
 const (
 	//TypeExample example type
 	TypeExample logutils.MessageDataType = "example"
+
+	//TypeEventLocations event locations
+	TypeEventLocations logutils.MessageDataType = "event_locations"
 )
 
 // Example is a generic Example data type
