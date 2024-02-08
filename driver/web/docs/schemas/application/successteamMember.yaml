@@ -1,0 +1,39 @@
+type: object
+required:
+- last_name
+- email
+- image
+- department
+- first_name
+- title
+- external_link
+- external_link_text
+- team_member_id
+properties:
+  last_name:
+    type: string
+    readOnly: true
+  email:
+    type: string
+    readOnly: true
+  image:
+    type: string
+    readOnly: true
+  department:
+    type: string
+    readOnly: true
+  title:
+    type: string
+    readOnly: true
+  external_link:
+    type: string
+    readOnly: true
+  external_link_text:
+    type: string
+    readOnly: true
+  first_name:
+    type: string
+    readOnly: true
+  team_member_id:
+    type: string
+    readOnly: true
