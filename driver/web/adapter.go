@@ -50,6 +50,7 @@ type Adapter struct {
 	bbsAPIsHandler     BBsAPIsHandler
 	tpsAPIsHandler     TPSAPIsHandler
 	systemAPIsHandler  SystemAPIsHandler
+	apiKeyHandler      APIKeyHandler
 
 	app *core.Application
 
@@ -73,6 +74,7 @@ func (a Adapter) Start() {
 
 	// Client APIs
 	mainRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.clientAPIsHandler.getExample, a.auth.client.Permissions)).Methods("GET")
+	mainRouter.HandleFunc("/calendars/{id}", a.wrapFunc(a.clientAPIsHandler.getUnitCalendar, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/rooms", a.wrapFunc(a.clientAPIsHandler.getLaundryRooms, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/room", a.wrapFunc(a.clientAPIsHandler.getRoomDetails, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/laundry/initrequest", a.wrapFunc(a.clientAPIsHandler.initServiceRequest, a.auth.client.User)).Methods("GET")
@@ -86,6 +88,10 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/courses/giescourses", a.wrapFunc(a.clientAPIsHandler.getGiesCourses, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/courses/studentcourses", a.wrapFunc(a.clientAPIsHandler.getStudentCourses, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/termsessions/listcurrent", a.wrapFunc(a.clientAPIsHandler.getTermSessions, a.auth.client.User)).Methods("GET")
+
+	mainRouter.HandleFunc("/successteam", a.wrapFunc(a.clientAPIsHandler.getStudentSuccessTeam, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/successteam/pcp", a.wrapFunc(a.clientAPIsHandler.getPrimaryCareProvider, a.auth.client.User)).Methods("GET")
+	mainRouter.HandleFunc("/successteam/advisors", a.wrapFunc(a.clientAPIsHandler.getAcademicAdvisors, a.auth.client.User)).Methods("GET")
 
 	// Admin APIs
 	adminRouter := mainRouter.PathPrefix("/admin").Subrouter()
@@ -111,6 +117,9 @@ func (a Adapter) Start() {
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.createAppointment, a.auth.bbs.Permissions)).Methods("POST")
 	bbsRouter.HandleFunc("/appointments/{id}", a.wrapFunc(a.bbsAPIsHandler.deleteAppointment, a.auth.bbs.Permissions)).Methods("DELETE")
 	bbsRouter.HandleFunc("/appointments/", a.wrapFunc(a.bbsAPIsHandler.updateAppointment, a.auth.bbs.Permissions)).Methods("PUT")
+
+	//use api key!!!
+	bbsRouter.HandleFunc("/events", a.wrapFunc(a.apiKeyHandler.getLegacyEvents, a.auth.apiKey)).Methods("GET")
 
 	// TPS APIs
 	tpsRouter := mainRouter.PathPrefix("/tps").Subrouter()
@@ -195,13 +204,13 @@ func (a Adapter) wrapFunc(handler handlerFunc, authorization tokenauth.Handler) 
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(baseURL string, port string, serviceID string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
+func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
 	yamlDoc, err := loadDocsYAML(baseURL)
 	if err != nil {
 		logger.Fatalf("error parsing docs yaml - %s", err.Error())
 	}
 
-	auth, err := NewAuth(serviceRegManager)
+	auth, err := NewAuth(serviceRegManager, apiKey)
 	if err != nil {
 		logger.Fatalf("error creating auth - %s", err.Error())
 	}
@@ -211,6 +220,8 @@ func NewWebAdapter(baseURL string, port string, serviceID string, app *core.Appl
 	adminAPIsHandler := NewAdminAPIsHandler(app)
 	bbsAPIsHandler := NewBBsAPIsHandler(app)
 	tpsAPIsHandler := NewTPSAPIsHandler(app)
+	apiKeyHandler := NewAPIKeyHandler(app)
 	return Adapter{baseURL: baseURL, port: port, serviceID: serviceID, cachedYamlDoc: yamlDoc, auth: auth, defaultAPIsHandler: defaultAPIsHandler,
-		clientAPIsHandler: clientAPIsHandler, adminAPIsHandler: adminAPIsHandler, bbsAPIsHandler: bbsAPIsHandler, tpsAPIsHandler: tpsAPIsHandler, app: app, logger: logger}
+		clientAPIsHandler: clientAPIsHandler, adminAPIsHandler: adminAPIsHandler, bbsAPIsHandler: bbsAPIsHandler,
+		tpsAPIsHandler: tpsAPIsHandler, app: app, apiKeyHandler: apiKeyHandler, logger: logger}
 }

@@ -15,7 +15,6 @@
 package storage
 
 import (
-	"application/core/interfaces"
 	"context"
 	"time"
 
@@ -39,10 +38,15 @@ type database struct {
 	dbClient *mongo.Client
 	logger   *logs.Logger
 
-	configs  *collectionWrapper
-	examples *collectionWrapper
+	globalConfigs *collectionWrapper
+	configs       *collectionWrapper
+	examples      *collectionWrapper
+	unitcalendars *collectionWrapper
 
-	listeners []interfaces.StorageListener
+	legacyEvents    *collectionWrapper
+	legacyLocations *collectionWrapper
+
+	listeners []Listener
 }
 
 func (d *database) start() error {
@@ -69,6 +73,12 @@ func (d *database) start() error {
 	//apply checks
 	db := client.Database(d.mongoDBName)
 
+	globalConfigs := &collectionWrapper{database: d, coll: db.Collection("global_configs")}
+	err = d.applyGlobalConfigsChecks(globalConfigs)
+	if err != nil {
+		return err
+	}
+
 	configs := &collectionWrapper{database: d, coll: db.Collection("configs")}
 	err = d.applyConfigsChecks(configs)
 	if err != nil {
@@ -81,22 +91,52 @@ func (d *database) start() error {
 		return err
 	}
 
+	legacyEvents := &collectionWrapper{database: d, coll: db.Collection("legacy_events")}
+	err = d.applyLegacyEventsChecks(legacyEvents)
+	if err != nil {
+		return err
+	}
+
+	unitcalendars := &collectionWrapper{database: d, coll: db.Collection("unitcalendars")}
+
+	legacyLocations := &collectionWrapper{database: d, coll: db.Collection("legacy_locations")}
+	err = d.applyLegacyLocationsChecks(legacyEvents)
+	if err != nil {
+		return err
+	}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
 
+	d.globalConfigs = globalConfigs
 	d.configs = configs
 	d.examples = examples
+	d.legacyEvents = legacyEvents
+	d.unitcalendars = unitcalendars
+	d.legacyLocations = legacyLocations
 
 	go d.configs.Watch(nil, d.logger)
 
 	return nil
 }
 
+func (d *database) applyGlobalConfigsChecks(globalConfigs *collectionWrapper) error {
+	d.logger.Info("apply global configs checks.....")
+
+	err := globalConfigs.AddIndex(bson.D{primitive.E{Key: "key", Value: 1}}, true)
+	if err != nil {
+		return err
+	}
+
+	d.logger.Info("global configs passed")
+	return nil
+}
+
 func (d *database) applyConfigsChecks(configs *collectionWrapper) error {
 	d.logger.Info("apply configs checks.....")
 
-	err := configs.AddIndex(nil, bson.D{primitive.E{Key: "type", Value: 1}, primitive.E{Key: "app_id", Value: 1}, primitive.E{Key: "org_id", Value: 1}}, true)
+	err := configs.AddIndex(bson.D{primitive.E{Key: "type", Value: 1}, primitive.E{Key: "app_id", Value: 1}, primitive.E{Key: "org_id", Value: 1}}, true)
 	if err != nil {
 		return err
 	}
@@ -109,12 +149,39 @@ func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
 	d.logger.Info("apply examples checks.....")
 
 	//add compound unique index - org_id + app_id
-	err := examples.AddIndex(nil, bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
+	err := examples.AddIndex(bson.D{primitive.E{Key: "org_id", Value: 1}, primitive.E{Key: "app_id", Value: 1}}, false)
 	if err != nil {
 		return errors.WrapErrorAction(logutils.ActionCreate, "index", nil, err)
 	}
 
 	d.logger.Info("apply examples passed")
+	return nil
+}
+
+func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) error {
+	d.logger.Info("apply legacy events checks.....")
+
+	//id
+	err := legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.id", Value: 1}}, true)
+	if err != nil {
+		return err
+	}
+
+	//TODO - add other - source event id - calendar id?
+
+	d.logger.Info("legacy events passed")
+	return nil
+}
+
+func (d *database) applyLegacyLocationsChecks(locations *collectionWrapper) error {
+	d.logger.Info("apply legacy_locations checks.....")
+
+	err := locations.AddIndex(bson.D{primitive.E{Key: "name", Value: 1}}, false)
+	if err != nil {
+		return err
+	}
+
+	d.logger.Info("legacy legacy_locations passed")
 	return nil
 }
 

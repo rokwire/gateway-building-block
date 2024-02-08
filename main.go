@@ -16,7 +16,7 @@ package main
 
 import (
 	"application/core"
-	"application/core/interfaces"
+	"application/driven/eventsbb"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
@@ -63,16 +63,25 @@ func main() {
 		logger.Fatalf("Cannot start the mongoDB adapter: %v", err)
 	}
 
+	// events bb adapter
+	eventsBBBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_BASE_URL", true, true)
+	eventsBBAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
+	eventsBBAdapter := eventsbb.NewEventsBBAdapter(eventsBBBaseURL, eventsBBAPIKey, logger)
+
 	// appointment adapters
-	appointments := make(map[string]interfaces.Appointments)
+	appointments := make(map[string]core.Appointments)
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, appointments, logger)
-	application.Start()
+	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, appointments, logger)
+	err = application.Start()
+	if err != nil {
+		logger.Fatalf("Cannot start the Application module: %v", err)
+	}
 
 	// web adapter
 	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
 	coreBBBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CORE_BB_BASE_URL", true, false)
+	rokwireAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, false)
 
 	authService := authservice.AuthService{
 		ServiceID:   serviceID,
@@ -91,6 +100,6 @@ func main() {
 		logger.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
-	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, application, serviceRegManager, logger)
+	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, logger)
 	webAdapter.Start()
 }

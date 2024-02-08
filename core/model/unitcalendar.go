@@ -21,19 +21,20 @@ import (
 )
 
 const (
-	//TypeExample example type
-	TypeExample logutils.MessageDataType = "example"
-
-	//TypeEventLocations event locations
-	TypeEventLocations logutils.MessageDataType = "event_locations"
+	//TypeUnitCalendar Orgazational Calendar
+	TypeUnitCalendar logutils.MessageDataType = "unit calendar"
 )
 
-// Example is a generic Example data type
-type Example struct {
+// UnitCalendar is a container for mapping units to external system calendar ids
+type UnitCalendar struct {
 	ID          string     `json:"id" bson:"_id"`
 	OrgID       string     `json:"org_id" bson:"org_id"`
 	AppID       string     `json:"app_id" bson:"app_id"`
-	Data        string     `json:"data" bson:"data"`
+	CalendarID  int        `json:"calendar_id" bson:"calendar_id"`
+	UnitID      int        `json:"unit_id" bson:"unit_id"`
+	UnitName    string     `json:"unit_name" bson:"unit_name"`
+	CollegeCode string     `json:"college_code" bson:"college_code"`
+	CollegeName string     `json:"college_name" bson:"college_name"`
 	DateCreated time.Time  `json:"date_created" bson:"date_created"`
 	DateUpdated *time.Time `json:"date_updated" bson:"date_updated"`
 }

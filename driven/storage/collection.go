@@ -54,7 +54,11 @@ func (collWrapper *collectionWrapper) Find(ctx context.Context, filter interface
 	return err
 }
 
-func (collWrapper *collectionWrapper) FindOne(ctx context.Context, filter interface{}, result interface{}, findOptions *options.FindOneOptions) error {
+func (collWrapper *collectionWrapper) FindOne(filter interface{}, result interface{}, findOptions *options.FindOneOptions) error {
+	return collWrapper.FindOneWithContext(context.Background(), filter, result, findOptions)
+}
+
+func (collWrapper *collectionWrapper) FindOneWithContext(ctx context.Context, filter interface{}, result interface{}, findOptions *options.FindOneOptions) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -76,7 +80,11 @@ func (collWrapper *collectionWrapper) FindOne(ctx context.Context, filter interf
 	return nil
 }
 
-func (collWrapper *collectionWrapper) ReplaceOne(ctx context.Context, filter interface{}, replacement interface{}, replaceOptions *options.ReplaceOptions) error {
+func (collWrapper *collectionWrapper) ReplaceOne(filter interface{}, replacement interface{}, replaceOptions *options.ReplaceOptions) error {
+	return collWrapper.ReplaceOneWithContext(context.Background(), filter, replacement, replaceOptions)
+}
+
+func (collWrapper *collectionWrapper) ReplaceOneWithContext(ctx context.Context, filter interface{}, replacement interface{}, replaceOptions *options.ReplaceOptions) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -129,6 +137,21 @@ func (collWrapper *collectionWrapper) InsertMany(ctx context.Context, documents 
 	}
 	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
 	defer cancel()
+
+	result, err := collWrapper.coll.InsertMany(ctx, documents, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (collWrapper *collectionWrapper) InsertManyWithContext(ctx context.Context, documents []interface{}, opts *options.InsertManyOptions) (*mongo.InsertManyResult, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	/*ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
+	defer cancel()*/
 
 	result, err := collWrapper.coll.InsertMany(ctx, documents, opts)
 	if err != nil {
@@ -274,11 +297,8 @@ func (collWrapper *collectionWrapper) ListIndexes(ctx context.Context, l *logs.L
 	return list, nil
 }
 
-func (collWrapper *collectionWrapper) AddIndex(ctx context.Context, keys interface{}, unique bool) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*15000)
+func (collWrapper *collectionWrapper) AddIndex(keys interface{}, unique bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*15000)
 	defer cancel()
 
 	index := mongo.IndexModel{Keys: keys}
@@ -293,11 +313,8 @@ func (collWrapper *collectionWrapper) AddIndex(ctx context.Context, keys interfa
 	return err
 }
 
-func (collWrapper *collectionWrapper) AddIndexWithOptions(ctx context.Context, keys interface{}, opt *options.IndexOptions) error {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*15000)
+func (collWrapper *collectionWrapper) AddIndexWithOptions(keys interface{}, opt *options.IndexOptions) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*15000)
 	defer cancel()
 
 	index := mongo.IndexModel{Keys: keys}

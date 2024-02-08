@@ -12,28 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package storage
 
 import (
-	"time"
+	"application/core/model"
+	"strconv"
 
+	"github.com/rokwire/logging-library-go/v2/errors"
 	"github.com/rokwire/logging-library-go/v2/logutils"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-const (
-	//TypeExample example type
-	TypeExample logutils.MessageDataType = "example"
+// FindCalendars finds all calendars for a given unit id
+func (a *Adapter) FindCalendars(id string) (*[]model.UnitCalendar, error) {
+	//filter := bson.M{"org_id": orgID, "app_id": appID, "unit_id": id}
+	intid, _ := strconv.Atoi(id)
+	filter := bson.M{"unit_id": intid}
+	//filter := bson.M{}
 
-	//TypeEventLocations event locations
-	TypeEventLocations logutils.MessageDataType = "event_locations"
-)
+	var data []model.UnitCalendar
+	err := a.db.unitcalendars.Find(a.context, filter, &data, nil)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
 
-// Example is a generic Example data type
-type Example struct {
-	ID          string     `json:"id" bson:"_id"`
-	OrgID       string     `json:"org_id" bson:"org_id"`
-	AppID       string     `json:"app_id" bson:"app_id"`
-	Data        string     `json:"data" bson:"data"`
-	DateCreated time.Time  `json:"date_created" bson:"date_created"`
-	DateUpdated *time.Time `json:"date_updated" bson:"date_updated"`
+	return &data, nil
 }

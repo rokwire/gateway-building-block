@@ -15,7 +15,6 @@
 package core
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 
 	"github.com/rokwire/core-auth-library-go/v3/authutils"
@@ -41,26 +40,39 @@ type Application struct {
 	version string
 	build   string
 
-	Default interfaces.Default // expose to the drivers adapters
-	Client  interfaces.Client  // expose to the drivers adapters
-	Admin   interfaces.Admin   // expose to the drivers adapters
-	BBs     interfaces.BBs     // expose to the drivers adapters
-	TPS     interfaces.TPS     // expose to the drivers adapters
-	System  interfaces.System  // expose to the drivers adapters
+	Default Default // expose to the drivers adapters
+	Client  Client  // expose to the drivers adapters
+	Admin   Admin   // expose to the drivers adapters
+	BBs     BBs     // expose to the drivers adapters
+	TPS     TPS     // expose to the drivers adapters
+	System  System  // expose to the drivers adapters
 	shared  Shared
 
-	AppointmentAdapters map[string]interfaces.Appointments //expose to the different vendor specific appointment adapters
+	AppointmentAdapters map[string]Appointments //expose to the different vendor specific appointment adapters
 
 	logger *logs.Logger
 
-	storage interfaces.Storage
+	storage Storage
+
+	eventsBBAdapter EventsBBAdapter
+
+	//events logic
+	eventsLogic eventsLogic
 }
 
 // Start starts the core part of the application
-func (a *Application) Start() {
+func (a *Application) Start() error {
 	//set storage listener
 	storageListener := storageListener{app: a}
 	a.storage.RegisterStorageListener(&storageListener)
+
+	err := a.eventsLogic.start()
+	if err != nil {
+		return err
+	}
+
+	//no error
+	return nil
 }
 
 // GetEnvConfigs retrieves the cached database env configs
@@ -77,8 +89,12 @@ func (a *Application) GetEnvConfigs() (*model.EnvConfigData, error) {
 }
 
 // NewApplication creates new Application
-func NewApplication(version string, build string, storage interfaces.Storage, appntAdapters map[string]interfaces.Appointments, logger *logs.Logger) *Application {
-	application := Application{version: version, build: build, storage: storage, logger: logger, AppointmentAdapters: appntAdapters}
+func NewApplication(version string, build string,
+	storage Storage,
+	eventsBBAdapter EventsBBAdapter,
+	appntAdapters map[string]Appointments,
+	logger *logs.Logger) *Application {
+	application := Application{version: version, build: build, storage: storage, eventsBBAdapter: eventsBBAdapter, logger: logger, AppointmentAdapters: appntAdapters}
 
 	//add the drivers ports/interfaces
 	application.Default = newAppDefault(&application)
@@ -88,6 +104,7 @@ func NewApplication(version string, build string, storage interfaces.Storage, ap
 	application.TPS = newAppTPS(&application)
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
+	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, *logger)
 
 	return &application
 }

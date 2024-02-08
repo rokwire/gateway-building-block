@@ -15,10 +15,10 @@
 package storage
 
 import (
-	"application/core/interfaces"
 	"application/core/model"
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -32,6 +32,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Adapter implements the Storage interface
@@ -65,7 +66,7 @@ func (a *Adapter) Start() error {
 }
 
 // RegisterStorageListener registers a data change listener with the storage adapter
-func (a *Adapter) RegisterStorageListener(listener interfaces.StorageListener) {
+func (a *Adapter) RegisterStorageListener(listener Listener) {
 	a.db.listeners = append(a.db.listeners, listener)
 }
 
@@ -194,6 +195,33 @@ func (a *Adapter) loadConfigs() ([]model.Config, error) {
 	return configs, nil
 }
 
+// FindGlobalConfig finds global config by key
+func (a *Adapter) FindGlobalConfig(context TransactionContext, key string) (*model.GlobalConfigEntry, error) {
+	var err error
+
+	filter := bson.D{
+		bson.E{Key: "key", Value: key},
+	}
+
+	var globalConfig model.GlobalConfigEntry
+	err = a.db.globalConfigs.FindOneWithContext(context, filter, &globalConfig, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &globalConfig, nil
+}
+
+// SaveGlobalConfig saves global config
+func (a *Adapter) SaveGlobalConfig(context TransactionContext, globalConfig model.GlobalConfigEntry) error {
+	filter := bson.D{primitive.E{Key: "_id", Value: globalConfig.ID}}
+	err := a.db.globalConfigs.ReplaceOneWithContext(context, filter, globalConfig, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // FindConfig finds the config for the specified type, appID, and orgID
 func (a *Adapter) FindConfig(configType string, appID string, orgID string) (*model.Config, error) {
 	return a.getCachedConfig("", configType, appID, orgID)
@@ -251,35 +279,116 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
-// PerformTransaction performs a transaction
-func (a *Adapter) PerformTransaction(transaction func(storage interfaces.Storage) error) error {
-	// transaction
-	callback := func(sessionContext mongo.SessionContext) (interface{}, error) {
-		adapter := a.withContext(sessionContext)
+// FindLegacyEventItems finds all legacy events
+func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.LegacyEventItem, error) {
+	filter := bson.M{}
+	var data []model.LegacyEventItem
+	err := a.db.legacyEvents.Find(context, filter, &data, nil)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
 
-		err := transaction(adapter)
+	return data, nil
+}
+
+// InsertLegacyEvents inserts legacy events
+func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {
+
+	storageItems := make([]interface{}, len(items))
+	for i, p := range items {
+		storageItems[i] = p
+	}
+
+	_, err := a.db.legacyEvents.InsertManyWithContext(context, storageItems, nil)
+	if err != nil {
+		return errors.WrapErrorAction("insert", "legacy events", nil, err)
+	}
+
+	return nil
+}
+
+// DeleteLegacyEvents Deletes a reminder
+func (a *Adapter) DeleteLegacyEvents() error {
+	filter := bson.M{}
+	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
+	return err
+}
+
+// DeleteLegacyEventsByIDs deletes all items by dataSourceEventIds
+func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[string]string) error {
+
+	var valueIds []string
+	for _, value := range Ids {
+		valueIds = append(valueIds, value)
+	}
+
+	//PS - check the format in the database. It is "item.dataSourceEventId"
+	filter := bson.D{
+		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
+	}
+	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	return err
+}
+
+// FindAllLegacyEvents finds all legacy events
+func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
+	filter := bson.M{}
+	var list []model.LegacyEventItem
+	err := a.db.legacyEvents.Find(a.context, filter, &list, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	//this processing should happen in the core module, not here
+	var legacyEvents []model.LegacyEvent
+	for _, l := range list {
+		le := l.Item
+
+		legacyEvents = append(legacyEvents, le)
+	}
+
+	return legacyEvents, err
+}
+
+// PerformTransaction performs a transaction
+func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
+	// transaction
+	timeout := time.Millisecond * time.Duration(timeoutMilliSeconds)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	opts := &options.SessionOptions{}
+	opts.SetDefaultMaxCommitTime(&timeout)
+
+	err := a.db.dbClient.UseSessionWithOptions(ctx, opts, func(sessionContext mongo.SessionContext) error {
+		err := sessionContext.StartTransaction()
 		if err != nil {
-			if wrappedErr, ok := err.(*errors.Error); ok && wrappedErr.Internal() != nil {
-				return nil, wrappedErr.Internal()
-			}
-			return nil, err
+			a.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionStart, logutils.TypeTransaction, nil, err)
 		}
 
-		return nil, nil
-	}
+		err = transaction(sessionContext)
+		if err != nil {
+			a.abortTransaction(sessionContext)
+			return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
+		}
 
-	session, err := a.db.dbClient.StartSession()
-	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionStart, "mongo session", nil, err)
-	}
-	context := context.Background()
-	defer session.EndSession(context)
+		err = sessionContext.CommitTransaction(sessionContext)
+		if err != nil {
+			a.abortTransaction(sessionContext)
+			return errors.WrapErrorAction(logutils.ActionCommit, logutils.TypeTransaction, nil, err)
+		}
+		return nil
+	})
 
-	_, err = session.WithTransaction(context, callback)
+	return err
+}
+
+func (a *Adapter) abortTransaction(sessionContext mongo.SessionContext) {
+	err := sessionContext.AbortTransaction(sessionContext)
 	if err != nil {
-		return errors.WrapErrorAction("performing", logutils.TypeTransaction, nil, err)
+		log.Printf("error aborting a transaction - %s", err)
 	}
-	return nil
 }
 
 func filterArgs(filter bson.M) *logutils.FieldArgs {
@@ -303,4 +412,15 @@ func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout stri
 
 	db := &database{mongoDBAuth: mongoDBAuth, mongoDBName: mongoDBName, mongoTimeout: time.Millisecond * time.Duration(timeout), logger: logger}
 	return &Adapter{db: db, cachedConfigs: cachedConfigs, configsLock: configsLock}
+}
+
+// Listener represents storage listener
+type Listener interface {
+	OnConfigsUpdated()
+	OnExamplesUpdated()
+}
+
+// TransactionContext represents storage transaction interface
+type TransactionContext interface {
+	mongo.SessionContext
 }
