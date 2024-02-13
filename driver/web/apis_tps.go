@@ -18,9 +18,12 @@ import (
 	"application/core"
 	"application/core/model"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
 	"github.com/rokwire/logging-library-go/v2/logs"
@@ -57,11 +60,25 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 	}
 
-	var record model.LegacyEvent
-	err = json.Unmarshal(data, &record)
+	var e model.LegacyEvent
+	err = json.Unmarshal(data, &e)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 	}
+
+	syncSourse := "events-tbs=api"
+	syncDate := time.Now()
+	ID := uuid.NewString()
+	createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
+		Item: model.LegacyEvent{AllDay: e.AllDay, CalendarID: e.CalendarID, Category: e.Category, Subcategory: e.Subcategory,
+			CreatedBy: e.CreatedBy, LongDescription: e.LongDescription, DataModified: e.DataModified, DataSourceEventID: e.DataSourceEventID,
+			DateCreated: e.DateCreated, EndDate: e.EndDate, EventID: ID, IcalURL: e.IcalURL, ID: ID, ImageURL: e.ImageURL,
+			IsEventFree: e.IsEventFree, IsVirtial: e.IsVirtial, Location: e.Location, OriginatingCalendarID: e.OriginatingCalendarID,
+			OutlookURL: e.OutlookURL, RecurrenceID: e.RecurrenceID, IsSuperEvent: e.IsSuperEvent, RecurringFlag: e.RecurringFlag,
+			SourceID: e.SourceID, Sponsor: e.Sponsor, StartDate: e.StartDate, Title: e.Title, TitleURL: e.TitleURL,
+			RegistrationURL: e.RegistrationURL, Contacts: e.Contacts, SubEvents: e.SubEvents}}
+
+	fmt.Println(createdEvent)
 
 	event, err := h.app.TPS.CreateEvent()
 	if err != nil {
