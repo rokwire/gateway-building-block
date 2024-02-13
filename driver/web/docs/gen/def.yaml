@@ -1191,6 +1191,37 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/tps/event:
+    post:
+      tags:
+        - TPS
+      summary: Create events
+      description: |
+        Creates new event
+
+        **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+      security:
+        - bearerAuth: []
+      parameters: null
+      requestBody:
+        description: New example content
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/_tps_req_create-event'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_tps_res_create-event'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   '/api/system/examples/{id}':
     get:
       tags:
@@ -1418,3 +1449,83 @@ components:
         data:
           anyOf:
             - $ref: '#/components/schemas/EnvConfigData'
+    _tps_req_create-event:
+      type: object
+      properties:
+        all_day:
+          type: boolean
+        calendar_id:
+          type: string
+        category:
+          type: string
+        subcategocy:
+          type: string
+        createdBy:
+          type: string
+        longDescription:
+          type: string
+        dataModified:
+          type: string
+        dataSourceEventId:
+          type: string
+        dateCreated:
+          type: string
+        endDate:
+          type: string
+        event_id:
+          type: string
+        icalURL:
+          type: string
+        imageURL:
+          type: string
+          nullable: true
+        isEventFree:
+          type: boolean
+        isVirtual:
+          type: boolean
+        originating_calendar_id:
+          type: string
+        outlookUrl:
+          type: string
+        recurrence_id:
+          type: string
+        isSuperEvent:
+          type: boolean
+        recurringFlag:
+          type: boolean
+        source_id:
+          type: string
+        sponsor:
+          type: string
+        startDate:
+          type: string
+        title:
+          type: string
+        titleUrl:
+          type: string
+        registrationURL:
+          type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactLegacy'
+        subeEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubEvents'
+        location:
+          items:
+            $ref: '#/components/schemas/LocationLegacy'
+    _tps_res_create-event:
+      type: object
+      properties:
+        id:
+          type: string
+        sync_process_source:
+          type: string
+        sync_date:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegacyEvent'

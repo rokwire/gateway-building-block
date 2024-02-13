@@ -1,0 +1,30 @@
+post:
+  tags:
+  - TPS
+  summary: Create events
+  description: |
+    Creates new event
+
+    **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+  security:
+    - bearerAuth: []
+  parameters:
+  requestBody:
+    description: New example content
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/apis/tps/create-event/Request.yaml"
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/apis/tps/create-event/Response.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error
