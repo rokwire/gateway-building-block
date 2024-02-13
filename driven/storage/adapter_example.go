@@ -73,11 +73,11 @@ func (a *Adapter) DeleteExample(orgID string, appID string, id string) error {
 }
 
 // InsertEvent inserts a new event
-func (a *Adapter) InsertEvent(example model.LegacyEventItem) error {
-	_, err := a.db.legacyEvents.InsertOne(a.context, example)
+func (a *Adapter) InsertEvent() (*model.LegacyEventItem, error) {
+	_, err := a.db.legacyEvents.InsertOne(a.context, nil)
 	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeExample, nil, err)
+		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeExample, nil, err)
 	}
 
-	return nil
+	return nil, nil
 }

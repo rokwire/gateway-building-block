@@ -18,6 +18,7 @@ import (
 	"application/core"
 	"application/core/model"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -51,6 +52,16 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 }
 
 func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
+
+	var record model.LegacyEvent
+	err = json.Unmarshal(data, &record)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
 
 	event, err := h.app.TPS.CreateEvent()
 	if err != nil {

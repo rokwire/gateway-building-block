@@ -28,6 +28,11 @@ func (a appShared) getExample(orgID string, appID string, id string) (*model.Exa
 	return a.app.storage.FindExample(orgID, appID, id)
 }
 
+// createEvent creates an event
+func (a appShared) createEvent() (*model.LegacyEventItem, error) {
+	return a.app.storage.InsertEvent()
+}
+
 // newAppShared creates new appShared
 func newAppShared(app *Application) appShared {
 	return appShared{app: app}
