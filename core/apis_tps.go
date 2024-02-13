@@ -28,6 +28,11 @@ func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Exampl
 	return a.app.shared.getExample(orgID, appID, id)
 }
 
+// CreateEvent creates an event
+func (a appTPS) CreateEvent() (*model.LegacyEventItem, error) {
+	return a.app.shared.createEvent()
+}
+
 // newAppTPS creates new appTPS
 func newAppTPS(app *Application) appTPS {
 	return appTPS{app: app}

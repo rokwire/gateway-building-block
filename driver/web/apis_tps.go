@@ -50,6 +50,20 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 	return l.HTTPResponseSuccessJSON(response)
 }
 
+func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	event, err := h.app.TPS.CreateEvent()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	response, err := json.Marshal(event)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(response)
+}
+
 // NewTPSAPIsHandler creates new third-party service API handler instance
 func NewTPSAPIsHandler(app *core.Application) TPSAPIsHandler {
 	return TPSAPIsHandler{app: app}
