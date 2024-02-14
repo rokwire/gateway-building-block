@@ -66,7 +66,7 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 	}
 
-	syncSourse := "events-tbs=api"
+	syncSourse := "events-tps-api"
 	syncDate := time.Now()
 	ID := uuid.NewString()
 	createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
