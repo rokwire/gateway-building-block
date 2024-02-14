@@ -18,7 +18,6 @@ import (
 	"application/core"
 	"application/core/model"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -78,14 +77,12 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 			SourceID: e.SourceID, Sponsor: e.Sponsor, StartDate: e.StartDate, Title: e.Title, TitleURL: e.TitleURL,
 			RegistrationURL: e.RegistrationURL, Contacts: e.Contacts, SubEvents: e.SubEvents}}
 
-	fmt.Println(createdEvent)
-
-	event, err := h.app.TPS.CreateEvent()
+	_, err = h.app.TPS.CreateEvent(&createdEvent)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}
 
-	response, err := json.Marshal(event)
+	response, err := json.Marshal(createdEvent)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
 	}
