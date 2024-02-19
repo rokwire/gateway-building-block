@@ -68,6 +68,23 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 	syncSourse := "events-tps-api"
 	syncDate := time.Now()
 	ID := uuid.NewString()
+	if e.StartDate != "" {
+		startDate, err := time.Parse("2006/01/02T15:04:05", e.StartDate)
+		if err != nil {
+			return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+
+		}
+		e.StartDate = startDate.Format(time.RFC3339)
+	}
+	if e.EndDate != "" {
+		endDate, err := time.Parse("2006/01/02T15:04:05", e.EndDate)
+		if err != nil {
+			return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+
+		}
+		e.EndDate = endDate.Format(time.RFC3339)
+	}
+
 	createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
 		Item: model.LegacyEvent{AllDay: e.AllDay, CalendarID: e.CalendarID, Category: e.Category, Subcategory: e.Subcategory,
 			CreatedBy: e.CreatedBy, LongDescription: e.LongDescription, DataModified: e.DataModified, DataSourceEventID: e.DataSourceEventID,
