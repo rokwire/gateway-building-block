@@ -20,6 +20,7 @@ properties:
     type: string   
   endDate:
     type: string 
+    description: time format "2006/01/02T15:04:05"
   event_id:
     type: string  
   icalURL:
@@ -47,6 +48,7 @@ properties:
     type: string  
   startDate:
     type: string
+    description: time format "2006/01/02T15:04:05"
   title:
     type: string 
   titleUrl:
