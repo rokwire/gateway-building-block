@@ -85,11 +85,20 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 		e.EndDate = endDate.Format(time.RFC3339)
 	}
 
+	var location *model.LocationLegacy
+	if e.Location != nil || e.Location.Longitude == 0 || e.Location.Latitude == 0 {
+		location = &model.LocationLegacy{
+			Description: e.Location.Description,
+			Longitude:   e.Location.Longitude,
+			Latitude:    e.Location.Latitude,
+		}
+	}
+
 	createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
 		Item: model.LegacyEvent{AllDay: e.AllDay, CalendarID: e.CalendarID, Category: e.Category, Subcategory: e.Subcategory,
 			CreatedBy: e.CreatedBy, LongDescription: e.LongDescription, DataModified: e.DataModified, DataSourceEventID: e.DataSourceEventID,
 			DateCreated: e.DateCreated, EndDate: e.EndDate, EventID: ID, IcalURL: e.IcalURL, ID: ID, ImageURL: e.ImageURL,
-			IsEventFree: e.IsEventFree, IsVirtial: e.IsVirtial, Location: e.Location, OriginatingCalendarID: e.OriginatingCalendarID,
+			IsEventFree: e.IsEventFree, IsVirtial: e.IsVirtial, Location: location, OriginatingCalendarID: e.OriginatingCalendarID,
 			OutlookURL: e.OutlookURL, RecurrenceID: e.RecurrenceID, IsSuperEvent: e.IsSuperEvent, RecurringFlag: e.RecurringFlag,
 			SourceID: e.SourceID, Sponsor: e.Sponsor, StartDate: e.StartDate, Title: e.Title, TitleURL: e.TitleURL,
 			RegistrationURL: e.RegistrationURL, Contacts: e.Contacts, SubEvents: e.SubEvents}}
