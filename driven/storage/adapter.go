@@ -326,8 +326,7 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 	filter := bson.D{
 		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
 	}
-	c, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
-	fmt.Print(c)
+	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
 	return err
 }
 
