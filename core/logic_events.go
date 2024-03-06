@@ -215,6 +215,8 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.dailyWebToolsTimer = nil
 	}
 }
+
+/*
 func (e eventsLogic) processWebTools() {
 	e.logger.Info("processWebTools")
 
@@ -236,7 +238,7 @@ func (e eventsLogic) processWebTools() {
 		e.logger.Info("processWebTools -> webtools timer aborted")
 		e.dailyWebToolsTimer = nil
 	}
-}
+} */
 
 func (e eventsLogic) processWebToolsEvents() {
 	//load all web tools events
