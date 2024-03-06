@@ -208,7 +208,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.logger.Info("setupWebToolsTimer -> web tools timer expired")
 		e.dailyWebToolsTimer = nil
 
-		e.processWebToolsEvents()
+		e.process()
 	case <-e.timerDone:
 		// timer aborted
 		e.logger.Info("setupWebToolsTimer -> web tools timer aborted")
@@ -216,29 +216,28 @@ func (e eventsLogic) setupWebToolsTimer() {
 	}
 }
 
-/*
-func (e eventsLogic) processWebTools() {
-	e.logger.Info("processWebTools")
+func (e eventsLogic) process() {
+	e.logger.Info("Webtools process")
 
-	//process nudges ???
+	//process work
 	e.processWebToolsEvents()
 
 	//generate new processing after 24 hours
 	duration := time.Hour * 24
-	e.logger.Infof("processWebTools -> next call after %s", duration)
+	e.logger.Infof("Webtools process -> next call after %s", duration)
 	e.dailyWebToolsTimer = time.NewTimer(duration)
 	select {
 	case <-e.dailyWebToolsTimer.C:
-		e.logger.Info("processWebTools -> nudges timer expired") ???
+		e.logger.Info("Webtools process -> timer expired")
 		e.dailyWebToolsTimer = nil
 
-		e.processWebTools()
+		e.process()
 	case <-e.timerDone:
 		// timer aborted
-		e.logger.Info("processWebTools -> webtools timer aborted")
+		e.logger.Info("Webtools process -> timer aborted")
 		e.dailyWebToolsTimer = nil
 	}
-} */
+}
 
 func (e eventsLogic) processWebToolsEvents() {
 	//load all web tools events
