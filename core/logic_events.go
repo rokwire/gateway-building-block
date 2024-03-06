@@ -220,7 +220,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 func (e eventsLogic) processWebTools() {
 	e.logger.Info("processWebTools")
 
-	//process nudges
+	//process nudges ???
 	e.processWebToolsEvents()
 
 	//generate new processing after 24 hours
@@ -229,7 +229,7 @@ func (e eventsLogic) processWebTools() {
 	e.dailyWebToolsTimer = time.NewTimer(duration)
 	select {
 	case <-e.dailyWebToolsTimer.C:
-		e.logger.Info("processWebTools -> nudges timer expired")
+		e.logger.Info("processWebTools -> nudges timer expired") ???
 		e.dailyWebToolsTimer = nil
 
 		e.processWebTools()
