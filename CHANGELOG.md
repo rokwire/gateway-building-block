@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Delete tps events API [#52](https://github.com/rokwire/gateway-building-block/issues/52)
+
 ## [2.2.1] - 2024-03-06
 ### Fixed
 - Fix daily timer [#49](https://github.com/rokwire/gateway-building-block/issues/49)
