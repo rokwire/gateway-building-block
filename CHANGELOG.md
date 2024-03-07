@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Create tps events API [#47](https://github.com/rokwire/gateway-building-block/issues/47)
 
+## [2.2.1] - 2024-03-06
+### Fixed
+- Fix daily timer [#49](https://github.com/rokwire/gateway-building-block/issues/49)
+
 ## [2.2.0] - 2024-02-08
 ### Added
 - WebTools events handling [#39](https://github.com/rokwire/gateway-building-block/issues/39)
