@@ -89,6 +89,8 @@ paths:
   # TPS
   /api/tps/examples/{id}:
     $ref: "./resources/tps/examples-id.yaml"
+  /api/tps/events:
+    $ref: "./resources/tps/delete-legacy-events.yaml"  
 
   # System
   /api/system/examples/{id}:
