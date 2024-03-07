@@ -50,6 +50,16 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 	return l.HTTPResponseSuccessJSON(response)
 }
 
+func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var ids map[string]string
+	err := h.app.TPS.DeleteLegacyEvents(ids)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
+
 // NewTPSAPIsHandler creates new third-party service API handler instance
 func NewTPSAPIsHandler(app *core.Application) TPSAPIsHandler {
 	return TPSAPIsHandler{app: app}

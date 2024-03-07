@@ -124,6 +124,7 @@ func (a Adapter) Start() {
 	// TPS APIs
 	tpsRouter := mainRouter.PathPrefix("/tps").Subrouter()
 	tpsRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.tpsAPIsHandler.getExample, a.auth.tps.Permissions)).Methods("GET")
+	tpsRouter.HandleFunc("/events", a.wrapFunc(a.tpsAPIsHandler.deleteLegacyEvents, a.auth.tps.Permissions)).Methods("DELETE")
 
 	// System APIs
 	systemRouter := mainRouter.PathPrefix("/system").Subrouter()

@@ -77,6 +77,7 @@ type BBs interface {
 // TPS exposes third-party service APIs for the driver adapters
 type TPS interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
+	DeleteLegacyEvents(ids map[string]string) error
 }
 
 // System exposes system administrative APIs for the driver adapters
@@ -87,6 +88,7 @@ type System interface {
 // Shared exposes shared APIs for other interface implementations
 type Shared interface {
 	getExample(orgID string, appID string, id string) (*model.Example, error)
+	deleteLegacyEvents(ids map[string]string) error
 }
 
 // EventsBBAdapter is used by core to communicate with the events BB
