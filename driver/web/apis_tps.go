@@ -19,6 +19,7 @@ import (
 	"application/core/model"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
@@ -52,6 +53,25 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 
 func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	var ids map[string]string
+	ids = make(map[string]string)
+
+	var id []string
+	idArg := r.URL.Query().Get("ids")
+	/*if id != nil {
+		id = strings.Split(idArg, ",")
+	}*/
+
+	if idArg != "" {
+		id = strings.Split(idArg, ",")
+		// Append the original argument to the slice
+		id = append(id, idArg)
+		// Convert slice to map
+		for _, w := range id {
+			if w != "" {
+				ids[w] = w
+			}
+		}
+	}
 	err := h.app.TPS.DeleteLegacyEvents(ids)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)

@@ -322,7 +322,6 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 		valueIds = append(valueIds, value)
 	}
 
-	//PS - check the format in the database. It is "item.dataSourceEventId"
 	filter := bson.D{
 		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
 	}
