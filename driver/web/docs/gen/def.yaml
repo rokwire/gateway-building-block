@@ -1199,7 +1199,7 @@ paths:
       description: |
         Delete legacy events
 
-         **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+         **Auth:** Requires valid admin token with manage_all_event  permission
       security:
         - bearerAuth: []
       parameters:
