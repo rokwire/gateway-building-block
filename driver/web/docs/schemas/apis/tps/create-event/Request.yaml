@@ -2,8 +2,6 @@ type: object
 properties:
   all_day:
     type: boolean
-  calendar_id:
-    type: string
   category:
     type: string
   subcategocy:
@@ -21,8 +19,6 @@ properties:
   endDate:
     type: string 
     description: time format "2006/01/02T15:04:05"
-  event_id:
-    type: string  
   icalURL:
     type: string 
   imageURL:
@@ -35,14 +31,6 @@ properties:
   originating_calendar_id:
     type: string    
   outlookUrl:
-    type: string
-  recurrence_id:
-    type: string 
-  isSuperEvent:
-    type: boolean  
-  recurringFlag:
-    type: boolean  
-  source_id:
     type: string
   sponsor:
     type: string  
@@ -59,10 +47,6 @@ properties:
     type: array
     items:
       $ref: "../../../application/ContactLegacy.yaml"
-  subeEvents:
-    type: array
-    items:
-      $ref: "../../../application/SubEvents.yaml"   
   location:
     items:
       $ref: "../../../application/LocationLegacy.yaml"    

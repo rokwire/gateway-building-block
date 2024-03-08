@@ -59,10 +59,6 @@ properties:
     type: array
     items:
       $ref: "./ContactLegacy.yaml"
-  subeEvents:
-    type: array
-    items:
-      $ref: "./SubEvents.yaml"    
   location:
     items:
       $ref: "./LocationLegacy.yaml"     

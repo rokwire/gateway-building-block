@@ -10,9 +10,7 @@ ContactLegacy:
 LegacyEvent:
   $ref: "./application/LegacyEvent.yaml"  
 LocationLegacy:
-  $ref: "./application/LocationLegacy.yaml"   
-SubEvents:
-  $ref: "./application/SubEvents.yaml"   
+  $ref: "./application/LocationLegacy.yaml"    
 
 # ADMIN section
 

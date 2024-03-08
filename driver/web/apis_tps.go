@@ -95,13 +95,12 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 	}
 
 	createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
-		Item: model.LegacyEvent{AllDay: e.AllDay, CalendarID: e.CalendarID, Category: e.Category, Subcategory: e.Subcategory,
+		Item: model.LegacyEvent{AllDay: e.AllDay, Category: e.Category, Subcategory: e.Subcategory,
 			CreatedBy: e.CreatedBy, LongDescription: e.LongDescription, DataModified: e.DataModified, DataSourceEventID: e.DataSourceEventID,
-			DateCreated: e.DateCreated, EndDate: e.EndDate, EventID: ID, IcalURL: e.IcalURL, ID: ID, ImageURL: e.ImageURL,
-			IsEventFree: e.IsEventFree, IsVirtial: e.IsVirtial, Location: location, OriginatingCalendarID: e.OriginatingCalendarID,
-			OutlookURL: e.OutlookURL, RecurrenceID: e.RecurrenceID, IsSuperEvent: e.IsSuperEvent, RecurringFlag: e.RecurringFlag,
-			SourceID: e.SourceID, Sponsor: e.Sponsor, StartDate: e.StartDate, Title: e.Title, TitleURL: e.TitleURL,
-			RegistrationURL: e.RegistrationURL, Contacts: e.Contacts, SubEvents: e.SubEvents}}
+			DateCreated: e.DateCreated, EndDate: e.EndDate, IcalURL: e.IcalURL, ID: ID, ImageURL: e.ImageURL,
+			IsEventFree: e.IsEventFree, IsVirtial: e.IsVirtial, Location: location,
+			OutlookURL: e.OutlookURL, Sponsor: e.Sponsor, StartDate: e.StartDate, Title: e.Title, TitleURL: e.TitleURL,
+			RegistrationURL: e.RegistrationURL, Contacts: e.Contacts}}
 
 	_, err = h.app.TPS.CreateEvent(&createdEvent)
 	if err != nil {
