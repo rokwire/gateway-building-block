@@ -12,28 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package core
+package storage
 
 import (
 	"application/core/model"
+
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
-// appTPS contains BB implementations
-type appTPS struct {
-	app *Application
-}
+// InsertEvents inserts a new event
+func (a *Adapter) InsertEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
+	insertedEvents := make([]interface{}, len(event))
+	for i, v := range event {
+		insertedEvents[i] = v
+	}
+	_, err := a.db.legacyEvents.InsertMany(a.context, insertedEvents, nil)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeExample, nil, err)
+	}
 
-// GetExample gets an Example by ID
-func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Example, error) {
-	return a.app.shared.getExample(orgID, appID, id)
-}
-
-// CreateEvent creates an event
-func (a appTPS) CreateEvent(event []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
-	return a.app.shared.createEvent(event)
-}
-
-// newAppTPS creates new appTPS
-func newAppTPS(app *Application) appTPS {
-	return appTPS{app: app}
+	return nil, nil
 }

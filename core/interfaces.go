@@ -77,7 +77,7 @@ type BBs interface {
 // TPS exposes third-party service APIs for the driver adapters
 type TPS interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
-	CreateEvent(event *model.LegacyEventItem) (*model.LegacyEventItem, error)
+	CreateEvent(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 }
 
 // System exposes system administrative APIs for the driver adapters
@@ -88,7 +88,7 @@ type System interface {
 // Shared exposes shared APIs for other interface implementations
 type Shared interface {
 	getExample(orgID string, appID string, id string) (*model.Example, error)
-	createEvent(event *model.LegacyEventItem) (*model.LegacyEventItem, error)
+	createEvent(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 }
 
 // EventsBBAdapter is used by core to communicate with the events BB
@@ -127,7 +127,7 @@ type Storage interface {
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 
-	InsertEvent(event *model.LegacyEventItem) (*model.LegacyEventItem, error)
+	InsertEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 }
 
 // StorageListener represents storage listener

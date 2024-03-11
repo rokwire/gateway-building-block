@@ -59,55 +59,62 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 	}
 
-	var e model.LegacyEvent
+	var e []model.LegacyEvent
 	err = json.Unmarshal(data, &e)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 	}
+	var createdEvents []model.LegacyEventItem
 
-	syncSourse := "events-tps-api"
-	syncDate := time.Now()
-	ID := uuid.NewString()
-	if e.StartDate != "" {
-		startDate, err := time.Parse("2006/01/02T15:04:05", e.StartDate)
-		if err != nil {
-			return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	for _, w := range e {
+		syncSourse := "events-tps-api"
+		syncDate := time.Now()
+		ID := uuid.NewString()
+		if w.StartDate != "" {
+			startDate, err := time.Parse("2006/01/02T15:04:05", w.StartDate)
+			if err != nil {
+				return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 
+			}
+			w.StartDate = startDate.Format(time.RFC3339)
 		}
-		e.StartDate = startDate.Format(time.RFC3339)
-	}
-	if e.EndDate != "" {
-		endDate, err := time.Parse("2006/01/02T15:04:05", e.EndDate)
-		if err != nil {
-			return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+		if w.EndDate != "" {
+			endDate, err := time.Parse("2006/01/02T15:04:05", w.EndDate)
+			if err != nil {
+				return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 
+			}
+			w.EndDate = endDate.Format(time.RFC3339)
 		}
-		e.EndDate = endDate.Format(time.RFC3339)
-	}
 
-	var location *model.LocationLegacy
-	if e.Location != nil || e.Location.Longitude == 0 || e.Location.Latitude == 0 {
-		location = &model.LocationLegacy{
-			Description: e.Location.Description,
-			Longitude:   e.Location.Longitude,
-			Latitude:    e.Location.Latitude,
+		var location *model.LocationLegacy
+		if w.Location != nil || w.Location.Longitude == 0 || w.Location.Latitude == 0 {
+			location = &model.LocationLegacy{
+				Description: w.Location.Description,
+				Longitude:   w.Location.Longitude,
+				Latitude:    w.Location.Latitude,
+			}
 		}
+
+		createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
+			Item: model.LegacyEvent{AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
+				CreatedBy: w.CreatedBy, LongDescription: w.LongDescription, DataModified: w.DataModified, DataSourceEventID: w.DataSourceEventID,
+				DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
+				IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
+				OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
+				RegistrationURL: w.RegistrationURL, Contacts: w.Contacts}}
+
+		createdEvents = append(createdEvents, createdEvent)
 	}
 
-	createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
-		Item: model.LegacyEvent{AllDay: e.AllDay, Category: e.Category, Subcategory: e.Subcategory,
-			CreatedBy: e.CreatedBy, LongDescription: e.LongDescription, DataModified: e.DataModified, DataSourceEventID: e.DataSourceEventID,
-			DateCreated: e.DateCreated, EndDate: e.EndDate, IcalURL: e.IcalURL, ID: ID, ImageURL: e.ImageURL,
-			IsEventFree: e.IsEventFree, IsVirtial: e.IsVirtial, Location: location,
-			OutlookURL: e.OutlookURL, Sponsor: e.Sponsor, StartDate: e.StartDate, Title: e.Title, TitleURL: e.TitleURL,
-			RegistrationURL: e.RegistrationURL, Contacts: e.Contacts}}
+	//fmt.Print(createdEvents)
 
-	_, err = h.app.TPS.CreateEvent(&createdEvent)
+	_, err = h.app.TPS.CreateEvent(createdEvents)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}
 
-	response, err := json.Marshal(createdEvent)
+	response, err := json.Marshal(createdEvents)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
 	}
