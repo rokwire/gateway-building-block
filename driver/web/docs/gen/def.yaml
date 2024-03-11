@@ -1197,17 +1197,18 @@ paths:
         - TPS
       summary: Create events
       description: |
-        Creates new event
+        Creates new events
 
         **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
       security:
         - bearerAuth: []
       parameters: null
       requestBody:
-        description: New example content
+        description: New events content
         content:
           application/json:
             schema:
+              type: array
               $ref: '#/components/schemas/_tps_req_create-event'
       responses:
         '200':
@@ -1215,6 +1216,7 @@ paths:
           content:
             application/json:
               schema:
+                type: array
                 $ref: '#/components/schemas/_tps_res_create-event'
         '400':
           description: Bad request

@@ -3,17 +3,18 @@ post:
   - TPS
   summary: Create events
   description: |
-    Creates new event
+    Creates new events
 
     **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
   security:
     - bearerAuth: []
   parameters:
   requestBody:
-    description: New example content
+    description: New events content
     content:
       application/json:
         schema:
+          type: array
           $ref: "../../schemas/apis/tps/create-event/Request.yaml"
   responses:
     200:
@@ -21,6 +22,7 @@ post:
       content:
         application/json:
           schema:
+            type: array
             $ref: "../../schemas/apis/tps/create-event/Response.yaml"
     400:
       description: Bad request
