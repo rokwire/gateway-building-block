@@ -1209,7 +1209,8 @@ paths:
           application/json:
             schema:
               type: array
-              $ref: '#/components/schemas/_tps_req_create-event'
+              items:
+                $ref: '#/components/schemas/_tps_req_create-event'
       responses:
         '200':
           description: Success
@@ -1217,7 +1218,8 @@ paths:
             application/json:
               schema:
                 type: array
-                $ref: '#/components/schemas/_tps_res_create-event'
+                items:
+                  $ref: '#/components/schemas/_tps_res_create-event'
         '400':
           description: Bad request
         '401':

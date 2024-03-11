@@ -15,7 +15,8 @@ post:
       application/json:
         schema:
           type: array
-          $ref: "../../schemas/apis/tps/create-event/Request.yaml"
+          items:
+            $ref: "../../schemas/apis/tps/create-event/Request.yaml"
   responses:
     200:
       description: Success
@@ -23,7 +24,8 @@ post:
         application/json:
           schema:
             type: array
-            $ref: "../../schemas/apis/tps/create-event/Response.yaml"
+            items: 
+              $ref: "../../schemas/apis/tps/create-event/Response.yaml"
     400:
       description: Bad request
     401:
