@@ -57,9 +57,6 @@ func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims 
 
 	var id []string
 	idArg := r.URL.Query().Get("ids")
-	/*if id != nil {
-		id = strings.Split(idArg, ",")
-	}*/
 
 	if idArg != "" {
 		id = strings.Split(idArg, ",")
@@ -71,6 +68,8 @@ func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims 
 				ids[w] = w
 			}
 		}
+	} else {
+		ids = nil
 	}
 	err := h.app.TPS.DeleteLegacyEvents(ids)
 	if err != nil {

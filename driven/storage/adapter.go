@@ -349,6 +349,26 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
+// DeleteTPSLegacyEvents deletes all items by dataSourceEventIds
+func (a *Adapter) DeleteTPSLegacyEvents(context TransactionContext, Ids map[string]string) error {
+
+	var valueIds []string
+	for _, value := range Ids {
+		valueIds = append(valueIds, value)
+	}
+
+	filter := bson.D{
+		primitive.E{Key: "sync_process_source", Value: "events-tps-api"},
+	}
+
+	if Ids != nil {
+		filter = append(filter, primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}})
+	}
+
+	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	return err
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction

@@ -126,6 +126,7 @@ type Storage interface {
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
+	DeleteTPSLegacyEvents(context storage.TransactionContext, Ids map[string]string) error
 }
 
 // StorageListener represents storage listener
