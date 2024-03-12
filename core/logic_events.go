@@ -385,9 +385,16 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 		isVirtual = true
 	}
 
+	var Recurrence bool
+	if g.Recurrence == "false" {
+		Recurrence = false
+	} else if g.Recurrence == "true" {
+		Recurrence = true
+	}
 	icalURL := fmt.Sprintf("https://calendars.illinois.edu/ical/%s/%s.ics", g.CalendarID, g.EventID)
 	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
+	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
 	location := constructLocation(g.Location)
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
@@ -447,11 +454,11 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	//end - start date + end date (+all day)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
-		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, IsVirtial: isVirtual,
+		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
-			Sponsor: g.Sponsor, Title: g.Title, AllDay: allDay, IsEventFree: costFree, LongDescription: g.Description,
-			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, IcalURL: icalURL, OutlookURL: outlookURL,
-			Location: &location, Contacts: contatsLegacy,
+			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, LongDescription: g.Description,
+			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
+			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr}}
 }
 

@@ -47,4 +47,9 @@ type legacyEvent struct {
 	Title                 string  `bson:"title"`
 	TitleURL              *string `bson:"titleURL"`
 	RegistrationURL       *string `bson:"registrationURL"`
+	SubEvents             []struct {
+		ID         string `bson:"id"`
+		IsFeatured bool   `bson:"isFeatured"`
+		Track      string `bson:"track"`
+	} `bson:"subEvents"`
 }

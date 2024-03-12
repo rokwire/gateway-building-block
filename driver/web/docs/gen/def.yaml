@@ -1406,6 +1406,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContactLegacy'
+        subeEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubEvents'
         location:
           items:
             $ref: '#/components/schemas/LocationLegacy'
@@ -1418,6 +1422,15 @@ components:
           type: number
         longitude:
           type: number
+    SubEvents:
+      type: object
+      properties:
+        id:
+          type: string
+        isFeatured:
+          type: boolean
+        track:
+          type: string
     _admin_req_update-configs:
       required:
         - type
@@ -1445,6 +1458,8 @@ components:
       properties:
         all_day:
           type: boolean
+        calendar_id:
+          type: string
         category:
           type: string
         subcategocy:
@@ -1462,6 +1477,8 @@ components:
         endDate:
           type: string
           description: 'time format "2006/01/02T15:04:05"'
+        event_id:
+          type: string
         icalURL:
           type: string
         imageURL:
@@ -1474,6 +1491,14 @@ components:
         originating_calendar_id:
           type: string
         outlookUrl:
+          type: string
+        recurrence_id:
+          type: string
+        isSuperEvent:
+          type: boolean
+        recurringFlag:
+          type: boolean
+        source_id:
           type: string
         sponsor:
           type: string
@@ -1490,6 +1515,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContactLegacy'
+        subeEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubEvents'
         location:
           items:
             $ref: '#/components/schemas/LocationLegacy'

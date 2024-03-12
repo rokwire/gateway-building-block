@@ -29,20 +29,25 @@ func consLegacyEvent(g model.LegacyEventItem) model.LegacyEventItem {
 
 	}
 	return model.LegacyEventItem{SyncProcessSource: g.SyncProcessSource, SyncDate: g.SyncDate,
-		Item: model.LegacyEvent{ID: id, AllDay: g.Item.AllDay, Category: g.Item.Category,
+		Item: model.LegacyEvent{ID: id, AllDay: g.Item.AllDay, CalendarID: g.Item.CalendarID, Category: g.Item.Category,
 			Subcategory: g.Item.Subcategory, CreatedBy: g.Item.CreatedBy, LongDescription: g.Item.LongDescription,
 			DataModified: g.Item.DataModified, DataSourceEventID: g.Item.DataSourceEventID, DateCreated: g.Item.DateCreated,
-			EndDate: g.Item.EndDate, IcalURL: g.Item.IcalURL, IsEventFree: g.Item.IsEventFree,
-			IsVirtial: g.Item.IsVirtial, Location: g.Item.Location, OutlookURL: g.Item.OutlookURL, Sponsor: g.Item.Sponsor, StartDate: g.Item.StartDate,
-			Title: g.Item.Title, TitleURL: g.Item.TitleURL, RegistrationURL: g.Item.RegistrationURL, Contacts: g.Item.Contacts}}
+			EndDate: g.Item.EndDate, EventID: g.Item.EventID, IcalURL: g.Item.IcalURL, IsEventFree: g.Item.IsEventFree,
+			IsVirtial: g.Item.IsVirtial, Location: g.Item.Location, OriginatingCalendarID: g.Item.OriginatingCalendarID,
+			OutlookURL: g.Item.OutlookURL, RecurrenceID: g.Item.RecurrenceID, IsSuperEvent: g.Item.IsSuperEvent,
+			RecurringFlag: g.Item.RecurringFlag, SourceID: g.Item.SourceID, Sponsor: g.Item.Sponsor, StartDate: g.Item.StartDate,
+			Title: g.Item.Title, TitleURL: g.Item.TitleURL, RegistrationURL: g.Item.RegistrationURL, Contacts: g.Item.Contacts, SubEvents: g.Item.SubEvents}}
 }
 
 func legacyEventFromStorage(item legacyEvent) model.LegacyEvent {
-	return model.LegacyEvent{AllDay: item.AllDay, Category: item.Category,
+	return model.LegacyEvent{AllDay: item.AllDay, CalendarID: item.CalendarID, Category: item.Category,
 		Subcategory: item.Subcategory, CreatedBy: item.CreatedBy, LongDescription: item.LongDescription, DataModified: item.DataModified,
-		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate,
-		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, Location: (*model.LocationLegacy)(item.Location),
-		OutlookURL: item.OutlookURL, Sponsor: item.Sponsor, StartDate: item.StartDate, Title: item.Title, TitleURL: *item.TitleURL, RegistrationURL: *item.RegistrationURL}
+		DataSourceEventID: item.DataSourceEventID, DateCreated: item.DateCreated, EndDate: item.EndDate, EventID: item.EventID,
+		IcalURL: item.IcalURL, ImageURL: item.ImageURL, IsEventFree: item.IsEventFree, IsVirtial: item.IsVirtial, /*Location*/
+		OriginatingCalendarID: item.OriginatingCalendarID, OutlookURL: item.OutlookURL, RecurrenceID: item.RecurrenceID,
+		IsSuperEvent: item.IsSuperEvent, RecurringFlag: item.RecurringFlag, SourceID: item.SourceID, Sponsor: item.Sponsor,
+		StartDate: item.StartDate, Title: item.Title, //TitleURL: item.TitleURL, RegistrationURL: item.RegistrationURL,
+		/*SubEvents*/}
 }
 
 func legacyEventsFromStorage(itemsList []legacyEvent) []model.LegacyEvent {

@@ -107,8 +107,6 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 		createdEvents = append(createdEvents, createdEvent)
 	}
 
-	//fmt.Print(createdEvents)
-
 	_, err = h.app.TPS.CreateEvent(createdEvents)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
