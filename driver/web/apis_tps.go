@@ -95,6 +95,8 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 				Latitude:    w.Location.Latitude,
 			}
 		}
+		now := time.Now()
+		createInfo := model.CreateInfo{Time: now, AccountID: claims.Id}
 
 		createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
 			Item: model.LegacyEvent{AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
@@ -102,7 +104,7 @@ func (h TPSAPIsHandler) createEvent(l *logs.Log, r *http.Request, claims *tokena
 				DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
 				IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
 				OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
-				RegistrationURL: w.RegistrationURL, Contacts: w.Contacts}}
+				RegistrationURL: w.RegistrationURL, Contacts: w.Contacts, CreateInfo: createInfo}}
 
 		createdEvents = append(createdEvents, createdEvent)
 	}
