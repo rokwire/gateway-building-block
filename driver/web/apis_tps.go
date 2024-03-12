@@ -71,7 +71,7 @@ func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims 
 	} else {
 		ids = nil
 	}
-	err := h.app.TPS.DeleteLegacyEvents(ids)
+	err := h.app.TPS.DeleteLegacyEvents(ids, claims.Id)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}

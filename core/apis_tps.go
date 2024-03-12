@@ -29,8 +29,8 @@ func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Exampl
 }
 
 // DeleteLegacyEvents deletes a legacy events by ID
-func (a appTPS) DeleteLegacyEvents(ids map[string]string) error {
-	return a.app.shared.deleteLegacyEvents(ids)
+func (a appTPS) DeleteLegacyEvents(ids map[string]string, accoundID string) error {
+	return a.app.shared.deleteLegacyEvents(ids, accoundID)
 }
 
 // newAppTPS creates new appTPS

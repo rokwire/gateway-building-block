@@ -350,7 +350,7 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 }
 
 // DeleteTPSLegacyEvents deletes all items by dataSourceEventIds
-func (a *Adapter) DeleteTPSLegacyEvents(context TransactionContext, Ids map[string]string) error {
+func (a *Adapter) DeleteTPSLegacyEvents(context TransactionContext, Ids map[string]string, accountID string) error {
 
 	var valueIds []string
 	for _, value := range Ids {
@@ -359,6 +359,7 @@ func (a *Adapter) DeleteTPSLegacyEvents(context TransactionContext, Ids map[stri
 
 	filter := bson.D{
 		primitive.E{Key: "sync_process_source", Value: "events-tps-api"},
+		primitive.E{Key: "item.create_info.account_id", Value: accountID},
 	}
 
 	if Ids != nil {

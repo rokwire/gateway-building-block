@@ -125,6 +125,7 @@ type LegacyEvent struct {
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
 	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
+	CreateInfo            CreateInfo      `bson:"create_info"`
 }
 
 // LocationLegacy represents event legacy location
@@ -154,4 +155,10 @@ type ContactLegacy struct {
 	ContactName  string `json:"contactName" bson:"contactName"`
 	ContactEmail string `json:"contactEmail" bson:"contactEmail"`
 	ContactPhone string `json:"contactPhone" bson:"contactPhone"`
+}
+
+// CreateInfo represents entity creation info
+type CreateInfo struct {
+	Time      time.Time `json:"time" bson:"time"`
+	AccountID string    `json:"account_id" bson:"account_id"`
 }
