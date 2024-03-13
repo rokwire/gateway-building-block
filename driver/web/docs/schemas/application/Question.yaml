@@ -11,7 +11,7 @@ properties:
     type: string
     readOnly: true
   provider_id:
-    type: int
+    type: integer
     readOnly: true
   required:
     type: bool

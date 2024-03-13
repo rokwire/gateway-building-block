@@ -535,10 +535,10 @@ paths:
                   - image_url
                 properties:
                   id:
-                    type: int
+                    type: integer
                     readOnly: true
                   provider_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   name:
                     type: string
@@ -616,10 +616,10 @@ paths:
                     type: string
                     readOnly: true
                   provider_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   unit_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   next_available:
                     type: string
@@ -715,24 +715,24 @@ paths:
                   - details
                 properties:
                   id:
-                    type: int
+                    type: integer
                     readOnly: true
                   provider_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   unit_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   person_id:
-                    type: int
+                    type: integer
                   start_time:
                     type: string
                   end_time:
                     type: string
                   capacity:
-                    type: int
+                    type: integer
                   filled:
-                    type: int
+                    type: integer
                   details:
                     type: map
         '400':
@@ -807,7 +807,7 @@ paths:
                         type: string
                         readOnly: true
                       provider_id:
-                        type: int
+                        type: integer
                         readOnly: true
                       required:
                         type: bool

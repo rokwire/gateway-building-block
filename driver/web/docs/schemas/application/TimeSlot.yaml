@@ -11,23 +11,23 @@ required:
 - details
 properties:
   id:
-    type: int
+    type: integer
     readOnly: true
   provider_id:
-    type: int
+    type: integer
     readOnly: true
   unit_id:
-    type: int
+    type: integer
     readOnly: true
   person_id:
-    type: int
+    type: integer
   start_time:
     type: string
   end_time:
     type: string
   capacity:
-    type: int
+    type: integer
   filled:
-    type: int
+    type: integer
   details:
     type: map
