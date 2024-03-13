@@ -12,7 +12,11 @@ LegacyEvent:
 LocationLegacy:
   $ref: "./application/LocationLegacy.yaml"   
 SubEvents:
-  $ref: "./application/SubEvents.yaml"   
+  $ref: "./application/SubEvents.yaml"
+AppointmentPost:
+  $ref: "./application/AppointmentPost.yaml"
+BuildingBlockAppointment:
+  $ref: "./application/BuildingBlockAppointment.yaml"
 
 # ADMIN section
 

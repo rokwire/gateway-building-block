@@ -29,12 +29,10 @@ properties:
     type: string
     readOnly: true
   user_external_ids:
-    type: 
-      -$ref: "./ExternalUserID.yaml"
+    $ref: "./ExternalUserID.yaml"
     readOnly: true
   source_id:
     type: string
     readOnly: true
   host:
-    type:
-      -$ref: "./AppointmentHost.yaml"
+    $ref: "./AppointmentHost.yaml"

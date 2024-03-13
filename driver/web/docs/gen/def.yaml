@@ -933,14 +933,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/paths/~1api~1bbs~1appointments~1/put/requestBody/content/application~1json/schema'
+              $ref: '#/components/schemas/AppointmentPost'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/paths/~1api~1bbs~1appointments~1/put/responses/200/content/application~1json/schema'
+                $ref: '#/components/schemas/BuildingBlockAppointment'
         '400':
           description: Bad request
         '401':
@@ -963,116 +963,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - provider_id
-                - unit_id
-                - person_id
-                - type
-                - start_time
-                - end_time
-                - user_external_ids
-                - slot_id
-                - answers
-              optional: _source_id
-              properties:
-                provider_id:
-                  type: string
-                  readOnly: true
-                unit_id:
-                  type: string
-                  readOnly: true
-                person_id:
-                  type: string
-                  readOnly: true
-                type:
-                  type: stirng
-                  readOnly: true
-                start_time:
-                  type: stirng
-                  readOnly: true
-                end_time:
-                  type: string
-                  readOnly: true
-                user_external_ids:
-                  type:
-                    - type: object
-                      required:
-                        - uin
-                      properties:
-                        uin:
-                          type: string
-                          readOnly: true
-                  readOnly: true
-                slot_id:
-                  type: string
-                  readOnly: true
-                source_id:
-                  type: string
-                  readOnly: true
-                answers:
-                  type: array
-                  items:
-                    - type: object
-                      required:
-                        - question_id
-                        - values
-                      properties:
-                        question_id:
-                          type: string
-                          readOnly: true
-                        values:
-                          type: array
-                          items:
-                            type: string
-                          readOnly: true
-                  readOnly: true
+              $ref: '#/components/schemas/AppointmentPost'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - provider_id
-                  - unit_id
-                  - person_id
-                  - type
-                  - start_time
-                  - end_time
-                  - user_external_ids
-                  - source_id
-                  - host
-                properties:
-                  provider_id:
-                    type: string
-                    readOnly: true
-                  unit_id:
-                    type: string
-                    readOnly: true
-                  person_id:
-                    type: string
-                    readOnly: true
-                  type:
-                    type: stirng
-                    readOnly: true
-                  start_time:
-                    type: stirng
-                    readOnly: true
-                  end_time:
-                    type: string
-                    readOnly: true
-                  user_external_ids:
-                    type:
-                      '-$ref': ./ExternalUserID.yaml
-                    readOnly: true
-                  source_id:
-                    type: string
-                    readOnly: true
-                  host:
-                    type:
-                      '-$ref': ./AppointmentHost.yaml
+                $ref: '#/components/schemas/BuildingBlockAppointment'
         '400':
           description: Bad request
         '401':
@@ -1421,6 +1319,120 @@ components:
           type: boolean
         track:
           type: string
+    AppointmentPost:
+      type: object
+      required:
+        - provider_id
+        - unit_id
+        - person_id
+        - type
+        - start_time
+        - end_time
+        - user_external_ids
+        - slot_id
+        - answers
+      optional: _source_id
+      properties:
+        provider_id:
+          type: string
+          readOnly: true
+        unit_id:
+          type: string
+          readOnly: true
+        person_id:
+          type: string
+          readOnly: true
+        type:
+          type: stirng
+          readOnly: true
+        start_time:
+          type: stirng
+          readOnly: true
+        end_time:
+          type: string
+          readOnly: true
+        user_external_ids:
+          type:
+            - type: object
+              required:
+                - uin
+              properties:
+                uin:
+                  type: string
+                  readOnly: true
+          readOnly: true
+        slot_id:
+          type: string
+          readOnly: true
+        source_id:
+          type: string
+          readOnly: true
+        answers:
+          type: array
+          items:
+            - type: object
+              required:
+                - question_id
+                - values
+              properties:
+                question_id:
+                  type: string
+                  readOnly: true
+                values:
+                  type: array
+                  items:
+                    type: string
+                  readOnly: true
+          readOnly: true
+    BuildingBlockAppointment:
+      type: object
+      required:
+        - provider_id
+        - unit_id
+        - person_id
+        - type
+        - start_time
+        - end_time
+        - user_external_ids
+        - source_id
+        - host
+      properties:
+        provider_id:
+          type: string
+          readOnly: true
+        unit_id:
+          type: string
+          readOnly: true
+        person_id:
+          type: string
+          readOnly: true
+        type:
+          type: stirng
+          readOnly: true
+        start_time:
+          type: stirng
+          readOnly: true
+        end_time:
+          type: string
+          readOnly: true
+        user_external_ids:
+          $ref: '#/components/schemas/AppointmentPost/properties/user_external_ids/type/0'
+          readOnly: true
+        source_id:
+          type: string
+          readOnly: true
+        host:
+          type: object
+          required:
+            - first_name
+            - last_name
+          properties:
+            first_name:
+              type: string
+              readOnly: true
+            last_name:
+              type: string
+              readOnly: true
     _admin_req_update-configs:
       required:
         - type
