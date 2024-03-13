@@ -14,7 +14,7 @@ properties:
     type: integer
     readOnly: true
   required:
-    type: bool
+    type: boolean
     readOnly: true
   type:
     type: string

@@ -1371,12 +1371,12 @@ components:
         time_slots:
           type: array
           items:
-            - $ref: '#/components/schemas/TimeSlot'
+            $ref: '#/components/schemas/TimeSlot'
           readOnly: true
         questions:
           type: array
           items:
-            - $ref: '#/components/schemas/Question'
+            $ref: '#/components/schemas/Question'
           readOnly: true
     TimeSlot:
       type: object
@@ -1429,7 +1429,7 @@ components:
           type: integer
           readOnly: true
         required:
-          type: bool
+          type: boolean
           readOnly: true
         type:
           type: string
