@@ -14,7 +14,7 @@ get:
     in: query
     description: External system id of person making the request
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string
@@ -22,7 +22,7 @@ get:
     in: query
     description: Rokwire provider id of the organization tracking/providing appointment data
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string
@@ -30,7 +30,7 @@ get:
     in: query
     description: External id identifying the unit the calendar entries belong to
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string
@@ -38,7 +38,7 @@ get:
     in: query
     description: External id identifying the advisor the calendar entry belongs to
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string

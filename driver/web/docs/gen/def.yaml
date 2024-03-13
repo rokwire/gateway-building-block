@@ -576,7 +576,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -584,7 +584,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -592,7 +592,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -652,7 +652,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -660,7 +660,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -668,7 +668,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -676,7 +676,7 @@ paths:
           in: query
           description: External id identifying the advisor the calendar entry belongs to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -684,7 +684,7 @@ paths:
           in: query
           description: The first date to look for available slots (yyyy-mm-dd). Required if end_time is provided.
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -692,7 +692,7 @@ paths:
           in: query
           description: The last date to look for available slots (yyyy-mm-dd) Required if start_time is provided
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -758,7 +758,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -766,7 +766,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -774,7 +774,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -782,7 +782,7 @@ paths:
           in: query
           description: External id identifying the advisor the calendar entry belongs to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -846,7 +846,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -854,7 +854,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -862,7 +862,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -870,7 +870,7 @@ paths:
           in: query
           description: External id identifying the advisor the calendar entry belongs to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -878,7 +878,7 @@ paths:
           in: query
           description: The first date to look for available slots (yyyy-mm-dd). Required if end_time is provided.
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -886,7 +886,7 @@ paths:
           in: query
           description: The last date to look for available slots (yyyy-mm-dd) Required if start_time is provided
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -1104,7 +1104,7 @@ paths:
           in: query
           description: Users UIN
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -1112,7 +1112,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string

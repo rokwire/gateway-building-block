@@ -22,7 +22,7 @@ delete:
     in: query
     description: Users UIN
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string
@@ -30,7 +30,7 @@ delete:
     in: query
     description: Rokwire provider id of the organization tracking/providing appointment data
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string
