@@ -42,5 +42,5 @@ properties:
   answers:
     type: array
     items:
-      - $ref: "./QuestionAnswer.yaml"
+      $ref: "./QuestionAnswer.yaml"
     readOnly: true 

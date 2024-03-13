@@ -21,6 +21,10 @@ ExternalUserID:
   $ref: "./application/ExternalUserID.yaml"
 QuestionAnswer:
   $ref: "./application/QuestionAnswer.yaml"
+AppointmentOptions:
+  $ref: "./application/AppointmentOptions.yaml"
+TimeSlot:
+  $ref: "./application/TimeSlot.yaml"
 
 # ADMIN section
 

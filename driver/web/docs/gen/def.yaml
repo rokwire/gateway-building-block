@@ -702,39 +702,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - provider_id
-                  - unit_id
-                  - person_id
-                  - start_time
-                  - end_time
-                  - capacity
-                  - filled
-                  - details
-                properties:
-                  id:
-                    type: integer
-                    readOnly: true
-                  provider_id:
-                    type: integer
-                    readOnly: true
-                  unit_id:
-                    type: integer
-                    readOnly: true
-                  person_id:
-                    type: integer
-                  start_time:
-                    type: string
-                  end_time:
-                    type: string
-                  capacity:
-                    type: integer
-                  filled:
-                    type: integer
-                  details:
-                    type: object
+                $ref: '#/components/schemas/TimeSlot'
         '400':
           description: Bad request
         '401':
@@ -896,21 +864,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - time_slots
-                  - questions
-                properties:
-                  time_slots:
-                    type: array
-                    items:
-                      - $ref: '#/paths/~1api~1bbs~1appointments~1slots/get/responses/200/content/application~1json/schema'
-                    readOnly: true
-                  questions:
-                    type: array
-                    items:
-                      - $ref: '#/paths/~1api~1bbs~1appointments~1questions/get/responses/200/content/application~1json/schema/items/0'
-                    readOnly: true
+                $ref: '#/components/schemas/AppointmentOptions'
         '400':
           description: Bad request
         '401':
@@ -1363,7 +1317,7 @@ components:
         answers:
           type: array
           items:
-            - $ref: '#/components/schemas/QuestionAnswer'
+            $ref: '#/components/schemas/QuestionAnswer'
           readOnly: true
     BuildingBlockAppointment:
       type: object
@@ -1436,6 +1390,56 @@ components:
           items:
             type: string
           readOnly: true
+    AppointmentOptions:
+      type: object
+      required:
+        - time_slots
+        - questions
+      properties:
+        time_slots:
+          type: array
+          items:
+            - $ref: '#/components/schemas/TimeSlot'
+          readOnly: true
+        questions:
+          type: array
+          items:
+            - $ref: '#/paths/~1api~1bbs~1appointments~1questions/get/responses/200/content/application~1json/schema/items/0'
+          readOnly: true
+    TimeSlot:
+      type: object
+      required:
+        - id
+        - provider_id
+        - unit_id
+        - person_id
+        - start_time
+        - end_time
+        - capacity
+        - filled
+        - details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        unit_id:
+          type: integer
+          readOnly: true
+        person_id:
+          type: integer
+        start_time:
+          type: string
+        end_time:
+          type: string
+        capacity:
+          type: integer
+        filled:
+          type: integer
+        details:
+          type: object
     _admin_req_update-configs:
       required:
         - type
