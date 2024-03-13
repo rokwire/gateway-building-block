@@ -17,6 +17,8 @@ AppointmentPost:
   $ref: "./application/AppointmentPost.yaml"
 BuildingBlockAppointment:
   $ref: "./application/BuildingBlockAppointment.yaml"
+ExternalUserID:
+  $ref: "./application/ExternalUserID.yaml"
 
 # ADMIN section
 

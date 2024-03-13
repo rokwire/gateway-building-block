@@ -1343,23 +1343,17 @@ components:
           type: string
           readOnly: true
         type:
-          type: stirng
+          type: string
           readOnly: true
         start_time:
-          type: stirng
+          type: string
           readOnly: true
         end_time:
           type: string
           readOnly: true
         user_external_ids:
           type:
-            - type: object
-              required:
-                - uin
-              properties:
-                uin:
-                  type: string
-                  readOnly: true
+            - $ref: '#/components/schemas/ExternalUserID'
           readOnly: true
         slot_id:
           type: string
@@ -1407,16 +1401,16 @@ components:
           type: string
           readOnly: true
         type:
-          type: stirng
+          type: string
           readOnly: true
         start_time:
-          type: stirng
+          type: string
           readOnly: true
         end_time:
           type: string
           readOnly: true
         user_external_ids:
-          $ref: '#/components/schemas/AppointmentPost/properties/user_external_ids/type/0'
+          $ref: '#/components/schemas/ExternalUserID'
           readOnly: true
         source_id:
           type: string
@@ -1433,6 +1427,14 @@ components:
             last_name:
               type: string
               readOnly: true
+    ExternalUserID:
+      type: object
+      required:
+        - uin
+      properties:
+        uin:
+          type: string
+          readOnly: true
     _admin_req_update-configs:
       required:
         - type
