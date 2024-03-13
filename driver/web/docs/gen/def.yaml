@@ -734,7 +734,7 @@ paths:
                   filled:
                     type: integer
                   details:
-                    type: map
+                    type: object
         '400':
           description: Bad request
         '401':
@@ -1193,7 +1193,6 @@ paths:
         **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
       security:
         - bearerAuth: []
-      parameters: null
       requestBody:
         description: New events content
         content:

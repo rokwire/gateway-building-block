@@ -30,4 +30,4 @@ properties:
   filled:
     type: integer
   details:
-    type: map
+    type: object

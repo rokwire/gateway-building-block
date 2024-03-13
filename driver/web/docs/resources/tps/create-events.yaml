@@ -8,7 +8,6 @@ post:
     **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
   security:
     - bearerAuth: []
-  parameters:
   requestBody:
     description: New events content
     content:
