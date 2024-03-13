@@ -50,7 +50,7 @@ get:
           schema:
             type: array
             items:
-              - $ref: "../../schemas/application/Question.yaml"
+              $ref: "../../schemas/application/Question.yaml"
     400:
       description: Bad request
     401:

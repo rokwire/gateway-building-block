@@ -762,7 +762,7 @@ paths:
               schema:
                 type: array
                 items:
-                  - $ref: '#/components/schemas/Question'
+                  $ref: '#/components/schemas/Question'
         '400':
           description: Bad request
         '401':
