@@ -9,8 +9,6 @@ required:
 - user_external_ids
 - slot_id
 - answers
-optional:
-  _source_id
 properties:
   provider_id:
     type: string
