@@ -25,6 +25,8 @@ AppointmentOptions:
   $ref: "./application/AppointmentOptions.yaml"
 TimeSlot:
   $ref: "./application/TimeSlot.yaml"
+Question:
+  $ref: "./application/Question.yaml"
 
 # ADMIN section
 

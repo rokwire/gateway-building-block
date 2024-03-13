@@ -762,35 +762,7 @@ paths:
               schema:
                 type: array
                 items:
-                  - type: object
-                    required:
-                      - id
-                      - provider_id
-                      - required
-                      - type
-                      - select_values
-                      - question
-                    properties:
-                      id:
-                        type: string
-                        readOnly: true
-                      provider_id:
-                        type: integer
-                        readOnly: true
-                      required:
-                        type: bool
-                        readOnly: true
-                      type:
-                        type: string
-                        readOnly: true
-                      select_values:
-                        type: array
-                        items:
-                          type: string
-                        readOnly: true
-                      question:
-                        type: string
-                        readOnly: true
+                  - $ref: '#/components/schemas/Question'
         '400':
           description: Bad request
         '401':
@@ -1404,7 +1376,7 @@ components:
         questions:
           type: array
           items:
-            - $ref: '#/paths/~1api~1bbs~1appointments~1questions/get/responses/200/content/application~1json/schema/items/0'
+            - $ref: '#/components/schemas/Question'
           readOnly: true
     TimeSlot:
       type: object
@@ -1440,6 +1412,36 @@ components:
           type: integer
         details:
           type: object
+    Question:
+      type: object
+      required:
+        - id
+        - provider_id
+        - required
+        - type
+        - select_values
+        - question
+      properties:
+        id:
+          type: string
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        required:
+          type: bool
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        select_values:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        question:
+          type: string
+          readOnly: true
     _admin_req_update-configs:
       required:
         - type
