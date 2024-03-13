@@ -77,7 +77,7 @@ type BBs interface {
 // TPS exposes third-party service APIs for the driver adapters
 type TPS interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
-	CreateEvent(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
+	CreateEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 }
 
 // System exposes system administrative APIs for the driver adapters
