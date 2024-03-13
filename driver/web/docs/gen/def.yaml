@@ -1352,8 +1352,7 @@ components:
           type: string
           readOnly: true
         user_external_ids:
-          type:
-            - $ref: '#/components/schemas/ExternalUserID'
+          $ref: '#/components/schemas/ExternalUserID'
           readOnly: true
         slot_id:
           type: string
@@ -1364,19 +1363,7 @@ components:
         answers:
           type: array
           items:
-            - type: object
-              required:
-                - question_id
-                - values
-              properties:
-                question_id:
-                  type: string
-                  readOnly: true
-                values:
-                  type: array
-                  items:
-                    type: string
-                  readOnly: true
+            - $ref: '#/components/schemas/QuestionAnswer'
           readOnly: true
     BuildingBlockAppointment:
       type: object
@@ -1434,6 +1421,20 @@ components:
       properties:
         uin:
           type: string
+          readOnly: true
+    QuestionAnswer:
+      type: object
+      required:
+        - question_id
+        - values
+      properties:
+        question_id:
+          type: string
+          readOnly: true
+        values:
+          type: array
+          items:
+            type: string
           readOnly: true
     _admin_req_update-configs:
       required:
