@@ -1191,7 +1191,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/tps/event:
+  /api/tps/events:
     post:
       tags:
         - TPS

@@ -89,8 +89,8 @@ paths:
   # TPS
   /api/tps/examples/{id}:
     $ref: "./resources/tps/examples-id.yaml"
-  /api/tps/event:
-    $ref: "./resources/tps/create-event.yaml"  
+  /api/tps/events:
+    $ref: "./resources/tps/create-events.yaml"  
 
   # System
   /api/system/examples/{id}:
