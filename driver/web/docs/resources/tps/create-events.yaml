@@ -15,7 +15,7 @@ post:
         schema:
           type: array
           items:
-            $ref: "../../schemas/apis/tps/create-event/Request.yaml"
+            $ref: "../../schemas/apis/tps/create-events/Request.yaml"
   responses:
     200:
       description: Success

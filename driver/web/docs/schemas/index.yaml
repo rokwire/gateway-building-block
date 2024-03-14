@@ -38,8 +38,8 @@ _admin_req_update-configs:
 
 # TPS section
 
-## tps create event API
+## tps create events API
 _tps_req_create-event:
-  $ref: "./apis/tps/create-event/Request.yaml"
+  $ref: "./apis/tps/create-events/Request.yaml"
 
 # end TPS section

@@ -207,14 +207,6 @@ type TpsReqCreateEvent struct {
 	TitleUrl    *string      `json:"titleUrl,omitempty"`
 }
 
-// TpsResCreateEvent defines model for _tps_res_create-event.
-type TpsResCreateEvent struct {
-	Id                *string        `json:"id,omitempty"`
-	Items             *[]LegacyEvent `json:"items,omitempty"`
-	SyncDate          *string        `json:"sync_date,omitempty"`
-	SyncProcessSource *string        `json:"sync_process_source,omitempty"`
-}
-
 // GetApiAdminConfigsParams defines parameters for GetApiAdminConfigs.
 type GetApiAdminConfigsParams struct {
 	// Type config type
