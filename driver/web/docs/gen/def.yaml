@@ -1014,7 +1014,7 @@ paths:
       description: |
         Creates new events
 
-        **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+        **Auth:** Requires valid tps token with `manage_legacy_events` permission
       security:
         - bearerAuth: []
       requestBody:
