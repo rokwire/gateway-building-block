@@ -19,12 +19,6 @@ post:
   responses:
     200:
       description: Success
-      content:
-        application/json:
-          schema:
-            type: array
-            items: 
-              $ref: "../../schemas/apis/tps/create-event/Response.yaml"
     400:
       description: Bad request
     401:

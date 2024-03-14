@@ -1028,12 +1028,6 @@ paths:
       responses:
         '200':
           description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/_tps_res_create-event'
         '400':
           description: Bad request
         '401':
@@ -1532,16 +1526,3 @@ components:
         location:
           items:
             $ref: '#/components/schemas/LocationLegacy'
-    _tps_res_create-event:
-      type: object
-      properties:
-        id:
-          type: string
-        sync_process_source:
-          type: string
-        sync_date:
-          type: string
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/LegacyEvent'
