@@ -18,11 +18,8 @@ import (
 	"application/core"
 	"application/core/model"
 	"encoding/json"
-	"io"
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
 	"github.com/rokwire/logging-library-go/v2/logs"
@@ -54,65 +51,65 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 }
 
 func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
-	}
-
-	var e []model.LegacyEvent
-	err = json.Unmarshal(data, &e)
-	if err != nil {
-		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
-	}
-	var createdEvents []model.LegacyEventItem
-
-	for _, w := range e {
-		syncSourse := "events-tps-api"
-		syncDate := time.Now()
-		ID := uuid.NewString()
-		if w.StartDate != "" {
-			startDate, err := time.Parse("2006/01/02T15:04:05", w.StartDate)
-			if err != nil {
-				return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
-
-			}
-			w.StartDate = startDate.Format(time.RFC3339)
-		}
-		if w.EndDate != "" {
-			endDate, err := time.Parse("2006/01/02T15:04:05", w.EndDate)
-			if err != nil {
-				return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
-
-			}
-			w.EndDate = endDate.Format(time.RFC3339)
+	/*	data, err := io.ReadAll(r.Body)
+		if err != nil {
+			return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 		}
 
-		var location *model.LocationLegacy
-		if w.Location != nil || w.Location.Longitude == 0 || w.Location.Latitude == 0 {
-			location = &model.LocationLegacy{
-				Description: w.Location.Description,
-				Longitude:   w.Location.Longitude,
-				Latitude:    w.Location.Latitude,
-			}
+		var e []model.LegacyEvent
+		err = json.Unmarshal(data, &e)
+		if err != nil {
+			return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 		}
-		now := time.Now()
-		createInfo := model.CreateInfo{Time: now, AccountID: claims.Id}
+		var createdEvents []model.LegacyEventItem
 
-		createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
-			Item: model.LegacyEvent{AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
-				CreatedBy: w.CreatedBy, LongDescription: w.LongDescription, DataModified: w.DataModified, DataSourceEventID: w.DataSourceEventID,
-				DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
-				IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
-				OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
-				RegistrationURL: w.RegistrationURL, Contacts: w.Contacts, CreateInfo: createInfo}}
+		for _, w := range e {
+			syncSourse := "events-tps-api"
+			syncDate := time.Now()
+			ID := uuid.NewString()
+			if w.StartDate != "" {
+				startDate, err := time.Parse("2006/01/02T15:04:05", w.StartDate)
+				if err != nil {
+					return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 
-		createdEvents = append(createdEvents, createdEvent)
-	}
+				}
+				w.StartDate = startDate.Format(time.RFC3339)
+			}
+			if w.EndDate != "" {
+				endDate, err := time.Parse("2006/01/02T15:04:05", w.EndDate)
+				if err != nil {
+					return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 
-	_, err = h.app.TPS.CreateEvents(createdEvents)
-	if err != nil {
-		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
-	}
+				}
+				w.EndDate = endDate.Format(time.RFC3339)
+			}
+
+			var location *model.LocationLegacy
+			if w.Location != nil || w.Location.Longitude == 0 || w.Location.Latitude == 0 {
+				location = &model.LocationLegacy{
+					Description: w.Location.Description,
+					Longitude:   w.Location.Longitude,
+					Latitude:    w.Location.Latitude,
+				}
+			}
+			now := time.Now()
+			createInfo := model.CreateInfo{Time: now, AccountID: claims.Id}
+
+			createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
+				Item: model.LegacyEvent{AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
+					CreatedBy: w.CreatedBy, LongDescription: w.LongDescription, DataModified: w.DataModified, DataSourceEventID: w.DataSourceEventID,
+					DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
+					IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
+					OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
+					RegistrationURL: w.RegistrationURL, Contacts: w.Contacts, CreateInfo: createInfo}}
+
+			createdEvents = append(createdEvents, createdEvent)
+		}
+
+		_, err = h.app.TPS.CreateEvents(createdEvents)
+		if err != nil {
+			return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+		} */
 
 	return l.HTTPResponseSuccess()
 }

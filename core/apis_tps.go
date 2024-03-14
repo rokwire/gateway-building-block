@@ -16,6 +16,8 @@ package core
 
 import (
 	"application/core/model"
+
+	"github.com/rokwire/logging-library-go/v2/errors"
 )
 
 // appTPS contains BB implementations
@@ -30,7 +32,9 @@ func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Exampl
 
 // CreateEvents creates events
 func (a appTPS) CreateEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
-	return a.app.shared.createEvent(event)
+	//TODO
+	return nil, errors.New("not implemented")
+	//return a.app.shared.createEvent(event)
 }
 
 // newAppTPS creates new appTPS
