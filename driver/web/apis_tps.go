@@ -114,11 +114,7 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}
 
-	response, err := json.Marshal(createdEvents)
-	if err != nil {
-		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResponseBody, nil, err, http.StatusInternalServerError, false)
-	}
-	return l.HTTPResponseSuccessJSON(response)
+	return l.HTTPResponseSuccess()
 }
 
 // NewTPSAPIsHandler creates new third-party service API handler instance
