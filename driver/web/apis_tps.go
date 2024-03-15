@@ -76,11 +76,6 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 	for _, w := range e {
 
 		id := uuid.NewString()
-
-		/*	type TpsReqCreateEvent struct {
-			Tags              *[]string                   `json:"tags,omitempty"`
-			TargetAudience    *[]string                   `json:"target_audience,omitempty"`
-		} */
 		recurrenceID := utils.GetInt(w.RecurrenceId)
 
 		var tags []string
@@ -104,7 +99,7 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 			IsVirtial: utils.GetBool(w.IsVirtual), LongDescription: utils.GetString(w.LongDescription),
 			RecurrenceID: &recurrenceID, RecurringFlag: utils.GetBool(w.RecurringFlag), RegistrationURL: utils.GetString(w.RegistrationUrl),
 			Sponsor: utils.GetString(w.Sponsor), Subcategory: utils.GetString(w.Subcategory), Title: utils.GetString(w.Title),
-			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &location}
+			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &location, Tags: &tags, TargetAudience: &targetAudience}
 
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,

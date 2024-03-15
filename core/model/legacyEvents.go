@@ -122,6 +122,8 @@ type LegacyEvent struct {
 	StartDate             string          `json:"startDate" bson:"startDate"`
 	Title                 string          `json:"title" bson:"title"`
 	TitleURL              string          `json:"titleURL" bson:"titleURL"`
+	Tags                  *[]string       `json:"tags" bson:"tags"`
+	TargetAudience        *[]string       `json:"target_audiance" bson:"target_audiance"`
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
 	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
@@ -133,6 +135,10 @@ type LocationLegacy struct {
 	Description string  `json:"description" bson:"description"`
 	Latitude    float64 `json:"latitude" bson:"latitude"`
 	Longitude   float64 `json:"longitude" bson:"longitude"`
+	Address     string  `json:"address" bson:"address"`
+	Building    string  `json:"building" bson:"building"`
+	Floor       int     `json:"floor" bson:"floor"`
+	Room        string  `json:"room" bson:"room"`
 }
 
 // SubEvents represents the sub events

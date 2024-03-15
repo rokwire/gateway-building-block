@@ -36,7 +36,8 @@ func contactsToDef(item []Def.TpsReqCreateEventContact) []model.ContactLegacy {
 // LocationLegacy
 func locationToDef(item Def.TpsReqCreateEventLocation) model.LocationLegacy {
 
-	return model.LocationLegacy{Latitude: float64(*item.Latitude), Longitude: float64(*item.Longitude), Description: *item.Description}
+	return model.LocationLegacy{Latitude: float64(*item.Latitude), Longitude: float64(*item.Longitude), Description: *item.Description,
+		Address: *item.Address, Building: *item.Building, Floor: *item.Floor, Room: *item.Room}
 }
 
 func locationsToDef(item []Def.TpsReqCreateEventLocation) []model.LocationLegacy {
