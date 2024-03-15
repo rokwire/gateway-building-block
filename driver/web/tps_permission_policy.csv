@@ -1,1 +1,4 @@
 p, get_examples, /gateway/api/tps/examples/*, (GET), Get examples
+
+p, manage_legacy_events, /gateway/api/tps/events, (POST), Create events
+

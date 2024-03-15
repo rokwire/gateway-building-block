@@ -1,0 +1,16 @@
+type: object
+properties:
+  description:
+    type: string
+  latitude:
+    type: number
+  longitude:
+    type: number
+  floor:
+    type: integer
+  address:
+    type: string
+  building:
+    type: string
+  room:
+    type: string

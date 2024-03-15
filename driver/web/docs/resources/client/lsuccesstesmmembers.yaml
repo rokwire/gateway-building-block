@@ -14,7 +14,7 @@ get:
     in: query
     description: External system id of person making the request (uin for students)
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string
@@ -22,7 +22,7 @@ get:
     in: query
     description: External id identifying the unit the calendar entries belong to
     required: true
-    style: simple
+    style: form
     explode: false
     schema:
       type: string

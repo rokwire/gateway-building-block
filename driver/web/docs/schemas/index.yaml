@@ -12,7 +12,21 @@ LegacyEvent:
 LocationLegacy:
   $ref: "./application/LocationLegacy.yaml"   
 SubEvents:
-  $ref: "./application/SubEvents.yaml"   
+  $ref: "./application/SubEvents.yaml"
+AppointmentPost:
+  $ref: "./application/AppointmentPost.yaml"
+BuildingBlockAppointment:
+  $ref: "./application/BuildingBlockAppointment.yaml"
+ExternalUserID:
+  $ref: "./application/ExternalUserID.yaml"
+QuestionAnswer:
+  $ref: "./application/QuestionAnswer.yaml"
+AppointmentOptions:
+  $ref: "./application/AppointmentOptions.yaml"
+TimeSlot:
+  $ref: "./application/TimeSlot.yaml"
+Question:
+  $ref: "./application/Question.yaml"
 
 # ADMIN section
 
@@ -21,3 +35,15 @@ _admin_req_update-configs:
   $ref: "./apis/admin/update-configs/Request.yaml"
 
 # end ADMIN section
+
+# TPS section
+
+## tps create events API
+_tps_req_create-event:
+  $ref: "./apis/tps/create-events/Request.yaml"
+_tps_req_create-event-contact:
+  $ref: "./apis/tps/create-events/Contact.yaml"
+_tps_req_create-event-location:
+  $ref: "./apis/tps/create-events/Location.yaml"
+
+# end TPS section

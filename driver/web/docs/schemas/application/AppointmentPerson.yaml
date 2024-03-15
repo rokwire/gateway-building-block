@@ -12,10 +12,10 @@ properties:
     type: string
     readOnly: true
   provider_id:
-    type: int
+    type: integer
     readOnly: true
   unit_id:
-    type: int
+    type: integer
     readOnly: true
   next_available:
     type: string

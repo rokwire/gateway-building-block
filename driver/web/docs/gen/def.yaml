@@ -87,15 +87,6 @@ paths:
         **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
       security:
         - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          description: ID of example to update
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
       requestBody:
         description: New example content
         content:
@@ -514,7 +505,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -522,7 +513,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -544,10 +535,10 @@ paths:
                   - image_url
                 properties:
                   id:
-                    type: int
+                    type: integer
                     readOnly: true
                   provider_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   name:
                     type: string
@@ -585,7 +576,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -593,7 +584,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -601,7 +592,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -625,10 +616,10 @@ paths:
                     type: string
                     readOnly: true
                   provider_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   unit_id:
-                    type: int
+                    type: integer
                     readOnly: true
                   next_available:
                     type: string
@@ -661,7 +652,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -669,7 +660,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -677,7 +668,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -685,7 +676,7 @@ paths:
           in: query
           description: External id identifying the advisor the calendar entry belongs to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -693,7 +684,7 @@ paths:
           in: query
           description: The first date to look for available slots (yyyy-mm-dd). Required if end_time is provided.
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -701,7 +692,7 @@ paths:
           in: query
           description: The last date to look for available slots (yyyy-mm-dd) Required if start_time is provided
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -711,39 +702,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - provider_id
-                  - unit_id
-                  - person_id
-                  - start_time
-                  - end_time
-                  - capacity
-                  - filled
-                  - details
-                properties:
-                  id:
-                    type: int
-                    readOnly: true
-                  provider_id:
-                    type: int
-                    readOnly: true
-                  unit_id:
-                    type: int
-                    readOnly: true
-                  person_id:
-                    type: int
-                  start_time:
-                    type: string
-                  end_time:
-                    type: string
-                  capacity:
-                    type: int
-                  filled:
-                    type: int
-                  details:
-                    type: map
+                $ref: '#/components/schemas/TimeSlot'
         '400':
           description: Bad request
         '401':
@@ -767,7 +726,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -775,7 +734,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -783,7 +742,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -791,7 +750,7 @@ paths:
           in: query
           description: External id identifying the advisor the calendar entry belongs to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -803,35 +762,7 @@ paths:
               schema:
                 type: array
                 items:
-                  - type: object
-                    required:
-                      - id
-                      - provider_id
-                      - required
-                      - type
-                      - select_values
-                      - question
-                    properties:
-                      id:
-                        type: string
-                        readOnly: true
-                      provider_id:
-                        type: int
-                        readOnly: true
-                      required:
-                        type: bool
-                        readOnly: true
-                      type:
-                        type: string
-                        readOnly: true
-                      select_values:
-                        type: array
-                        items:
-                          type: string
-                        readOnly: true
-                      question:
-                        type: string
-                        readOnly: true
+                  $ref: '#/components/schemas/Question'
         '400':
           description: Bad request
         '401':
@@ -855,7 +786,7 @@ paths:
           in: query
           description: External system id of person making the request
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -863,7 +794,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -871,7 +802,7 @@ paths:
           in: query
           description: External id identifying the unit the calendar entries belong to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -879,7 +810,7 @@ paths:
           in: query
           description: External id identifying the advisor the calendar entry belongs to
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -887,7 +818,7 @@ paths:
           in: query
           description: The first date to look for available slots (yyyy-mm-dd). Required if end_time is provided.
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -895,7 +826,7 @@ paths:
           in: query
           description: The last date to look for available slots (yyyy-mm-dd) Required if start_time is provided
           required: false
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -905,21 +836,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - time_slots
-                  - questions
-                properties:
-                  time_slots:
-                    type: array
-                    items:
-                      - $ref: '#/paths/~1api~1bbs~1appointments~1slots/get/responses/200/content/application~1json/schema'
-                    readOnly: true
-                  questions:
-                    type: array
-                    items:
-                      - $ref: '#/paths/~1api~1bbs~1appointments~1questions/get/responses/200/content/application~1json/schema/items/0'
-                    readOnly: true
+                $ref: '#/components/schemas/AppointmentOptions'
         '400':
           description: Bad request
         '401':
@@ -942,14 +859,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/paths/~1api~1bbs~1appointments~1/put/requestBody/content/application~1json/schema'
+              $ref: '#/components/schemas/AppointmentPost'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/paths/~1api~1bbs~1appointments~1/put/responses/200/content/application~1json/schema'
+                $ref: '#/components/schemas/BuildingBlockAppointment'
         '400':
           description: Bad request
         '401':
@@ -972,116 +889,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - provider_id
-                - unit_id
-                - person_id
-                - type
-                - start_time
-                - end_time
-                - user_external_ids
-                - slot_id
-                - answers
-              optional: _source_id
-              properties:
-                provider_id:
-                  type: string
-                  readOnly: true
-                unit_id:
-                  type: string
-                  readOnly: true
-                person_id:
-                  type: string
-                  readOnly: true
-                type:
-                  type: stirng
-                  readOnly: true
-                start_time:
-                  type: stirng
-                  readOnly: true
-                end_time:
-                  type: string
-                  readOnly: true
-                user_external_ids:
-                  type:
-                    - type: object
-                      required:
-                        - uin
-                      properties:
-                        uin:
-                          type: string
-                          readOnly: true
-                  readOnly: true
-                slot_id:
-                  type: string
-                  readOnly: true
-                source_id:
-                  type: string
-                  readOnly: true
-                answers:
-                  type: array
-                  items:
-                    - type: object
-                      required:
-                        - question_id
-                        - values
-                      properties:
-                        question_id:
-                          type: string
-                          readOnly: true
-                        values:
-                          type: array
-                          items:
-                            type: string
-                          readOnly: true
-                  readOnly: true
+              $ref: '#/components/schemas/AppointmentPost'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - provider_id
-                  - unit_id
-                  - person_id
-                  - type
-                  - start_time
-                  - end_time
-                  - user_external_ids
-                  - source_id
-                  - host
-                properties:
-                  provider_id:
-                    type: string
-                    readOnly: true
-                  unit_id:
-                    type: string
-                    readOnly: true
-                  person_id:
-                    type: string
-                    readOnly: true
-                  type:
-                    type: stirng
-                    readOnly: true
-                  start_time:
-                    type: stirng
-                    readOnly: true
-                  end_time:
-                    type: string
-                    readOnly: true
-                  user_external_ids:
-                    type:
-                      '-$ref': ./ExternalUserID.yaml
-                    readOnly: true
-                  source_id:
-                    type: string
-                    readOnly: true
-                  host:
-                    type:
-                      '-$ref': ./AppointmentHost.yaml
+                $ref: '#/components/schemas/BuildingBlockAppointment'
         '400':
           description: Bad request
         '401':
@@ -1113,7 +928,7 @@ paths:
           in: query
           description: Users UIN
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -1121,7 +936,7 @@ paths:
           in: query
           description: Rokwire provider id of the organization tracking/providing appointment data
           required: true
-          style: simple
+          style: form
           explode: false
           schema:
             type: string
@@ -1185,6 +1000,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Example'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/tps/events:
+    post:
+      tags:
+        - TPS
+      summary: Create events
+      description: |
+        Creates new events
+
+        **Auth:** Requires valid tps token with `manage_legacy_events` permission
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: New events content
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/_tps_req_create-event'
+      responses:
+        '200':
+          description: Success
         '400':
           description: Bad request
         '401':
@@ -1320,7 +1163,7 @@ components:
           type: string
         category:
           type: string
-        subcategocy:
+        subcategory:
           type: string
         createdBy:
           type: string
@@ -1396,6 +1239,202 @@ components:
           type: boolean
         track:
           type: string
+    AppointmentPost:
+      type: object
+      required:
+        - provider_id
+        - unit_id
+        - person_id
+        - type
+        - start_time
+        - end_time
+        - user_external_ids
+        - slot_id
+        - answers
+      properties:
+        provider_id:
+          type: string
+          readOnly: true
+        unit_id:
+          type: string
+          readOnly: true
+        person_id:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          readOnly: true
+        end_time:
+          type: string
+          readOnly: true
+        user_external_ids:
+          $ref: '#/components/schemas/ExternalUserID'
+          readOnly: true
+        slot_id:
+          type: string
+          readOnly: true
+        source_id:
+          type: string
+          readOnly: true
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionAnswer'
+          readOnly: true
+    BuildingBlockAppointment:
+      type: object
+      required:
+        - provider_id
+        - unit_id
+        - person_id
+        - type
+        - start_time
+        - end_time
+        - user_external_ids
+        - source_id
+        - host
+      properties:
+        provider_id:
+          type: string
+          readOnly: true
+        unit_id:
+          type: string
+          readOnly: true
+        person_id:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          readOnly: true
+        end_time:
+          type: string
+          readOnly: true
+        user_external_ids:
+          $ref: '#/components/schemas/ExternalUserID'
+          readOnly: true
+        source_id:
+          type: string
+          readOnly: true
+        host:
+          type: object
+          required:
+            - first_name
+            - last_name
+          properties:
+            first_name:
+              type: string
+              readOnly: true
+            last_name:
+              type: string
+              readOnly: true
+    ExternalUserID:
+      type: object
+      required:
+        - uin
+      properties:
+        uin:
+          type: string
+          readOnly: true
+    QuestionAnswer:
+      type: object
+      required:
+        - question_id
+        - values
+      properties:
+        question_id:
+          type: string
+          readOnly: true
+        values:
+          type: array
+          items:
+            type: string
+          readOnly: true
+    AppointmentOptions:
+      type: object
+      required:
+        - time_slots
+        - questions
+      properties:
+        time_slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+          readOnly: true
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+          readOnly: true
+    TimeSlot:
+      type: object
+      required:
+        - id
+        - provider_id
+        - unit_id
+        - person_id
+        - start_time
+        - end_time
+        - capacity
+        - filled
+        - details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        unit_id:
+          type: integer
+          readOnly: true
+        person_id:
+          type: integer
+        start_time:
+          type: string
+        end_time:
+          type: string
+        capacity:
+          type: integer
+        filled:
+          type: integer
+        details:
+          type: object
+    Question:
+      type: object
+      required:
+        - id
+        - provider_id
+        - required
+        - type
+        - select_values
+        - question
+      properties:
+        id:
+          type: string
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        required:
+          type: boolean
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        select_values:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        question:
+          type: string
+          readOnly: true
     _admin_req_update-configs:
       required:
         - type
@@ -1418,3 +1457,83 @@ components:
         data:
           anyOf:
             - $ref: '#/components/schemas/EnvConfigData'
+    _tps_req_create-event:
+      type: object
+      properties:
+        all_day:
+          type: boolean
+        category:
+          type: string
+        subcategory:
+          type: string
+        cost:
+          type: string
+        created_by:
+          type: string
+        date_modified:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+        image_url:
+          type: string
+          nullable: true
+        registration_url:
+          type: string
+        is_virtual:
+          type: boolean
+        long_description:
+          type: string
+        recurrence_id:
+          type: integer
+        recurring_flag:
+          type: boolean
+        sponsor:
+          type: string
+        registration_label:
+          type: string
+        title:
+          type: string
+        title_url:
+          type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/_tps_req_create-event-contact'
+        tags:
+          type: array
+          items:
+            type: string
+        target_audience:
+          type: array
+          items:
+            type: string
+        location:
+          $ref: '#/components/schemas/_tps_req_create-event-location'
+    _tps_req_create-event-contact:
+      type: object
+      properties:
+        contact_name:
+          type: string
+        contact_email:
+          type: string
+        contact_phone:
+          type: string
+    _tps_req_create-event-location:
+      type: object
+      properties:
+        description:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        floor:
+          type: integer
+        address:
+          type: string
+        building:
+          type: string
+        room:
+          type: string
