@@ -114,10 +114,10 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		createdEvents = append(createdEvents, createdEvent)
 	}
 
-	/*	_, err = h.app.TPS.CreateEvents(createdEvents)
-		if err != nil {
-			return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
-		} */
+	_, err = h.app.TPS.CreateEvents(createdEvents)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
 
 	return l.HTTPResponseSuccess()
 }

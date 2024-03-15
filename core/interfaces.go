@@ -88,7 +88,6 @@ type System interface {
 // Shared exposes shared APIs for other interface implementations
 type Shared interface {
 	getExample(orgID string, appID string, id string) (*model.Example, error)
-	createEvent(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 }
 
 // EventsBBAdapter is used by core to communicate with the events BB
@@ -123,7 +122,7 @@ type Storage interface {
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
 
 	FindLegacyEventItems(context storage.TransactionContext) ([]model.LegacyEventItem, error)
-	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) error
+	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 
