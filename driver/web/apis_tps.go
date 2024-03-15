@@ -17,7 +17,9 @@ package web
 import (
 	"application/core"
 	"application/core/model"
+	Def "application/driver/web/docs/gen"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -51,16 +53,18 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 }
 
 func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	/*	data, err := io.ReadAll(r.Body)
-		if err != nil {
-			return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
-		}
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
 
-		var e []model.LegacyEvent
-		err = json.Unmarshal(data, &e)
-		if err != nil {
-			return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
-		}
+	var e []Def.TpsReqCreateEvent
+	err = json.Unmarshal(data, &e)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	}
+
+	/*
 		var createdEvents []model.LegacyEventItem
 
 		for _, w := range e {
