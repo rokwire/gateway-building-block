@@ -37,6 +37,10 @@ properties:
     type: string 
   title_url:
     type: string
+  contacts:
+    type: array
+    items:
+      $ref: "./ContactLegacy.yaml"
 
 
 

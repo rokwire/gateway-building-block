@@ -172,24 +172,32 @@ type TimeSlot struct {
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
 type TpsReqCreateEvent struct {
-	AllDay            *bool   `json:"all_day,omitempty"`
-	Category          *string `json:"category,omitempty"`
-	Cost              *string `json:"cost,omitempty"`
-	CreatedBy         *string `json:"created_by,omitempty"`
-	DateModified      *string `json:"date_modified,omitempty"`
-	EndDate           *string `json:"end_date,omitempty"`
-	ImageUrl          *string `json:"image_url"`
-	IsVirtual         *bool   `json:"is_virtual,omitempty"`
-	LongDescription   *string `json:"long_description,omitempty"`
-	RecurrenceId      *int    `json:"recurrence_id,omitempty"`
-	RecurringFlag     *bool   `json:"recurring_flag,omitempty"`
-	RegistrationLabel *string `json:"registration_label,omitempty"`
-	RegistrationUrl   *string `json:"registration_url,omitempty"`
-	Sponsor           *string `json:"sponsor,omitempty"`
-	StartDate         *string `json:"start_date,omitempty"`
-	Subcategocy       *string `json:"subcategocy,omitempty"`
-	Title             *string `json:"title,omitempty"`
-	TitleUrl          *string `json:"title_url,omitempty"`
+	AllDay            *bool                       `json:"all_day,omitempty"`
+	Category          *string                     `json:"category,omitempty"`
+	Contacts          *[]TpsReqCreateEventContact `json:"contacts,omitempty"`
+	Cost              *string                     `json:"cost,omitempty"`
+	CreatedBy         *string                     `json:"created_by,omitempty"`
+	DateModified      *string                     `json:"date_modified,omitempty"`
+	EndDate           *string                     `json:"end_date,omitempty"`
+	ImageUrl          *string                     `json:"image_url"`
+	IsVirtual         *bool                       `json:"is_virtual,omitempty"`
+	LongDescription   *string                     `json:"long_description,omitempty"`
+	RecurrenceId      *int                        `json:"recurrence_id,omitempty"`
+	RecurringFlag     *bool                       `json:"recurring_flag,omitempty"`
+	RegistrationLabel *string                     `json:"registration_label,omitempty"`
+	RegistrationUrl   *string                     `json:"registration_url,omitempty"`
+	Sponsor           *string                     `json:"sponsor,omitempty"`
+	StartDate         *string                     `json:"start_date,omitempty"`
+	Subcategocy       *string                     `json:"subcategocy,omitempty"`
+	Title             *string                     `json:"title,omitempty"`
+	TitleUrl          *string                     `json:"title_url,omitempty"`
+}
+
+// TpsReqCreateEventContact defines model for _tps_req_create-event-contact.
+type TpsReqCreateEventContact struct {
+	ContactEmail *string `json:"contact_email,omitempty"`
+	ContactName  *string `json:"contact_name,omitempty"`
+	ContactPhone *string `json:"contact_phone,omitempty"`
 }
 
 // GetApiAdminConfigsParams defines parameters for GetApiAdminConfigs.

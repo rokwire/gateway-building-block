@@ -41,5 +41,7 @@ _admin_req_update-configs:
 ## tps create events API
 _tps_req_create-event:
   $ref: "./apis/tps/create-events/Request.yaml"
+_tps_req_create-event-contact:
+  $ref: "./apis/tps/create-events/ContactLegacy.yaml"
 
 # end TPS section

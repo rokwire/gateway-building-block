@@ -1497,3 +1497,16 @@ components:
           type: string
         title_url:
           type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/_tps_req_create-event-contact'
+    _tps_req_create-event-contact:
+      type: object
+      properties:
+        contact_name:
+          type: string
+        contact_email:
+          type: string
+        contact_phone:
+          type: string
