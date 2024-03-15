@@ -4,7 +4,7 @@ properties:
     type: boolean
   category:
     type: string
-  subcategocy:
+  subcategory:
     type: string
   cost:
     type: string

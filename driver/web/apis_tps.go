@@ -78,26 +78,33 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		id := uuid.NewString()
 
 		/*	type TpsReqCreateEvent struct {
-
-			Contacts          *[]TpsReqCreateEventContact `json:"contacts,omitempty"`
-			Location          *TpsReqCreateEventLocation  `json:"location,omitempty"`
-
-			RecurrenceId      *int                        `json:"recurrence_id,omitempty"`
-			RecurringFlag     *bool                       `json:"recurring_flag,omitempty"`
-			RegistrationLabel *string                     `json:"registration_label,omitempty"`
-			RegistrationUrl   *string                     `json:"registration_url,omitempty"`
-			Sponsor           *string                     `json:"sponsor,omitempty"`
-			Subcategocy       *string                     `json:"subcategocy,omitempty"`
 			Tags              *[]string                   `json:"tags,omitempty"`
 			TargetAudience    *[]string                   `json:"target_audience,omitempty"`
-			Title             *string                     `json:"title,omitempty"`
-			TitleUrl          *string                     `json:"title_url,omitempty"`
 		} */
+		recurrenceID := utils.GetInt(w.RecurrenceId)
+
+		var tags []string
+		if w.Tags != nil {
+			tags = append(tags, *w.Tags...)
+		} else {
+			tags = nil
+		}
+		var targetAudience []string
+		if w.TargetAudience != nil {
+			targetAudience = append(targetAudience, *w.TargetAudience...)
+		} else {
+			targetAudience = nil
+		}
+		contacts := contactsToDef(*w.Contacts)
+		location := locationToDef(*w.Location)
 
 		legacyEvent := model.LegacyEvent{ID: id, AllDay: utils.GetBool(w.AllDay), Category: utils.GetString(w.Category),
 			Cost: utils.GetString(w.Cost), CreatedBy: utils.GetString(w.CreatedBy), DataModified: utils.GetString(w.DateModified),
 			StartDate: utils.GetString(w.StartDate), EndDate: utils.GetString(w.EndDate), ImageURL: w.ImageUrl,
-			IsVirtial: utils.GetBool(w.IsVirtual), LongDescription: utils.GetString(w.LongDescription)}
+			IsVirtial: utils.GetBool(w.IsVirtual), LongDescription: utils.GetString(w.LongDescription),
+			RecurrenceID: &recurrenceID, RecurringFlag: utils.GetBool(w.RecurringFlag), RegistrationURL: utils.GetString(w.RegistrationUrl),
+			Sponsor: utils.GetString(w.Sponsor), Subcategory: utils.GetString(w.Subcategory), Title: utils.GetString(w.Title),
+			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &location}
 
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,

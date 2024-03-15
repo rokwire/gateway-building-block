@@ -8,7 +8,7 @@ properties:
     type: string
   category:
     type: string
-  subcategocy:
+  subcategory:
     type: string
   createdBy:
     type: string
