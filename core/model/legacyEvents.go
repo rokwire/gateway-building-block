@@ -125,7 +125,6 @@ type LegacyEvent struct {
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
 	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
-	CreateInfo            CreateInfo      `bson:"create_info"`
 }
 
 // LocationLegacy represents event legacy location
@@ -144,10 +143,12 @@ type SubEvents struct {
 
 // LegacyEventItem represents legacy event entity which contains legacy event + other sync info
 type LegacyEventItem struct {
-	SyncProcessSource string    `bson:"sync_process_source"` //webtools-direct or events-bb-initial
+	SyncProcessSource string    `bson:"sync_process_source"` //webtools-direct or events-bb-initial or events-tps-api
 	SyncDate          time.Time `bson:"sync_date"`
 
 	Item LegacyEvent `bson:"item"`
+
+	CreateInfo CreateInfo `bson:"create_info"`
 }
 
 // ContactLegacy represents event legacy contacts

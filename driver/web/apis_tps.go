@@ -20,8 +20,11 @@ import (
 	Def "application/driver/web/docs/gen"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
 	"github.com/rokwire/logging-library-go/v2/logs"
@@ -64,53 +67,43 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
 	}
 
-	/*
-		var createdEvents []model.LegacyEventItem
+	var createdEvents []model.LegacyEventItem
 
-		for _, w := range e {
-			syncSourse := "events-tps-api"
-			syncDate := time.Now()
-			ID := uuid.NewString()
-			if w.StartDate != "" {
-				startDate, err := time.Parse("2006/01/02T15:04:05", w.StartDate)
-				if err != nil {
-					return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+	syncSourse := "events-tps-api"
+	syncDate := time.Now()
+	now := time.Now()
+	createInfo := model.CreateInfo{Time: now, AccountID: claims.Id}
+	for _, w := range e {
 
-				}
-				w.StartDate = startDate.Format(time.RFC3339)
-			}
-			if w.EndDate != "" {
-				endDate, err := time.Parse("2006/01/02T15:04:05", w.EndDate)
-				if err != nil {
-					return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, false)
+		id := uuid.NewString()
 
-				}
-				w.EndDate = endDate.Format(time.RFC3339)
-			}
-
-			var location *model.LocationLegacy
+		/*	var location *model.LocationLegacy
 			if w.Location != nil || w.Location.Longitude == 0 || w.Location.Latitude == 0 {
 				location = &model.LocationLegacy{
 					Description: w.Location.Description,
 					Longitude:   w.Location.Longitude,
 					Latitude:    w.Location.Latitude,
 				}
-			}
-			now := time.Now()
-			createInfo := model.CreateInfo{Time: now, AccountID: claims.Id}
+			} */
 
-			createdEvent := model.LegacyEventItem{SyncProcessSource: syncSourse, SyncDate: syncDate,
-				Item: model.LegacyEvent{AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
-					CreatedBy: w.CreatedBy, LongDescription: w.LongDescription, DataModified: w.DataModified, DataSourceEventID: w.DataSourceEventID,
-					DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
-					IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
-					OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
-					RegistrationURL: w.RegistrationURL, Contacts: w.Contacts, CreateInfo: createInfo}}
+		log.Println(w.Category)
 
-			createdEvents = append(createdEvents, createdEvent)
-		}
+		legacyEvent := model.LegacyEvent{ID: id} /*AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
+		CreatedBy: w.CreatedBy, LongDescription: w.LongDescription, DataModified: w.DataModified, DataSourceEventID: w.DataSourceEventID,
+		DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
+		IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
+		OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
+		RegistrationURL: w.RegistrationURL, Contacts: w.Contacts*/
 
-		_, err = h.app.TPS.CreateEvents(createdEvents)
+		createdEvent := model.LegacyEventItem{
+			SyncProcessSource: syncSourse, SyncDate: syncDate,
+			Item:       legacyEvent,
+			CreateInfo: createInfo}
+
+		createdEvents = append(createdEvents, createdEvent)
+	}
+
+	/*	_, err = h.app.TPS.CreateEvents(createdEvents)
 		if err != nil {
 			return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 		} */
