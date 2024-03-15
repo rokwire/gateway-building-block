@@ -72,7 +72,7 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 	syncSourse := "events-tps-api"
 	syncDate := time.Now()
 	now := time.Now()
-	createInfo := model.CreateInfo{Time: now, AccountID: claims.Id}
+	createInfo := model.CreateInfo{Time: now, AccountID: claims.Subject}
 	for _, w := range e {
 
 		id := uuid.NewString()
