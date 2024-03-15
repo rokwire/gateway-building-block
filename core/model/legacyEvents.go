@@ -123,7 +123,7 @@ type LegacyEvent struct {
 	Title                 string          `json:"title" bson:"title"`
 	TitleURL              string          `json:"titleURL" bson:"titleURL"`
 	Tags                  *[]string       `json:"tags" bson:"tags"`
-	TargetAudience        *[]string       `json:"target_audiance" bson:"target_audiance"`
+	TargetAudience        *[]string       `json:"target_audience" bson:"target_audience"`
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
 	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
