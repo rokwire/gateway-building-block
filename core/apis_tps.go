@@ -33,6 +33,11 @@ func (a appTPS) DeleteLegacyEvents(ids map[string]string, accoundID string) erro
 	return a.app.shared.deleteLegacyEvents(ids, accoundID)
 }
 
+// CreateEvents creates events
+func (a appTPS) CreateEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
+	return a.app.storage.InsertLegacyEvents(nil, event)
+}
+
 // newAppTPS creates new appTPS
 func newAppTPS(app *Application) appTPS {
 	return appTPS{app: app}

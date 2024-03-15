@@ -122,10 +122,13 @@ type LegacyEvent struct {
 	StartDate             string          `json:"startDate" bson:"startDate"`
 	Title                 string          `json:"title" bson:"title"`
 	TitleURL              string          `json:"titleURL" bson:"titleURL"`
+	Tags                  *[]string       `json:"tags" bson:"tags"`
+	TargetAudience        *[]string       `json:"target_audience" bson:"target_audience"`
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
 	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
 	CreateInfo            CreateInfo      `bson:"create_info"`
+	Cost                  string          `json:"cost" bson:"cost"`
 }
 
 // LocationLegacy represents event legacy location
@@ -133,6 +136,10 @@ type LocationLegacy struct {
 	Description string  `json:"description" bson:"description"`
 	Latitude    float64 `json:"latitude" bson:"latitude"`
 	Longitude   float64 `json:"longitude" bson:"longitude"`
+	Address     string  `json:"address" bson:"address"`
+	Building    string  `json:"building" bson:"building"`
+	Floor       int     `json:"floor" bson:"floor"`
+	Room        string  `json:"room" bson:"room"`
 }
 
 // SubEvents represents the sub events
@@ -144,10 +151,12 @@ type SubEvents struct {
 
 // LegacyEventItem represents legacy event entity which contains legacy event + other sync info
 type LegacyEventItem struct {
-	SyncProcessSource string    `bson:"sync_process_source"` //webtools-direct or events-bb-initial
+	SyncProcessSource string    `bson:"sync_process_source"` //webtools-direct or events-bb-initial or events-tps-api
 	SyncDate          time.Time `bson:"sync_date"`
 
 	Item LegacyEvent `bson:"item"`
+
+	CreateInfo CreateInfo `bson:"create_info"`
 }
 
 // ContactLegacy represents event legacy contacts

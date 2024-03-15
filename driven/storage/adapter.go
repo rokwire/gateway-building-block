@@ -292,7 +292,7 @@ func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.Lega
 }
 
 // InsertLegacyEvents inserts legacy events
-func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {
+func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
 
 	storageItems := make([]interface{}, len(items))
 	for i, p := range items {
@@ -301,10 +301,10 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 
 	_, err := a.db.legacyEvents.InsertManyWithContext(context, storageItems, nil)
 	if err != nil {
-		return errors.WrapErrorAction("insert", "legacy events", nil, err)
+		return nil, errors.WrapErrorAction("insert", "legacy events", nil, err)
 	}
 
-	return nil
+	return nil, nil
 }
 
 // DeleteLegacyEvents Deletes a reminder

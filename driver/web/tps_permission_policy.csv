@@ -1,2 +1,4 @@
 p, get_examples, /gateway/api/tps/examples/*, (GET), Get examples
-p, manage_all_event, /gateway/api/tps/event, (DELETE), Delete an events
+p, manage_legacy_events,, /gateway/api/tps/events, (DELETE), Delete an events
+p, manage_legacy_events, /gateway/api/tps/events, (POST), Create events
+

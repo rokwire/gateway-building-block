@@ -1,0 +1,53 @@
+type: object
+properties:
+  all_day:
+    type: boolean
+  category:
+    type: string
+  subcategory:
+    type: string
+  cost:
+    type: string
+  created_by:
+    type: string
+  date_modified:
+    type: string
+  start_date:
+    type: string
+  end_date:
+    type: string
+  image_url:
+    type: string 
+    nullable: true
+  registration_url:
+    type: string
+  is_virtual:
+    type: boolean
+  long_description:
+    type: string
+  recurrence_id:
+    type: integer  
+  recurring_flag:
+    type: boolean
+  sponsor:
+    type: string
+  registration_label:
+    type: string
+  title:
+    type: string 
+  title_url:
+    type: string
+  contacts:
+    type: array
+    items:
+      $ref: "./Contact.yaml"
+  tags:
+    type: array
+    items:
+      type: string
+  target_audience:
+    type: array
+    items:
+      type: string
+  location:
+    $ref: "./Location.yaml"

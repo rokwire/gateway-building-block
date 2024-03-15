@@ -6,10 +6,10 @@ properties:
   time_slots:
     type: array
     items:
-      - $ref: "./TimeSlot.yaml"
+      $ref: "./TimeSlot.yaml"
     readOnly: true
   questions:
     type: array
     items:
-      - $ref: "./Question.yaml"
+      $ref: "./Question.yaml"
     readOnly: true
