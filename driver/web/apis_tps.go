@@ -18,9 +18,9 @@ import (
 	"application/core"
 	"application/core/model"
 	Def "application/driver/web/docs/gen"
+	"application/utils"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -77,23 +77,27 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 
 		id := uuid.NewString()
 
-		/*	var location *model.LocationLegacy
-			if w.Location != nil || w.Location.Longitude == 0 || w.Location.Latitude == 0 {
-				location = &model.LocationLegacy{
-					Description: w.Location.Description,
-					Longitude:   w.Location.Longitude,
-					Latitude:    w.Location.Latitude,
-				}
-			} */
+		/*	type TpsReqCreateEvent struct {
 
-		log.Println(w.Category)
+			Contacts          *[]TpsReqCreateEventContact `json:"contacts,omitempty"`
+			Location          *TpsReqCreateEventLocation  `json:"location,omitempty"`
 
-		legacyEvent := model.LegacyEvent{ID: id} /*AllDay: w.AllDay, Category: w.Category, Subcategory: w.Subcategory,
-		CreatedBy: w.CreatedBy, LongDescription: w.LongDescription, DataModified: w.DataModified, DataSourceEventID: w.DataSourceEventID,
-		DateCreated: w.DateCreated, EndDate: w.EndDate, IcalURL: w.IcalURL, ID: ID, ImageURL: w.ImageURL,
-		IsEventFree: w.IsEventFree, IsVirtial: w.IsVirtial, Location: location,
-		OutlookURL: w.OutlookURL, Sponsor: w.Sponsor, StartDate: w.StartDate, Title: w.Title, TitleURL: w.TitleURL,
-		RegistrationURL: w.RegistrationURL, Contacts: w.Contacts*/
+			RecurrenceId      *int                        `json:"recurrence_id,omitempty"`
+			RecurringFlag     *bool                       `json:"recurring_flag,omitempty"`
+			RegistrationLabel *string                     `json:"registration_label,omitempty"`
+			RegistrationUrl   *string                     `json:"registration_url,omitempty"`
+			Sponsor           *string                     `json:"sponsor,omitempty"`
+			Subcategocy       *string                     `json:"subcategocy,omitempty"`
+			Tags              *[]string                   `json:"tags,omitempty"`
+			TargetAudience    *[]string                   `json:"target_audience,omitempty"`
+			Title             *string                     `json:"title,omitempty"`
+			TitleUrl          *string                     `json:"title_url,omitempty"`
+		} */
+
+		legacyEvent := model.LegacyEvent{ID: id, AllDay: utils.GetBool(w.AllDay), Category: utils.GetString(w.Category),
+			Cost: utils.GetString(w.Cost), CreatedBy: utils.GetString(w.CreatedBy), DataModified: utils.GetString(w.DateModified),
+			StartDate: utils.GetString(w.StartDate), EndDate: utils.GetString(w.EndDate), ImageURL: w.ImageUrl,
+			IsVirtial: utils.GetBool(w.IsVirtual), LongDescription: utils.GetString(w.LongDescription)}
 
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,

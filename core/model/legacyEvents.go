@@ -125,6 +125,7 @@ type LegacyEvent struct {
 	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
 	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
 	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
+	Cost                  string          `json:"cost" bson:"cost"`
 }
 
 // LocationLegacy represents event legacy location

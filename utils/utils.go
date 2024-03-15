@@ -200,6 +200,14 @@ func GetInt(v *int) int {
 	return *v
 }
 
+// GetBool gives the value which this pointer points. Gives false if the pointer is nil
+func GetBool(v *bool) bool {
+	if v == nil {
+		return false
+	}
+	return *v
+}
+
 // GetString gives the value which this pointer points. Gives empty string if the pointer is nil
 func GetString(v *string) string {
 	if v == nil {
