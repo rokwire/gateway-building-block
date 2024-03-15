@@ -40,7 +40,7 @@ properties:
   contacts:
     type: array
     items:
-      $ref: "./ContactLegacy.yaml"
+      $ref: "./Contact.yaml"
 
 
 
