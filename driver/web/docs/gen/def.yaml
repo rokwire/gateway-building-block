@@ -1501,6 +1501,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/_tps_req_create-event-contact'
+        tags:
+          type: array
+          items:
+            type: string
+        target_audience:
+          type: array
+          items:
+            type: string
     _tps_req_create-event-contact:
       type: object
       properties:

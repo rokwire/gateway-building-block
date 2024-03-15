@@ -189,6 +189,8 @@ type TpsReqCreateEvent struct {
 	Sponsor           *string                     `json:"sponsor,omitempty"`
 	StartDate         *string                     `json:"start_date,omitempty"`
 	Subcategocy       *string                     `json:"subcategocy,omitempty"`
+	Tags              *[]string                   `json:"tags,omitempty"`
+	TargetAudience    *[]string                   `json:"target_audience,omitempty"`
 	Title             *string                     `json:"title,omitempty"`
 	TitleUrl          *string                     `json:"title_url,omitempty"`
 }

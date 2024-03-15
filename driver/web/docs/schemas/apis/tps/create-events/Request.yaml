@@ -41,6 +41,11 @@ properties:
     type: array
     items:
       $ref: "./Contact.yaml"
-
-
-
+  tags:
+    type: array
+    items:
+      type: string
+  target_audience:
+    type: array
+    items:
+      type: string
