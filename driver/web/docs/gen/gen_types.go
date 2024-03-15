@@ -181,6 +181,7 @@ type TpsReqCreateEvent struct {
 	EndDate           *string                     `json:"end_date,omitempty"`
 	ImageUrl          *string                     `json:"image_url"`
 	IsVirtual         *bool                       `json:"is_virtual,omitempty"`
+	Location          *TpsReqCreateEventLocation  `json:"location,omitempty"`
 	LongDescription   *string                     `json:"long_description,omitempty"`
 	RecurrenceId      *int                        `json:"recurrence_id,omitempty"`
 	RecurringFlag     *bool                       `json:"recurring_flag,omitempty"`
@@ -200,6 +201,17 @@ type TpsReqCreateEventContact struct {
 	ContactEmail *string `json:"contact_email,omitempty"`
 	ContactName  *string `json:"contact_name,omitempty"`
 	ContactPhone *string `json:"contact_phone,omitempty"`
+}
+
+// TpsReqCreateEventLocation defines model for _tps_req_create-event-location.
+type TpsReqCreateEventLocation struct {
+	Address     *string  `json:"address,omitempty"`
+	Building    *string  `json:"building,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Floor       *int     `json:"floor,omitempty"`
+	Latitude    *float32 `json:"latitude,omitempty"`
+	Longitude   *float32 `json:"longitude,omitempty"`
+	Room        *string  `json:"room,omitempty"`
 }
 
 // GetApiAdminConfigsParams defines parameters for GetApiAdminConfigs.

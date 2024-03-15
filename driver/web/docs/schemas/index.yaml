@@ -43,5 +43,7 @@ _tps_req_create-event:
   $ref: "./apis/tps/create-events/Request.yaml"
 _tps_req_create-event-contact:
   $ref: "./apis/tps/create-events/Contact.yaml"
+_tps_req_create-event-location:
+  $ref: "./apis/tps/create-events/Location.yaml"
 
 # end TPS section

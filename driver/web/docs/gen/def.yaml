@@ -1509,6 +1509,8 @@ components:
           type: array
           items:
             type: string
+        location:
+          $ref: '#/components/schemas/_tps_req_create-event-location'
     _tps_req_create-event-contact:
       type: object
       properties:
@@ -1517,4 +1519,21 @@ components:
         contact_email:
           type: string
         contact_phone:
+          type: string
+    _tps_req_create-event-location:
+      type: object
+      properties:
+        description:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        floor:
+          type: integer
+        address:
+          type: string
+        building:
+          type: string
+        room:
           type: string
