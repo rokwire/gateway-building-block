@@ -359,7 +359,7 @@ func (a *Adapter) DeleteTPSLegacyEvents(context TransactionContext, Ids map[stri
 
 	filter := bson.D{
 		primitive.E{Key: "sync_process_source", Value: "events-tps-api"},
-		primitive.E{Key: "item.create_info.account_id", Value: accountID},
+		primitive.E{Key: "create_info.account_id", Value: accountID},
 	}
 
 	if Ids != nil {

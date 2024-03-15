@@ -76,6 +76,7 @@ func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims 
 	} else {
 		ids = nil
 	}
+
 	err := h.app.TPS.DeleteLegacyEvents(ids, claims.Subject)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
@@ -110,17 +111,20 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		var tags []string
 		if w.Tags != nil {
 			tags = append(tags, *w.Tags...)
-		} else {
-			tags = nil
 		}
+
 		var targetAudience []string
 		if w.TargetAudience != nil {
 			targetAudience = append(targetAudience, *w.TargetAudience...)
-		} else {
-			targetAudience = nil
 		}
-		contacts := contactsToDef(*w.Contacts)
-		location := locationToDef(*w.Location)
+		var contacts []model.ContactLegacy
+		if w.Contacts != nil {
+			contacts = contactsToDef(*w.Contacts)
+		}
+		var locations model.LocationLegacy
+		if w.Location != nil {
+			locations = locationToDef(*w.Location)
+		}
 
 		legacyEvent := model.LegacyEvent{ID: id, AllDay: utils.GetBool(w.AllDay), Category: utils.GetString(w.Category),
 			Cost: utils.GetString(w.Cost), CreatedBy: utils.GetString(w.CreatedBy), DataModified: utils.GetString(w.DateModified),
@@ -128,7 +132,7 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 			IsVirtial: utils.GetBool(w.IsVirtual), LongDescription: utils.GetString(w.LongDescription),
 			RecurrenceID: &recurrenceID, RecurringFlag: utils.GetBool(w.RecurringFlag), RegistrationURL: utils.GetString(w.RegistrationUrl),
 			Sponsor: utils.GetString(w.Sponsor), Subcategory: utils.GetString(w.Subcategory), Title: utils.GetString(w.Title),
-			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &location, Tags: &tags, TargetAudience: &targetAudience}
+			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &locations, Tags: &tags, TargetAudience: &targetAudience}
 
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,
