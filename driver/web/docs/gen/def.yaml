@@ -1462,67 +1462,38 @@ components:
       properties:
         all_day:
           type: boolean
-        calendar_id:
-          type: string
         category:
           type: string
         subcategocy:
           type: string
-        createdBy:
+        cost:
           type: string
-        longDescription:
+        created_by:
           type: string
-        dataModified:
+        date_modified:
           type: string
-        dataSourceEventId:
+        start_date:
           type: string
-        dateCreated:
+        end_date:
           type: string
-        endDate:
-          type: string
-          description: 'time format "2006/01/02T15:04:05"'
-        event_id:
-          type: string
-        icalURL:
-          type: string
-        imageURL:
+        image_url:
           type: string
           nullable: true
-        isEventFree:
-          type: boolean
-        isVirtual:
-          type: boolean
-        originating_calendar_id:
+        registration_url:
           type: string
-        outlookUrl:
+        is_virtual:
+          type: boolean
+        long_description:
           type: string
         recurrence_id:
-          type: string
-        isSuperEvent:
+          type: integer
+        recurring_flag:
           type: boolean
-        recurringFlag:
-          type: boolean
-        source_id:
-          type: string
         sponsor:
           type: string
-        startDate:
+        registration_label:
           type: string
-          description: 'time format "2006/01/02T15:04:05"'
         title:
           type: string
-        titleUrl:
+        title_url:
           type: string
-        registrationURL:
-          type: string
-        contacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContactLegacy'
-        subeEvents:
-          type: array
-          items:
-            $ref: '#/components/schemas/SubEvents'
-        location:
-          items:
-            $ref: '#/components/schemas/LocationLegacy'

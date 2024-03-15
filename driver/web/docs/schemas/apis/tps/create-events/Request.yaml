@@ -2,67 +2,41 @@ type: object
 properties:
   all_day:
     type: boolean
-  calendar_id:
-    type: string
   category:
     type: string
   subcategocy:
     type: string
-  createdBy:
+  cost:
     type: string
-  longDescription:
-    type: string  
-  dataModified:
+  created_by:
+    type: string
+  date_modified:
+    type: string
+  start_date:
+    type: string
+  end_date:
+    type: string
+  image_url:
     type: string 
-  dataSourceEventId:
-    type: string    
-  dateCreated:
-    type: string   
-  endDate:
-    type: string 
-    description: time format "2006/01/02T15:04:05"
-  event_id:
-    type: string  
-  icalURL:
-    type: string 
-  imageURL:
-    type: string 
-    nullable: true 
-  isEventFree:
+    nullable: true
+  registration_url:
+    type: string
+  is_virtual:
     type: boolean
-  isVirtual:
-    type: boolean 
-  originating_calendar_id:
-    type: string    
-  outlookUrl:
+  long_description:
     type: string
   recurrence_id:
-    type: string 
-  isSuperEvent:
-    type: boolean  
-  recurringFlag:
-    type: boolean  
-  source_id:
-    type: string
+    type: integer  
+  recurring_flag:
+    type: boolean
   sponsor:
-    type: string  
-  startDate:
     type: string
-    description: time format "2006/01/02T15:04:05"
+  registration_label:
+    type: string
   title:
     type: string 
-  titleUrl:
-    type: string          
-  registrationURL:
-    type: string  
-  contacts:
-    type: array
-    items:
-      $ref: "../../../application/ContactLegacy.yaml"
-  subeEvents:
-    type: array
-    items:
-      $ref: "../../../application/SubEvents.yaml"   
-  location:
-    items:
-      $ref: "../../../application/LocationLegacy.yaml"    
+  title_url:
+    type: string
+
+
+

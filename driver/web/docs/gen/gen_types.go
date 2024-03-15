@@ -172,39 +172,24 @@ type TimeSlot struct {
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
 type TpsReqCreateEvent struct {
-	AllDay            *bool            `json:"all_day,omitempty"`
-	CalendarId        *string          `json:"calendar_id,omitempty"`
-	Category          *string          `json:"category,omitempty"`
-	Contacts          *[]ContactLegacy `json:"contacts,omitempty"`
-	CreatedBy         *string          `json:"createdBy,omitempty"`
-	DataModified      *string          `json:"dataModified,omitempty"`
-	DataSourceEventId *string          `json:"dataSourceEventId,omitempty"`
-	DateCreated       *string          `json:"dateCreated,omitempty"`
-
-	// EndDate time format "2006/01/02T15:04:05"
-	EndDate               *string      `json:"endDate,omitempty"`
-	EventId               *string      `json:"event_id,omitempty"`
-	IcalURL               *string      `json:"icalURL,omitempty"`
-	ImageURL              *string      `json:"imageURL"`
-	IsEventFree           *bool        `json:"isEventFree,omitempty"`
-	IsSuperEvent          *bool        `json:"isSuperEvent,omitempty"`
-	IsVirtual             *bool        `json:"isVirtual,omitempty"`
-	Location              *interface{} `json:"location,omitempty"`
-	LongDescription       *string      `json:"longDescription,omitempty"`
-	OriginatingCalendarId *string      `json:"originating_calendar_id,omitempty"`
-	OutlookUrl            *string      `json:"outlookUrl,omitempty"`
-	RecurrenceId          *string      `json:"recurrence_id,omitempty"`
-	RecurringFlag         *bool        `json:"recurringFlag,omitempty"`
-	RegistrationURL       *string      `json:"registrationURL,omitempty"`
-	SourceId              *string      `json:"source_id,omitempty"`
-	Sponsor               *string      `json:"sponsor,omitempty"`
-
-	// StartDate time format "2006/01/02T15:04:05"
-	StartDate   *string      `json:"startDate,omitempty"`
-	Subcategocy *string      `json:"subcategocy,omitempty"`
-	SubeEvents  *[]SubEvents `json:"subeEvents,omitempty"`
-	Title       *string      `json:"title,omitempty"`
-	TitleUrl    *string      `json:"titleUrl,omitempty"`
+	AllDay            *bool   `json:"all_day,omitempty"`
+	Category          *string `json:"category,omitempty"`
+	Cost              *string `json:"cost,omitempty"`
+	CreatedBy         *string `json:"created_by,omitempty"`
+	DateModified      *string `json:"date_modified,omitempty"`
+	EndDate           *string `json:"end_date,omitempty"`
+	ImageUrl          *string `json:"image_url"`
+	IsVirtual         *bool   `json:"is_virtual,omitempty"`
+	LongDescription   *string `json:"long_description,omitempty"`
+	RecurrenceId      *int    `json:"recurrence_id,omitempty"`
+	RecurringFlag     *bool   `json:"recurring_flag,omitempty"`
+	RegistrationLabel *string `json:"registration_label,omitempty"`
+	RegistrationUrl   *string `json:"registration_url,omitempty"`
+	Sponsor           *string `json:"sponsor,omitempty"`
+	StartDate         *string `json:"start_date,omitempty"`
+	Subcategocy       *string `json:"subcategocy,omitempty"`
+	Title             *string `json:"title,omitempty"`
+	TitleUrl          *string `json:"title_url,omitempty"`
 }
 
 // GetApiAdminConfigsParams defines parameters for GetApiAdminConfigs.
