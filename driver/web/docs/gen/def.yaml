@@ -1037,9 +1037,9 @@ paths:
     delete:
       tags:
         - TPS
-      summary: Delete legacy events
+      summary: Delete events
       description: |
-        Delete legacy events
+        Deletes all events created by the calling account. If the "ids" param is passed them it deletes only the provided events.
 
          **Auth:** Requires valid admin token with manage_all_event  permission
       security:
