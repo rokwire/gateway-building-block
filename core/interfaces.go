@@ -89,7 +89,6 @@ type System interface {
 // Shared exposes shared APIs for other interface implementations
 type Shared interface {
 	getExample(orgID string, appID string, id string) (*model.Example, error)
-	deleteLegacyEvents(ids map[string]string, accoundID string) error
 }
 
 // EventsBBAdapter is used by core to communicate with the events BB
