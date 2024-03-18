@@ -32,7 +32,7 @@ delete:
   description: |
     Deletes all events created by the calling account. If the "ids" param is passed them it deletes only the provided events.
 
-     **Auth:** Requires valid admin token with manage_all_event  permission
+    **Auth:** Requires valid tps token with `manage_legacy_events` permission
   security:
     - bearerAuth: []
   parameters:
