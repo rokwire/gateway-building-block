@@ -56,35 +56,6 @@ func (h TPSAPIsHandler) getExample(l *logs.Log, r *http.Request, claims *tokenau
 	return l.HTTPResponseSuccessJSON(response)
 }
 
-func (h TPSAPIsHandler) deleteLegacyEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	var ids map[string]string
-	ids = make(map[string]string)
-
-	var id []string
-	idArg := r.URL.Query().Get("ids")
-
-	if idArg != "" {
-		id = strings.Split(idArg, ",")
-		// Append the original argument to the slice
-		id = append(id, idArg)
-		// Convert slice to map
-		for _, w := range id {
-			if w != "" {
-				ids[w] = w
-			}
-		}
-	} else {
-		ids = nil
-	}
-
-	err := h.app.TPS.DeleteLegacyEvents(ids, claims.Subject)
-	if err != nil {
-		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
-	}
-
-	return l.HTTPResponseSuccess()
-}
-
 func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -143,6 +114,35 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 	}
 
 	_, err = h.app.TPS.CreateEvents(createdEvents)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
+
+func (h TPSAPIsHandler) deleteEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var ids map[string]string
+	ids = make(map[string]string)
+
+	var id []string
+	idArg := r.URL.Query().Get("ids")
+
+	if idArg != "" {
+		id = strings.Split(idArg, ",")
+		// Append the original argument to the slice
+		id = append(id, idArg)
+		// Convert slice to map
+		for _, w := range id {
+			if w != "" {
+				ids[w] = w
+			}
+		}
+	} else {
+		ids = nil
+	}
+
+	err := h.app.TPS.DeleteLegacyEvents(ids, claims.Subject)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}
