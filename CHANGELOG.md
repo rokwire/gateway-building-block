@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Delete tps events API [#52](https://github.com/rokwire/gateway-building-block/issues/52)
 - Create tps events API [#47](https://github.com/rokwire/gateway-building-block/issues/47)
 
 ## [2.2.1] - 2024-03-06

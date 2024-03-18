@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -81,17 +82,20 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		var tags []string
 		if w.Tags != nil {
 			tags = append(tags, *w.Tags...)
-		} else {
-			tags = nil
 		}
+
 		var targetAudience []string
 		if w.TargetAudience != nil {
 			targetAudience = append(targetAudience, *w.TargetAudience...)
-		} else {
-			targetAudience = nil
 		}
-		contacts := contactsToDef(*w.Contacts)
-		location := locationToDef(*w.Location)
+		var contacts []model.ContactLegacy
+		if w.Contacts != nil {
+			contacts = contactsToDef(*w.Contacts)
+		}
+		var location model.LocationLegacy
+		if w.Location != nil {
+			location = locationToDef(*w.Location)
+		}
 
 		legacyEvent := model.LegacyEvent{ID: id, AllDay: utils.GetBool(w.AllDay), Category: utils.GetString(w.Category),
 			Cost: utils.GetString(w.Cost), CreatedBy: utils.GetString(w.CreatedBy), DataModified: utils.GetString(w.DateModified),
@@ -110,6 +114,24 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 	}
 
 	_, err = h.app.TPS.CreateEvents(createdEvents)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
+
+func (h TPSAPIsHandler) deleteEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	var idsList []string
+	idsArg := r.URL.Query().Get("ids")
+
+	if idsArg != "" {
+		idsList = strings.Split(idsArg, ",")
+
+	}
+
+	err := h.app.TPS.DeleteEvents(idsList, claims.Subject)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}

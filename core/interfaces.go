@@ -78,6 +78,7 @@ type BBs interface {
 type TPS interface {
 	GetExample(orgID string, appID string, id string) (*model.Example, error)
 	CreateEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error)
+	DeleteEvents(ids []string, accountID string) error
 }
 
 // System exposes system administrative APIs for the driver adapters
@@ -124,6 +125,7 @@ type Storage interface {
 	FindLegacyEventItems(context storage.TransactionContext) ([]model.LegacyEventItem, error)
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
+	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 }
 
