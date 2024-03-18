@@ -28,11 +28,6 @@ func (a appShared) getExample(orgID string, appID string, id string) (*model.Exa
 	return a.app.storage.FindExample(orgID, appID, id)
 }
 
-// deleteLegacyEvents deletes a tps legacy events by ID
-func (a appShared) deleteLegacyEvents(ids map[string]string, accoundID string) error {
-	return a.app.storage.DeleteTPSLegacyEvents(nil, ids, accoundID)
-}
-
 // newAppShared creates new appShared
 func newAppShared(app *Application) appShared {
 	return appShared{app: app}

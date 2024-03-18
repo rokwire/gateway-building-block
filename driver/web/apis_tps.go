@@ -122,27 +122,16 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 }
 
 func (h TPSAPIsHandler) deleteEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	var ids map[string]string
-	ids = make(map[string]string)
 
-	var id []string
-	idArg := r.URL.Query().Get("ids")
+	var idsList []string
+	idsArg := r.URL.Query().Get("ids")
 
-	if idArg != "" {
-		id = strings.Split(idArg, ",")
-		// Append the original argument to the slice
-		id = append(id, idArg)
-		// Convert slice to map
-		for _, w := range id {
-			if w != "" {
-				ids[w] = w
-			}
-		}
-	} else {
-		ids = nil
+	if idsArg != "" {
+		idsList = strings.Split(idsArg, ",")
+
 	}
 
-	err := h.app.TPS.DeleteLegacyEvents(ids, claims.Subject)
+	err := h.app.TPS.DeleteEvents(idsList, claims.Subject)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeExample, nil, err, http.StatusInternalServerError, true)
 	}

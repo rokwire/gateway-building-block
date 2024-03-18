@@ -329,6 +329,27 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 	return err
 }
 
+// DeleteLegacyEventsByIDsAndCreator deletes legacy events by ids and creator
+func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, ids []string, accountID string) error {
+	return nil
+	/*var valueIds []string
+	for _, value := range Ids {
+		valueIds = append(valueIds, value)
+	}
+
+	filter := bson.D{
+		primitive.E{Key: "sync_process_source", Value: "events-tps-api"},
+		primitive.E{Key: "create_info.account_id", Value: accountID},
+	}
+
+	if Ids != nil {
+		filter = append(filter, primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}})
+	}
+
+	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	return err */
+}
+
 // FindAllLegacyEvents finds all legacy events
 func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
@@ -347,27 +368,6 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	}
 
 	return legacyEvents, err
-}
-
-// DeleteTPSLegacyEvents deletes all items by dataSourceEventIds
-func (a *Adapter) DeleteTPSLegacyEvents(context TransactionContext, Ids map[string]string, accountID string) error {
-
-	var valueIds []string
-	for _, value := range Ids {
-		valueIds = append(valueIds, value)
-	}
-
-	filter := bson.D{
-		primitive.E{Key: "sync_process_source", Value: "events-tps-api"},
-		primitive.E{Key: "create_info.account_id", Value: accountID},
-	}
-
-	if Ids != nil {
-		filter = append(filter, primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}})
-	}
-
-	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
-	return err
 }
 
 // PerformTransaction performs a transaction
