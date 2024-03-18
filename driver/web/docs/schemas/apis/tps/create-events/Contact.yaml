@@ -1,0 +1,8 @@
+type: object
+properties:
+  contact_name:
+    type: string
+  contact_email:
+    type: string
+  contact_phone:
+    type: string

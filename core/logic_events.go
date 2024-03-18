@@ -138,7 +138,7 @@ func (e eventsLogic) importInitialEventsFromEventsBB() error {
 		}
 
 		//insert the initial events
-		err = e.app.storage.InsertLegacyEvents(context, resultList)
+		_, err = e.app.storage.InsertLegacyEvents(context, resultList)
 		if err != nil {
 			return err
 		}
@@ -301,7 +301,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		}
 
 		//4. Store all them in the database
-		err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
+		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
 		if err != nil {
 			e.logger.Errorf("error on saving events to the storage - %s", err)
 			return nil

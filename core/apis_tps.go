@@ -28,6 +28,16 @@ func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Exampl
 	return a.app.shared.getExample(orgID, appID, id)
 }
 
+// CreateEvents creates events
+func (a appTPS) CreateEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
+	return a.app.storage.InsertLegacyEvents(nil, event)
+}
+
+// DeleteEvents deletes legacy events by ids and creator
+func (a appTPS) DeleteEvents(ids []string, accountID string) error {
+	return a.app.storage.DeleteLegacyEventsByIDsAndCreator(nil, ids, accountID)
+}
+
 // newAppTPS creates new appTPS
 func newAppTPS(app *Application) appTPS {
 	return appTPS{app: app}

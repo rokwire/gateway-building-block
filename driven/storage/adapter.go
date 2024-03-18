@@ -292,7 +292,7 @@ func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.Lega
 }
 
 // InsertLegacyEvents inserts legacy events
-func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) error {
+func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
 
 	storageItems := make([]interface{}, len(items))
 	for i, p := range items {
@@ -301,10 +301,10 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 
 	_, err := a.db.legacyEvents.InsertManyWithContext(context, storageItems, nil)
 	if err != nil {
-		return errors.WrapErrorAction("insert", "legacy events", nil, err)
+		return nil, errors.WrapErrorAction("insert", "legacy events", nil, err)
 	}
 
-	return nil
+	return nil, nil
 }
 
 // DeleteLegacyEvents Deletes a reminder
@@ -322,10 +322,29 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 		valueIds = append(valueIds, value)
 	}
 
-	//PS - check the format in the database. It is "item.dataSourceEventId"
 	filter := bson.D{
 		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
 	}
+	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	return err
+}
+
+// DeleteLegacyEventsByIDsAndCreator deletes legacy events by ids and creator
+func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, ids []string, accountID string) error {
+	var valueIds []string
+	for _, value := range ids {
+		valueIds = append(valueIds, value)
+	}
+
+	filter := bson.D{
+		primitive.E{Key: "sync_process_source", Value: "events-tps-api"},
+		primitive.E{Key: "create_info.account_id", Value: accountID},
+	}
+
+	if ids != nil {
+		filter = append(filter, primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}})
+	}
+
 	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
 	return err
 }
