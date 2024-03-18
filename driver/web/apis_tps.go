@@ -121,9 +121,9 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		if w.Contacts != nil {
 			contacts = contactsToDef(*w.Contacts)
 		}
-		var locations model.LocationLegacy
+		var location model.LocationLegacy
 		if w.Location != nil {
-			locations = locationToDef(*w.Location)
+			location = locationToDef(*w.Location)
 		}
 
 		legacyEvent := model.LegacyEvent{ID: id, AllDay: utils.GetBool(w.AllDay), Category: utils.GetString(w.Category),
@@ -132,7 +132,7 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 			IsVirtial: utils.GetBool(w.IsVirtual), LongDescription: utils.GetString(w.LongDescription),
 			RecurrenceID: &recurrenceID, RecurringFlag: utils.GetBool(w.RecurringFlag), RegistrationURL: utils.GetString(w.RegistrationUrl),
 			Sponsor: utils.GetString(w.Sponsor), Subcategory: utils.GetString(w.Subcategory), Title: utils.GetString(w.Title),
-			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &locations, Tags: &tags, TargetAudience: &targetAudience}
+			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &location, Tags: &tags, TargetAudience: &targetAudience}
 
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,
