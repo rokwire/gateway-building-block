@@ -331,9 +331,8 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 
 // DeleteLegacyEventsByIDsAndCreator deletes legacy events by ids and creator
 func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, ids []string, accountID string) error {
-	return nil
-	/*var valueIds []string
-	for _, value := range Ids {
+	var valueIds []string
+	for _, value := range ids {
 		valueIds = append(valueIds, value)
 	}
 
@@ -342,12 +341,12 @@ func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, 
 		primitive.E{Key: "create_info.account_id", Value: accountID},
 	}
 
-	if Ids != nil {
+	if ids != nil {
 		filter = append(filter, primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}})
 	}
 
 	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
-	return err */
+	return err
 }
 
 // FindAllLegacyEvents finds all legacy events
