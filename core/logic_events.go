@@ -176,7 +176,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.dailyWebToolsTimer.Stop()
 	}
 
-	//wait until it is the correct moment from the day
+	/*//wait until it is the correct moment from the day
 	location, err := time.LoadLocation("America/Chicago")
 	if err != nil {
 		e.logger.Errorf("Error getting location:%s\n", err.Error())
@@ -197,9 +197,9 @@ func (e eventsLogic) setupWebToolsTimer() {
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
-	log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(10)
-	duration := time.Second * time.Duration(durationInSeconds)
+	log.Println(durationInSeconds) */
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -456,7 +456,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
-			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, LongDescription: g.Description,
+			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr}}
