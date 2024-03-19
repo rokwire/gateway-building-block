@@ -155,7 +155,7 @@ type LegacyEventItem struct {
 
 	Item LegacyEvent `bson:"item"`
 
-	CreateInfo CreateInfo `bson:"create_info"`
+	CreateInfo *CreateInfo `bson:"create_info"`
 }
 
 // ContactLegacy represents event legacy contacts
