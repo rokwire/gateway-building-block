@@ -198,7 +198,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
 	log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(10)
+	//duration := time.Second * time.Duration(3)
 	duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
@@ -453,13 +453,50 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 
 	//end - start date + end date (+all day)
 
+	//tags
+	var tags *[]string
+	if len(g.Topic) > 0 {
+		tagsList := []string{}
+		for _, t := range g.Topic {
+			tagsList = append(tagsList, t.Name)
+		}
+		tags = &tagsList
+	}
+	//end tags
+
+	//target audience
+	var targetAudience *[]string
+
+	var targetAudienceList []string
+	if g.AudienceFacultyStaff == "true" {
+		targetAudienceList = append(targetAudienceList, "faculty", "staff")
+	}
+	if g.AudienceStudents == "true" {
+		targetAudienceList = append(targetAudienceList, "students")
+	}
+	if g.AudiencePublic == "true" {
+		targetAudienceList = append(targetAudienceList, "public")
+	}
+	if g.AudienceAlumni == "true" {
+		targetAudienceList = append(targetAudienceList, "alumni")
+	}
+	if g.AudienceParents == "true" {
+		targetAudienceList = append(targetAudienceList, "parents")
+	}
+
+	if len(targetAudienceList) != 0 {
+		targetAudience = &targetAudienceList
+	}
+	//end target audience
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
-			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, LongDescription: g.Description,
+			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
-			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr}}
+			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
+			Tags: tags, TargetAudience: targetAudience}}
 }
 
 func (e eventsLogic) formatDate(wtDate string) string {
