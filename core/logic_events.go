@@ -176,7 +176,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.dailyWebToolsTimer.Stop()
 	}
 
-	/*//wait until it is the correct moment from the day
+	//wait until it is the correct moment from the day
 	location, err := time.LoadLocation("America/Chicago")
 	if err != nil {
 		e.logger.Errorf("Error getting location:%s\n", err.Error())
@@ -197,9 +197,9 @@ func (e eventsLogic) setupWebToolsTimer() {
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
-	log.Println(durationInSeconds) */
-	duration := time.Second * time.Duration(3)
-	//duration := time.Second * time.Duration(durationInSeconds)
+	log.Println(durationInSeconds)
+	//duration := time.Second * time.Duration(3)
+	duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
