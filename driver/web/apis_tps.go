@@ -108,7 +108,7 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,
 			Item:       legacyEvent,
-			CreateInfo: createInfo}
+			CreateInfo: &createInfo}
 
 		createdEvents = append(createdEvents, createdEvent)
 	}
