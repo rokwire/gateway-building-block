@@ -43,8 +43,9 @@ type database struct {
 	examples      *collectionWrapper
 	unitcalendars *collectionWrapper
 
-	legacyEvents    *collectionWrapper
-	legacyLocations *collectionWrapper
+	legacyEvents           *collectionWrapper
+	legacyLocations        *collectionWrapper
+	webtoolsBlacklistItems *collectionWrapper
 
 	listeners []Listener
 }
@@ -105,6 +106,12 @@ func (d *database) start() error {
 		return err
 	}
 
+	webtoolsBlacklistItems := &collectionWrapper{database: d, coll: db.Collection("webtools_blacklist_items")}
+	err = d.applyWebtoolsBlacklistItemsChecks(webtoolsBlacklistItems)
+	if err != nil {
+		return err
+	}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
@@ -115,6 +122,7 @@ func (d *database) start() error {
 	d.legacyEvents = legacyEvents
 	d.unitcalendars = unitcalendars
 	d.legacyLocations = legacyLocations
+	d.webtoolsBlacklistItems = webtoolsBlacklistItems
 
 	go d.configs.Watch(nil, d.logger)
 
@@ -182,6 +190,13 @@ func (d *database) applyLegacyLocationsChecks(locations *collectionWrapper) erro
 	}
 
 	d.logger.Info("legacy legacy_locations passed")
+	return nil
+}
+
+func (d *database) applyWebtoolsBlacklistItemsChecks(webtoolsBlacklistItems *collectionWrapper) error {
+	d.logger.Info("apply webtools_blacklist_items checks.....")
+
+	d.logger.Info("legacy webtools_blacklist_items passed")
 	return nil
 }
 
