@@ -193,6 +193,12 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 	return nil
 }
 
+func (a appAdmin) CreateWebtoolsBlackList(ids []string) (*model.WebToolsEventID, error) {
+	//TODO
+	// create an object with ids and name: "webtools_events_ids"and insert in the database
+	return nil, nil
+}
+
 // newAppAdmin creates new appAdmin
 func newAppAdmin(app *Application) appAdmin {
 	return appAdmin{app: app}

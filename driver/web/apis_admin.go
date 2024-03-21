@@ -17,6 +17,7 @@ package web
 import (
 	"application/core"
 	"application/core/model"
+	Def "application/driver/web/docs/gen"
 	"encoding/json"
 	"net/http"
 
@@ -231,6 +232,35 @@ func (h AdminAPIsHandler) deleteConfig(l *logs.Log, r *http.Request, claims *tok
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionDelete, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
+
+	return l.HTTPResponseSuccess()
+}
+
+func (h AdminAPIsHandler) webtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var requestData Def.PostApiAdminWebtoolsblacklistJSONBody
+	err := json.NewDecoder(r.Body).Decode(&requestData)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionUnmarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, true)
+	}
+
+	var ids []string
+	for _, w := range *requestData.Data {
+		if w != "" {
+			ids = append(ids, w)
+		}
+	}
+
+	blacklist, err := h.app.Admin.CreateWebtoolsBlackList(ids)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	data, err := json.Marshal(blacklist)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(data)
 
 	return l.HTTPResponseSuccess()
 }
