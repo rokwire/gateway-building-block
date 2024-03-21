@@ -170,6 +170,12 @@ type TimeSlot struct {
 	UnitId     *int                   `json:"unit_id,omitempty"`
 }
 
+// WebtoolsBlacklistItems defines model for WebtoolsBlacklistItems.
+type WebtoolsBlacklistItems struct {
+	Data *[]string `json:"data,omitempty"`
+	Name *string   `json:"name,omitempty"`
+}
+
 // TpsReqCreateEvent defines model for _tps_req_create-event.
 type TpsReqCreateEvent struct {
 	AllDay            *bool                       `json:"all_day,omitempty"`
@@ -218,6 +224,11 @@ type TpsReqCreateEventLocation struct {
 type GetApiAdminConfigsParams struct {
 	// Type config type
 	Type *string `form:"type,omitempty" json:"type,omitempty"`
+}
+
+// PostApiAdminWebtoolsBlacklistJSONBody defines parameters for PostApiAdminWebtoolsBlacklist.
+type PostApiAdminWebtoolsBlacklistJSONBody struct {
+	Data *[]string `json:"data,omitempty"`
 }
 
 // GetApiBbsAppointmentsPeopleParams defines parameters for GetApiBbsAppointmentsPeople.
@@ -327,6 +338,9 @@ type PostApiAdminExamplesJSONRequestBody = Example
 
 // PutApiAdminExamplesIdJSONRequestBody defines body for PutApiAdminExamplesId for application/json ContentType.
 type PutApiAdminExamplesIdJSONRequestBody = Example
+
+// PostApiAdminWebtoolsBlacklistJSONRequestBody defines body for PostApiAdminWebtoolsBlacklist for application/json ContentType.
+type PostApiAdminWebtoolsBlacklistJSONRequestBody PostApiAdminWebtoolsBlacklistJSONBody
 
 // PostApiBbsAppointmentsJSONRequestBody defines body for PostApiBbsAppointments for application/json ContentType.
 type PostApiBbsAppointmentsJSONRequestBody = AppointmentPost

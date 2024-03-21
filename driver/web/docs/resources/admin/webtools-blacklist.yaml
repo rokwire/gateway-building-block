@@ -1,0 +1,29 @@
+post:
+  tags:
+  - Admin
+  summary: Create webtools blacklist item
+  description: |
+    Create webtools blacklist item
+
+    **Auth:** Requires valid admin token with `update_examples` or `all_examples`  permission
+  security:
+    - bearerAuth: []
+  requestBody:
+    description: list of the ids that needs to be blacklisted
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/apis/admin/create-webtools-blacklist/Request.yaml"
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/WebtoolsBlacklistItems.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

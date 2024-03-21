@@ -27,6 +27,8 @@ TimeSlot:
   $ref: "./application/TimeSlot.yaml"
 Question:
   $ref: "./application/Question.yaml"
+WebtoolsBlacklistItems: 
+  $ref: "./application/WebtoolsBlacklistItems.yaml" 
 
 # ADMIN section
 
