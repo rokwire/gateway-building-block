@@ -106,8 +106,8 @@ func (a Adapter) Start() {
 	adminRouter.HandleFunc("/configs/{id}", a.wrapFunc(a.adminAPIsHandler.updateConfig, a.auth.admin.Permissions)).Methods("PUT")
 	adminRouter.HandleFunc("/configs/{id}", a.wrapFunc(a.adminAPIsHandler.deleteConfig, a.auth.admin.Permissions)).Methods("DELETE")
 
-	adminRouter.HandleFunc("/webtoolsblacklist", a.wrapFunc(a.adminAPIsHandler.webtoolsblacklist, a.auth.admin.Permissions)).Methods("POST")
-	adminRouter.HandleFunc("/webtoolsblacklist", a.wrapFunc(a.adminAPIsHandler.webtoolsblacklist, a.auth.admin.Permissions)).Methods("GET")
+	adminRouter.HandleFunc("/webtoolsblacklist", a.wrapFunc(a.adminAPIsHandler.createwebtoolsblacklist, a.auth.admin.Permissions)).Methods("POST")
+	adminRouter.HandleFunc("/webtoolsblacklist", a.wrapFunc(a.adminAPIsHandler.getwebtoolsblacklist, a.auth.admin.Permissions)).Methods("GET")
 
 	// BB APIs
 	bbsRouter := mainRouter.PathPrefix("/bbs").Subrouter()

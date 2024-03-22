@@ -194,8 +194,6 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 }
 
 func (a appAdmin) CreateWebtoolsBlackList(ids []string) (*model.WebToolsEventID, error) {
-	//TODO
-	// create an object with ids and name: "webtools_events_ids"and insert in the database
 	name := "webtools_events_ids"
 	blacklist := model.WebToolsEventID{Name: name, Data: ids}
 
@@ -204,6 +202,15 @@ func (a appAdmin) CreateWebtoolsBlackList(ids []string) (*model.WebToolsEventID,
 		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
 	}
 	return &blacklist, nil
+}
+
+func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsEventID, error) {
+
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
+	}
+	return blacklist, nil
 }
 
 // newAppAdmin creates new appAdmin

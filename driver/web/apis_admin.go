@@ -236,7 +236,7 @@ func (h AdminAPIsHandler) deleteConfig(l *logs.Log, r *http.Request, claims *tok
 	return l.HTTPResponseSuccess()
 }
 
-func (h AdminAPIsHandler) webtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+func (h AdminAPIsHandler) createwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	var requestData Def.PostApiAdminWebtoolsblacklistJSONBody
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
@@ -261,8 +261,21 @@ func (h AdminAPIsHandler) webtoolsblacklist(l *logs.Log, r *http.Request, claims
 	}
 
 	return l.HTTPResponseSuccessJSON(data)
+}
 
-	return l.HTTPResponseSuccess()
+func (h AdminAPIsHandler) getwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	blacklist, err := h.app.Admin.GetWebtoolsBlackList()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	data, err := json.Marshal(blacklist)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(data)
 }
 
 // NewAdminAPIsHandler creates new rest Handler instance

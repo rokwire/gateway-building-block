@@ -369,6 +369,27 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
+// InsertWebtoolsBlacklistData inserts a webtools blacklist of ids
+func (a *Adapter) InsertWebtoolsBlacklistData(items model.WebToolsEventID) error {
+	_, err := a.db.webtoolsBlacklistItems.InsertOne(a.context, items)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
+	}
+
+	return nil
+}
+
+// FindWebtoolsBlacklistData finds all webtools blacklist from the database
+func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsEventID, error) {
+	filter := bson.M{}
+	var data []model.WebToolsEventID
+	err := a.db.webtoolsBlacklistItems.Find(a.context, filter, &data, nil)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction
@@ -416,16 +437,6 @@ func filterArgs(filter bson.M) *logutils.FieldArgs {
 		args[k] = v
 	}
 	return &args
-}
-
-// InsertWebtoolsBlacklistData inserts a webtools blacklist of ids
-func (a *Adapter) InsertWebtoolsBlacklistData(items model.WebToolsEventID) error {
-	_, err := a.db.webtoolsBlacklistItems.InsertOne(a.context, items)
-	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
-	}
-
-	return nil
 }
 
 // NewStorageAdapter creates a new storage adapter instance
