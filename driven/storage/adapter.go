@@ -418,6 +418,16 @@ func filterArgs(filter bson.M) *logutils.FieldArgs {
 	return &args
 }
 
+// InsertWebtoolsBlacklistData inserts a webtools blacklist of ids
+func (a *Adapter) InsertWebtoolsBlacklistData(items model.WebToolsEventID) error {
+	_, err := a.db.webtoolsBlacklistItems.InsertOne(a.context, items)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
+	}
+
+	return nil
+}
+
 // NewStorageAdapter creates a new storage adapter instance
 func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout string, logger *logs.Logger) *Adapter {
 	timeout, err := strconv.Atoi(mongoTimeout)

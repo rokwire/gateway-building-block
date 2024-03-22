@@ -128,6 +128,8 @@ type Storage interface {
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
+
+	InsertWebtoolsBlacklistData(item model.WebToolsEventID) error
 }
 
 // StorageListener represents storage listener
