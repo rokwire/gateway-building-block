@@ -463,7 +463,7 @@ paths:
       description: |
         Create webtools blacklist item
 
-        **Auth:** Requires valid admin token 
+        **Auth:** Requires valid admin token and "webtools_blacklist" permission
       security:
         - bearerAuth: []
       requestBody:
@@ -477,6 +477,29 @@ paths:
                   type: array
                   items:
                     type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebtoolsBlacklistItems'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    get:
+      tags:
+        - BBs
+      summary: Get all webtools blacklist item
+      description: |
+        Get all webtools blacklist items
+
+         **Auth:** Requires valid admin token and "webtools_blacklist" permission
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Success
