@@ -279,7 +279,7 @@ func (h AdminAPIsHandler) getwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 	return l.HTTPResponseSuccessJSON(data)
 }
 
-func (h AdminAPIsHandler) deletewebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	var idsList []string
 	idsArg := r.URL.Query().Get("ids")
 
@@ -287,7 +287,7 @@ func (h AdminAPIsHandler) deletewebtoolsblacklist(l *logs.Log, r *http.Request, 
 		idsList = strings.Split(idsArg, ",")
 
 	}
-	err := h.app.Admin.DeleteWebtoolsBlackList(idsList)
+	err := h.app.Admin.RemoveWebtoolsBlackList(idsList)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}

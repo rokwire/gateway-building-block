@@ -379,6 +379,18 @@ func (a *Adapter) InsertWebtoolsBlacklistData(items model.WebToolsEventID) error
 	return nil
 }
 
+// RemoveWebtoolsBlacklistData remove data from the database
+func (a *Adapter) RemoveWebtoolsBlacklistData(data []string) error {
+	filter := bson.M{}
+	update := bson.M{"$set": bson.M{"data": data}}
+
+	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filter, update, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filter), err)
+	}
+	return nil
+}
+
 // FindWebtoolsBlacklistData finds all webtools blacklist from the database
 func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsEventID, error) {
 	filter := bson.M{}

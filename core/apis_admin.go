@@ -213,7 +213,31 @@ func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsEventID, error) {
 	return blacklist, nil
 }
 
-func (a appAdmin) DeleteWebtoolsBlackList(ids []string) error {
+func (a appAdmin) RemoveWebtoolsBlackList(ids []string) error {
+
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
+	}
+
+	idMap := make(map[string]bool)
+	for _, id := range ids {
+		idMap[id] = true
+	}
+
+	newData := []string{}
+	for _, j := range blacklist {
+		for _, d := range j.Data {
+			if !idMap[d] {
+				newData = append(newData, d)
+			}
+		}
+	}
+
+	err = a.app.storage.RemoveWebtoolsBlacklistData(newData)
+	if err != nil {
+		return nil
+	}
 
 	return nil
 }
