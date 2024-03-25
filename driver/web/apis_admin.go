@@ -20,6 +20,7 @@ import (
 	Def "application/driver/web/docs/gen"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/authutils"
@@ -276,6 +277,22 @@ func (h AdminAPIsHandler) getwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 	}
 
 	return l.HTTPResponseSuccessJSON(data)
+}
+
+func (h AdminAPIsHandler) deletewebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var idsList []string
+	idsArg := r.URL.Query().Get("ids")
+
+	if idsArg != "" {
+		idsList = strings.Split(idsArg, ",")
+
+	}
+	err := h.app.Admin.DeleteWebtoolsBlackList(idsList)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
 }
 
 // NewAdminAPIsHandler creates new rest Handler instance

@@ -213,6 +213,11 @@ func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsEventID, error) {
 	return blacklist, nil
 }
 
+func (a appAdmin) DeleteWebtoolsBlackList(ids []string) error {
+
+	return nil
+}
+
 // newAppAdmin creates new appAdmin
 func newAppAdmin(app *Application) appAdmin {
 	return appAdmin{app: app}
