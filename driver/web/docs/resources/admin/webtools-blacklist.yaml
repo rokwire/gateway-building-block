@@ -1,9 +1,9 @@
-post:
+put:
   tags:
   - Admin
-  summary: Create webtools blacklist item
+  summary: Add webtools blacklist data
   description: |
-    Create webtools blacklist item
+    Add webtools blacklist data
 
     **Auth:** Requires valid admin token and "webtools_blacklist" permission
   security:
@@ -13,14 +13,10 @@ post:
     content:
       application/json:
         schema:
-          $ref: "../../schemas/apis/admin/create-webtools-blacklist/Request.yaml"
+          $ref: "../../schemas/apis/admin/add-webtools-blacklist/Request.yaml"
   responses:
     200:
       description: Success
-      content:
-        application/json:
-          schema:
-            $ref: "../../schemas/application/WebtoolsBlacklistItems.yaml"
     400:
       description: Bad request
     401:

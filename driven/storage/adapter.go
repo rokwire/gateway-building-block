@@ -369,18 +369,8 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
-// InsertWebtoolsBlacklistData inserts a webtools blacklist of ids
-func (a *Adapter) InsertWebtoolsBlacklistData(items model.WebToolsEventID) error {
-	_, err := a.db.webtoolsBlacklistItems.InsertOne(a.context, items)
-	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
-	}
-
-	return nil
-}
-
-// RemoveWebtoolsBlacklistData remove data from the database
-func (a *Adapter) RemoveWebtoolsBlacklistData(data []string) error {
+// UpdateWebtoolsBlacklistData update data from the database
+func (a *Adapter) UpdateWebtoolsBlacklistData(data []string) error {
 	filter := bson.M{}
 	update := bson.M{"$set": bson.M{"data": data}}
 

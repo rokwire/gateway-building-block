@@ -456,12 +456,12 @@ paths:
         '500':
           description: Internal error
   /api/admin/webtoolsblacklist:
-    post:
+    put:
       tags:
         - Admin
-      summary: Create webtools blacklist item
+      summary: Add webtools blacklist data
       description: |
-        Create webtools blacklist item
+        Add webtools blacklist data
 
         **Auth:** Requires valid admin token and "webtools_blacklist" permission
       security:
@@ -480,10 +480,6 @@ paths:
       responses:
         '200':
           description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WebtoolsBlacklistItems'
         '400':
           description: Bad request
         '401':

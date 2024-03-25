@@ -237,8 +237,8 @@ func (h AdminAPIsHandler) deleteConfig(l *logs.Log, r *http.Request, claims *tok
 	return l.HTTPResponseSuccess()
 }
 
-func (h AdminAPIsHandler) createwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	var requestData Def.PostApiAdminWebtoolsblacklistJSONBody
+func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var requestData Def.PutApiAdminWebtoolsblacklistJSONBody
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionUnmarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, true)
@@ -251,17 +251,12 @@ func (h AdminAPIsHandler) createwebtoolsblacklist(l *logs.Log, r *http.Request, 
 		}
 	}
 
-	blacklist, err := h.app.Admin.CreateWebtoolsBlackList(ids)
+	err = h.app.Admin.AddWebtoolsBlackList(ids)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
 
-	data, err := json.Marshal(blacklist)
-	if err != nil {
-		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
-	}
-
-	return l.HTTPResponseSuccessJSON(data)
+	return l.HTTPResponseSuccess()
 }
 
 func (h AdminAPIsHandler) getwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
@@ -285,8 +280,10 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 
 	if idsArg != "" {
 		idsList = strings.Split(idsArg, ",")
-
+	} else {
+		idsList = nil
 	}
+
 	err := h.app.Admin.RemoveWebtoolsBlackList(idsList)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)

@@ -60,7 +60,7 @@ type Admin interface {
 	CreateConfig(config model.Config, claims *tokenauth.Claims) (*model.Config, error)
 	UpdateConfig(config model.Config, claims *tokenauth.Claims) error
 	DeleteConfig(id string, claims *tokenauth.Claims) error
-	CreateWebtoolsBlackList(ids []string) (*model.WebToolsEventID, error)
+	AddWebtoolsBlackList(ids []string) error
 	GetWebtoolsBlackList() ([]model.WebToolsEventID, error)
 	RemoveWebtoolsBlackList(ids []string) error
 }
@@ -131,9 +131,8 @@ type Storage interface {
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 
-	InsertWebtoolsBlacklistData(item model.WebToolsEventID) error
 	FindWebtoolsBlacklistData() ([]model.WebToolsEventID, error)
-	RemoveWebtoolsBlacklistData(data []string) error
+	UpdateWebtoolsBlacklistData(data []string) error
 }
 
 // StorageListener represents storage listener

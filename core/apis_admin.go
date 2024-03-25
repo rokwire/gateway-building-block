@@ -193,15 +193,38 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 	return nil
 }
 
-func (a appAdmin) CreateWebtoolsBlackList(ids []string) (*model.WebToolsEventID, error) {
-	name := "webtools_events_ids"
-	blacklist := model.WebToolsEventID{Name: name, Data: ids}
-
-	err := a.app.storage.InsertWebtoolsBlacklistData(blacklist)
+func (a appAdmin) AddWebtoolsBlackList(ids []string) error {
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
 	if err != nil {
-		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
+		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
 	}
-	return &blacklist, nil
+	existingData := make(map[string]bool)
+	for _, u := range blacklist {
+		for _, val := range u.Data {
+			existingData[val] = true
+		}
+	}
+	for _, val := range ids {
+		if !existingData[val] {
+			for _, s := range blacklist {
+				s.Data = append(s.Data, val)
+				existingData[val] = true
+			}
+		}
+	}
+
+	var newData []string
+
+	for key := range existingData {
+		newData = append(newData, key)
+	}
+
+	err = a.app.storage.UpdateWebtoolsBlacklistData(newData)
+	if err != nil {
+		return nil
+	}
+
+	return nil
 }
 
 func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsEventID, error) {
@@ -226,15 +249,19 @@ func (a appAdmin) RemoveWebtoolsBlackList(ids []string) error {
 	}
 
 	newData := []string{}
-	for _, j := range blacklist {
-		for _, d := range j.Data {
-			if !idMap[d] {
-				newData = append(newData, d)
+	if ids != nil {
+		for _, j := range blacklist {
+			for _, d := range j.Data {
+				if !idMap[d] {
+					newData = append(newData, d)
+				}
 			}
 		}
+	} else {
+		ids = nil
 	}
 
-	err = a.app.storage.RemoveWebtoolsBlacklistData(newData)
+	err = a.app.storage.UpdateWebtoolsBlacklistData(newData)
 	if err != nil {
 		return nil
 	}
