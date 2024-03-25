@@ -226,6 +226,12 @@ type GetApiAdminConfigsParams struct {
 	Type *string `form:"type,omitempty" json:"type,omitempty"`
 }
 
+// DeleteApiAdminWebtoolsblacklistParams defines parameters for DeleteApiAdminWebtoolsblacklist.
+type DeleteApiAdminWebtoolsblacklistParams struct {
+	// Ids A comma-separated list of ids
+	Ids *string `form:"ids,omitempty" json:"ids,omitempty"`
+}
+
 // PostApiAdminWebtoolsblacklistJSONBody defines parameters for PostApiAdminWebtoolsblacklist.
 type PostApiAdminWebtoolsblacklistJSONBody struct {
 	Data *[]string `json:"data,omitempty"`
