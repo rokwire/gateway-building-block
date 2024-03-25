@@ -97,7 +97,32 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 		return nil, err
 	}
 
-	return leEvents, nil
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	if err != nil {
+		return nil, err
+	}
+	var data []string
+	for _, j := range blacklist {
+		if j.Data != nil {
+			data = append(data, j.Data...)
+		}
+	}
+
+	var newLegacyEvents []model.LegacyEvent
+	for _, le := range leEvents {
+		matched := false
+		for _, wb := range data {
+			if le.DataSourceEventID == wb {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			newLegacyEvents = append(newLegacyEvents, le)
+		}
+	}
+
+	return newLegacyEvents, nil
 
 }
 
