@@ -244,14 +244,21 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 		return l.HTTPResponseErrorAction(logutils.ActionUnmarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, true)
 	}
 
-	var ids []string
+	var dataSourceIDs []string
 	for _, w := range *requestData.DataSourceIds {
 		if w != "" {
-			ids = append(ids, w)
+			dataSourceIDs = append(dataSourceIDs, w)
 		}
 	}
 
-	err = h.app.Admin.AddWebtoolsBlackList(ids)
+	var dataCalendarIDs []string
+	for _, w := range *requestData.DataCalendarIds {
+		if w != "" {
+			dataCalendarIDs = append(dataCalendarIDs, w)
+		}
+	}
+
+	err = h.app.Admin.AddWebtoolsBlackList(dataSourceIDs, dataCalendarIDs)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}

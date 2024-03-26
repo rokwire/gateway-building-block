@@ -370,9 +370,14 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 }
 
 // UpdateWebtoolsBlacklistData update data from the database
-func (a *Adapter) UpdateWebtoolsBlacklistData(data []string) error {
+func (a *Adapter) UpdateWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
 	filter := bson.M{}
-	update := bson.M{"$set": bson.M{"data": data}}
+	update := bson.M{
+		"$set": bson.M{
+			"data_source_ids":   dataSourceIDs,
+			"data_calendar_ids": dataCalendarIDs,
+		},
+	}
 
 	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filter, update, nil)
 	if err != nil {

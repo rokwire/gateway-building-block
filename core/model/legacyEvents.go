@@ -95,8 +95,9 @@ type WebToolsEvent struct {
 
 // WebToolsEventID represents web tools blacklist ids
 type WebToolsEventID struct {
-	Name          string   `json:"name" bson:"name"`
-	DataSourceIDs []string `json:"data_source_ids" bson:"data_source_ids"`
+	Name            string   `json:"name" bson:"name"`
+	DataSourceIDs   []string `json:"data_source_ids" bson:"data_source_ids"`
+	DataCalendarIDs []string `json:"data_calendar_ids" bson:"data_calendar_ids"`
 }
 
 // LegacyEvent wrapper
