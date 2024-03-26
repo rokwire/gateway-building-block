@@ -57,7 +57,7 @@ delete:
   security:
     - bearerAuth: []
   parameters:
-    - name: ids
+    - name: source_ids
       in: query
       description: A comma-separated list of ids
       required: false
@@ -65,6 +65,14 @@ delete:
       explode: false
       schema:
         type: string  
+    - name: calendar_ids
+      in: query
+      description: A comma-separated list of ids
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string    
   responses:
     200:
       description: Success

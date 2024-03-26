@@ -172,8 +172,9 @@ type TimeSlot struct {
 
 // WebtoolsBlacklistItems defines model for WebtoolsBlacklistItems.
 type WebtoolsBlacklistItems struct {
-	DataSourceIds *[]string `json:"data_source_ids,omitempty"`
-	Name          *string   `json:"name,omitempty"`
+	DataCalendarIds *[]string `json:"data_calendar_ids,omitempty"`
+	DataSourceIds   *[]string `json:"data_source_ids,omitempty"`
+	Name            *string   `json:"name,omitempty"`
 }
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
@@ -228,13 +229,17 @@ type GetApiAdminConfigsParams struct {
 
 // DeleteApiAdminWebtoolsblacklistParams defines parameters for DeleteApiAdminWebtoolsblacklist.
 type DeleteApiAdminWebtoolsblacklistParams struct {
-	// Ids A comma-separated list of ids
-	Ids *string `form:"ids,omitempty" json:"ids,omitempty"`
+	// SourceIds A comma-separated list of ids
+	SourceIds *string `form:"source_ids,omitempty" json:"source_ids,omitempty"`
+
+	// CalendarIds A comma-separated list of ids
+	CalendarIds *string `form:"calendar_ids,omitempty" json:"calendar_ids,omitempty"`
 }
 
 // PutApiAdminWebtoolsblacklistJSONBody defines parameters for PutApiAdminWebtoolsblacklist.
 type PutApiAdminWebtoolsblacklistJSONBody struct {
-	DataSourceIds *[]string `json:"data_source_ids,omitempty"`
+	DataCalendarIds *[]string `json:"data_calendar_ids,omitempty"`
+	DataSourceIds   *[]string `json:"data_source_ids,omitempty"`
 }
 
 // GetApiBbsAppointmentsPeopleParams defines parameters for GetApiBbsAppointmentsPeople.

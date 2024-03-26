@@ -477,6 +477,10 @@ paths:
                   type: array
                   items:
                     type: string
+                data_calendar_ids:
+                  type: array
+                  items:
+                    type: string
       responses:
         '200':
           description: Success
@@ -520,7 +524,15 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: ids
+        - name: source_ids
+          in: query
+          description: A comma-separated list of ids
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: calendar_ids
           in: query
           description: A comma-separated list of ids
           required: false
@@ -1561,6 +1573,10 @@ components:
         name:
           type: string
         data_source_ids:
+          type: array
+          items:
+            type: string
+        data_calendar_ids:
           type: array
           items:
             type: string

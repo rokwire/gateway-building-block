@@ -245,7 +245,7 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 	}
 
 	var ids []string
-	for _, w := range *requestData.Data {
+	for _, w := range *requestData.DataSourceIds {
 		if w != "" {
 			ids = append(ids, w)
 		}
