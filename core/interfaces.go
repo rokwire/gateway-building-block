@@ -62,7 +62,7 @@ type Admin interface {
 	DeleteConfig(id string, claims *tokenauth.Claims) error
 	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string) error
 	GetWebtoolsBlackList() ([]model.WebToolsEventID, error)
-	RemoveWebtoolsBlackList(ids []string) error
+	RemoveWebtoolsBlackList(sourceids []string, calendarids []string) error
 }
 
 // BBs exposes Building Block APIs for the driver adapters

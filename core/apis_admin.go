@@ -256,32 +256,50 @@ func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsEventID, error) {
 	return blacklist, nil
 }
 
-func (a appAdmin) RemoveWebtoolsBlackList(sourceIDs []string) error {
+func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []string) error {
 
 	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
 	if err != nil {
 		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
 	}
 
-	idMap := make(map[string]bool)
-	for _, id := range sourceIDs {
-		idMap[id] = true
+	sidMap := make(map[string]bool)
+	for _, id := range sourceIds {
+		sidMap[id] = true
 	}
 
 	dataSourceIDs := []string{}
-	if sourceIDs != nil {
+	if sourceIds != nil {
 		for _, j := range blacklist {
 			for _, d := range j.DataSourceIDs {
-				if !idMap[d] {
+				if !sidMap[d] {
 					dataSourceIDs = append(dataSourceIDs, d)
 				}
 			}
 		}
 	} else {
-		sourceIDs = nil
+		sourceIds = nil
 	}
 
-	err = a.app.storage.UpdateWebtoolsBlacklistData(dataSourceIDs, nil)
+	cidMap := make(map[string]bool)
+	for _, id := range calendarids {
+		cidMap[id] = true
+	}
+
+	dataCalendarIDs := []string{}
+	if calendarids != nil {
+		for _, j := range blacklist {
+			for _, d := range j.DataCalendarIDs {
+				if !cidMap[d] {
+					dataCalendarIDs = append(dataCalendarIDs, d)
+				}
+			}
+		}
+	} else {
+		calendarids = nil
+	}
+
+	err = a.app.storage.UpdateWebtoolsBlacklistData(dataSourceIDs, calendarids)
 	if err != nil {
 		return nil
 	}
