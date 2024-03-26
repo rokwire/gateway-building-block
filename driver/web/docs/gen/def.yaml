@@ -473,7 +473,7 @@ paths:
             schema:
               type: object
               properties:
-                data:
+                data_source_ids:
                   type: array
                   items:
                     type: string
@@ -1560,7 +1560,7 @@ components:
       properties:
         name:
           type: string
-        data:
+        data_source_ids:
           type: array
           items:
             type: string

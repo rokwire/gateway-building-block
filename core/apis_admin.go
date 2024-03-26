@@ -200,14 +200,14 @@ func (a appAdmin) AddWebtoolsBlackList(ids []string) error {
 	}
 	existingData := make(map[string]bool)
 	for _, u := range blacklist {
-		for _, val := range u.Data {
+		for _, val := range u.DataSourceIDs {
 			existingData[val] = true
 		}
 	}
 	for _, val := range ids {
 		if !existingData[val] {
 			for _, s := range blacklist {
-				s.Data = append(s.Data, val)
+				s.DataSourceIDs = append(s.DataSourceIDs, val)
 				existingData[val] = true
 			}
 		}
@@ -251,7 +251,7 @@ func (a appAdmin) RemoveWebtoolsBlackList(ids []string) error {
 	newData := []string{}
 	if ids != nil {
 		for _, j := range blacklist {
-			for _, d := range j.Data {
+			for _, d := range j.DataSourceIDs {
 				if !idMap[d] {
 					newData = append(newData, d)
 				}

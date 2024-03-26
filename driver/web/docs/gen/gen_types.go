@@ -172,8 +172,8 @@ type TimeSlot struct {
 
 // WebtoolsBlacklistItems defines model for WebtoolsBlacklistItems.
 type WebtoolsBlacklistItems struct {
-	Data *[]string `json:"data,omitempty"`
-	Name *string   `json:"name,omitempty"`
+	DataSourceIds *[]string `json:"data_source_ids,omitempty"`
+	Name          *string   `json:"name,omitempty"`
 }
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
@@ -234,7 +234,7 @@ type DeleteApiAdminWebtoolsblacklistParams struct {
 
 // PutApiAdminWebtoolsblacklistJSONBody defines parameters for PutApiAdminWebtoolsblacklist.
 type PutApiAdminWebtoolsblacklistJSONBody struct {
-	Data *[]string `json:"data,omitempty"`
+	DataSourceIds *[]string `json:"data_source_ids,omitempty"`
 }
 
 // GetApiBbsAppointmentsPeopleParams defines parameters for GetApiBbsAppointmentsPeople.

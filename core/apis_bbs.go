@@ -103,8 +103,8 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 	}
 	var data []string
 	for _, j := range blacklist {
-		if j.Data != nil {
-			data = append(data, j.Data...)
+		if j.DataSourceIDs != nil {
+			data = append(data, j.DataSourceIDs...)
 		}
 	}
 

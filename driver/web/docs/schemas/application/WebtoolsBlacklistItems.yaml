@@ -2,7 +2,7 @@ type: object
 properties:
   name:
     type: string
-  data:
+  data_source_ids:
     type: array
     items:
       type: string
