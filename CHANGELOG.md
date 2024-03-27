@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Ability to block/blacklist specific Webtools events [#57](https://github.com/rokwire/gateway-building-block/issues/57)
 
+[2.3.2] - 2024-03-27
+- Increase webtools transaction timeout
+
 [2.3.1] - 2024-03-21
 ### Fixed
 - Handle cost, tags, target and location on the Webtools import [#54](https://github.com/rokwire/gateway-building-block/issues/54)
