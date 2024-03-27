@@ -311,7 +311,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		//* keep the already exisiting events IDS THE SAME!
 
 		return nil
-	}, 60000)
+	}, 180000)
 
 	if err != nil {
 		e.logger.Errorf("error performing transaction - %s", err)
