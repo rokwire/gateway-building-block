@@ -455,7 +455,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/admin/webtoolsblacklist:
+  /api/admin/webtools-blacklist:
     put:
       tags:
         - Admin

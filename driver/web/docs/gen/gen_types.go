@@ -227,8 +227,8 @@ type GetApiAdminConfigsParams struct {
 	Type *string `form:"type,omitempty" json:"type,omitempty"`
 }
 
-// DeleteApiAdminWebtoolsblacklistParams defines parameters for DeleteApiAdminWebtoolsblacklist.
-type DeleteApiAdminWebtoolsblacklistParams struct {
+// DeleteApiAdminWebtoolsBlacklistParams defines parameters for DeleteApiAdminWebtoolsBlacklist.
+type DeleteApiAdminWebtoolsBlacklistParams struct {
 	// SourceIds A comma-separated list of ids
 	SourceIds *string `form:"source_ids,omitempty" json:"source_ids,omitempty"`
 
@@ -236,8 +236,8 @@ type DeleteApiAdminWebtoolsblacklistParams struct {
 	CalendarIds *string `form:"calendar_ids,omitempty" json:"calendar_ids,omitempty"`
 }
 
-// PutApiAdminWebtoolsblacklistJSONBody defines parameters for PutApiAdminWebtoolsblacklist.
-type PutApiAdminWebtoolsblacklistJSONBody struct {
+// PutApiAdminWebtoolsBlacklistJSONBody defines parameters for PutApiAdminWebtoolsBlacklist.
+type PutApiAdminWebtoolsBlacklistJSONBody struct {
 	DataCalendarIds *[]string `json:"data_calendar_ids,omitempty"`
 	DataSourceIds   *[]string `json:"data_source_ids,omitempty"`
 }
@@ -350,8 +350,8 @@ type PostApiAdminExamplesJSONRequestBody = Example
 // PutApiAdminExamplesIdJSONRequestBody defines body for PutApiAdminExamplesId for application/json ContentType.
 type PutApiAdminExamplesIdJSONRequestBody = Example
 
-// PutApiAdminWebtoolsblacklistJSONRequestBody defines body for PutApiAdminWebtoolsblacklist for application/json ContentType.
-type PutApiAdminWebtoolsblacklistJSONRequestBody PutApiAdminWebtoolsblacklistJSONBody
+// PutApiAdminWebtoolsBlacklistJSONRequestBody defines body for PutApiAdminWebtoolsBlacklist for application/json ContentType.
+type PutApiAdminWebtoolsBlacklistJSONRequestBody PutApiAdminWebtoolsBlacklistJSONBody
 
 // PostApiBbsAppointmentsJSONRequestBody defines body for PostApiBbsAppointments for application/json ContentType.
 type PostApiBbsAppointmentsJSONRequestBody = AppointmentPost
