@@ -117,8 +117,23 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 }
 
 func (a appBBs) isBlacklisted(blacklists []model.WebToolsItem, event model.LegacyEvent) bool {
-	//TODO
-	return true
+	for _, blacklist := range blacklists {
+		switch blacklist.Name {
+		case "webtools_events_ids":
+			for _, id := range blacklist.Data {
+				if event.DataSourceEventID == id {
+					return true
+				}
+			}
+		case "webtools_calendar_ids":
+			for _, id := range blacklist.Data {
+				if event.CalendarID == id {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // newAppBBs creates new appBBs
