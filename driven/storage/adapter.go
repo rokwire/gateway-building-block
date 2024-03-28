@@ -387,14 +387,15 @@ func (a *Adapter) UpdateWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 }
 
 // FindWebtoolsBlacklistData finds all webtools blacklist from the database
-func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsEventID, error) {
-	filter := bson.M{}
-	var data []model.WebToolsEventID
-	err := a.db.webtoolsBlacklistItems.Find(a.context, filter, &data, nil)
+func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
+	filterSource := bson.M{}
+	var dataSource []model.WebToolsItem
+	err := a.db.webtoolsBlacklistItems.Find(a.context, filterSource, &dataSource, nil)
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+
+	return dataSource, nil
 }
 
 // PerformTransaction performs a transaction

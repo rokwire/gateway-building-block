@@ -2,12 +2,8 @@ type: object
 properties:
   name:
     type: string
-  data_source_ids:
+  data:
     type: array
     items:
       type: string
-  data_calendar_ids:
-    type: array
-    items:
-      type: string    
   

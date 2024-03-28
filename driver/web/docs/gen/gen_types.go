@@ -172,9 +172,8 @@ type TimeSlot struct {
 
 // WebtoolsBlacklistItems defines model for WebtoolsBlacklistItems.
 type WebtoolsBlacklistItems struct {
-	DataCalendarIds *[]string `json:"data_calendar_ids,omitempty"`
-	DataSourceIds   *[]string `json:"data_source_ids,omitempty"`
-	Name            *string   `json:"name,omitempty"`
+	Data *[]string `json:"data,omitempty"`
+	Name *string   `json:"name,omitempty"`
 }
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
