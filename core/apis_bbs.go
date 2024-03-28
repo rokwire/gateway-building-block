@@ -102,13 +102,6 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 		return nil, err
 	}
 
-	var data []string
-	for _, j := range blacklist {
-		if j.Data != nil {
-			data = append(data, j.Data...)
-		}
-	}
-
 	var newLegacyEvents []model.LegacyEvent
 	for _, le := range leEvents {
 		matched := false
