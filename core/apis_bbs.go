@@ -16,7 +16,6 @@ package core
 
 import (
 	"application/core/model"
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -102,13 +101,13 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(blacklist)
+
 	var data []string
-	/*for _, j := range blacklist {
-		if j.DataSourceIDs != nil {
-			data = append(data, j.DataSourceIDs...)
+	for _, j := range blacklist {
+		if j.Data != nil {
+			data = append(data, j.Data...)
 		}
-	}*/
+	}
 
 	var newLegacyEvents []model.LegacyEvent
 	for _, le := range leEvents {
