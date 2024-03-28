@@ -16,4 +16,4 @@ p, update_configs_gateway, /gateway/api/admin/configs, (GET)|(POST),
 p, delete_configs_gateway, /gateway/api/admin/configs/*, (GET)|(DELETE), Delete gateway configs
 p, delete_configs_gateway, /gateway/api/admin/configs, (GET),
 
-p, webtools_blacklist, /gateway/api/admin/webtoolsblacklist, (GET)|(POST)|(PUT)|(DELETE), Webtools blacklist actions
+p, webtools_blacklist, /gateway/api/admin/webtools-blacklist, (GET)|(POST)|(PUT)|(DELETE), Webtools blacklist actions
