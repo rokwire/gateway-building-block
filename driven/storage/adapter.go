@@ -369,21 +369,64 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
-// UpdateWebtoolsBlacklistData update data from the database
-func (a *Adapter) UpdateWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
-	filter := bson.M{}
-	update := bson.M{
-		"$set": bson.M{
-			"data_source_ids":   dataSourceIDs,
-			"data_calendar_ids": dataCalendarIDs,
+// AddWebtoolsBlacklistData update data from the database
+func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+	filterSource := bson.M{"name": "webtools_events_ids"}
+	updateSource := bson.M{
+		"$push": bson.M{
+			"data": bson.M{"$each": dataSourceIDs},
 		},
 	}
 
-	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filter, update, nil)
+	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterSource, updateSource, nil)
 	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filter), err)
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterSource), err)
 	}
+
+	filterCalendar := bson.M{"name": "webtools_calendar_ids"}
+	updateCalendar := bson.M{
+		"$push": bson.M{
+			"data": bson.M{"$each": dataCalendarIDs},
+		},
+	}
+
+	_, err = a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+	}
+
 	return nil
+
+}
+
+// RemoveWebtoolsBlacklistData update data from the database
+func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+	filterSource := bson.M{"name": "webtools_events_ids"}
+	updateSource := bson.M{
+		"$pull": bson.M{
+			"data": bson.M{"$in": dataSourceIDs},
+		},
+	}
+
+	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterSource, updateSource, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterSource), err)
+	}
+
+	filterCalendar := bson.M{"name": "webtools_calendar_ids"}
+	updateCalendar := bson.M{
+		"$pull": bson.M{
+			"data": bson.M{"$in": dataCalendarIDs},
+		},
+	}
+
+	_, err = a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+	}
+
+	return nil
+
 }
 
 // FindWebtoolsBlacklistData finds all webtools blacklist from the database

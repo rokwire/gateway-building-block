@@ -248,6 +248,8 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 	for _, w := range *requestData.DataSourceIds {
 		if w != "" {
 			dataSourceIDs = append(dataSourceIDs, w)
+		} else {
+			dataSourceIDs = nil
 		}
 	}
 
@@ -255,6 +257,8 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 	for _, w := range *requestData.DataCalendarIds {
 		if w != "" {
 			dataCalendarIDs = append(dataCalendarIDs, w)
+		} else {
+			dataCalendarIDs = nil
 		}
 	}
 

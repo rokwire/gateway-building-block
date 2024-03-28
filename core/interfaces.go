@@ -132,7 +132,8 @@ type Storage interface {
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
-	UpdateWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
+	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
+	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 }
 
 // StorageListener represents storage listener
