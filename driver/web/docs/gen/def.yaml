@@ -506,7 +506,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebtoolsBlacklistItems'
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebtoolsBlacklistItems'
         '400':
           description: Bad request
         '401':

@@ -39,7 +39,9 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../schemas/application/WebtoolsBlacklistItems.yaml"
+            type: array
+            items:
+              $ref: "../../schemas/application/WebtoolsBlacklistItems.yaml"
     400:
       description: Bad request
     401:
