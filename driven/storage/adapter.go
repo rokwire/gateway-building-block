@@ -373,7 +373,7 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
 	filterSource := bson.M{"name": "webtools_events_ids"}
 	updateSource := bson.M{
-		"$push": bson.M{
+		"$addToSet": bson.M{
 			"data": bson.M{"$each": dataSourceIDs},
 		},
 	}
@@ -385,7 +385,7 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 
 	filterCalendar := bson.M{"name": "webtools_calendar_ids"}
 	updateCalendar := bson.M{
-		"$push": bson.M{
+		"$addToSet": bson.M{
 			"data": bson.M{"$each": dataCalendarIDs},
 		},
 	}
