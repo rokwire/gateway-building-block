@@ -193,6 +193,33 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 	return nil
 }
 
+func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string) error {
+	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs)
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
+func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsItem, error) {
+
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
+	}
+	return blacklist, nil
+}
+
+func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []string) error {
+	err := a.app.storage.RemoveWebtoolsBlacklistData(sourceIds, calendarids)
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
 // newAppAdmin creates new appAdmin
 func newAppAdmin(app *Application) appAdmin {
 	return appAdmin{app: app}

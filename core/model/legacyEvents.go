@@ -93,6 +93,12 @@ type WebToolsEvent struct {
 	} `xml:"topic"`
 }
 
+// WebToolsItem represents web tools blacklist ids
+type WebToolsItem struct {
+	Name string   `json:"name" bson:"name"`
+	Data []string `json:"data" bson:"data"`
+}
+
 // LegacyEvent wrapper
 type LegacyEvent struct {
 	AllDay                bool            `json:"allDay" bson:"allDay"`

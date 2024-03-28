@@ -17,8 +17,10 @@ package web
 import (
 	"application/core"
 	"application/core/model"
+	Def "application/driver/web/docs/gen"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/rokwire/core-auth-library-go/v3/authutils"
@@ -230,6 +232,81 @@ func (h AdminAPIsHandler) deleteConfig(l *logs.Log, r *http.Request, claims *tok
 	err := h.app.Admin.DeleteConfig(id, claims)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionDelete, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
+
+func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var requestData Def.PutApiAdminWebtoolsBlacklistJSONBody
+	err := json.NewDecoder(r.Body).Decode(&requestData)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionUnmarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, true)
+	}
+
+	var dataSourceIDs []string
+	for _, w := range *requestData.DataSourceIds {
+		if w != "" {
+			dataSourceIDs = append(dataSourceIDs, w)
+		} else {
+			dataSourceIDs = nil
+		}
+	}
+
+	var dataCalendarIDs []string
+	for _, w := range *requestData.DataCalendarIds {
+		if w != "" {
+			dataCalendarIDs = append(dataCalendarIDs, w)
+		} else {
+			dataCalendarIDs = nil
+		}
+	}
+
+	err = h.app.Admin.AddWebtoolsBlackList(dataSourceIDs, dataCalendarIDs)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
+
+func (h AdminAPIsHandler) getwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	blacklist, err := h.app.Admin.GetWebtoolsBlackList()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	data, err := json.Marshal(blacklist)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(data)
+}
+
+func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var sourceIdsList []string
+	sourceIdsArg := r.URL.Query().Get("source_ids")
+
+	if sourceIdsArg != "" {
+		sourceIdsList = strings.Split(sourceIdsArg, ",")
+	} else {
+		sourceIdsList = nil
+	}
+
+	var calendarIdsList []string
+	calendarIdsArg := r.URL.Query().Get("calendar_ids")
+
+	if calendarIdsArg != "" {
+		calendarIdsList = strings.Split(calendarIdsArg, ",")
+	} else {
+		calendarIdsList = nil
+	}
+
+	err := h.app.Admin.RemoveWebtoolsBlackList(sourceIdsList, calendarIdsList)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
 
 	return l.HTTPResponseSuccess()

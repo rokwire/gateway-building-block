@@ -1,0 +1,91 @@
+put:
+  tags:
+  - Admin
+  summary: Add webtools blacklist data
+  description: |
+    Add webtools blacklist data
+
+    **Auth:** Requires valid admin token and "webtools_blacklist" permission
+  security:
+    - bearerAuth: []
+  requestBody:
+    description: list of the ids that needs to be blacklisted
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/apis/admin/add-webtools-blacklist/Request.yaml"
+  responses:
+    200:
+      description: Success
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error
+get:
+  tags:
+  - Admin
+  summary: Get all webtools blacklist item
+  description: |
+    Get all webtools blacklist items
+
+     **Auth:** Requires valid admin token and "webtools_blacklist" permission
+  security:
+    - bearerAuth: []
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/WebtoolsBlacklistItems.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error    
+delete:
+  tags:
+  - Admin
+  summary: Delete webtools blacklist item
+  description: |
+    Deletes webtools blacklist items.
+
+    **Auth:** Requires valid admin token and "webtools_blacklist" permission
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: source_ids
+      in: query
+      description: A comma-separated list of ids
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string  
+    - name: calendar_ids
+      in: query
+      description: A comma-separated list of ids
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string    
+  responses:
+    200:
+      description: Success
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Success
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error             

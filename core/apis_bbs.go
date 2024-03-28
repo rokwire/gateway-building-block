@@ -90,6 +90,7 @@ func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, a
 	}
 	return ret, nil
 }
+
 func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 
 	leEvents, err := a.app.storage.FindAllLegacyEvents()
@@ -97,8 +98,42 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 		return nil, err
 	}
 
-	return leEvents, nil
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	if err != nil {
+		return nil, err
+	}
 
+	var newLegacyEvents []model.LegacyEvent
+	for _, le := range leEvents {
+
+		isBlacklisted := a.isBlacklisted(blacklist, le)
+		if !isBlacklisted {
+			newLegacyEvents = append(newLegacyEvents, le)
+		}
+	}
+
+	return newLegacyEvents, nil
+
+}
+
+func (a appBBs) isBlacklisted(blacklists []model.WebToolsItem, event model.LegacyEvent) bool {
+	for _, blacklist := range blacklists {
+		switch blacklist.Name {
+		case "webtools_events_ids":
+			for _, id := range blacklist.Data {
+				if event.DataSourceEventID == id {
+					return true
+				}
+			}
+		case "webtools_calendar_ids":
+			for _, id := range blacklist.Data {
+				if event.CalendarID == id {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // newAppBBs creates new appBBs

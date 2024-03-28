@@ -369,6 +369,78 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
+// AddWebtoolsBlacklistData update data from the database
+func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+	filterSource := bson.M{"name": "webtools_events_ids"}
+	updateSource := bson.M{
+		"$addToSet": bson.M{
+			"data": bson.M{"$each": dataSourceIDs},
+		},
+	}
+
+	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterSource, updateSource, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterSource), err)
+	}
+
+	filterCalendar := bson.M{"name": "webtools_calendar_ids"}
+	updateCalendar := bson.M{
+		"$addToSet": bson.M{
+			"data": bson.M{"$each": dataCalendarIDs},
+		},
+	}
+
+	_, err = a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+	}
+
+	return nil
+
+}
+
+// RemoveWebtoolsBlacklistData update data from the database
+func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+	filterSource := bson.M{"name": "webtools_events_ids"}
+	updateSource := bson.M{
+		"$pull": bson.M{
+			"data": bson.M{"$in": dataSourceIDs},
+		},
+	}
+
+	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterSource, updateSource, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterSource), err)
+	}
+
+	filterCalendar := bson.M{"name": "webtools_calendar_ids"}
+	updateCalendar := bson.M{
+		"$pull": bson.M{
+			"data": bson.M{"$in": dataCalendarIDs},
+		},
+	}
+
+	_, err = a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+	}
+
+	return nil
+
+}
+
+// FindWebtoolsBlacklistData finds all webtools blacklist from the database
+func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
+	filterSource := bson.M{}
+	var dataSource []model.WebToolsItem
+	err := a.db.webtoolsBlacklistItems.Find(a.context, filterSource, &dataSource, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return dataSource, nil
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction

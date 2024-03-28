@@ -1,0 +1,11 @@
+type: object
+properties:
+  data_source_ids:
+    type: array
+    items:
+      type: string
+  data_calendar_ids:
+    type: array
+    items:
+      type: string     
+  
