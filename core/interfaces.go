@@ -60,6 +60,9 @@ type Admin interface {
 	CreateConfig(config model.Config, claims *tokenauth.Claims) (*model.Config, error)
 	UpdateConfig(config model.Config, claims *tokenauth.Claims) error
 	DeleteConfig(id string, claims *tokenauth.Claims) error
+	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string) error
+	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
+	RemoveWebtoolsBlackList(sourceids []string, calendarids []string) error
 }
 
 // BBs exposes Building Block APIs for the driver adapters
@@ -127,6 +130,10 @@ type Storage interface {
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
+
+	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
+	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
+	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 }
 
 // StorageListener represents storage listener
