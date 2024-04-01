@@ -245,20 +245,20 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 	}
 
 	var dataSourceIDs []string
-	for _, w := range *requestData.DataSourceIds {
-		if w != "" {
-			dataSourceIDs = append(dataSourceIDs, w)
-		} else {
-			dataSourceIDs = nil
+	if requestData.DataSourceIds != nil {
+		for _, w := range *requestData.DataSourceIds {
+			if w != "" {
+				dataSourceIDs = append(dataSourceIDs, w)
+			}
 		}
 	}
 
 	var dataCalendarIDs []string
-	for _, w := range *requestData.DataCalendarIds {
-		if w != "" {
-			dataCalendarIDs = append(dataCalendarIDs, w)
-		} else {
-			dataCalendarIDs = nil
+	if requestData.DataCalendarIds != nil {
+		for _, w := range *requestData.DataCalendarIds {
+			if w != "" {
+				dataCalendarIDs = append(dataCalendarIDs, w)
+			}
 		}
 	}
 
