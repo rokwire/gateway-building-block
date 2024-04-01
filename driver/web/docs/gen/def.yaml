@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Rokwire Gateway Building Block API
   description: Gateway Building Block API Documentation
-  version: 2.4.0
+  version: 2.4.1
 servers:
   - url: 'https://api.rokwire.illinois.edu/gateway'
     description: Production server
@@ -475,10 +475,12 @@ paths:
               properties:
                 data_source_ids:
                   type: array
+                  nullable: true
                   items:
                     type: string
                 data_calendar_ids:
                   type: array
+                  nullable: true
                   items:
                     type: string
       responses:

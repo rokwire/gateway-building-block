@@ -237,8 +237,8 @@ type DeleteApiAdminWebtoolsBlacklistParams struct {
 
 // PutApiAdminWebtoolsBlacklistJSONBody defines parameters for PutApiAdminWebtoolsBlacklist.
 type PutApiAdminWebtoolsBlacklistJSONBody struct {
-	DataCalendarIds *[]string `json:"data_calendar_ids,omitempty"`
-	DataSourceIds   *[]string `json:"data_source_ids,omitempty"`
+	DataCalendarIds *[]string `json:"data_calendar_ids"`
+	DataSourceIds   *[]string `json:"data_source_ids"`
 }
 
 // GetApiBbsAppointmentsPeopleParams defines parameters for GetApiBbsAppointmentsPeople.

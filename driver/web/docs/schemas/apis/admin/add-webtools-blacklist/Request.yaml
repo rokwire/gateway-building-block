@@ -2,10 +2,12 @@ type: object
 properties:
   data_source_ids:
     type: array
+    nullable: true
     items:
       type: string
   data_calendar_ids:
     type: array
+    nullable: true
     items:
       type: string     
   

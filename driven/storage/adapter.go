@@ -401,28 +401,32 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 
 // RemoveWebtoolsBlacklistData update data from the database
 func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
-	filterSource := bson.M{"name": "webtools_events_ids"}
-	updateSource := bson.M{
-		"$pull": bson.M{
-			"data": bson.M{"$in": dataSourceIDs},
-		},
-	}
+	if dataSourceIDs != nil {
+		filterSource := bson.M{"name": "webtools_events_ids"}
+		updateSource := bson.M{
+			"$pull": bson.M{
+				"data": bson.M{"$in": dataSourceIDs},
+			},
+		}
 
-	_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterSource, updateSource, nil)
-	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterSource), err)
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterSource, updateSource, nil)
+		if err != nil {
+			return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterSource), err)
+		}
 	}
+	if dataCalendarIDs != nil {
+		filterCalendar := bson.M{"name": "webtools_calendar_ids"}
+		updateCalendar := bson.M{
+			"$pull": bson.M{
+				"data": bson.M{"$in": dataCalendarIDs},
+			},
+		}
 
-	filterCalendar := bson.M{"name": "webtools_calendar_ids"}
-	updateCalendar := bson.M{
-		"$pull": bson.M{
-			"data": bson.M{"$in": dataCalendarIDs},
-		},
-	}
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+		if err != nil {
+			return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+		}
 
-	_, err = a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
-	if err != nil {
-		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
 	}
 
 	return nil
