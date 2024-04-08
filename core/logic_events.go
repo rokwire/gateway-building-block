@@ -259,7 +259,7 @@ func (e eventsLogic) processWebToolsEvents() {
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
+		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(nil) //does not pass the transaction context - an issue!
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
 			return nil
