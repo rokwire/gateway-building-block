@@ -31,7 +31,7 @@ func (a *Adapter) FindCalendars(id string) (*[]model.UnitCalendar, error) {
 	//filter := bson.M{}
 
 	var data []model.UnitCalendar
-	err := a.db.unitcalendars.Find(a.context, filter, &data, nil)
+	err := a.db.unitcalendars.FindWithContext(a.context, filter, &data, nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}

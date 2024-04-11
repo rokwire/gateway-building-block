@@ -187,7 +187,7 @@ func (a *Adapter) loadConfigs() ([]model.Config, error) {
 	filter := bson.M{}
 
 	var configs []model.Config
-	err := a.db.configs.Find(a.context, filter, &configs, nil)
+	err := a.db.configs.FindWithContext(a.context, filter, &configs, nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeConfig, nil, err)
 	}
@@ -283,7 +283,8 @@ func (a *Adapter) DeleteConfig(id string) error {
 func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.LegacyEventItem, error) {
 	filter := bson.M{}
 	var data []model.LegacyEventItem
-	err := a.db.legacyEvents.Find(context, filter, &data, nil)
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(context, filter, &data, nil, &timeout)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}
@@ -353,7 +354,8 @@ func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, 
 func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
 	var list []model.LegacyEventItem
-	err := a.db.legacyEvents.Find(a.context, filter, &list, nil)
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
 	if err != nil {
 		return nil, err
 	}
@@ -441,7 +443,7 @@ func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	filterSource := bson.M{}
 	var dataSource []model.WebToolsItem
-	err := a.db.webtoolsBlacklistItems.Find(a.context, filterSource, &dataSource, nil)
+	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
 	if err != nil {
 		return nil, err
 	}
