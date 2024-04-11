@@ -353,7 +353,8 @@ func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, 
 func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	filter := bson.M{}
 	var list []model.LegacyEventItem
-	err := a.db.legacyEvents.FindWithContext(nil, filter, &list, nil)
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
 	if err != nil {
 		return nil, err
 	}
