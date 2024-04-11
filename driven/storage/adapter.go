@@ -283,7 +283,8 @@ func (a *Adapter) DeleteConfig(id string) error {
 func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.LegacyEventItem, error) {
 	filter := bson.M{}
 	var data []model.LegacyEventItem
-	err := a.db.legacyEvents.FindWithContext(context, filter, &data, nil)
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(context, filter, &data, nil, &timeout)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}
