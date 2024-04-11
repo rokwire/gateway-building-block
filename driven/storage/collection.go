@@ -31,13 +31,26 @@ type collectionWrapper struct {
 	coll     *mongo.Collection
 }
 
-func (collWrapper *collectionWrapper) Find(ctx context.Context, filter interface{}, result interface{},
-	findOptions *options.FindOptions) error {
+func (collWrapper *collectionWrapper) Find(filter interface{}, result interface{}, findOptions *options.FindOptions) error {
+	return collWrapper.FindWithParams(context.Background(), filter, result, findOptions, nil)
+}
+
+func (collWrapper *collectionWrapper) FindWithContext(ctx context.Context, filter interface{}, result interface{}, findOptions *options.FindOptions) error {
+	return collWrapper.FindWithParams(ctx, filter, result, findOptions, nil)
+}
+
+func (collWrapper *collectionWrapper) FindWithParams(ctx context.Context, filter interface{}, result interface{},
+	findOptions *options.FindOptions, timeout *time.Duration) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
+	//set timeout
+	if timeout == nil {
+		timeout = &collWrapper.database.mongoTimeout
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, *timeout)
 	defer cancel()
 
 	if filter == nil {
