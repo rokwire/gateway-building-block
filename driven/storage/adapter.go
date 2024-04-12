@@ -271,7 +271,7 @@ func (a *Adapter) UpdateConfig(config model.Config) error {
 // DeleteConfig deletes a configuration from storage
 func (a *Adapter) DeleteConfig(id string) error {
 	delFilter := bson.M{"_id": id}
-	_, err := a.db.configs.DeleteMany(a.context, delFilter, nil)
+	_, err := a.db.configs.DeleteManyWithContext(a.context, delFilter, nil)
 	if err != nil {
 		return errors.WrapErrorAction(logutils.ActionDelete, model.TypeConfig, &logutils.FieldArgs{"id": id}, err)
 	}
@@ -311,7 +311,7 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 // DeleteLegacyEvents Deletes a reminder
 func (a *Adapter) DeleteLegacyEvents() error {
 	filter := bson.M{}
-	_, err := a.db.legacyEvents.DeleteMany(nil, filter, nil)
+	_, err := a.db.legacyEvents.DeleteManyWithContext(nil, filter, nil)
 	return err
 }
 
@@ -326,7 +326,7 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 	filter := bson.D{
 		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
 	}
-	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	_, err := a.db.legacyEvents.DeleteManyWithContext(context, filter, nil)
 	return err
 }
 
@@ -346,7 +346,7 @@ func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, 
 		filter = append(filter, primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}})
 	}
 
-	_, err := a.db.legacyEvents.DeleteMany(context, filter, nil)
+	_, err := a.db.legacyEvents.DeleteManyWithContext(context, filter, nil)
 	return err
 }
 

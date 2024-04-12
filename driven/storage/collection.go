@@ -174,12 +174,25 @@ func (collWrapper *collectionWrapper) InsertManyWithContext(ctx context.Context,
 	return result, nil
 }
 
-func (collWrapper *collectionWrapper) DeleteMany(ctx context.Context, filter interface{}, opts *options.DeleteOptions) (*mongo.DeleteResult, error) {
+func (collWrapper *collectionWrapper) DeleteMany(filter interface{}, opts *options.DeleteOptions) (*mongo.DeleteResult, error) {
+	return collWrapper.DeleteManyWithParams(context.Background(), filter, opts, nil)
+}
+
+func (collWrapper *collectionWrapper) DeleteManyWithContext(ctx context.Context, filter interface{}, opts *options.DeleteOptions) (*mongo.DeleteResult, error) {
+	return collWrapper.DeleteManyWithParams(ctx, filter, opts, nil)
+}
+
+func (collWrapper *collectionWrapper) DeleteManyWithParams(ctx context.Context, filter interface{}, opts *options.DeleteOptions, timeout *time.Duration) (*mongo.DeleteResult, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
+	//set timeout
+	if timeout == nil {
+		timeout = &collWrapper.database.mongoTimeout
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, *timeout)
 	defer cancel()
 
 	result, err := collWrapper.coll.DeleteMany(ctx, filter, opts)

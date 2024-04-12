@@ -177,29 +177,29 @@ func (e eventsLogic) setupWebToolsTimer() {
 	}
 
 	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
-	if err != nil {
-		e.logger.Errorf("Error getting location:%s\n", err.Error())
-	}
-	now := time.Now().In(location)
-	e.logger.Infof("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
+	/*	location, err := time.LoadLocation("America/Chicago")
+		if err != nil {
+			e.logger.Errorf("Error getting location:%s\n", err.Error())
+		}
+		now := time.Now().In(location)
+		e.logger.Infof("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
-	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
+		nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
+		desiredMoment := 18000
 
-	var durationInSeconds int
-	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
-	if nowSecondsInDay <= desiredMoment {
-		e.logger.Infof("setupWebToolsTimer -> not web tools process today, so the first process will be today")
-		durationInSeconds = desiredMoment - nowSecondsInDay
-	} else {
-		e.logger.Infof("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
-		leftToday := 86400 - nowSecondsInDay
-		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
-	log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+		var durationInSeconds int
+		log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
+		if nowSecondsInDay <= desiredMoment {
+			e.logger.Infof("setupWebToolsTimer -> not web tools process today, so the first process will be today")
+			durationInSeconds = desiredMoment - nowSecondsInDay
+		} else {
+			e.logger.Infof("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
+			leftToday := 86400 - nowSecondsInDay
+			durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
+		}
+		log.Println(durationInSeconds) */
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -259,7 +259,7 @@ func (e eventsLogic) processWebToolsEvents() {
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
 		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(nil) //does not pass the transaction context - an issue!
+		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
 			return nil
