@@ -144,27 +144,26 @@ func (collWrapper *collectionWrapper) InsertOne(ctx context.Context, data interf
 	return nil, err
 }
 
-func (collWrapper *collectionWrapper) InsertMany(ctx context.Context, documents []interface{}, opts *options.InsertManyOptions) (*mongo.InsertManyResult, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
-	defer cancel()
-
-	result, err := collWrapper.coll.InsertMany(ctx, documents, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+func (collWrapper *collectionWrapper) InsertMany(documents []interface{}, opts *options.InsertManyOptions) (*mongo.InsertManyResult, error) {
+	return collWrapper.InsertManyWithParams(context.Background(), documents, opts, nil)
 }
 
 func (collWrapper *collectionWrapper) InsertManyWithContext(ctx context.Context, documents []interface{}, opts *options.InsertManyOptions) (*mongo.InsertManyResult, error) {
+	return collWrapper.InsertManyWithParams(ctx, documents, opts, nil)
+}
+
+func (collWrapper *collectionWrapper) InsertManyWithParams(ctx context.Context, documents []interface{}, opts *options.InsertManyOptions, timeout *time.Duration) (*mongo.InsertManyResult, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	/*ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
-	defer cancel()*/
+
+	//set timeout
+	if timeout == nil {
+		timeout = &collWrapper.database.mongoTimeout
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, *timeout)
+	defer cancel()
 
 	result, err := collWrapper.coll.InsertMany(ctx, documents, opts)
 	if err != nil {

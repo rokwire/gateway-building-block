@@ -300,7 +300,8 @@ func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.L
 		storageItems[i] = p
 	}
 
-	_, err := a.db.legacyEvents.InsertManyWithContext(context, storageItems, nil)
+	timeout := 15 * time.Second //15 seconds timeout
+	_, err := a.db.legacyEvents.InsertManyWithParams(context, storageItems, nil, &timeout)
 	if err != nil {
 		return nil, errors.WrapErrorAction("insert", "legacy events", nil, err)
 	}
