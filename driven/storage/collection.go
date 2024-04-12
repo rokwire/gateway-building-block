@@ -178,8 +178,8 @@ func (collWrapper *collectionWrapper) DeleteMany(ctx context.Context, filter int
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	timeout := 15 * time.Second //15 seconds timeout
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+
+	ctx, cancel := context.WithTimeout(ctx, collWrapper.database.mongoTimeout)
 	defer cancel()
 
 	result, err := collWrapper.coll.DeleteMany(ctx, filter, opts)
