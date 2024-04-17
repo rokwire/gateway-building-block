@@ -333,22 +333,29 @@ func (e eventsLogic) processWebToolsEvents() {
 func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
 	modifiedList := []model.WebToolsEvent{}
 
+	ignored := 0
 	for _, wte := range allWebtoolsEvents {
-		category := wte.EventType
+		currentWte := wte
+
+		category := currentWte.EventType
 		lowerCategory := strings.ToLower(category)
 		if lowerCategory == "informational" || lowerCategory == "meeting" ||
 			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
 			lowerCategory == "other" {
 
 			e.logger.Infof("skipping event as category is %s", category)
+
+			ignored++
+
 			continue
 		}
 
 		//add it
-		modifiedList = append(modifiedList, wte)
+		modifiedList = append(modifiedList, currentWte)
 	}
 
-	e.logger.Infof("modified list is %d", len(modifiedList))
+	e.logger.Infof("ignored events count is %d", ignored)
+	e.logger.Infof("final modified list is %d", len(modifiedList))
 
 	return modifiedList, nil
 }
