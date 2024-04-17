@@ -177,7 +177,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 	}
 
 	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
+	/*location, err := time.LoadLocation("America/Chicago")
 	if err != nil {
 		e.logger.Errorf("Error getting location:%s\n", err.Error())
 	}
@@ -197,9 +197,9 @@ func (e eventsLogic) setupWebToolsTimer() {
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
-	log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+	log.Println(durationInSeconds) */
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -262,7 +262,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
-			return nil
+			return err
 		}
 
 		var leExist []model.LegacyEventItem
@@ -286,12 +286,21 @@ func (e eventsLogic) processWebToolsEvents() {
 		err = e.app.storage.DeleteLegacyEventsByIDs(context, existingLegacyIdsMap)
 		if err != nil {
 			e.logger.Errorf("error on deleting events from the storage - %s", err)
-			return nil
+			return err
 		}
 
-		//3. Now you have to convert all allWebToolsEvents into legacy events
+		//at this moment the existing events are removed and we can add what comes from webtools
+
+		//3. we have a requirement to ignore events or modify them before applying
+		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+		if err != nil {
+			e.logger.Errorf("error on ignoring web tools events - %s", err)
+			return err
+		}
+
+		//4. Now you have to convert all allWebToolsEvents into legacy events
 		newLegacyEvents := []model.LegacyEventItem{}
-		for _, wt := range allWebToolsEvents {
+		for _, wt := range modifiedWebToolsEvents {
 
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
@@ -300,11 +309,11 @@ func (e eventsLogic) processWebToolsEvents() {
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
-		//4. Store all them in the database
+		//5. Store all them in the database
 		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
 		if err != nil {
 			e.logger.Errorf("error on saving events to the storage - %s", err)
-			return nil
+			return err
 		}
 		// It is all!
 
@@ -317,6 +326,15 @@ func (e eventsLogic) processWebToolsEvents() {
 		e.logger.Errorf("error performing transaction - %s", err)
 		return
 	}
+}
+
+// ignore or modify webtools events
+func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	//TODO
+
+	res := []model.WebToolsEvent{allWebtoolsEvents[0]}
+
+	return res, nil
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
