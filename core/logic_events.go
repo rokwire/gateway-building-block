@@ -334,27 +334,54 @@ func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebTools
 	modifiedList := []model.WebToolsEvent{}
 
 	ignored := 0
+	modified := 0
+
+	//map for category conversions
+	categoryMap := map[string]string{
+		"exhibition":               "Exhibits",
+		"festival/celebration":     "Festivals and Celebrations",
+		"film screening":           "Film Screenings",
+		"performance":              "Performances",
+		"lecture":                  "Speakers and Seminars",
+		"seminar/symposium":        "Speakers and Seminars",
+		"conference/workshop":      "Conferences and Workshops",
+		"reception/open house":     "Receptions and Open House Events",
+		"social/informal event":    "Social and Informal Events",
+		"professional development": "Career Development",
+		"health/fitness":           "Recreation, Health and Fitness",
+		"sporting event":           "Club Athletics",
+		"sidearm":                  "Big 10 Athletics",
+	}
+
 	for _, wte := range allWebtoolsEvents {
 		currentWte := wte
-
 		category := currentWte.EventType
 		lowerCategory := strings.ToLower(category)
+
+		//ignore some categories
 		if lowerCategory == "informational" || lowerCategory == "meeting" ||
 			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
 			lowerCategory == "other" {
 
 			e.logger.Infof("skipping event as category is %s", category)
-
 			ignored++
-
 			continue
 		}
 
-		//add it
+		//modify some categories
+		if newCategory, ok := categoryMap[lowerCategory]; ok {
+			currentWte.EventType = newCategory
+			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
+
+			modified++
+		}
+
+		//add it to the modified list
 		modifiedList = append(modifiedList, currentWte)
 	}
 
 	e.logger.Infof("ignored events count is %d", ignored)
+	e.logger.Infof("modified events count is %d", modified)
 	e.logger.Infof("final modified list is %d", len(modifiedList))
 
 	return modifiedList, nil
