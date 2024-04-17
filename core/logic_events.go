@@ -27,6 +27,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -330,11 +331,26 @@ func (e eventsLogic) processWebToolsEvents() {
 
 // ignore or modify webtools events
 func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
-	//TODO
+	modifiedList := []model.WebToolsEvent{}
 
-	res := []model.WebToolsEvent{allWebtoolsEvents[0]}
+	for _, wte := range allWebtoolsEvents {
+		category := wte.EventType
+		lowerCategory := strings.ToLower(category)
+		if lowerCategory == "informational" || lowerCategory == "meeting" ||
+			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
+			lowerCategory == "other" {
 
-	return res, nil
+			e.logger.Infof("skipping event as category is %s", category)
+			continue
+		}
+
+		//add it
+		modifiedList = append(modifiedList, wte)
+	}
+
+	e.logger.Infof("modified list is %d", len(modifiedList))
+
+	return modifiedList, nil
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
