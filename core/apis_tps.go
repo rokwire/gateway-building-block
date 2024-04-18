@@ -16,6 +16,7 @@ package core
 
 import (
 	"application/core/model"
+	"strings"
 )
 
 // appTPS contains BB implementations
@@ -30,12 +31,75 @@ func (a appTPS) GetExample(orgID string, appID string, id string) (*model.Exampl
 
 // CreateEvents creates events
 func (a appTPS) CreateEvents(event []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
-	return a.app.storage.InsertLegacyEvents(nil, event)
+	modifiedLegacyEvents, err := a.modifyLegacyEventsList(event)
+	if err != nil {
+		a.app.logger.Errorf("error on ignoring legacy events - %s", err)
+		return nil, err
+	}
+	return a.app.storage.InsertLegacyEvents(nil, modifiedLegacyEvents)
 }
 
 // DeleteEvents deletes legacy events by ids and creator
 func (a appTPS) DeleteEvents(ids []string, accountID string) error {
 	return a.app.storage.DeleteLegacyEventsByIDsAndCreator(nil, ids, accountID)
+}
+
+// ignore or modify legacy events
+func (a appTPS) modifyLegacyEventsList(legacyEvents []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
+	modifiedList := []model.LegacyEventItem{}
+
+	ignored := 0
+	modified := 0
+
+	//map for category conversions
+	categoryMap := map[string]string{
+		"exhibition":               "Exhibits",
+		"festival/celebration":     "Festivals and Celebrations",
+		"film screening":           "Film Screenings",
+		"performance":              "Performances",
+		"lecture":                  "Speakers and Seminars",
+		"seminar/symposium":        "Speakers and Seminars",
+		"conference/workshop":      "Conferences and Workshops",
+		"reception/open house":     "Receptions and Open House Events",
+		"social/informal event":    "Social and Informal Events",
+		"professional development": "Career Development",
+		"health/fitness":           "Recreation, Health and Fitness",
+		"sporting event":           "Club Athletics",
+		"sidearm":                  "Big 10 Athletics",
+	}
+
+	for _, wte := range legacyEvents {
+		currentWte := wte
+		category := currentWte.Item.Category
+		lowerCategory := strings.ToLower(category)
+
+		//ignore some categories
+		if lowerCategory == "informational" || lowerCategory == "meeting" ||
+			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
+			lowerCategory == "other" {
+
+			a.app.logger.Infof("skipping event as category is %s", category)
+			ignored++
+			continue
+		}
+
+		//modify some categories
+		if newCategory, ok := categoryMap[lowerCategory]; ok {
+			currentWte.Item.Category = newCategory
+			a.app.logger.Infof("modifying event category from %s to %s", category, newCategory)
+
+			modified++
+		}
+
+		//add it to the modified list
+		modifiedList = append(modifiedList, currentWte)
+	}
+
+	a.app.logger.Infof("ignored events count is %d", ignored)
+	a.app.logger.Infof("modified events count is %d", modified)
+	a.app.logger.Infof("final modified list is %d", len(modifiedList))
+
+	return modifiedList, nil
 }
 
 // newAppTPS creates new appTPS
