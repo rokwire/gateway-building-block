@@ -27,6 +27,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -262,7 +263,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
 		if err != nil {
 			e.logger.Errorf("error on loading events from the storage - %s", err)
-			return nil
+			return err
 		}
 
 		var leExist []model.LegacyEventItem
@@ -286,12 +287,21 @@ func (e eventsLogic) processWebToolsEvents() {
 		err = e.app.storage.DeleteLegacyEventsByIDs(context, existingLegacyIdsMap)
 		if err != nil {
 			e.logger.Errorf("error on deleting events from the storage - %s", err)
-			return nil
+			return err
 		}
 
-		//3. Now you have to convert all allWebToolsEvents into legacy events
+		//at this moment the existing events are removed and we can add what comes from webtools
+
+		//3. we have a requirement to ignore events or modify them before applying
+		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+		if err != nil {
+			e.logger.Errorf("error on ignoring web tools events - %s", err)
+			return err
+		}
+
+		//4. Now you have to convert all allWebToolsEvents into legacy events
 		newLegacyEvents := []model.LegacyEventItem{}
-		for _, wt := range allWebToolsEvents {
+		for _, wt := range modifiedWebToolsEvents {
 
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
@@ -300,11 +310,11 @@ func (e eventsLogic) processWebToolsEvents() {
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
-		//4. Store all them in the database
+		//5. Store all them in the database
 		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
 		if err != nil {
 			e.logger.Errorf("error on saving events to the storage - %s", err)
-			return nil
+			return err
 		}
 		// It is all!
 
@@ -317,6 +327,80 @@ func (e eventsLogic) processWebToolsEvents() {
 		e.logger.Errorf("error performing transaction - %s", err)
 		return
 	}
+}
+
+// ignore or modify webtools events
+func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	modifiedList := []model.WebToolsEvent{}
+
+	ignored := 0
+	modified := 0
+
+	//map for category conversions
+	categoryMap := map[string]string{
+		"exhibition":               "Exhibits",
+		"festival/celebration":     "Festivals and Celebrations",
+		"film screening":           "Film Screenings",
+		"performance":              "Performances",
+		"lecture":                  "Speakers and Seminars",
+		"seminar/symposium":        "Speakers and Seminars",
+		"conference/workshop":      "Conferences and Workshops",
+		"reception/open house":     "Receptions and Open House Events",
+		"social/informal event":    "Social and Informal Events",
+		"professional development": "Career Development",
+		"health/fitness":           "Recreation, Health and Fitness",
+		"sporting event":           "Club Athletics",
+		"sidearm":                  "Big 10 Athletics",
+	}
+
+	for _, wte := range allWebtoolsEvents {
+		currentWte := wte
+		category := currentWte.EventType
+		lowerCategory := strings.ToLower(category)
+
+		//ignore all day events
+		allDay := e.isAllDay(currentWte)
+		if allDay {
+			e.logger.Info("skipping event as all day is true")
+			ignored++
+			continue
+		}
+
+		//ignore some categories
+		if lowerCategory == "informational" || lowerCategory == "meeting" ||
+			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
+			lowerCategory == "other" {
+
+			e.logger.Infof("skipping event as category is %s", category)
+			ignored++
+			continue
+		}
+
+		//modify some categories
+		if newCategory, ok := categoryMap[lowerCategory]; ok {
+			currentWte.EventType = newCategory
+			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
+
+			modified++
+		}
+
+		//add it to the modified list
+		modifiedList = append(modifiedList, currentWte)
+	}
+
+	e.logger.Infof("ignored events count is %d", ignored)
+	e.logger.Infof("modified events count is %d", modified)
+	e.logger.Infof("final modified list is %d", len(modifiedList))
+
+	return modifiedList, nil
+}
+
+func (e eventsLogic) isAllDay(wt model.WebToolsEvent) bool {
+	timeType := wt.TimeType
+	if timeType == "NONE" {
+		return true
+	}
+	return false
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
