@@ -47,8 +47,6 @@ func (a appTPS) DeleteEvents(ids []string, accountID string) error {
 // ignore or modify legacy events
 func (a appTPS) modifyLegacyEventsList(legacyEvents []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
 	modifiedList := []model.LegacyEventItem{}
-
-	ignored := 0
 	modified := 0
 
 	//map for category conversions
@@ -73,16 +71,6 @@ func (a appTPS) modifyLegacyEventsList(legacyEvents []model.LegacyEventItem) ([]
 		category := currentWte.Item.Category
 		lowerCategory := strings.ToLower(category)
 
-		//ignore some categories
-		if lowerCategory == "informational" || lowerCategory == "meeting" ||
-			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
-			lowerCategory == "other" {
-
-			a.app.logger.Infof("skipping event as category is %s", category)
-			ignored++
-			continue
-		}
-
 		//modify some categories
 		if newCategory, ok := categoryMap[lowerCategory]; ok {
 			currentWte.Item.Category = newCategory
@@ -94,10 +82,8 @@ func (a appTPS) modifyLegacyEventsList(legacyEvents []model.LegacyEventItem) ([]
 		//add it to the modified list
 		modifiedList = append(modifiedList, currentWte)
 	}
-
-	a.app.logger.Infof("ignored events count is %d", ignored)
-	a.app.logger.Infof("modified events count is %d", modified)
-	a.app.logger.Infof("final modified list is %d", len(modifiedList))
+	a.app.logger.Infof("events count is %d", modified)
+	a.app.logger.Infof("final list is %d", len(modifiedList))
 
 	return modifiedList, nil
 }
