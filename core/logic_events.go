@@ -266,7 +266,14 @@ func (e eventsLogic) processWebToolsEvents() {
 			return err
 		}
 
-		log.Println(webtoolsItemsFromStorage)
+		existingLegacyIdsMap := make(map[string]string)
+		for _, w := range webtoolsItemsFromStorage {
+			if len(w.Item.DataSourceEventID) > 0 {
+				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
+			}
+		}
+
+		log.Println(existingLegacyIdsMap)
 
 		/*	//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
 			legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
