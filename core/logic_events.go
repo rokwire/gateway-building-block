@@ -255,7 +255,7 @@ func (e eventsLogic) processWebToolsEvents() {
 
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
-	//now := time.Now()
+	now := time.Now()
 
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
@@ -282,65 +282,30 @@ func (e eventsLogic) processWebToolsEvents() {
 
 		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
 
-		log.Println(existingLegacyIdsMap)
+		//3. we have a requirement to ignore events or modify them before applying
+		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+		if err != nil {
+			e.logger.Errorf("error on ignoring web tools events - %s", err)
+			return err
+		}
 
-		/*	//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-			legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
-			if err != nil {
-				e.logger.Errorf("error on loading events from the storage - %s", err)
-				return err
-			}
+		//4. now you have to convert all allWebToolsEvents into legacy events
+		newLegacyEvents := []model.LegacyEventItem{}
+		for _, wt := range modifiedWebToolsEvents {
 
-			var leExist []model.LegacyEventItem
-			for _, w := range allWebToolsEvents {
-				for _, l := range legacyEventItemFromStorage {
-					if w.EventID == l.Item.DataSourceEventID {
-						leExist = append(leExist, l)
-					}
-				}
-			}
+			//prepare the id
+			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 4
-			existingLegacyIdsMap := make(map[string]string)
-			for _, w := range leExist {
-				if w.Item.DataSourceEventID != "" {
-					existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
-				}
-			}
+			le := e.constructLegacyEvent(wt, id, now)
+			newLegacyEvents = append(newLegacyEvents, le)
+		}
 
-			//2. Once you know which are already in the datatabse then you must remove all of them
-			err = e.app.storage.DeleteLegacyEventsByIDs(context, existingLegacyIdsMap)
-			if err != nil {
-				e.logger.Errorf("error on deleting events from the storage - %s", err)
-				return err
-			}
-
-			//at this moment the existing events are removed and we can add what comes from webtools
-
-			//3. we have a requirement to ignore events or modify them before applying
-			modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
-			if err != nil {
-				e.logger.Errorf("error on ignoring web tools events - %s", err)
-				return err
-			}
-
-			//4. Now you have to convert all allWebToolsEvents into legacy events
-			newLegacyEvents := []model.LegacyEventItem{}
-			for _, wt := range modifiedWebToolsEvents {
-
-				//prepare the id
-				id := e.prepareID(wt.EventID, existingLegacyIdsMap)
-
-				le := e.constructLegacyEvent(wt, id, now)
-				newLegacyEvents = append(newLegacyEvents, le)
-			}
-
-			//5. Store all them in the database
-			_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
-			if err != nil {
-				e.logger.Errorf("error on saving events to the storage - %s", err)
-				return err
-			} */
+		//5. store all them in the database
+		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
+		if err != nil {
+			e.logger.Errorf("error on saving events to the storage - %s", err)
+			return err
+		}
 		// It is all!
 
 		return nil
