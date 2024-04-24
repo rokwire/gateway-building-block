@@ -292,6 +292,19 @@ func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.Lega
 	return data, nil
 }
 
+// FindLegacyEventItemsBySourceID finds legacy events items by source id
+func (a *Adapter) FindLegacyEventItemsBySourceID(context TransactionContext, sourceID string) ([]model.LegacyEventItem, error) {
+	filter := bson.D{primitive.E{Key: "item.sourceId", Value: sourceID}}
+	var data []model.LegacyEventItem
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(context, filter, &data, nil, &timeout)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
+
+	return data, nil
+}
+
 // InsertLegacyEvents inserts legacy events
 func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
 
@@ -316,7 +329,7 @@ func (a *Adapter) DeleteLegacyEvents() error {
 	return err
 }
 
-// DeleteLegacyEventsByIDs deletes all items by dataSourceEventIds
+// DeleteLegacyEventsByIDs deletes all items by dataSourceEventIds ????
 func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[string]string) error {
 
 	var valueIds []string
@@ -326,6 +339,16 @@ func (a *Adapter) DeleteLegacyEventsByIDs(context TransactionContext, Ids map[st
 
 	filter := bson.D{
 		primitive.E{Key: "item.id", Value: primitive.M{"$in": valueIds}},
+	}
+	timeout := 15 * time.Second //15 seconds timeout
+	_, err := a.db.legacyEvents.DeleteManyWithParams(context, filter, nil, &timeout)
+	return err
+}
+
+// DeleteLegacyEventsBySourceID deletes all legacy events by source id
+func (a *Adapter) DeleteLegacyEventsBySourceID(context TransactionContext, sourceID string) error {
+	filter := bson.D{
+		primitive.E{Key: "item.sourceId", Value: sourceID},
 	}
 	timeout := 15 * time.Second //15 seconds timeout
 	_, err := a.db.legacyEvents.DeleteManyWithParams(context, filter, nil, &timeout)

@@ -259,38 +259,28 @@ func (e eventsLogic) processWebToolsEvents() {
 
 	//in transaction
 	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-		//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
-		legacyEventItemFromStorage, err := e.app.storage.FindLegacyEventItems(context)
+		//1. first we must keep the events ids for the webtools events(sourceId = "0") because we will remove all of them and later recreated with the new ones
+		webtoolsItemsFromStorage, err := e.app.storage.FindLegacyEventItemsBySourceID(context, "0")
 		if err != nil {
-			e.logger.Errorf("error on loading events from the storage - %s", err)
+			e.logger.Errorf("error on loading webtools events from the storage - %s", err)
 			return err
 		}
 
-		var leExist []model.LegacyEventItem
-		for _, w := range allWebToolsEvents {
-			for _, l := range legacyEventItemFromStorage {
-				if w.EventID == l.Item.DataSourceEventID {
-					leExist = append(leExist, l)
-				}
-			}
-		}
-
-		//1.1 before to execute point 2(i.e. remove all of them) you must keep their IDs so that to put them again on point 3
 		existingLegacyIdsMap := make(map[string]string)
-		for _, w := range leExist {
-			if w.Item.DataSourceEventID != "" {
+		for _, w := range webtoolsItemsFromStorage {
+			if len(w.Item.DataSourceEventID) > 0 {
 				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
 			}
 		}
 
-		//2. Once you know which are already in the datatabse then you must remove all of them
-		err = e.app.storage.DeleteLegacyEventsByIDs(context, existingLegacyIdsMap)
+		//2. once we already have the ids then we have to remove all webtools events from the database
+		err = e.app.storage.DeleteLegacyEventsBySourceID(context, "0")
 		if err != nil {
-			e.logger.Errorf("error on deleting events from the storage - %s", err)
+			e.logger.Errorf("error on deleting legacy events from the storage - %s", err)
 			return err
 		}
 
-		//at this moment the existing events are removed and we can add what comes from webtools
+		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
 
 		//3. we have a requirement to ignore events or modify them before applying
 		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
@@ -299,7 +289,7 @@ func (e eventsLogic) processWebToolsEvents() {
 			return err
 		}
 
-		//4. Now you have to convert all allWebToolsEvents into legacy events
+		//4. now you have to convert all allWebToolsEvents into legacy events
 		newLegacyEvents := []model.LegacyEventItem{}
 		for _, wt := range modifiedWebToolsEvents {
 
@@ -310,15 +300,13 @@ func (e eventsLogic) processWebToolsEvents() {
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
-		//5. Store all them in the database
+		//5. store all them in the database
 		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
 		if err != nil {
 			e.logger.Errorf("error on saving events to the storage - %s", err)
 			return err
 		}
 		// It is all!
-
-		//* keep the already exisiting events IDS THE SAME!
 
 		return nil
 	}, 180000)
@@ -336,7 +324,7 @@ func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebTools
 	ignored := 0
 	modified := 0
 
-	//map for category conversions
+	//whitelist with categories which we care + map for category conversions
 	categoryMap := map[string]string{
 		"exhibition":               "Exhibits",
 		"festival/celebration":     "Festivals and Celebrations",
@@ -366,22 +354,16 @@ func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebTools
 			continue
 		}
 
-		//ignore some categories
-		if lowerCategory == "informational" || lowerCategory == "meeting" ||
-			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
-			lowerCategory == "other" {
-
-			e.logger.Infof("skipping event as category is %s", category)
-			ignored++
-			continue
-		}
-
-		//modify some categories
+		//get only the events which have a category from the whitelist
 		if newCategory, ok := categoryMap[lowerCategory]; ok {
 			currentWte.EventType = newCategory
 			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
 
 			modified++
+		} else {
+			e.logger.Infof("skipping event as category is %s", category)
+			ignored++
+			continue
 		}
 
 		//add it to the modified list
