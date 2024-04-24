@@ -324,7 +324,7 @@ func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebTools
 	ignored := 0
 	modified := 0
 
-	//map for category conversions
+	//whitelist with categories which we care + map for category conversions
 	categoryMap := map[string]string{
 		"exhibition":               "Exhibits",
 		"festival/celebration":     "Festivals and Celebrations",
@@ -354,22 +354,16 @@ func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebTools
 			continue
 		}
 
-		//ignore some categories
-		if lowerCategory == "informational" || lowerCategory == "meeting" ||
-			lowerCategory == "community service" || lowerCategory == "ceremony/service" ||
-			lowerCategory == "other" {
-
-			e.logger.Infof("skipping event as category is %s", category)
-			ignored++
-			continue
-		}
-
-		//modify some categories
+		//get only the events which have a category from the whitelist
 		if newCategory, ok := categoryMap[lowerCategory]; ok {
 			currentWte.EventType = newCategory
 			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
 
 			modified++
+		} else {
+			e.logger.Infof("skipping event as category is %s", category)
+			ignored++
+			continue
 		}
 
 		//add it to the modified list
