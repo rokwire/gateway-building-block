@@ -129,6 +129,7 @@ type Storage interface {
 	FindLegacyEventItemsBySourceID(context storage.TransactionContext, sourceID string) ([]model.LegacyEventItem, error)
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
+	DeleteLegacyEventsBySourceID(context storage.TransactionContext, sourceID string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 

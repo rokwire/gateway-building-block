@@ -273,6 +273,15 @@ func (e eventsLogic) processWebToolsEvents() {
 			}
 		}
 
+		//2. once we already have the ids then we have to remove all webtools events from the database
+		err = e.app.storage.DeleteLegacyEventsBySourceID(context, "0")
+		if err != nil {
+			e.logger.Errorf("error on deleting legacy events from the storage - %s", err)
+			return err
+		}
+
+		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
+
 		log.Println(existingLegacyIdsMap)
 
 		/*	//1. first find which events are already in the database. You have to compare by dataSourceEventId field.
