@@ -292,6 +292,19 @@ func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.Lega
 	return data, nil
 }
 
+// FindLegacyEventItemsBySourceID finds legacy events items by source id
+func (a *Adapter) FindLegacyEventItemsBySourceID(context TransactionContext, sourceID string) ([]model.LegacyEventItem, error) {
+	filter := bson.D{primitive.E{Key: "item.sourceId", Value: sourceID}}
+	var data []model.LegacyEventItem
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(context, filter, &data, nil, &timeout)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
+
+	return data, nil
+}
+
 // InsertLegacyEvents inserts legacy events
 func (a *Adapter) InsertLegacyEvents(context TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error) {
 
