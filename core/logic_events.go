@@ -26,6 +26,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -199,8 +200,8 @@ func (e eventsLogic) setupWebToolsTimer() {
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
 	log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -247,6 +248,15 @@ func (e eventsLogic) processWebToolsEvents() {
 		e.logger.Errorf("error on loading web tools events - %s", err)
 		return
 	}
+	var withimage []model.WebToolsEvent
+	for _, l := range allWebToolsEvents {
+		if l.LargeImageUploaded != "" {
+			withimage = append(withimage, l)
+		}
+		allWebToolsEvents = withimage
+	}
+
+	//fmt.Print(withimage)
 	webToolsCount := len(allWebToolsEvents)
 	if webToolsCount == 0 {
 		e.logger.Error("web tools are nil")
@@ -462,6 +472,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
 	location := constructLocation(g.Location)
+	imageUrl := counstructImage(g.OriginatingCalendarID, g.EventID, id, "none")
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
 	contacts = append(contacts, con)
@@ -562,7 +573,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
-			Tags: tags, TargetAudience: targetAudience}}
+			Tags: tags, TargetAudience: targetAudience, ImageURL: &imageUrl}}
 }
 
 func (e eventsLogic) formatDate(wtDate string) string {
@@ -666,6 +677,60 @@ func contactsToDef(items []model.ContactLegacy) []model.ContactLegacy {
 		defs[index] = contactToDef(items[index])
 	}
 	return defs
+}
+
+func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, prefixPath string) string {
+	currentAppConfig := "https://calendars.illinois.edu/eventImage"
+	currAppConfig := "large.png"
+	webtoolImageURL := fmt.Sprintf("%s/%s/%s/%s",
+		currentAppConfig,
+		originatingCalendarID,
+		dataSourceEventID,
+		currAppConfig,
+	)
+
+	/*imageStorePath := "./images"
+	if prefixPath != "" {
+		imageStorePath = prefixPath
+	}*/
+
+	imageResponse, err := http.Get(webtoolImageURL)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return ""
+	}
+	defer imageResponse.Body.Close()
+
+	if imageResponse.StatusCode == http.StatusNotFound {
+		webtoolImageURL = ""
+	}
+
+	if imageResponse.StatusCode == http.StatusOK {
+		// Make a GET request to the image URL
+		response, err := http.Get(webtoolImageURL)
+		if err != nil {
+			fmt.Println("Error while downloading the image:", err)
+			return ""
+		}
+		defer response.Body.Close()
+
+		// Create a new file to save the image
+		file, err := os.Create("image.png")
+		if err != nil {
+			fmt.Println("Error creating file:", err)
+			return ""
+		}
+		defer file.Close()
+
+		// Copy the response body to the file
+		_, err = io.Copy(file, response.Body)
+		if err != nil {
+			fmt.Println("Error while saving the image:", err)
+			return ""
+		}
+
+	}
+	return webtoolImageURL
 }
 
 // newAppEventsLogic creates new appShared
