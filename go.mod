@@ -13,6 +13,7 @@ require (
 	github.com/swaggo/swag v1.16.1
 	go.mongodb.org/mongo-driver v1.14.0
 	golang.org/x/sync v0.3.0
+	googlemaps.github.io/maps v1.7.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -54,5 +55,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
+	go.opencensus.io v0.22.3 // indirect
+	golang.org/x/time v0.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

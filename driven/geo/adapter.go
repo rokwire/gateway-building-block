@@ -1,7 +1,11 @@
 package geo
 
 import (
+	"context"
+	"log"
 	"strings"
+
+	"googlemaps.github.io/maps"
 )
 
 // Tip is a struct to hold localization tips
@@ -59,6 +63,41 @@ func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInf
 	return false, nil
 }
 
+func fetchGeoData(client *maps.Client, location string, entry map[string]interface{}) {
+	// Подготвяме заявката за геокодиране
+	req := &maps.GeocodingRequest{
+		Address: location + ", Urbana",
+		Components: map[maps.Component]string{
+			maps.ComponentAdministrativeArea: "Urbana",
+			maps.ComponentCountry:            "US",
+		},
+	}
+
+	// Извършваме заявката
+	resp, err := client.Geocode(context.Background(), req)
+	if err != nil {
+		log.Printf("API Key Error: %v", err)
+		entry["location"] = map[string]string{"description": location}
+		// Тук трябва да добавите записа към базата данни MongoDB или друга структура
+		return
+	}
+
+	if len(resp) != 0 {
+		lat := resp[0].Geometry.Location.Lat
+		lng := resp[0].Geometry.Location.Lng
+		geoInfo := map[string]interface{}{
+			"latitude":    lat,
+			"longitude":   lng,
+			"description": location,
+		}
+		entry["location"] = geoInfo
+	} else {
+		entry["location"] = map[string]string{"description": location}
+		log.Printf("calendarId: %s, dataSourceEventId: %s, location: %s geolocation not found",
+			entry["calendarId"], entry["dataSourceEventId"], location)
+	}
+}
+
 func main() {
 	found, geoInfo := searchStaticLocation("Krannert Center", "", "studio 5")
 	if found {
@@ -66,4 +105,12 @@ func main() {
 	} else {
 		println("No GeoInfo found")
 	}
+
+	/*client, err := maps.NewClient(maps.WithAPIKey("TODO"))
+	  if err != nil {
+	      log.Fatalf("Error creating client: %v", err)
+	  }
+
+	  entry := make(map[string]interface{})
+	  fetchGeoData(client, "123 Main St, Urbana", entry) */
 }
