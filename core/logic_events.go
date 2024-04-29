@@ -242,6 +242,8 @@ func (e eventsLogic) process() {
 }
 
 func (e eventsLogic) processWebToolsEvents() {
+
+	e.geoBBAdapter.TODO("Koral")
 	/*
 	   //load all web tools events
 	   allWebToolsEvents, err := e.loadAllWebToolsEvents()

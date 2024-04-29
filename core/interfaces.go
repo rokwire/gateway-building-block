@@ -101,7 +101,7 @@ type EventsBBAdapter interface {
 
 // GeoAdapter is used by core to get geo services
 type GeoAdapter interface {
-	TODO()
+	TODO(location string)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
