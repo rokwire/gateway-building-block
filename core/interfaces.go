@@ -99,6 +99,11 @@ type EventsBBAdapter interface {
 	LoadAllLegacyEvents() ([]model.LegacyEvent, error)
 }
 
+// GeoAdapter is used by core to get geo services
+type GeoAdapter interface {
+	TODO()
+}
+
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
 type Storage interface {
 	RegisterStorageListener(listener storage.Listener)

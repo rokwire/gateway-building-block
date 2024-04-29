@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/rokwire/logging-library-go/v2/logs"
 	"googlemaps.github.io/maps"
 )
 
@@ -40,6 +41,18 @@ var CalName2Location = map[string][2]float64{
 	"Foellinger Auditorium Events": {40.1059431, -88.2294751},
 	"Department of Sociology":      {40.1066528, -88.2305061},
 	"NCSA":                         {40.1147743, -88.2252053},
+}
+
+// Adapter implements the GeoAdapter interface
+type Adapter struct {
+	googleAPIKey string
+
+	log logs.Log
+}
+
+// TODO todo
+func (na Adapter) TODO() {
+
 }
 
 // searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
@@ -98,6 +111,7 @@ func fetchGeoData(client *maps.Client, location string, entry map[string]interfa
 	}
 }
 
+/*
 func main() {
 	found, geoInfo := searchStaticLocation("Krannert Center", "", "studio 5")
 	if found {
@@ -106,11 +120,21 @@ func main() {
 		println("No GeoInfo found")
 	}
 
-	/*client, err := maps.NewClient(maps.WithAPIKey("TODO"))
+	client, err := maps.NewClient(maps.WithAPIKey("TODO"))
 	  if err != nil {
 	      log.Fatalf("Error creating client: %v", err)
 	  }
 
 	  entry := make(map[string]interface{})
-	  fetchGeoData(client, "123 Main St, Urbana", entry) */
+	  fetchGeoData(client, "123 Main St, Urbana", entry)
+} */
+
+// NewGeoBBAdapter creates new instance
+func NewGeoBBAdapter(googleAPIKey string, logger *logs.Logger) Adapter {
+	log := logger.NewLog("geo_bb_adapter", logs.RequestContext{})
+
+	return Adapter{
+		googleAPIKey: googleAPIKey,
+		log:          *log,
+	}
 }

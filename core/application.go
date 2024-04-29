@@ -55,6 +55,7 @@ type Application struct {
 	storage Storage
 
 	eventsBBAdapter EventsBBAdapter
+	geoBBAdapter    GeoAdapter
 
 	//events logic
 	eventsLogic eventsLogic
@@ -92,9 +93,12 @@ func (a *Application) GetEnvConfigs() (*model.EnvConfigData, error) {
 func NewApplication(version string, build string,
 	storage Storage,
 	eventsBBAdapter EventsBBAdapter,
+	geoBBAdapter GeoAdapter,
 	appntAdapters map[string]Appointments,
 	logger *logs.Logger) *Application {
-	application := Application{version: version, build: build, storage: storage, eventsBBAdapter: eventsBBAdapter, logger: logger, AppointmentAdapters: appntAdapters}
+	application := Application{version: version, build: build, storage: storage,
+		eventsBBAdapter: eventsBBAdapter, geoBBAdapter: geoBBAdapter,
+		logger: logger, AppointmentAdapters: appntAdapters}
 
 	//add the drivers ports/interfaces
 	application.Default = newAppDefault(&application)
@@ -104,7 +108,7 @@ func NewApplication(version string, build string,
 	application.TPS = newAppTPS(&application)
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
-	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, *logger)
+	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, geoBBAdapter, *logger)
 
 	return &application
 }

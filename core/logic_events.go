@@ -39,6 +39,7 @@ type eventsLogic struct {
 	logger logs.Logger
 
 	eventsBBAdapter EventsBBAdapter
+	geoBBAdapter    GeoAdapter
 
 	//web tools timer
 	dailyWebToolsTimer *time.Timer
@@ -241,80 +242,183 @@ func (e eventsLogic) process() {
 }
 
 func (e eventsLogic) processWebToolsEvents() {
-	//load all web tools events
-	allWebToolsEvents, err := e.loadAllWebToolsEvents()
-	if err != nil {
-		e.logger.Errorf("error on loading web tools events - %s", err)
-		return
-	}
-	webToolsCount := len(allWebToolsEvents)
-	if webToolsCount == 0 {
-		e.logger.Error("web tools are nil")
-		return
-	}
+	/*
+	   //load all web tools events
+	   allWebToolsEvents, err := e.loadAllWebToolsEvents()
 
-	e.logger.Infof("we loaded %d web tools events", webToolsCount)
+	   	if err != nil {
+	   		e.logger.Errorf("error on loading web tools events - %s", err)
+	   		return
+	   	}
 
-	now := time.Now()
+	   webToolsCount := len(allWebToolsEvents)
 
-	//in transaction
-	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-		//1. first we must keep the events ids for the webtools events(sourceId = "0") because we will remove all of them and later recreated with the new ones
-		webtoolsItemsFromStorage, err := e.app.storage.FindLegacyEventItemsBySourceID(context, "0")
-		if err != nil {
-			e.logger.Errorf("error on loading webtools events from the storage - %s", err)
-			return err
-		}
+	   	if webToolsCount == 0 {
+	   		e.logger.Error("web tools are nil")
+	   		return
+	   	}
 
-		existingLegacyIdsMap := make(map[string]string)
-		for _, w := range webtoolsItemsFromStorage {
-			if len(w.Item.DataSourceEventID) > 0 {
-				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
-			}
-		}
+	   e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
-		//2. once we already have the ids then we have to remove all webtools events from the database
-		err = e.app.storage.DeleteLegacyEventsBySourceID(context, "0")
-		if err != nil {
-			e.logger.Errorf("error on deleting legacy events from the storage - %s", err)
-			return err
-		}
+	   now := time.Now()
 
-		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
+	   //tmp
+	   ign := 0
+	   used := 0
+	   usedList := map[string]bool{}
+	   ignoredList := map[string]bool{}
 
-		//3. we have a requirement to ignore events or modify them before applying
-		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
-		if err != nil {
-			e.logger.Errorf("error on ignoring web tools events - %s", err)
-			return err
-		}
+	   	for _, c := range allWebToolsEvents {
+	   		location := c.Location
 
-		//4. now you have to convert all allWebToolsEvents into legacy events
-		newLegacyEvents := []model.LegacyEventItem{}
-		for _, wt := range modifiedWebToolsEvents {
+	   		if len(location) == 0 {
+	   			continue //we do not care empty lcoations
+	   		}
 
-			//prepare the id
-			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
+	   		if location == "Davenport 109A" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Nevada Dance Studio (905 W. Nevada St.)" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "18th Ave Library, 175 W 18th Ave, Room 205, Oklahoma City, OK" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Champaign County Fairgrounds" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Student Union SLC Conference room" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Armory, room 172 (the Innovation Studio)" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Student Union Room 235" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Uni 206, 210, 211" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Uni 205, 206, 210" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Southern Historical Association Combs Chandler 30" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "St. Louis, MO" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Student Union SLC" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "Purdue University, West Lafayette, Indiana" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "MP 7" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "116 Roger Adams Lab" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "2700 Campus Way 45221" {
+	   			used++
+	   			usedList[location] = true
+	   		} else if location == "The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL" {
+	   			used++
+	   			usedList[location] = true
+	   		} else {
+	   			ign++
+	   			ignoredList[location] = true
+	   		}
 
-			le := e.constructLegacyEvent(wt, id, now)
-			newLegacyEvents = append(newLegacyEvents, le)
-		}
+	   		if c.VirtualEvent == "true" {
+	   			fmt.Printf("%s VIRTUAL\n", c.Title)
+	   		}
+	   	}
 
-		//5. store all them in the database
-		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
-		if err != nil {
-			e.logger.Errorf("error on saving events to the storage - %s", err)
-			return err
-		}
-		// It is all!
+	   //TMP
 
-		return nil
-	}, 180000)
+	   //fmt.Printf("ТТТ\tIgnore %s\n", location)
+	   //	ign++
 
-	if err != nil {
-		e.logger.Errorf("error performing transaction - %s", err)
-		return
-	}
+	   //fmt.Printf("TTT\tUsed %s\n", location)
+	   //	used++
+
+	   fmt.Printf("L: (ignored events: %d) (ignored locations: %d)", ign, len(ignoredList))
+
+	   	for k, _ := range ignoredList {
+	   		fmt.Printf("\nL: %s", k)
+	   	}
+
+	   fmt.Println("")
+	   fmt.Println("")
+
+	   fmt.Printf("L: (used: %d) (used locations: %d)", used, len(usedList))
+
+	   	for k, _ := range usedList {
+	   		fmt.Printf("\nL: %s", k)
+	   	}
+
+	   //in transaction
+
+	   	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+	   		//1. first we must keep the events ids for the webtools events(sourceId = "0") because we will remove all of them and later recreated with the new ones
+	   		webtoolsItemsFromStorage, err := e.app.storage.FindLegacyEventItemsBySourceID(context, "0")
+	   		if err != nil {
+	   			e.logger.Errorf("error on loading webtools events from the storage - %s", err)
+	   			return err
+	   		}
+
+	   		existingLegacyIdsMap := make(map[string]string)
+	   		for _, w := range webtoolsItemsFromStorage {
+	   			if len(w.Item.DataSourceEventID) > 0 {
+	   				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
+	   			}
+	   		}
+
+	   		//2. once we already have the ids then we have to remove all webtools events from the database
+	   		err = e.app.storage.DeleteLegacyEventsBySourceID(context, "0")
+	   		if err != nil {
+	   			e.logger.Errorf("error on deleting legacy events from the storage - %s", err)
+	   			return err
+	   		}
+
+	   		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
+
+	   		//3. we have a requirement to ignore events or modify them before applying
+	   		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+	   		if err != nil {
+	   			e.logger.Errorf("error on ignoring web tools events - %s", err)
+	   			return err
+	   		}
+
+	   		//4. now you have to convert all allWebToolsEvents into legacy events
+	   		newLegacyEvents := []model.LegacyEventItem{}
+	   		for _, wt := range modifiedWebToolsEvents {
+
+	   			//prepare the id
+	   			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
+
+	   			le := e.constructLegacyEvent(wt, id, now)
+	   			newLegacyEvents = append(newLegacyEvents, le)
+	   		}
+
+	   		//5. store all them in the database
+	   		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
+	   		if err != nil {
+	   			e.logger.Errorf("error on saving events to the storage - %s", err)
+	   			return err
+	   		}
+	   		// It is all!
+
+	   		return nil
+	   	}, 180000)
+
+	   	if err != nil {
+	   		e.logger.Errorf("error performing transaction - %s", err)
+	   		return
+	   	}
+	*/
 }
 
 // ignore or modify webtools events
@@ -658,6 +762,20 @@ func constructLocation(location string) model.LocationLegacy {
 		longitude = -88.22901039999999
 	}
 
+	/*//TMP
+	//	ign := 0
+	//	used := 0
+	if latitude == 0.0 {
+		fmt.Printf("ТТТ\tIgnore %s\n", location)
+		//	ign++
+	} else {
+		fmt.Printf("TTT\tUsed %s\n", location)
+		//	used++
+	}
+
+	//fmt.Printf("L: ignored: %d", ign)
+	//fmt.Printf("L: used: %d", used) */
+
 	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
 }
 
@@ -674,7 +792,9 @@ func contactsToDef(items []model.ContactLegacy) []model.ContactLegacy {
 }
 
 // newAppEventsLogic creates new appShared
-func newAppEventsLogic(app *Application, eventsBBAdapter EventsBBAdapter, logger logs.Logger) eventsLogic {
+func newAppEventsLogic(app *Application, eventsBBAdapter EventsBBAdapter, geoBBAdapter GeoAdapter, logger logs.Logger) eventsLogic {
 	timerDone := make(chan bool)
-	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter, timerDone: timerDone, logger: logger}
+	return eventsLogic{app: app,
+		eventsBBAdapter: eventsBBAdapter, geoBBAdapter: geoBBAdapter,
+		timerDone: timerDone, logger: logger}
 }

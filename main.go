@@ -17,6 +17,7 @@ package main
 import (
 	"application/core"
 	"application/driven/eventsbb"
+	"application/driven/geo"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
@@ -68,11 +69,16 @@ func main() {
 	eventsBBAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
 	eventsBBAdapter := eventsbb.NewEventsBBAdapter(eventsBBBaseURL, eventsBBAPIKey, logger)
 
+	// geo bb adapter
+	//geoBBGoogleAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
+	geoBBGoogleAPIKey := "1234"
+	geoBBAdapter := geo.NewGeoBBAdapter(geoBBGoogleAPIKey, logger)
+
 	// appointment adapters
 	appointments := make(map[string]core.Appointments)
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, appointments, logger)
+	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, geoBBAdapter, appointments, logger)
 	err = application.Start()
 	if err != nil {
 		logger.Fatalf("Cannot start the Application module: %v", err)
