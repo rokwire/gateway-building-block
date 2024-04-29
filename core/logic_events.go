@@ -23,6 +23,8 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"image"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -706,6 +708,7 @@ func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, p
 	}
 
 	if imageResponse.StatusCode == http.StatusOK {
+
 		// Make a GET request to the image URL
 		response, err := http.Get(webtoolImageURL)
 		if err != nil {
@@ -714,20 +717,44 @@ func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, p
 		}
 		defer response.Body.Close()
 
-		// Create a new file to save the image
-		file, err := os.Create("image.png")
+		// Decode the image
+		img, format, err := image.Decode(response.Body)
+		if err != nil {
+			fmt.Println("Error while decoding the image:", err)
+			return ""
+		}
+
+		// Get the image dimensions
+		bounds := img.Bounds()
+		width := bounds.Dx()
+		height := bounds.Dy()
+
+		// Set the filename and quality for the JPEG file
+		filename := "image.png"
+		quality := "100" // Quality doesn't apply for PNG format
+
+		// Create a new file to save the image as PNG
+		file, err := os.Create(filename)
 		if err != nil {
 			fmt.Println("Error creating file:", err)
 			return ""
 		}
 		defer file.Close()
 
-		// Copy the response body to the file
-		_, err = io.Copy(file, response.Body)
+		// Encode the image as PNG and save it to the file
+		err = png.Encode(file, img)
 		if err != nil {
-			fmt.Println("Error while saving the image:", err)
+			fmt.Println("Error while saving the image as PNG:", err)
 			return ""
 		}
+
+		fmt.Printf("Image downloaded and saved as PNG successfully.\n")
+		fmt.Printf("Format: %s\n", format)
+		fmt.Printf("Width: %d\n", width)
+		fmt.Printf("Height: %d\n", height)
+		fmt.Printf("Filename: %s\n", filename)
+		fmt.Printf("Quality: %s\n", quality)
+		fmt.Printf("url: %s\n", webtoolImageURL)
 
 	}
 	return webtoolImageURL
