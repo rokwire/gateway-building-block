@@ -20,10 +20,16 @@ import (
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"strings"
 
+	"github.com/golang-jwt/jwt"
+	"github.com/rokwire/core-auth-library-go/v2/envloader"
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
-	"github.com/rokwire/core-auth-library-go/v3/envloader"
+	"github.com/rokwire/core-auth-library-go/v3/keys"
+	"github.com/rokwire/core-auth-library-go/v3/sigauth"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -90,16 +96,60 @@ func main() {
 		AuthBaseURL: coreBBBaseURL,
 	}
 
+	serviceAccountID := envLoader.GetAndLogEnvVar("GATEWAY_SERVICE_ACCOUNT_ID", true, true)
+	privKeyRaw := envLoader.GetAndLogEnvVar("GATEWAY_PRIV_KEY", true, true)
+	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
+	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
+	if err != nil {
+		logger.Fatalf("Error parsing priv key: %v", err)
+	}
+
+	pkey := convertToKeysPrivKey(privKey)
+
 	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, nil)
 	if err != nil {
 		logger.Fatalf("Error initializing remote service registration loader: %v", err)
 	}
 
-	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, !strings.HasPrefix(baseURL, "http://localhost"))
+	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, false)
 	if err != nil {
 		logger.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
-	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, logger)
+	signatureAuth, err := sigauth.NewSignatureAuth(pkey, serviceRegManager, false, false)
+	if err != nil {
+		logger.Fatalf("Error initializing signature auth: %v", err)
+	}
+
+	serviceAccountLoader, err := authservice.NewRemoteServiceAccountLoader(&authService, serviceAccountID, signatureAuth)
+	if err != nil {
+		logger.Fatalf("Error initializing remote service account loader: %v", err)
+	}
+
+	serviceAccountManager, err := authservice.NewServiceAccountManager(&authService, serviceAccountLoader)
+	if err != nil {
+		logger.Fatalf("Error initializing service account manager: %v", err)
+	}
+
+	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, serviceAccountManager, logger)
 	webAdapter.Start()
+}
+
+func convertToKeysPrivKey(privateKey *rsa.PrivateKey) *keys.PrivKey {
+	// Convert RSA private key to DER format
+	derBytes := x509.MarshalPKCS1PrivateKey(privateKey)
+
+	// Encode DER bytes to PEM format
+	pemBytes := pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: derBytes,
+	})
+
+	// Now create keys.PrivKey using pemBytes
+	privKey := &keys.PrivKey{
+		KeyPem: string(pemBytes),
+		// Other fields initialization as needed
+	}
+
+	return privKey
 }

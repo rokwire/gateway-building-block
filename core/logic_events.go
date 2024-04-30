@@ -20,13 +20,16 @@ package core
 import (
 	"application/core/model"
 	"application/driven/storage"
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"image"
 	"image/png"
 	"io"
+	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
@@ -691,11 +694,6 @@ func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, p
 		currAppConfig,
 	)
 
-	/*imageStorePath := "./images"
-	if prefixPath != "" {
-		imageStorePath = prefixPath
-	}*/
-
 	imageResponse, err := http.Get(webtoolImageURL)
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -718,7 +716,7 @@ func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, p
 		defer response.Body.Close()
 
 		// Decode the image
-		img, format, err := image.Decode(response.Body)
+		img, _, err := image.Decode(response.Body)
 		if err != nil {
 			fmt.Println("Error while decoding the image:", err)
 			return ""
@@ -731,7 +729,6 @@ func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, p
 
 		// Set the filename and quality for the JPEG file
 		filename := "image.png"
-		quality := "100" // Quality doesn't apply for PNG format
 
 		// Create a new file to save the image as PNG
 		file, err := os.Create(filename)
@@ -748,16 +745,104 @@ func counstructImage(originatingCalendarID, dataSourceEventID, eventID string, p
 			return ""
 		}
 
-		fmt.Printf("Image downloaded and saved as PNG successfully.\n")
-		fmt.Printf("Format: %s\n", format)
-		fmt.Printf("Width: %d\n", width)
-		fmt.Printf("Height: %d\n", height)
-		fmt.Printf("Filename: %s\n", filename)
-		fmt.Printf("Quality: %s\n", quality)
-		fmt.Printf("url: %s\n", webtoolImageURL)
+		// Download the image and fetch additional data
+		// Fetch the image from the URL
+		resp, err := http.Get(webtoolImageURL)
+		if err != nil {
+			fmt.Println("Error fetching image:", err)
+			return ""
+		}
+		defer resp.Body.Close()
 
+		// Read the image data into a byte slice
+		imageData, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("Error reading image data:", err)
+			return ""
+		}
+
+		// Upload the image with additional data
+		imageURL, err := uploadImage(imageData, height, width, 100, "event/tout", filename)
+		if err != nil {
+			fmt.Println("Error uploading image:", err)
+			return ""
+		}
+
+		fmt.Println("Image uploaded successfully!")
+		webtoolImageURL = imageURL
 	}
 	return webtoolImageURL
+}
+
+// Function to upload image to another API along with additional data
+func uploadImage(imageData []byte, height int, width int, quality int, path, fileName string) (string, error) {
+	// URL to which the request will be sent
+	targetURL := "https://api-dev.rokwire.illinois.edu/content/bbs/image"
+
+	// Send the request and get the response
+	response, err := sendRequest(targetURL, path, width, height, quality, string(imageData))
+	if err != nil {
+		fmt.Println("Error:", err)
+		return "", err
+	}
+
+	fmt.Println("Response:", response)
+	return response, nil
+}
+
+func sendRequest(targetURL, path string, width, height, quality int, filePath string) (string, error) {
+	// Create a new buffer to store the multipart form data
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	// Add the path, width, height, and quality as form fields
+	_ = writer.WriteField("path", path)
+	_ = writer.WriteField("width", strconv.Itoa(width))
+	_ = writer.WriteField("height", strconv.Itoa(height))
+	_ = writer.WriteField("quality", strconv.Itoa(quality))
+
+	// Add the file as a form file field
+	fileWriter, err := writer.CreateFormFile("fileName", "image.jpg")
+	if err != nil {
+		return "", fmt.Errorf("error creating form file: %w", err)
+	}
+
+	// Copy the file data into the file writer
+	_, err = io.Copy(fileWriter, bytes.NewReader([]byte(filePath)))
+	if err != nil {
+		return "", fmt.Errorf("error copying file data: %w", err)
+	}
+
+	// Close the multipart writer
+	writer.Close()
+
+	// Create the HTTP request
+	request, err := http.NewRequest("POST", targetURL, &requestBody)
+	if err != nil {
+		return "", fmt.Errorf("error creating HTTP request: %w", err)
+	}
+
+	// Set the content type header
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Send the request
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("error sending HTTP request: %w", err)
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", fmt.Errorf("error reading response body: %w", err)
+	}
+
+	// Convert response body to string
+	responseString := string(responseBody)
+
+	return responseString, nil
 }
 
 // newAppEventsLogic creates new appShared
