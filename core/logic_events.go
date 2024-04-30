@@ -477,7 +477,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
 	location := constructLocation(g.Location)
-	imageUrl := counstructImage(g.OriginatingCalendarID, g.EventID, id, "none")
+	imageURL := counstructImage(g.OriginatingCalendarID, g.EventID, id, "none")
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
 	contacts = append(contacts, con)
@@ -578,7 +578,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
-			Tags: tags, TargetAudience: targetAudience, ImageURL: &imageUrl}}
+			Tags: tags, TargetAudience: targetAudience, ImageURL: &imageURL}}
 }
 
 func (e eventsLogic) formatDate(wtDate string) string {
