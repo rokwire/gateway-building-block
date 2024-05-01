@@ -137,7 +137,8 @@ type Storage interface {
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 
-	FindImageItems(context storage.TransactionContext) ([]model.ContentImagesURL, error)
+	FindImageItems() ([]model.ContentImagesURL, error)
+	InsertImageItems(items model.ContentImagesURL) error
 }
 
 // StorageListener represents storage listener

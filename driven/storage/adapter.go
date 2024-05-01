@@ -525,17 +525,26 @@ func filterArgs(filter bson.M) *logutils.FieldArgs {
 	return &args
 }
 
-// FindImageItemss finds all images stored in the database
-func (a *Adapter) FindImageItems(context TransactionContext) ([]model.ContentImagesURL, error) {
+// FindImageItems finds all images stored in the database
+func (a *Adapter) FindImageItems() ([]model.ContentImagesURL, error) {
 	filter := bson.M{}
 	var data []model.ContentImagesURL
 	timeout := 15 * time.Second //15 seconds timeout
-	err := a.db.processedImages.FindWithParams(context, filter, &data, nil, &timeout)
+	err := a.db.processedImages.FindWithParams(nil, filter, &data, nil, &timeout)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}
 
 	return data, nil
+}
+
+// InsertImageItems insert content image url
+func (a *Adapter) InsertImageItems(items model.ContentImagesURL) error {
+	_, err := a.db.processedImages.InsertOne(nil, items)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeExample, nil, err)
+	}
+	return nil
 }
 
 // NewStorageAdapter creates a new storage adapter instance
