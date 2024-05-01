@@ -261,7 +261,6 @@ func (e eventsLogic) processWebToolsEvents() {
 		allWebToolsEvents = withimage
 	}
 
-	//fmt.Print(withimage)
 	webToolsCount := len(allWebToolsEvents)
 	if webToolsCount == 0 {
 		e.logger.Error("web tools are nil")
