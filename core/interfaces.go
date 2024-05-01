@@ -187,3 +187,7 @@ type SuccessTeam interface {
 	GetPrimaryCareProvider(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 }
+
+// ImageAdapter  is used to precess images
+type ImageAdapter interface {
+}

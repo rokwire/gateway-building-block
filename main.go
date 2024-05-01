@@ -17,12 +17,14 @@ package main
 import (
 	"application/core"
 	"application/driven/eventsbb"
+	"application/driven/image"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+
 	"strings"
 
 	"github.com/golang-jwt/jwt"
@@ -77,12 +79,6 @@ func main() {
 	// appointment adapters
 	appointments := make(map[string]core.Appointments)
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
-	// application
-	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, appointments, logger)
-	err = application.Start()
-	if err != nil {
-		logger.Fatalf("Cannot start the Application module: %v", err)
-	}
 
 	// web adapter
 	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
@@ -115,7 +111,6 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Error initializing service registration manager: %v", err)
 	}
-
 	signatureAuth, err := sigauth.NewSignatureAuth(pkey, serviceRegManager, false, false)
 	if err != nil {
 		logger.Fatalf("Error initializing signature auth: %v", err)
@@ -129,6 +124,20 @@ func main() {
 	serviceAccountManager, err := authservice.NewServiceAccountManager(&authService, serviceAccountLoader)
 	if err != nil {
 		logger.Fatalf("Error initializing service account manager: %v", err)
+	}
+
+	// image adapter
+	imageBaseURL := envLoader.GetAndLogEnvVar("GATEWAY_CONTENT_BB_BASE_URL", true, true)
+	imageAdapter := image.NewImageAdapter(imageBaseURL, serviceAccountManager)
+	if err != nil {
+		logger.Fatalf("Error initializing sports adapter: %v", err)
+	}
+
+	// application
+	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, imageAdapter, appointments, logger)
+	err = application.Start()
+	if err != nil {
+		logger.Fatalf("Cannot start the Application module: %v", err)
 	}
 
 	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, serviceAccountManager, logger)
