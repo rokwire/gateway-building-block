@@ -20,7 +20,7 @@ type ContentImagesURL struct {
 	ImageURL string `json:"imageURL" bson:"imageURL"`
 }
 
-// ImagesData is used to keep the the image thata from webtools
+// ImageData is used to keep the the image thata from webtools
 type ImageData struct {
 	ImageData []byte `json:"image_data"`
 	Height    int    `json:"height"`
