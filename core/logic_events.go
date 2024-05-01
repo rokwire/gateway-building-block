@@ -199,8 +199,8 @@ func (e eventsLogic) setupWebToolsTimer() {
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
 	log.Println(durationInSeconds)
-	duration := time.Second * time.Duration(3)
-	//duration := time.Second * time.Duration(durationInSeconds)
+	//duration := time.Second * time.Duration(3)
+	duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
