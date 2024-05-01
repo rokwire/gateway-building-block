@@ -91,6 +91,7 @@ type WebToolsEvent struct {
 		ID   string `xml:"id"`
 		Name string `xml:"name"`
 	} `xml:"topic"`
+	ImageURL string `json:"imageURL"`
 }
 
 // WebToolsItem represents web tools blacklist ids

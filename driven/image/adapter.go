@@ -142,7 +142,7 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 // Function to upload image to another API along with additional data
 func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int, quality int, path, fileName string) (string, error) {
 	// URL to which the request will be sent
-	targetURL := "http://localhost/content/bbs/image"
+	targetURL := "https://api-dev.rokwire.illinois.edu/content/bbs/image"
 
 	// Send the request and get the response
 	response, err := sendRequest(targetURL, path, width, height, quality, string(imageData))
