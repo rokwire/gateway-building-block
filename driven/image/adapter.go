@@ -38,7 +38,7 @@ type Adapter struct {
 
 // ProcessImages downloads from webtools and uploads in content
 func (im Adapter) ProcessImages(item []model.WebToolsEvent) ([]model.ContentImagesURL, error) {
-	var contentimageUrl []model.ContentImagesURL
+	var contentImageURL []model.ContentImagesURL
 	for _, w := range item {
 		if w.LargeImageUploaded != "false" {
 			webtoolsImage, err := im.downloadWebtoolImages(w)
@@ -49,11 +49,10 @@ func (im Adapter) ProcessImages(item []model.WebToolsEvent) ([]model.ContentImag
 				webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
 				webtoolsImage.Path, webtoolsImage.FileName)
 			contentImage := model.ContentImagesURL{ID: w.EventID, ImageURL: uploadImageFromContent}
-			contentimageUrl = append(contentimageUrl, contentImage)
-			fmt.Println(contentimageUrl)
+			contentImageURL = append(contentImageURL, contentImage)
 		}
 	}
-	return contentimageUrl, nil
+	return contentImageURL, nil
 
 }
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
