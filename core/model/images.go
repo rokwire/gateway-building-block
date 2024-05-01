@@ -19,3 +19,13 @@ type ContentImagesURL struct {
 	ID       string `json:"id" bson:"_id"`
 	ImageURL string `json:"imageURL" bson:"imageURL"`
 }
+
+// ImagesData is used to keep the the image thata from webtools
+type ImageData struct {
+	ImageData []byte `json:"image_data"`
+	Height    int    `json:"height"`
+	Width     int    `json:"width"`
+	Quality   int    `json:"quality"`
+	Path      string `json:"path"`
+	FileName  string `json:"fileName"`
+}
