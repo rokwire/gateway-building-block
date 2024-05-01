@@ -525,6 +525,19 @@ func filterArgs(filter bson.M) *logutils.FieldArgs {
 	return &args
 }
 
+// FindImageItemss finds all images stored in the database
+func (a *Adapter) FindImageItems(context TransactionContext) ([]model.ContentImagesURL, error) {
+	filter := bson.M{}
+	var data []model.ContentImagesURL
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.processedImages.FindWithParams(context, filter, &data, nil, &timeout)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
+
+	return data, nil
+}
+
 // NewStorageAdapter creates a new storage adapter instance
 func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout string, logger *logs.Logger) *Adapter {
 	timeout, err := strconv.Atoi(mongoTimeout)
