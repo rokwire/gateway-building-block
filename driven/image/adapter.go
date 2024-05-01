@@ -30,7 +30,7 @@ import (
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
 )
 
-// Adapter implements the Sports interface
+// Adapter implements the Image interface
 type Adapter struct {
 	baseURL        string
 	accountManager *authservice.ServiceAccountManager
