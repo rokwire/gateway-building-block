@@ -192,5 +192,5 @@ type SuccessTeam interface {
 
 // ImageAdapter  is used to precess images
 type ImageAdapter interface {
-	ProcessImages(item []model.WebToolsEvent) ([]model.WebToolsEvent, error)
+	ProcessImages(item []model.WebToolsEvent) ([]model.ContentImagesURL, error)
 }

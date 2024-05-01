@@ -16,12 +16,16 @@ package image
 
 import (
 	"application/core/model"
+	"bytes"
 	"fmt"
 	"image"
 	"image/png"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
 )
@@ -33,14 +37,23 @@ type Adapter struct {
 }
 
 // ProcessImages downloads from webtools and uploads in content
-func (im Adapter) ProcessImages(item []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+func (im Adapter) ProcessImages(item []model.WebToolsEvent) ([]model.ContentImagesURL, error) {
+	var contentimageUrl []model.ContentImagesURL
 	for _, w := range item {
 		if w.LargeImageUploaded != "false" {
-			webtoolsImage, _ := im.downloadWebtoolImages(w)
-			fmt.Println(webtoolsImage)
+			webtoolsImage, err := im.downloadWebtoolImages(w)
+			if err != nil {
+				return nil, err
+			}
+			uploadImageFromContent, _ := im.uploadImageFromContent(webtoolsImage.ImageData,
+				webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
+				webtoolsImage.Path, webtoolsImage.FileName)
+			contentImage := model.ContentImagesURL{ID: w.EventID, ImageURL: uploadImageFromContent}
+			contentimageUrl = append(contentimageUrl, contentImage)
+			fmt.Println(contentimageUrl)
 		}
 	}
-	return nil, nil
+	return contentimageUrl, nil
 
 }
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
@@ -124,6 +137,77 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 			Quality: 100, Path: "event/tout", FileName: filename}
 	}
 	return &webtoolImage, nil
+}
+
+// Function to upload image to another API along with additional data
+func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int, quality int, path, fileName string) (string, error) {
+	// URL to which the request will be sent
+	targetURL := "http://localhost/content/bbs/image"
+
+	// Send the request and get the response
+	response, err := sendRequest(targetURL, path, width, height, quality, string(imageData))
+	if err != nil {
+		fmt.Println("Error:", err)
+		return "", err
+	}
+
+	fmt.Println("Response:", response)
+	return response, nil
+}
+
+func sendRequest(targetURL, path string, width, height, quality int, filePath string) (string, error) {
+	// Create a new buffer to store the multipart form data
+	var requestBody bytes.Buffer
+	writer := multipart.NewWriter(&requestBody)
+
+	// Add the path, width, height, and quality as form fields
+	_ = writer.WriteField("path", path)
+	_ = writer.WriteField("width", strconv.Itoa(width))
+	_ = writer.WriteField("height", strconv.Itoa(height))
+	_ = writer.WriteField("quality", strconv.Itoa(quality))
+
+	// Add the file as a form file field
+	fileWriter, err := writer.CreateFormFile("fileName", "image.jpg")
+	if err != nil {
+		return "", fmt.Errorf("error creating form file: %w", err)
+	}
+
+	// Copy the file data into the file writer
+	_, err = io.Copy(fileWriter, bytes.NewReader([]byte(filePath)))
+	if err != nil {
+		return "", fmt.Errorf("error copying file data: %w", err)
+	}
+
+	// Close the multipart writer
+	writer.Close()
+
+	// Create the HTTP request
+	request, err := http.NewRequest("POST", targetURL, &requestBody)
+	if err != nil {
+		return "", fmt.Errorf("error creating HTTP request: %w", err)
+	}
+
+	// Set the content type header
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Send the request
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("error sending HTTP request: %w", err)
+	}
+	defer response.Body.Close()
+
+	// Read the response body
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", fmt.Errorf("error reading response body: %w", err)
+	}
+
+	// Convert response body to string
+	responseString := string(responseBody)
+
+	return responseString, nil
 }
 
 // NewImageAdapter creates a new image adapter instance
