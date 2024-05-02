@@ -92,8 +92,8 @@ func main() {
 		AuthBaseURL: coreBBBaseURL,
 	}
 
-	serviceAccountID := envLoader.GetAndLogEnvVar("GATEWAY_SERVICE_ACCOUNT_ID", true, true)
-	privKeyRaw := envLoader.GetAndLogEnvVar("GATEWAY_PRIV_KEY", true, true)
+	serviceAccountID := envLoader.GetAndLogEnvVar(envPrefix+"SERVICE_ACCOUNT_ID", true, true)
+	privKeyRaw := envLoader.GetAndLogEnvVar(envPrefix+"PRIV_KEY", true, true)
 	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
 	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
 	if err != nil {
@@ -127,7 +127,7 @@ func main() {
 	}
 
 	// image adapter
-	imageBaseURL := envLoader.GetAndLogEnvVar("GATEWAY_CONTENT_BB_BASE_URL", true, true)
+	imageBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CONTENT_BB_BASE_URL", true, true)
 	imageAdapter := image.NewImageAdapter(imageBaseURL, serviceAccountManager)
 	if err != nil {
 		logger.Fatalf("Error initializing sports adapter: %v", err)
