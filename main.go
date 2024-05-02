@@ -92,6 +92,16 @@ func main() {
 		AuthBaseURL: coreBBBaseURL,
 	}
 
+	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, nil)
+	if err != nil {
+		logger.Fatalf("Error initializing remote service registration loader: %v", err)
+	}
+
+	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, false)
+	if err != nil {
+		logger.Fatalf("Error initializing service registration manager: %v", err)
+	}
+
 	serviceAccountID := envLoader.GetAndLogEnvVar(envPrefix+"SERVICE_ACCOUNT_ID", true, true)
 	privKeyRaw := envLoader.GetAndLogEnvVar(envPrefix+"PRIV_KEY", true, true)
 	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
@@ -102,15 +112,6 @@ func main() {
 
 	pkey := convertToKeysPrivKey(privKey)
 
-	serviceRegLoader, err := authservice.NewRemoteServiceRegLoader(&authService, nil)
-	if err != nil {
-		logger.Fatalf("Error initializing remote service registration loader: %v", err)
-	}
-
-	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, false)
-	if err != nil {
-		logger.Fatalf("Error initializing service registration manager: %v", err)
-	}
 	signatureAuth, err := sigauth.NewSignatureAuth(pkey, serviceRegManager, false, false)
 	if err != nil {
 		logger.Fatalf("Error initializing signature auth: %v", err)
