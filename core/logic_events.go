@@ -326,14 +326,6 @@ func (e eventsLogic) processWebToolsEvents() {
 }
 
 func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) error {
-	var withimage []model.WebToolsEvent
-	for _, l := range allWebtoolsEvents {
-		if l.LargeImageUploaded != "" {
-			withimage = append(withimage, l)
-		}
-		allWebtoolsEvents = withimage
-	}
-
 	contentImagesFromTheDataBase, err := e.app.storage.FindImageItems()
 	if err != nil {
 		e.logger.Error("Error on finding image items")
@@ -342,7 +334,7 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) erro
 
 	images, err := e.app.imageAdapter.ProcessImages(allWebtoolsEvents)
 	if err != nil {
-		e.logger.Error("Error on finding image items")
+		e.logger.Error("Error on processing images")
 		return err
 	}
 	for _, t := range contentImagesFromTheDataBase {
