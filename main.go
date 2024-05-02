@@ -21,13 +21,9 @@ import (
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 
 	"strings"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/rokwire/core-auth-library-go/v2/envloader"
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
 	"github.com/rokwire/core-auth-library-go/v3/keys"
@@ -105,12 +101,12 @@ func main() {
 	serviceAccountID := envLoader.GetAndLogEnvVar(envPrefix+"SERVICE_ACCOUNT_ID", true, true)
 	privKeyRaw := envLoader.GetAndLogEnvVar(envPrefix+"PRIV_KEY", true, true)
 	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
-	privKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privKeyRaw))
-	if err != nil {
-		logger.Fatalf("Error parsing priv key: %v", err)
-	}
 
-	pkey := convertToKeysPrivKey(privKey)
+	alg := keys.RS256
+	pkey, err := keys.NewPrivKey(alg, privKeyRaw)
+	if err != nil {
+		logger.Fatalf("Failed to parse auth priv key: %v", err)
+	}
 
 	signatureAuth, err := sigauth.NewSignatureAuth(pkey, serviceRegManager, false, false)
 	if err != nil {
@@ -143,23 +139,4 @@ func main() {
 
 	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, serviceAccountManager, logger)
 	webAdapter.Start()
-}
-
-func convertToKeysPrivKey(privateKey *rsa.PrivateKey) *keys.PrivKey {
-	// Convert RSA private key to DER format
-	derBytes := x509.MarshalPKCS1PrivateKey(privateKey)
-
-	// Encode DER bytes to PEM format
-	pemBytes := pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: derBytes,
-	})
-
-	// Now create keys.PrivKey using pemBytes
-	privKey := &keys.PrivKey{
-		KeyPem: string(pemBytes),
-		// Other fields initialization as needed
-	}
-
-	return privKey
 }
