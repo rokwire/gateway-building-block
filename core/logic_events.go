@@ -326,39 +326,39 @@ func (e eventsLogic) processWebToolsEvents() {
 }
 
 func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) error {
-	contentImagesFromTheDataBase, err := e.app.storage.FindImageItems()
+	/*contentImagesFromTheDataBase, err := e.app.storage.FindImageItems()
 	if err != nil {
 		e.logger.Error("Error on finding image items")
 		return err
-	}
+	} */
 
-	images, err := e.app.imageAdapter.ProcessImages(allWebtoolsEvents)
+	_, err := e.app.imageAdapter.ProcessImages(allWebtoolsEvents)
 	if err != nil {
 		e.logger.Error("Error on processing images")
 		return err
 	}
-	for _, t := range contentImagesFromTheDataBase {
-		for _, l := range images {
-			if t.ID != l.ID && t.ImageURL != l.ImageURL {
-				err = e.app.storage.InsertImageItems(l)
+	/*	for _, t := range contentImagesFromTheDataBase {
+			for _, l := range images {
+				if t.ID != l.ID && t.ImageURL != l.ImageURL {
+					err = e.app.storage.InsertImageItems(l)
 
+				}
 			}
 		}
-	}
 
-	// Create a map to store ImageURLs with corresponding IDs
-	imageURLMap := make(map[string]string)
-	for _, ciu := range images {
-		imageURLMap[ciu.ID] = ciu.ImageURL
-	}
-
-	for i := range allWebtoolsEvents {
-		if allWebtoolsEvents[i].LargeImageUploaded == "false" {
-			allWebtoolsEvents[i].ImageURL = ""
-		} else if imageURL, ok := imageURLMap[allWebtoolsEvents[i].EventID]; ok {
-			allWebtoolsEvents[i].ImageURL = imageURL
+		// Create a map to store ImageURLs with corresponding IDs
+		imageURLMap := make(map[string]string)
+		for _, ciu := range images {
+			imageURLMap[ciu.ID] = ciu.ImageURL
 		}
-	}
+
+		for i := range allWebtoolsEvents {
+			if allWebtoolsEvents[i].LargeImageUploaded == "false" {
+				allWebtoolsEvents[i].ImageURL = ""
+			} else if imageURL, ok := imageURLMap[allWebtoolsEvents[i].EventID]; ok {
+				allWebtoolsEvents[i].ImageURL = imageURL
+			}
+		} */
 
 	//TODO
 	return nil

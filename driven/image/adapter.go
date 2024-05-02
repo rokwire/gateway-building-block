@@ -22,39 +22,67 @@ import (
 	"image/png"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
+	"github.com/rokwire/logging-library-go/v2/errors"
+	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
 // Adapter implements the Image interface
 type Adapter struct {
 	baseURL        string
 	accountManager *authservice.ServiceAccountManager
+
+	logger logs.Logger
 }
 
 // ProcessImages downloads from webtools and uploads in content
 func (im Adapter) ProcessImages(item []model.WebToolsEvent) ([]model.ContentImagesURL, error) {
-	var contentImageURL []model.ContentImagesURL
+	itemsWithImages := 0
 	for _, w := range item {
-		if w.LargeImageUploaded != "false" {
-			webtoolsImage, err := im.downloadWebtoolImages(w)
-			if err != nil {
-				return nil, err
-			}
-			uploadImageFromContent, _ := im.uploadImageFromContent(webtoolsImage.ImageData,
-				webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
-				webtoolsImage.Path, webtoolsImage.FileName)
-			contentImage := model.ContentImagesURL{ID: w.EventID, ImageURL: uploadImageFromContent}
-			contentImageURL = append(contentImageURL, contentImage)
+		if w.LargeImageUploaded != "true" {
+			continue
 		}
-	}
-	return contentImageURL, nil
 
+		err := im.processImage(w)
+		if err != nil {
+			return nil, err
+		}
+
+		itemsWithImages++
+	}
+
+	im.logger.Infof("events with images: %d", itemsWithImages)
+
+	return nil, errors.New("not implemented")
 }
+
+func (im Adapter) processImage(item model.WebToolsEvent) error {
+	//downlaod
+	webtoolsImage, err := im.downloadWebtoolImages(item)
+	if err != nil {
+		return err
+	}
+
+	//upload
+	uploadImageFromContent, err := im.uploadImageFromContent(webtoolsImage.ImageData,
+		webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
+		webtoolsImage.Path, webtoolsImage.FileName)
+	if err != nil {
+		return err
+	}
+
+	//contentImage := model.ContentImagesURL{ID: item.EventID, ImageURL: uploadImageFromContent}
+	//contentImageURL = append(contentImageURL, contentImage)
+	fmt.Println(uploadImageFromContent)
+	return nil
+}
+
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
 	var webtoolImage model.ImageData
 	currentAppConfig := "https://calendars.illinois.edu/eventImage"
@@ -197,6 +225,11 @@ func sendRequest(targetURL, path string, width, height, quality int, filePath st
 	}
 	defer response.Body.Close()
 
+	if response.StatusCode != 200 {
+		log.Printf("error with response code - %d", response.StatusCode)
+		return "", fmt.Errorf("error with response code != 200")
+	}
+
 	// Read the response body
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -210,6 +243,6 @@ func sendRequest(targetURL, path string, width, height, quality int, filePath st
 }
 
 // NewImageAdapter creates a new image adapter instance
-func NewImageAdapter(imageHost string, accountManager *authservice.ServiceAccountManager) *Adapter {
-	return &Adapter{baseURL: imageHost, accountManager: accountManager}
+func NewImageAdapter(imageHost string, accountManager *authservice.ServiceAccountManager, logger logs.Logger) *Adapter {
+	return &Adapter{baseURL: imageHost, accountManager: accountManager, logger: logger}
 }

@@ -125,7 +125,7 @@ func main() {
 
 	// image adapter
 	imageBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CONTENT_BB_BASE_URL", true, true)
-	imageAdapter := image.NewImageAdapter(imageBaseURL, serviceAccountManager)
+	imageAdapter := image.NewImageAdapter(imageBaseURL, serviceAccountManager, *logger)
 	if err != nil {
 		logger.Fatalf("Error initializing sports adapter: %v", err)
 	}
