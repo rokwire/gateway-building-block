@@ -538,8 +538,8 @@ func (a *Adapter) FindImageItems() ([]model.ContentImagesURL, error) {
 	return data, nil
 }
 
-// InsertImageItems insert content image url
-func (a *Adapter) InsertImageItems(items model.ContentImagesURL) error {
+// InsertImageItem insert content image url
+func (a *Adapter) InsertImageItem(items model.ContentImagesURL) error {
 	_, err := a.db.processedImages.InsertOne(nil, items)
 	if err != nil {
 		return errors.WrapErrorAction(logutils.ActionInsert, model.TypeExample, nil, err)

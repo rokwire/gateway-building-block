@@ -30,7 +30,6 @@ import (
 	"strconv"
 
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
-	"github.com/rokwire/logging-library-go/v2/errors"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -42,32 +41,12 @@ type Adapter struct {
 	logger logs.Logger
 }
 
-// ProcessImages downloads from webtools and uploads in content
-func (im Adapter) ProcessImages(item []model.WebToolsEvent) ([]model.ContentImagesURL, error) {
-	itemsWithImages := 0
-	for _, w := range item {
-		if w.LargeImageUploaded != "true" {
-			continue
-		}
-
-		err := im.processImage(w)
-		if err != nil {
-			return nil, err
-		}
-
-		itemsWithImages++
-	}
-
-	im.logger.Infof("events with images: %d", itemsWithImages)
-
-	return nil, errors.New("not implemented")
-}
-
-func (im Adapter) processImage(item model.WebToolsEvent) error {
+// ProcessImage process an image
+func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error) {
 	//downlaod
 	webtoolsImage, err := im.downloadWebtoolImages(item)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	//upload
@@ -75,13 +54,12 @@ func (im Adapter) processImage(item model.WebToolsEvent) error {
 		webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
 		webtoolsImage.Path, webtoolsImage.FileName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	//contentImage := model.ContentImagesURL{ID: item.EventID, ImageURL: uploadImageFromContent}
-	//contentImageURL = append(contentImageURL, contentImage)
-	fmt.Println(uploadImageFromContent)
-	return nil
+	res := model.ContentImagesURL{ID: item.EventID, ImageURL: uploadImageFromContent}
+
+	return &res, nil
 }
 
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {

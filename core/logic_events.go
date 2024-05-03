@@ -332,7 +332,7 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) erro
 		return err
 	} */
 
-	_, err := e.app.imageAdapter.ProcessImages(allWebtoolsEvents)
+	err := e.applyProcessImages(allWebtoolsEvents)
 	if err != nil {
 		e.logger.Error("Error on processing images")
 		return err
@@ -362,6 +362,40 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) erro
 
 	//TODO
 	return nil
+}
+
+func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
+	itemsWithImages := 0
+	for _, w := range item {
+		if w.LargeImageUploaded != "true" {
+			continue
+		}
+
+		//process image
+		res, err := e.app.imageAdapter.ProcessImage(w)
+		if err != nil {
+			return err
+		}
+
+		if res == nil {
+			continue
+		}
+
+		//mark as processed
+		err = e.app.storage.InsertImageItem(*res)
+		if err != nil {
+			return err
+		}
+
+		e.logger.Infof("%s image was processed: %s", res.ID, res.ImageURL)
+
+		itemsWithImages++
+	}
+
+	e.logger.Infof("events with images: %d", itemsWithImages)
+
+	return nil
+
 }
 
 // ignore or modify webtools events

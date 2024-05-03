@@ -138,7 +138,7 @@ type Storage interface {
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 
 	FindImageItems() ([]model.ContentImagesURL, error)
-	InsertImageItems(items model.ContentImagesURL) error
+	InsertImageItem(items model.ContentImagesURL) error
 }
 
 // StorageListener represents storage listener
@@ -193,5 +193,5 @@ type SuccessTeam interface {
 
 // ImageAdapter  is used to precess images
 type ImageAdapter interface {
-	ProcessImages(item []model.WebToolsEvent) ([]model.ContentImagesURL, error)
+	ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error)
 }
