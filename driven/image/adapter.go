@@ -17,6 +17,7 @@ package image
 import (
 	"application/core/model"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/png"
@@ -172,14 +173,25 @@ func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int
 	targetURL := fmt.Sprintf("%s/content/bbs/image", im.baseURL)
 
 	// Send the request and get the response
-	response, err := im.sendRequest(targetURL, path, width, height, quality, string(imageData))
+	respData, err := im.sendRequest(targetURL, path, width, height, quality, string(imageData))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return "", err
 	}
+	fmt.Println("Response:", respData)
 
-	fmt.Println("Response:", response)
-	return response, nil
+	type response struct {
+		URL string `json:"url"`
+	}
+
+	var resp response
+	err = json.Unmarshal([]byte(respData), &resp)
+	if err != nil {
+		fmt.Println("Error unmarshalling response:", err)
+		return "", err
+	}
+
+	return resp.URL, nil
 }
 
 func (im Adapter) sendRequest(targetURL, path string, width, height, quality int, filePath string) (string, error) {
