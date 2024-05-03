@@ -172,7 +172,7 @@ func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int
 	targetURL := fmt.Sprintf("%s/content/bbs/image", im.baseURL)
 
 	// Send the request and get the response
-	response, err := sendRequest(targetURL, path, width, height, quality, string(imageData))
+	response, err := im.sendRequest(targetURL, path, width, height, quality, string(imageData))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return "", err
@@ -182,7 +182,7 @@ func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int
 	return response, nil
 }
 
-func sendRequest(targetURL, path string, width, height, quality int, filePath string) (string, error) {
+func (im Adapter) sendRequest(targetURL, path string, width, height, quality int, filePath string) (string, error) {
 	// Create a new buffer to store the multipart form data
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
@@ -218,10 +218,10 @@ func sendRequest(targetURL, path string, width, height, quality int, filePath st
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 
 	// Send the request
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := im.accountManager.MakeRequest(request, "all", "all")
 	if err != nil {
-		return "", fmt.Errorf("error sending HTTP request: %w", err)
+		log.Printf("error sending request - %s", err)
+		return "", err
 	}
 	defer response.Body.Close()
 
