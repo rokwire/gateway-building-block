@@ -49,6 +49,11 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 		return nil, err
 	}
 
+	if webtoolsImage == nil {
+		im.logger.Infof("no webtools image for %s", item.EventID)
+		return nil, nil
+	}
+
 	//upload
 	uploadImageFromContent, err := im.uploadImageFromContent(webtoolsImage.ImageData,
 		webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
@@ -62,6 +67,7 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 	return &res, nil
 }
 
+// Why do you call this API two times??
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
 	var webtoolImage model.ImageData
 	currentAppConfig := "https://calendars.illinois.edu/eventImage"
@@ -140,7 +146,7 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 			return nil, nil
 		}
 		webtoolImage = model.ImageData{ImageData: imageData, Height: height, Width: width,
-			Quality: 100, Path: "event/tout", FileName: filename}
+			Quality: 100, Path: "event/tout/tmp", FileName: filename}
 	}
 	return &webtoolImage, nil
 }
@@ -156,7 +162,6 @@ func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int
 		fmt.Println("Error:", err)
 		return "", err
 	}
-	fmt.Println("Response:", respData)
 
 	type response struct {
 		URL string `json:"url"`
