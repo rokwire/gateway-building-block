@@ -332,11 +332,15 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) erro
 		return err
 	} */
 
-	err := e.applyProcessImages(allWebtoolsEvents)
+	
+
+	/*err := e.applyProcessImages(allWebtoolsEvents)
 	if err != nil {
 		e.logger.Error("Error on processing images")
 		return err
 	}
+
+	*/
 	/*	for _, t := range contentImagesFromTheDataBase {
 			for _, l := range images {
 				if t.ID != l.ID && t.ImageURL != l.ImageURL {
