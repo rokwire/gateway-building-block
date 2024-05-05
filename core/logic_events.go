@@ -342,6 +342,11 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) erro
 
 	e.logger.Infof("there are %d events to be processed as not proccesed", len(notProccesed))
 
+	err = e.applyProcessImages(notProccesed)
+	if err != nil {
+		e.logger.Error("Error on processing images")
+		return err
+	}
 	/*contentImagesFromTheDataBase, err := e.app.storage.FindImageItems()
 	if err != nil {
 		e.logger.Error("Error on finding image items")
@@ -415,11 +420,8 @@ func (e eventsLogic) getNotProcessedEvents(eventsForProcessing []model.WebToolsE
 }
 
 func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
-	itemsWithImages := 0
+	i := 0
 	for _, w := range item {
-		if w.LargeImageUploaded != "true" {
-			continue
-		}
 
 		//process image
 		res, err := e.app.imageAdapter.ProcessImage(w)
@@ -437,13 +439,10 @@ func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
 			return err
 		}
 
-		e.logger.Infof("%s image was processed: %s", res.ID, res.ImageURL)
+		e.logger.Infof("%d - %s image was processed: %s", i, res.ID, res.ImageURL)
 
-		itemsWithImages++
+		i++
 	}
-
-	e.logger.Infof("events with images: %d", itemsWithImages)
-
 	return nil
 
 }
