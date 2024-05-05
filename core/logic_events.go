@@ -326,13 +326,19 @@ func (e eventsLogic) processWebToolsEvents() {
 }
 
 func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) error {
+	//get the events for images processing
+	forProcessingEvents, err := e.getEventsForImagesProcessing(allWebtoolsEvents)
+	if err != nil {
+		return err
+	}
+
+	e.logger.Infof("there are %d events for images processing", len(forProcessingEvents))
+
 	/*contentImagesFromTheDataBase, err := e.app.storage.FindImageItems()
 	if err != nil {
 		e.logger.Error("Error on finding image items")
 		return err
 	} */
-
-	
 
 	/*err := e.applyProcessImages(allWebtoolsEvents)
 	if err != nil {
@@ -366,6 +372,17 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) erro
 
 	//TODO
 	return nil
+}
+
+func (e eventsLogic) getEventsForImagesProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	res := []model.WebToolsEvent{}
+	for _, w := range allWebtoolsEvents {
+		if w.LargeImageUploaded == "true" {
+			res = append(res, w)
+		}
+
+	}
+	return res, nil
 }
 
 func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
