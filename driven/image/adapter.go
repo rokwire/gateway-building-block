@@ -149,7 +149,7 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 		return nil, nil
 	}
 	webtoolImage = model.ImageData{ImageData: imageData, Height: height, Width: width,
-		Quality: 100, Path: "event/tout/tmp", FileName: filename}
+		Quality: 100, Path: "event/tout", FileName: filename}
 
 	return &webtoolImage, nil
 }
