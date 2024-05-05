@@ -247,6 +247,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		e.logger.Errorf("error on loading web tools events - %s", err)
 		return
 	}
+
 	webToolsCount := len(allWebToolsEvents)
 	if webToolsCount == 0 {
 		e.logger.Error("web tools are nil")
@@ -254,6 +255,13 @@ func (e eventsLogic) processWebToolsEvents() {
 	}
 
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
+
+	//process the images before the main processing
+	imagesData, err := e.processImages(allWebToolsEvents)
+	if err != nil {
+		e.logger.Errorf("error on processing images - %s", err)
+		return
+	}
 
 	now := time.Now()
 
@@ -296,7 +304,7 @@ func (e eventsLogic) processWebToolsEvents() {
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now)
+			le := e.constructLegacyEvent(wt, id, now, imagesData)
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -315,6 +323,99 @@ func (e eventsLogic) processWebToolsEvents() {
 		e.logger.Errorf("error performing transaction - %s", err)
 		return
 	}
+}
+
+func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) ([]model.ContentImagesURL, error) {
+	//get the events for images processing
+	forProcessingEvents, err := e.getEventsForImagesProcessing(allWebtoolsEvents)
+	if err != nil {
+		return nil, err
+	}
+
+	e.logger.Infof("there are %d events for images processing", len(forProcessingEvents))
+
+	//get the events which are not processed
+	notProccesed, err := e.getNotProcessedEvents(forProcessingEvents)
+	if err != nil {
+		return nil, err
+	}
+
+	e.logger.Infof("there are %d events to be processed as not proccesed", len(notProccesed))
+
+	//process the images which have not been processed
+	err = e.applyProcessImages(notProccesed)
+	if err != nil {
+		e.logger.Error("Error on processing images")
+		return nil, err
+	}
+
+	//as we already ahve processed all iages just return this dtaa to be used
+	imagesData, err := e.app.storage.FindImageItems()
+	if err != nil {
+		return nil, err
+	}
+
+	return imagesData, nil
+}
+
+func (e eventsLogic) getEventsForImagesProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	res := []model.WebToolsEvent{}
+	for _, w := range allWebtoolsEvents {
+		if w.LargeImageUploaded == "true" {
+			res = append(res, w)
+		}
+
+	}
+	return res, nil
+}
+
+func (e eventsLogic) getNotProcessedEvents(eventsForProcessing []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	allProcessed, err := e.app.storage.FindImageItems()
+	if err != nil {
+		return nil, err
+	}
+
+	processedMap := make(map[string]bool) // map to keep track of processed events
+	for _, item := range allProcessed {
+		processedMap[item.ID] = true
+	}
+
+	var notProcessedEvents []model.WebToolsEvent
+	for _, event := range eventsForProcessing {
+		if _, processed := processedMap[event.EventID]; !processed {
+			notProcessedEvents = append(notProcessedEvents, event)
+		}
+	}
+
+	return notProcessedEvents, nil
+}
+
+func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
+	i := 0
+	for _, w := range item {
+
+		//process image
+		res, err := e.app.imageAdapter.ProcessImage(w)
+		if err != nil {
+			return err
+		}
+
+		if res == nil {
+			continue
+		}
+
+		//mark as processed
+		err = e.app.storage.InsertImageItem(*res)
+		if err != nil {
+			return err
+		}
+
+		e.logger.Infof("%d - %s image was processed: %s", i, res.ID, res.ImageURL)
+
+		i++
+	}
+	return nil
+
 }
 
 // ignore or modify webtools events
@@ -432,7 +533,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -555,6 +656,9 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	}
 	//end target audience
 
+	//image url
+	imageURL := e.getImageURL(g.EventID, imagesData)
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
@@ -562,7 +666,16 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
-			Tags: tags, TargetAudience: targetAudience}}
+			Tags: tags, TargetAudience: targetAudience, ImageURL: imageURL}}
+}
+
+func (e eventsLogic) getImageURL(eventID string, imageData []model.ContentImagesURL) *string {
+	for _, image := range imageData {
+		if image.ID == eventID {
+			return &image.ImageURL
+		}
+	}
+	return nil
 }
 
 func (e eventsLogic) formatDate(wtDate string) string {

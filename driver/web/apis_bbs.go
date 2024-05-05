@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/rokwire/core-auth-library-go/v3/authservice"
 	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
 	"github.com/rokwire/logging-library-go/v2/logs"
 	"github.com/rokwire/logging-library-go/v2/logutils"
@@ -350,7 +351,7 @@ func (h BBsAPIsHandler) checkAppointmentParams(reqParms *utils.Filter, req *http
 }
 
 // NewBBsAPIsHandler creates new Building Block API handler instance
-func NewBBsAPIsHandler(app *core.Application) BBsAPIsHandler {
+func NewBBsAPIsHandler(app *core.Application, serviceAccountManager *authservice.ServiceAccountManager) BBsAPIsHandler {
 	return BBsAPIsHandler{app: app}
 }
 

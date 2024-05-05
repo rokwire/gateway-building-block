@@ -46,6 +46,7 @@ type database struct {
 	legacyEvents           *collectionWrapper
 	legacyLocations        *collectionWrapper
 	webtoolsBlacklistItems *collectionWrapper
+	processedImages        *collectionWrapper
 
 	listeners []Listener
 }
@@ -112,6 +113,12 @@ func (d *database) start() error {
 		return err
 	}
 
+	processedImages := &collectionWrapper{database: d, coll: db.Collection("processed_images")}
+	err = d.applyprocessedImagesChecks(processedImages)
+	if err != nil {
+		return err
+	}
+
 	//assign the db, db client and the collections
 	d.db = db
 	d.dbClient = client
@@ -123,6 +130,7 @@ func (d *database) start() error {
 	d.unitcalendars = unitcalendars
 	d.legacyLocations = legacyLocations
 	d.webtoolsBlacklistItems = webtoolsBlacklistItems
+	d.processedImages = processedImages
 
 	go d.configs.Watch(nil, d.logger)
 
@@ -203,6 +211,13 @@ func (d *database) applyWebtoolsBlacklistItemsChecks(webtoolsBlacklistItems *col
 	d.logger.Info("apply webtools_blacklist_items checks.....")
 
 	d.logger.Info("legacy webtools_blacklist_items passed")
+	return nil
+}
+
+func (d *database) applyprocessedImagesChecks(webtoolsBlacklistItems *collectionWrapper) error {
+	d.logger.Info("apply processed_images checks.....")
+
+	d.logger.Info("processed_images passed")
 	return nil
 }
 
