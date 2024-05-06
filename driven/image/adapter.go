@@ -22,11 +22,9 @@ import (
 	"image"
 	"image/png"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
@@ -69,8 +67,6 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 
 // Why do you call this API two times??
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
-	var webtoolImage model.ImageData
-
 	currentAppConfig := "https://calendars.illinois.edu/eventImage"
 	currAppConfig := "large.png"
 	webtoolImageURL := fmt.Sprintf("%s/%s/%s/%s",
@@ -80,34 +76,25 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 		currAppConfig,
 	)
 
-	imageResponse, err := http.Get(webtoolImageURL)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return nil, nil
-	}
-	defer imageResponse.Body.Close()
-
-	//if not 200 then we do not care
-	if imageResponse.StatusCode != http.StatusOK {
-		im.logger.Infof("response code %d for %s", imageResponse.StatusCode, item.EventID)
-		return nil, nil
-	}
-
-	//it is response code 200
-
-	// Make a GET request to the image URL
+	// Make a GET request to download the image
 	response, err := http.Get(webtoolImageURL)
 	if err != nil {
 		fmt.Println("Error while downloading the image:", err)
-		return nil, nil
+		return nil, err
 	}
 	defer response.Body.Close()
+
+	// Check if the response status code is OK
+	if response.StatusCode != http.StatusOK {
+		im.logger.Infof("response code %d for %s", response.StatusCode, item.EventID)
+		return nil, fmt.Errorf("non-OK response status: %d", response.StatusCode)
+	}
 
 	// Decode the image
 	img, _, err := image.Decode(response.Body)
 	if err != nil {
 		fmt.Println("Error while decoding the image:", err)
-		return nil, nil
+		return nil, err
 	}
 
 	// Get the image dimensions
@@ -115,41 +102,23 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 	width := bounds.Dx()
 	height := bounds.Dy()
 
-	// Set the filename and quality for the JPEG file
-	filename := "image.png"
-
-	// Create a new file to save the image as PNG
-	file, err := os.Create(filename)
+	// Encode the image as PNG
+	var buf bytes.Buffer
+	err = png.Encode(&buf, img)
 	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return nil, nil
-	}
-	defer file.Close()
-
-	// Encode the image as PNG and save it to the file
-	err = png.Encode(file, img)
-	if err != nil {
-		fmt.Println("Error while saving the image as PNG:", err)
-		return nil, nil
+		fmt.Println("Error while encoding the image as PNG:", err)
+		return nil, err
 	}
 
-	// Download the image and fetch additional data
-	// Fetch the image from the URL
-	resp, err := http.Get(webtoolImageURL)
-	if err != nil {
-		fmt.Println("Error fetching image:", err)
-		return nil, nil
+	// Fetch additional data and return
+	webtoolImage := model.ImageData{
+		ImageData: buf.Bytes(),
+		Height:    height,
+		Width:     width,
+		Quality:   100,
+		Path:      "event/tout",
+		FileName:  "image.png",
 	}
-	defer resp.Body.Close()
-
-	// Read the image data into a byte slice
-	imageData, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading image data:", err)
-		return nil, nil
-	}
-	webtoolImage = model.ImageData{ImageData: imageData, Height: height, Width: width,
-		Quality: 100, Path: "event/tout", FileName: filename}
 
 	return &webtoolImage, nil
 }
