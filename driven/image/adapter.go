@@ -87,7 +87,7 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 	// Check if the response status code is OK
 	if response.StatusCode != http.StatusOK {
 		im.logger.Infof("response code %d for %s", response.StatusCode, item.EventID)
-		return nil, fmt.Errorf("non-OK response status: %d", response.StatusCode)
+		return nil, nil //do not return error when cannot get/find an image
 	}
 
 	// Decode the image
