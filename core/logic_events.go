@@ -179,7 +179,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 	}
 
 	//wait until it is the correct moment from the day
-	/*location, err := time.LoadLocation("America/Chicago")
+	location, err := time.LoadLocation("America/Chicago")
 	if err != nil {
 		e.logger.Errorf("Error getting location:%s\n", err.Error())
 	}
@@ -199,9 +199,9 @@ func (e eventsLogic) setupWebToolsTimer() {
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
-	log.Println(durationInSeconds) */
-	duration := time.Second * time.Duration(3)
-	//duration := time.Second * time.Duration(durationInSeconds)
+	log.Println(durationInSeconds)
+	//duration := time.Second * time.Duration(3)
+	duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -242,185 +242,181 @@ func (e eventsLogic) process() {
 }
 
 func (e eventsLogic) processWebToolsEvents() {
+	//load all web tools events
+	allWebToolsEvents, err := e.loadAllWebToolsEvents()
+	if err != nil {
+		e.logger.Errorf("error on loading web tools events - %s", err)
+		return
+	}
 
-	e.geoBBAdapter.TODO("Koral")
-	/*
-	   //load all web tools events
-	   allWebToolsEvents, err := e.loadAllWebToolsEvents()
+	webToolsCount := len(allWebToolsEvents)
+	if webToolsCount == 0 {
+		e.logger.Error("web tools are nil")
+		return
+	}
 
-	   	if err != nil {
-	   		e.logger.Errorf("error on loading web tools events - %s", err)
-	   		return
-	   	}
+	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
-	   webToolsCount := len(allWebToolsEvents)
+	//process the images before the main processing
+	imagesData, err := e.processImages(allWebToolsEvents)
+	if err != nil {
+		e.logger.Errorf("error on processing images - %s", err)
+		return
+	}
 
-	   	if webToolsCount == 0 {
-	   		e.logger.Error("web tools are nil")
-	   		return
-	   	}
+	now := time.Now()
 
-	   e.logger.Infof("we loaded %d web tools events", webToolsCount)
+	//in transaction
+	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
+		//1. first we must keep the events ids for the webtools events(sourceId = "0") because we will remove all of them and later recreated with the new ones
+		webtoolsItemsFromStorage, err := e.app.storage.FindLegacyEventItemsBySourceID(context, "0")
+		if err != nil {
+			e.logger.Errorf("error on loading webtools events from the storage - %s", err)
+			return err
+		}
 
-	   now := time.Now()
+		existingLegacyIdsMap := make(map[string]string)
+		for _, w := range webtoolsItemsFromStorage {
+			if len(w.Item.DataSourceEventID) > 0 {
+				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
+			}
+		}
 
-	   //tmp
-	   ign := 0
-	   used := 0
-	   usedList := map[string]bool{}
-	   ignoredList := map[string]bool{}
+		//2. once we already have the ids then we have to remove all webtools events from the database
+		err = e.app.storage.DeleteLegacyEventsBySourceID(context, "0")
+		if err != nil {
+			e.logger.Errorf("error on deleting legacy events from the storage - %s", err)
+			return err
+		}
 
-	   	for _, c := range allWebToolsEvents {
-	   		location := c.Location
+		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
 
-	   		if len(location) == 0 {
-	   			continue //we do not care empty lcoations
-	   		}
+		//3. we have a requirement to ignore events or modify them before applying
+		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+		if err != nil {
+			e.logger.Errorf("error on ignoring web tools events - %s", err)
+			return err
+		}
 
-	   		if location == "Davenport 109A" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Nevada Dance Studio (905 W. Nevada St.)" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "18th Ave Library, 175 W 18th Ave, Room 205, Oklahoma City, OK" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Champaign County Fairgrounds" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Student Union SLC Conference room" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Armory, room 172 (the Innovation Studio)" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Student Union Room 235" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Uni 206, 210, 211" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Uni 205, 206, 210" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Southern Historical Association Combs Chandler 30" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "St. Louis, MO" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Student Union SLC" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "Purdue University, West Lafayette, Indiana" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "MP 7" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "116 Roger Adams Lab" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "2700 Campus Way 45221" {
-	   			used++
-	   			usedList[location] = true
-	   		} else if location == "The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL" {
-	   			used++
-	   			usedList[location] = true
-	   		} else {
-	   			ign++
-	   			ignoredList[location] = true
-	   		}
+		//4. now you have to convert all allWebToolsEvents into legacy events
+		newLegacyEvents := []model.LegacyEventItem{}
+		for _, wt := range modifiedWebToolsEvents {
 
-	   		if c.VirtualEvent == "true" {
-	   			fmt.Printf("%s VIRTUAL\n", c.Title)
-	   		}
-	   	}
+			//prepare the id
+			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-	   //TMP
+			le := e.constructLegacyEvent(wt, id, now, imagesData)
+			newLegacyEvents = append(newLegacyEvents, le)
+		}
 
-	   //fmt.Printf("ТТТ\tIgnore %s\n", location)
-	   //	ign++
+		//5. store all them in the database
+		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
+		if err != nil {
+			e.logger.Errorf("error on saving events to the storage - %s", err)
+			return err
+		}
+		// It is all!
 
-	   //fmt.Printf("TTT\tUsed %s\n", location)
-	   //	used++
+		return nil
+	}, 180000)
 
-	   fmt.Printf("L: (ignored events: %d) (ignored locations: %d)", ign, len(ignoredList))
+	if err != nil {
+		e.logger.Errorf("error performing transaction - %s", err)
+		return
+	}
+}
 
-	   	for k, _ := range ignoredList {
-	   		fmt.Printf("\nL: %s", k)
-	   	}
+func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) ([]model.ContentImagesURL, error) {
+	//get the events for images processing
+	forProcessingEvents, err := e.getEventsForImagesProcessing(allWebtoolsEvents)
+	if err != nil {
+		return nil, err
+	}
 
-	   fmt.Println("")
-	   fmt.Println("")
+	e.logger.Infof("there are %d events for images processing", len(forProcessingEvents))
 
-	   fmt.Printf("L: (used: %d) (used locations: %d)", used, len(usedList))
+	//get the events which are not processed
+	notProccesed, err := e.getNotProcessedEvents(forProcessingEvents)
+	if err != nil {
+		return nil, err
+	}
 
-	   	for k, _ := range usedList {
-	   		fmt.Printf("\nL: %s", k)
-	   	}
+	e.logger.Infof("there are %d events to be processed as not proccesed", len(notProccesed))
 
-	   //in transaction
+	//process the images which have not been processed
+	err = e.applyProcessImages(notProccesed)
+	if err != nil {
+		e.logger.Error("Error on processing images")
+		return nil, err
+	}
 
-	   	err = e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-	   		//1. first we must keep the events ids for the webtools events(sourceId = "0") because we will remove all of them and later recreated with the new ones
-	   		webtoolsItemsFromStorage, err := e.app.storage.FindLegacyEventItemsBySourceID(context, "0")
-	   		if err != nil {
-	   			e.logger.Errorf("error on loading webtools events from the storage - %s", err)
-	   			return err
-	   		}
+	//as we already ahve processed all iages just return this dtaa to be used
+	imagesData, err := e.app.storage.FindImageItems()
+	if err != nil {
+		return nil, err
+	}
 
-	   		existingLegacyIdsMap := make(map[string]string)
-	   		for _, w := range webtoolsItemsFromStorage {
-	   			if len(w.Item.DataSourceEventID) > 0 {
-	   				existingLegacyIdsMap[w.Item.DataSourceEventID] = w.Item.ID
-	   			}
-	   		}
+	return imagesData, nil
+}
 
-	   		//2. once we already have the ids then we have to remove all webtools events from the database
-	   		err = e.app.storage.DeleteLegacyEventsBySourceID(context, "0")
-	   		if err != nil {
-	   			e.logger.Errorf("error on deleting legacy events from the storage - %s", err)
-	   			return err
-	   		}
+func (e eventsLogic) getEventsForImagesProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	res := []model.WebToolsEvent{}
+	for _, w := range allWebtoolsEvents {
+		if w.LargeImageUploaded == "true" {
+			res = append(res, w)
+		}
 
-	   		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
+	}
+	return res, nil
+}
 
-	   		//3. we have a requirement to ignore events or modify them before applying
-	   		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
-	   		if err != nil {
-	   			e.logger.Errorf("error on ignoring web tools events - %s", err)
-	   			return err
-	   		}
+func (e eventsLogic) getNotProcessedEvents(eventsForProcessing []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	allProcessed, err := e.app.storage.FindImageItems()
+	if err != nil {
+		return nil, err
+	}
 
-	   		//4. now you have to convert all allWebToolsEvents into legacy events
-	   		newLegacyEvents := []model.LegacyEventItem{}
-	   		for _, wt := range modifiedWebToolsEvents {
+	processedMap := make(map[string]bool) // map to keep track of processed events
+	for _, item := range allProcessed {
+		processedMap[item.ID] = true
+	}
 
-	   			//prepare the id
-	   			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
+	var notProcessedEvents []model.WebToolsEvent
+	for _, event := range eventsForProcessing {
+		if _, processed := processedMap[event.EventID]; !processed {
+			notProcessedEvents = append(notProcessedEvents, event)
+		}
+	}
 
-	   			le := e.constructLegacyEvent(wt, id, now)
-	   			newLegacyEvents = append(newLegacyEvents, le)
-	   		}
+	return notProcessedEvents, nil
+}
 
-	   		//5. store all them in the database
-	   		_, err = e.app.storage.InsertLegacyEvents(context, newLegacyEvents)
-	   		if err != nil {
-	   			e.logger.Errorf("error on saving events to the storage - %s", err)
-	   			return err
-	   		}
-	   		// It is all!
+func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
+	i := 0
+	for _, w := range item {
 
-	   		return nil
-	   	}, 180000)
+		//process image
+		res, err := e.app.imageAdapter.ProcessImage(w)
+		if err != nil {
+			return err
+		}
 
-	   	if err != nil {
-	   		e.logger.Errorf("error performing transaction - %s", err)
-	   		return
-	   	}
-	*/
+		if res == nil {
+			continue
+		}
+
+		//mark as processed
+		err = e.app.storage.InsertImageItem(*res)
+		if err != nil {
+			return err
+		}
+
+		e.logger.Infof("%d - %s image was processed: %s", i, res.ID, res.ImageURL)
+
+		i++
+	}
+	return nil
+
 }
 
 // ignore or modify webtools events
@@ -538,7 +534,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -661,6 +657,9 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	}
 	//end target audience
 
+	//image url
+	imageURL := e.getImageURL(g.EventID, imagesData)
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
@@ -668,7 +667,16 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
-			Tags: tags, TargetAudience: targetAudience}}
+			Tags: tags, TargetAudience: targetAudience, ImageURL: imageURL}}
+}
+
+func (e eventsLogic) getImageURL(eventID string, imageData []model.ContentImagesURL) *string {
+	for _, image := range imageData {
+		if image.ID == eventID {
+			return &image.ImageURL
+		}
+	}
+	return nil
 }
 
 func (e eventsLogic) formatDate(wtDate string) string {
@@ -702,11 +710,6 @@ func recurenceIDtoInt(s string) (*int, error) {
 }
 
 func constructLocation(location string) model.LocationLegacy {
-	//do not process empty locations
-	if len(location) == 0 {
-		return model.LocationLegacy{Description: "", Latitude: float64(0.0), Longitude: float64(0.0)}
-	}
-
 	description := location
 	latitude := 0.0
 	longitude := 0.0
@@ -764,20 +767,6 @@ func constructLocation(location string) model.LocationLegacy {
 		longitude = -88.22901039999999
 	}
 
-	/*//TMP
-	//	ign := 0
-	//	used := 0
-	if latitude == 0.0 {
-		fmt.Printf("ТТТ\tIgnore %s\n", location)
-		//	ign++
-	} else {
-		fmt.Printf("TTT\tUsed %s\n", location)
-		//	used++
-	}
-
-	//fmt.Printf("L: ignored: %d", ign)
-	//fmt.Printf("L: used: %d", used) */
-
 	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
 }
 
@@ -796,7 +785,5 @@ func contactsToDef(items []model.ContactLegacy) []model.ContactLegacy {
 // newAppEventsLogic creates new appShared
 func newAppEventsLogic(app *Application, eventsBBAdapter EventsBBAdapter, geoBBAdapter GeoAdapter, logger logs.Logger) eventsLogic {
 	timerDone := make(chan bool)
-	return eventsLogic{app: app,
-		eventsBBAdapter: eventsBBAdapter, geoBBAdapter: geoBBAdapter,
-		timerDone: timerDone, logger: logger}
+	return eventsLogic{app: app, eventsBBAdapter: eventsBBAdapter, geoBBAdapter: geoBBAdapter, timerDone: timerDone, logger: logger}
 }

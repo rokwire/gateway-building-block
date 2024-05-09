@@ -210,7 +210,7 @@ func (a Adapter) wrapFunc(handler handlerFunc, authorization tokenauth.Handler) 
 }
 
 // NewWebAdapter creates new WebAdapter instance
-func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, logger *logs.Logger) Adapter {
+func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string, app *core.Application, serviceRegManager *authservice.ServiceRegManager, serviceAccountManager *authservice.ServiceAccountManager, logger *logs.Logger) Adapter {
 	yamlDoc, err := loadDocsYAML(baseURL)
 	if err != nil {
 		logger.Fatalf("error parsing docs yaml - %s", err.Error())
@@ -224,7 +224,7 @@ func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string,
 	defaultAPIsHandler := NewDefaultAPIsHandler(app)
 	clientAPIsHandler := NewClientAPIsHandler(app)
 	adminAPIsHandler := NewAdminAPIsHandler(app)
-	bbsAPIsHandler := NewBBsAPIsHandler(app)
+	bbsAPIsHandler := NewBBsAPIsHandler(app, serviceAccountManager)
 	tpsAPIsHandler := NewTPSAPIsHandler(app)
 	apiKeyHandler := NewAPIKeyHandler(app)
 	return Adapter{baseURL: baseURL, port: port, serviceID: serviceID, cachedYamlDoc: yamlDoc, auth: auth, defaultAPIsHandler: defaultAPIsHandler,

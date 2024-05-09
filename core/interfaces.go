@@ -141,6 +141,9 @@ type Storage interface {
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
+
+	FindImageItems() ([]model.ContentImagesURL, error)
+	InsertImageItem(items model.ContentImagesURL) error
 }
 
 // StorageListener represents storage listener
@@ -191,4 +194,9 @@ type SuccessTeam interface {
 	GetSuccessTeam(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error)
 	GetPrimaryCareProvider(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
+}
+
+// ImageAdapter  is used to precess images
+type ImageAdapter interface {
+	ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error)
 }

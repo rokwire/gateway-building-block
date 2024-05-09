@@ -18,13 +18,17 @@ import (
 	"application/core"
 	"application/driven/eventsbb"
 	"application/driven/geo"
+	"application/driven/image"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
 	"application/driver/web"
+
 	"strings"
 
+	"github.com/rokwire/core-auth-library-go/v2/envloader"
 	"github.com/rokwire/core-auth-library-go/v3/authservice"
-	"github.com/rokwire/core-auth-library-go/v3/envloader"
+	"github.com/rokwire/core-auth-library-go/v3/keys"
+	"github.com/rokwire/core-auth-library-go/v3/sigauth"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
@@ -69,20 +73,9 @@ func main() {
 	eventsBBAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
 	eventsBBAdapter := eventsbb.NewEventsBBAdapter(eventsBBBaseURL, eventsBBAPIKey, logger)
 
-	// geo bb adapter
-	//geoBBGoogleAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
-	geoBBGoogleAPIKey := "1234"
-	geoBBAdapter := geo.NewGeoBBAdapter(geoBBGoogleAPIKey, logger)
-
 	// appointment adapters
 	appointments := make(map[string]core.Appointments)
 	appointments["2"] = uiucadapters.NewEngineeringAppontmentsAdapter("KP")
-	// application
-	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, geoBBAdapter, appointments, logger)
-	err = application.Start()
-	if err != nil {
-		logger.Fatalf("Cannot start the Application module: %v", err)
-	}
 
 	// web adapter
 	baseURL := envLoader.GetAndLogEnvVar(envPrefix+"BASE_URL", true, false)
@@ -101,11 +94,56 @@ func main() {
 		logger.Fatalf("Error initializing remote service registration loader: %v", err)
 	}
 
-	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, !strings.HasPrefix(baseURL, "http://localhost"))
+	serviceRegManager, err := authservice.NewServiceRegManager(&authService, serviceRegLoader, false)
 	if err != nil {
 		logger.Fatalf("Error initializing service registration manager: %v", err)
 	}
 
-	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, logger)
+	serviceAccountID := envLoader.GetAndLogEnvVar(envPrefix+"SERVICE_ACCOUNT_ID", true, true)
+	privKeyRaw := envLoader.GetAndLogEnvVar(envPrefix+"PRIV_KEY", true, true)
+	privKeyRaw = strings.ReplaceAll(privKeyRaw, "\\n", "\n")
+
+	alg := keys.RS256
+	pkey, err := keys.NewPrivKey(alg, privKeyRaw)
+	if err != nil {
+		logger.Fatalf("Failed to parse auth priv key: %v", err)
+	}
+
+	signatureAuth, err := sigauth.NewSignatureAuth(pkey, serviceRegManager, false, false)
+	if err != nil {
+		logger.Fatalf("Error initializing signature auth: %v", err)
+	}
+
+	serviceAccountLoader, err := authservice.NewRemoteServiceAccountLoader(&authService, serviceAccountID, signatureAuth)
+	if err != nil {
+		logger.Fatalf("Error initializing remote service account loader: %v", err)
+	}
+
+	serviceAccountManager, err := authservice.NewServiceAccountManager(&authService, serviceAccountLoader)
+	if err != nil {
+		logger.Fatalf("Error initializing service account manager: %v", err)
+	}
+
+	// image adapter
+	imageBaseURL := envLoader.GetAndLogEnvVar(envPrefix+"CONTENT_BB_BASE_URL", true, true)
+	imageAdapter := image.NewImageAdapter(imageBaseURL, serviceAccountManager, *logger)
+	if err != nil {
+		logger.Fatalf("Error initializing sports adapter: %v", err)
+	}
+
+	// geo bb adapter
+	//geoBBGoogleAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
+	geoBBGoogleAPIKey := "1234"
+	geoBBAdapter := geo.NewGeoBBAdapter(geoBBGoogleAPIKey, logger)
+
+	// application
+	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter,
+		imageAdapter, geoBBAdapter, appointments, logger)
+	err = application.Start()
+	if err != nil {
+		logger.Fatalf("Cannot start the Application module: %v", err)
+	}
+
+	webAdapter := web.NewWebAdapter(baseURL, port, serviceID, rokwireAPIKey, application, serviceRegManager, serviceAccountManager, logger)
 	webAdapter.Start()
 }

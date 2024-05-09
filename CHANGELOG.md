@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Handle location processing on WebTools import [#90](https://github.com/rokwire/gateway-building-block/issues/90)
 
+[2.9.0] - 2024-05-07
+### Changed
+- Webtools images fixes [#92](https://github.com/rokwire/gateway-building-block/issues/92)
+
+[2.8.0] - 2024-05-05
+### Changed
+- Webtools fixes [#86](https://github.com/rokwire/gateway-building-block/issues/86)
+
 [2.7.0] - 2024-04-24
 ### Changed
 - Events issues [#87](https://github.com/rokwire/gateway-building-block/issues/87)
