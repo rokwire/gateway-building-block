@@ -262,7 +262,8 @@ func (e eventsLogic) processWebToolsEvents() {
 	if err != nil {
 		e.logger.Errorf("error on processing images - %s", err)
 		return
-	}*/
+	}
+	fmt.Print(imagesData)*/
 
 	locationData, err := e.processLocation(allWebToolsEvents)
 	if err != nil {
@@ -570,7 +571,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
-	location := constructLocation(g.Location)
+	//location := constructLocation(g.Location)
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
 	contacts = append(contacts, con)
@@ -672,7 +673,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 			DataModified: modifiedDate, DateCreated: createdDate,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
-			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
+			RecurrenceID: recurrenceID /*Location: &location*/, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
 			Tags: tags, TargetAudience: targetAudience, ImageURL: imageURL}}
 }
@@ -705,17 +706,31 @@ func (e eventsLogic) formatDate(wtDate string) string {
 func (e eventsLogic) processLocation(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
 	// Create a map to store location, eventID, and calendarName
 	locationEventMap := make(map[string]map[string]string)
-
+	var l []model.LegacyLocation
 	// Populate the map
 	for _, event := range allWebtoolsEvents {
 		locationEventMap[event.EventID] = map[string]string{
+			"eventID":      event.EventID,
 			"location":     event.Location,
 			"calendarName": event.CalendarName,
+			"sponsor":      event.Sponsor,
 		}
 	}
 
-	fmt.Println(locationEventMap)
+	// Process the values in the map
+	for eventID, eventData := range locationEventMap {
+		// If the location is empty in the event data, set it to nil
+		if eventData["location"] == "" {
+			eventData["location"] = ""
+		}
+		ll, _ := e.geoBBAdapter.ProcessLocation(eventID, eventData["calendarName"], eventData["sponsor"], eventData["location"])
+		l = append(l, *ll)
+	}
 
+	fmt.Println(l)
+
+	/*location, _ := e.app.geoBBAdapter.ProcessLocation(event.EventID, event.CalendarName, event.Sponsor, event.Location)
+	fmt.Println(location)*/
 	return nil, nil
 }
 

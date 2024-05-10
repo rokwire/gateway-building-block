@@ -1,9 +1,8 @@
 package geo
 
 import (
-	"context"
+	"application/core/model"
 	"log"
-	"strings"
 
 	"github.com/rokwire/logging-library-go/v2/logs"
 	"googlemaps.github.io/maps"
@@ -43,6 +42,26 @@ var CalName2Location = map[string][2]float64{
 	"NCSA":                         {40.1147743, -88.2252053},
 }
 
+var DefinedLocation = map[string][2]float64{
+	"Davenport 109A": {40.107335, -88.226069},
+	"Nevada Dance Studio (905 W. Nevada St.)":                       {40.105825, -88.219873},
+	"18th Ave Library, 175 W 18th Ave, Room 205, Oklahoma City, OK": {36.102183, -97.111245},
+	"Champaign County Fairgrounds":                                  {40.1202191, -88.2178757},
+	"Student Union SLC Conference room":                             {39.727282, -89.617477},
+	"Armory, room 172 (the Innovation Studio)":                      {40.104749, -88.23195},
+	"Student Union Room 235":                                        {39.727282, -89.617477},
+	"Uni 206, 210, 211":                                             {40.11314, -88.225259},
+	"Uni 205, 206, 210":                                             {40.11314, -88.225259},
+	"Southern Historical Association Combs Chandler 30":             {38.258116, -85.756139},
+	"St. Louis, MO":                                                 {38.694237, -90.4493},
+	"Student Union SLC":                                             {39.727282, -89.617477},
+	"Purdue University, West Lafayette, Indiana":                    {40.425012, -86.912645},
+	"MP 7":                  {40.100803, -88.23604},
+	"116 Roger Adams Lab":   {40.107741, -88.224943},
+	"2700 Campus Way 45221": {39.131894, -84.519143},
+	"The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL": {40.1047044, -88.22901039999999},
+}
+
 // Adapter implements the GeoAdapter interface
 type Adapter struct {
 	googleMapsClient maps.Client
@@ -50,9 +69,40 @@ type Adapter struct {
 	log logs.Log
 }
 
+// процесване на локейшъните
+// взимане на всички локейшъни от уебтоолс и се намапват всички с ид и локешъна
+// проверка, ако има хардкорднати локейшъни се прави обект за легаси ивент от него
+// ако нямя отива в гугъл, намира координатите и строи обект от не тях
+// след като се процеснат се подават за конструиране за легаси ивент
+
 // TODO todo
-func (na Adapter) TODO(location string) {
-	entry := make(map[string]interface{})
+func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string) (*model.LegacyLocation, error) {
+	var legacyLocation model.LegacyLocation
+	if location == "" {
+		legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName, Description: location,
+			Lat: nil, Long: nil}
+	}
+
+	for name, _ := range CalName2Location {
+		if location == name {
+			_, statiLocation := searchStaticLocation(calendarName, sponsor, location)
+			if statiLocation != nil {
+				legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName,
+					Description: statiLocation.Description, Lat: &statiLocation.Latitude, Long: &statiLocation.Longitude}
+			}
+
+		}
+	}
+
+	for name, cords := range DefinedLocation {
+		if location == name {
+			legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName,
+				Description: location, Lat: &cords[0], Long: &cords[1]}
+		}
+
+	}
+
+	/*entry := make(map[string]interface{})
 
 	// Подготвяме заявката за геокодиране
 	req := &maps.GeocodingRequest{
@@ -64,7 +114,7 @@ func (na Adapter) TODO(location string) {
 	}
 
 	// Извършваме заявката
-	resp, err := na.googleMapsClient.Geocode(context.Background(), req)
+	resp, err := l.googleMapsClient.Geocode(context.Background(), req)
 	if err != nil {
 		log.Printf("API Key Error: %v", err)
 		entry["location"] = map[string]string{"description": location}
@@ -85,12 +135,13 @@ func (na Adapter) TODO(location string) {
 		entry["location"] = map[string]string{"description": location}
 		log.Printf("calendarId: %s, dataSourceEventId: %s, location: %s geolocation not found",
 			entry["calendarId"], entry["dataSourceEventId"], location)
-	}
+	}*/
+	return &legacyLocation, nil
 }
 
 // searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
 func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInfo) {
-	for _, tip := range tip4CalALoc {
+	/*for _, tip := range tip4CalALoc {
 		if tip.CalendarName == calendarName &&
 			strings.Contains(strings.ToLower(sponsor), tip.SponsorKeyword) &&
 			strings.Contains(strings.ToLower(location), tip.LocationKeyword) {
@@ -105,6 +156,17 @@ func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInf
 			}
 			return true, &geoInfo
 		}
+	}
+	return false, nil*/
+	for _, tip := range tip4CalALoc {
+		latLong, _ := CalName2Location[tip.AccessName]
+
+		geoInfo := GeoInfo{
+			Latitude:    latLong[0],
+			Longitude:   latLong[1],
+			Description: location,
+		}
+		return true, &geoInfo
 	}
 	return false, nil
 }
