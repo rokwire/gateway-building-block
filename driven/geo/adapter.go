@@ -3,6 +3,7 @@ package geo
 import (
 	"application/core/model"
 	"log"
+	"strings"
 
 	"github.com/rokwire/logging-library-go/v2/logs"
 	"googlemaps.github.io/maps"
@@ -141,7 +142,7 @@ func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string
 
 // searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
 func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInfo) {
-	/*for _, tip := range tip4CalALoc {
+	for _, tip := range tip4CalALoc {
 		if tip.CalendarName == calendarName &&
 			strings.Contains(strings.ToLower(sponsor), tip.SponsorKeyword) &&
 			strings.Contains(strings.ToLower(location), tip.LocationKeyword) {
@@ -157,18 +158,8 @@ func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInf
 			return true, &geoInfo
 		}
 	}
-	return false, nil*/
-	for _, tip := range tip4CalALoc {
-		latLong, _ := CalName2Location[tip.AccessName]
-
-		geoInfo := GeoInfo{
-			Latitude:    latLong[0],
-			Longitude:   latLong[1],
-			Description: location,
-		}
-		return true, &geoInfo
-	}
 	return false, nil
+
 }
 
 func fetchGeoData(client *maps.Client, location string, entry map[string]interface{}) {
