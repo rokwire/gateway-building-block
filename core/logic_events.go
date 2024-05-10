@@ -200,8 +200,8 @@ func (e eventsLogic) setupWebToolsTimer() {
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
 	log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -258,11 +258,18 @@ func (e eventsLogic) processWebToolsEvents() {
 	e.logger.Infof("we loaded %d web tools events", webToolsCount)
 
 	//process the images before the main processing
-	imagesData, err := e.processImages(allWebToolsEvents)
+	/*imagesData, err := e.processImages(allWebToolsEvents)
 	if err != nil {
 		e.logger.Errorf("error on processing images - %s", err)
 		return
+	}*/
+
+	locationData, err := e.processLocation(allWebToolsEvents)
+	if err != nil {
+		e.logger.Errorf("error on processing locations - %s", err)
+		return
 	}
+	fmt.Println(locationData)
 
 	now := time.Now()
 
@@ -305,7 +312,7 @@ func (e eventsLogic) processWebToolsEvents() {
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now, imagesData)
+			le := e.constructLegacyEvent(wt, id, now /*imagesData*/, []model.ContentImagesURL{})
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -693,6 +700,23 @@ func (e eventsLogic) formatDate(wtDate string) string {
 
 	result := dataObj.Format("2006-01-02T15:04:05")
 	return result
+}
+
+func (e eventsLogic) processLocation(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
+	// Create a map to store location, eventID, and calendarName
+	locationEventMap := make(map[string]map[string]string)
+
+	// Populate the map
+	for _, event := range allWebtoolsEvents {
+		locationEventMap[event.EventID] = map[string]string{
+			"location":     event.Location,
+			"calendarName": event.CalendarName,
+		}
+	}
+
+	fmt.Println(locationEventMap)
+
+	return nil, nil
 }
 
 func recurenceIDtoInt(s string) (*int, error) {
