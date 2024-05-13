@@ -144,6 +144,9 @@ type Storage interface {
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error
+
+	FindLegacyLocationItems() ([]model.LegacyLocation, error)
+	InsertLegacyLocationItem(items model.LegacyLocation) error
 }
 
 // StorageListener represents storage listener

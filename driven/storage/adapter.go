@@ -547,6 +547,28 @@ func (a *Adapter) InsertImageItem(items model.ContentImagesURL) error {
 	return nil
 }
 
+// FindILegacyLocationItems finds all legacy locations stored in the database
+func (a *Adapter) FindLegacyLocationItems() ([]model.LegacyLocation, error) {
+	filter := bson.M{}
+	var data []model.LegacyLocation
+	timeout := 15 * time.Second //15 seconds timeout
+	err := a.db.legacyLocations.FindWithParams(nil, filter, &data, nil, &timeout)
+	if err != nil {
+		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
+	}
+
+	return data, nil
+}
+
+// InsertLegacyLocationItem insertthe location of the event
+func (a *Adapter) InsertLegacyLocationItem(items model.LegacyLocation) error {
+	_, err := a.db.legacyLocations.InsertOne(nil, items)
+	if err != nil {
+		return nil
+	}
+	return nil
+}
+
 // NewStorageAdapter creates a new storage adapter instance
 func NewStorageAdapter(mongoDBAuth string, mongoDBName string, mongoTimeout string, logger *logs.Logger) *Adapter {
 	timeout, err := strconv.Atoi(mongoTimeout)

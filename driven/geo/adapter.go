@@ -2,6 +2,7 @@ package geo
 
 import (
 	"application/core/model"
+	"context"
 	"log"
 	"strings"
 
@@ -70,74 +71,61 @@ type Adapter struct {
 	log logs.Log
 }
 
-// процесване на локейшъните
-// взимане на всички локейшъни от уебтоолс и се намапват всички с ид и локешъна
-// проверка, ако има хардкорднати локейшъни се прави обект за легаси ивент от него
-// ако нямя отива в гугъл, намира координатите и строи обект от не тях
-// след като се процеснат се подават за конструиране за легаси ивент
-
-// TODO todo
+// ProcessLocation process the location
 func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string) (*model.LegacyLocation, error) {
-	var legacyLocation model.LegacyLocation
+
+	var legacyLocation *model.LegacyLocation
+
 	if location == "" {
-		legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName, Description: location,
-			Lat: nil, Long: nil}
-	}
-
-	for name, _ := range CalName2Location {
-		if location == name {
-			_, statiLocation := searchStaticLocation(calendarName, sponsor, location)
-			if statiLocation != nil {
-				legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName,
-					Description: statiLocation.Description, Lat: &statiLocation.Latitude, Long: &statiLocation.Longitude}
-			}
-
+		legacyLocation = &model.LegacyLocation{
+			ID:          eventID,
+			Name:        calendarName,
+			Description: location,
+			Lat:         nil,
+			Long:        nil,
 		}
+		return legacyLocation, nil
 	}
 
 	for name, cords := range DefinedLocation {
 		if location == name {
-			legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName,
-				Description: location, Lat: &cords[0], Long: &cords[1]}
+			legacyLocation = &model.LegacyLocation{
+				ID:          eventID,
+				Name:        name,
+				Description: location,
+				Lat:         &cords[0],
+				Long:        &cords[1],
+			}
+			return legacyLocation, nil
 		}
-
 	}
 
-	/*entry := make(map[string]interface{})
-
-	// Подготвяме заявката за геокодиране
-	req := &maps.GeocodingRequest{
-		Address: location + ", Urbana",
-		Components: map[maps.Component]string{
-			maps.ComponentAdministrativeArea: "Urbana",
-			maps.ComponentCountry:            "US",
-		},
-	}
-
-	// Извършваме заявката
-	resp, err := l.googleMapsClient.Geocode(context.Background(), req)
-	if err != nil {
-		log.Printf("API Key Error: %v", err)
-		entry["location"] = map[string]string{"description": location}
-		// Тук трябва да добавите записа към базата данни MongoDB или друга структура
-		return
-	}
-
-	if len(resp) != 0 {
-		lat := resp[0].Geometry.Location.Lat
-		lng := resp[0].Geometry.Location.Lng
-		geoInfo := map[string]interface{}{
-			"latitude":    lat,
-			"longitude":   lng,
-			"description": location,
+	_, statiLocation := searchStaticLocation(calendarName, sponsor, location)
+	if statiLocation != nil {
+		legacyLocation = &model.LegacyLocation{
+			ID:          eventID,
+			Name:        calendarName,
+			Description: statiLocation.Description,
+			Lat:         &statiLocation.Latitude,
+			Long:        &statiLocation.Longitude,
 		}
-		entry["location"] = geoInfo
-	} else {
-		entry["location"] = map[string]string{"description": location}
-		log.Printf("calendarId: %s, dataSourceEventId: %s, location: %s geolocation not found",
-			entry["calendarId"], entry["dataSourceEventId"], location)
-	}*/
-	return &legacyLocation, nil
+		return legacyLocation, nil
+	}
+
+	locationFromGoogle, _ := l.findLocationFromGoogle(nil, location, eventID, calendarName)
+	if locationFromGoogle != nil {
+		legacyLocation = &model.LegacyLocation{
+			ID:          locationFromGoogle.ID,
+			Name:        locationFromGoogle.Name,
+			Description: locationFromGoogle.Description,
+			Lat:         locationFromGoogle.Lat,
+			Long:        locationFromGoogle.Long,
+		}
+		return legacyLocation, nil
+	}
+
+	// Default return (if none of the conditions are met)
+	return legacyLocation, nil
 }
 
 // searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
@@ -162,8 +150,43 @@ func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInf
 
 }
 
-func fetchGeoData(client *maps.Client, location string, entry map[string]interface{}) {
+func (l Adapter) findLocationFromGoogle(client *maps.Client, location string, eventID string, calendarName string) (*model.LegacyLocation, error) {
+	entry := make(map[string]interface{})
+	var legacyLocation model.LegacyLocation
+	// Подготвяме заявката за геокодиране
+	req := &maps.GeocodingRequest{
+		Address: location + ", Urbana",
+		Components: map[maps.Component]string{
+			maps.ComponentAdministrativeArea: "Urbana",
+			maps.ComponentCountry:            "US",
+		},
+	}
 
+	// Извършваме заявката
+	resp, err := l.googleMapsClient.Geocode(context.Background(), req)
+	if err != nil {
+		log.Printf("API Key Error: %v", err)
+		entry["location"] = map[string]string{"description": location}
+		return nil, nil
+	}
+
+	if len(resp) != 0 {
+		lat := resp[0].Geometry.Location.Lat
+		lng := resp[0].Geometry.Location.Lng
+		geoInfo := map[string]interface{}{
+			"latitude":    lat,
+			"longitude":   lng,
+			"description": location,
+		}
+		entry["location"] = geoInfo
+		legacyLocation = model.LegacyLocation{ID: eventID, Name: calendarName,
+			Description: location, Lat: &lat, Long: &lng}
+	} else {
+		entry["location"] = map[string]string{"description": location}
+		log.Printf("calendarId: %s, dataSourceEventId: %s, location: %s geolocation not found",
+			entry["calendarId"], entry["dataSourceEventId"], location)
+	}
+	return &legacyLocation, nil
 }
 
 /*
