@@ -264,13 +264,11 @@ func (e eventsLogic) processWebToolsEvents() {
 		return
 	}
 
-	err = e.preProcessLocation(allWebToolsEvents)
+	locations, err := e.processLocation(allWebToolsEvents)
 	if err != nil {
 		e.logger.Errorf("error on processing locations - %s", err)
 		return
 	}
-
-	location, _ := e.processLocation()
 
 	now := time.Now()
 
@@ -313,7 +311,7 @@ func (e eventsLogic) processWebToolsEvents() {
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now, imagesData, location)
+			le := e.constructLegacyEvent(wt, id, now, imagesData, locations)
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -397,28 +395,6 @@ func (e eventsLogic) getNotProcessedEvents(eventsForProcessing []model.WebToolsE
 	}
 
 	return notProcessedEvents, nil
-}
-
-func (e eventsLogic) getNotProcessedLocation(locationForProcessing []model.LegacyLocation) ([]model.LegacyLocation, error) {
-	/*allProcessed, err := e.app.storage.FindImageItems()
-	if err != nil {
-		return nil, err
-	}
-
-	processedMap := make(map[string]bool) // map to keep track of processed events
-	for _, item := range allProcessed {
-		processedMap[item.ID] = true
-	}
-
-	var notProcessedLocation []model.LegacyLocation
-	for _, event := range locationForProcessing {
-		if _, processed := processedMap[event.ID]; !processed {
-			notProcessedLocation = append(notProcessedLocation, event)
-		}
-	}
-
-	return notProcessedLocation, nil*/
-	return nil, nil
 }
 
 func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
@@ -564,7 +540,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, location []model.LegacyLocation) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, locations []model.LegacyLocation) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -688,7 +664,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 
 	//image url
 	imageURL := e.getImageURL(g.EventID, imagesData)
-	loc := constructLocation(g.EventID, location)
+	loc := constructLocation(g.Location, locations)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
@@ -725,7 +701,7 @@ func (e eventsLogic) formatDate(wtDate string) string {
 	return result
 }
 
-func (e eventsLogic) preProcessLocation(allWebtoolsEvents []model.WebToolsEvent) error {
+func (e eventsLogic) processLocation(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
 	locationEventMap := make(map[string]map[string]string)
 
 	for _, event := range allWebtoolsEvents {
@@ -739,7 +715,7 @@ func (e eventsLogic) preProcessLocation(allWebtoolsEvents []model.WebToolsEvent)
 
 	locationFromTheDatabase, err := e.app.storage.FindLegacyLocationItems()
 	if err != nil {
-		return nil
+		return nil, nil
 	}
 
 	newLocations := make(map[string]map[string]string)
@@ -764,22 +740,22 @@ func (e eventsLogic) preProcessLocation(allWebtoolsEvents []model.WebToolsEvent)
 
 	// Process the values in the map
 	for eventID, eventData := range newLocations {
-		l, _ := e.geoBBAdapter.ProcessLocation(eventID, eventData["Name"], eventData["Sponsor"], eventData["Name"])
+		l, err := e.geoBBAdapter.ProcessLocation(eventID, eventData["Name"], eventData["Sponsor"], eventData["Name"])
+		if err != nil {
+			return nil, err
+		}
 		err = e.app.storage.InsertLegacyLocationItem(*l)
 		if err != nil {
-			return nil
+			return nil, err
 		}
 
 	}
 
-	return nil
-}
-
-func (e eventsLogic) processLocation() ([]model.LegacyLocation, error) {
 	location, err := e.app.storage.FindLegacyLocationItems()
 	if err != nil {
 		return nil, nil
 	}
+
 	return location, nil
 }
 
@@ -797,9 +773,9 @@ func recurenceIDtoInt(s string) (*int, error) {
 	return result, nil
 }
 
-func constructLocation(eventID string, location []model.LegacyLocation) *model.LocationLegacy {
-	for _, location := range location {
-		if location.ID == eventID {
+func constructLocation(loc string, locations []model.LegacyLocation) *model.LocationLegacy {
+	for _, location := range locations {
+		if location.Name == loc {
 			return &model.LocationLegacy{Description: location.Description,
 				Latitude: *location.Lat, Longitude: *location.Long}
 		}
