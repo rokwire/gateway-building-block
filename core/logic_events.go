@@ -265,7 +265,7 @@ func (e eventsLogic) processWebToolsEvents() {
 	}
 
 	//process the locations before the main processing
-	locations, err := e.processLocation(allWebToolsEvents)
+	locations, err := e.processLocations(allWebToolsEvents)
 	if err != nil {
 		e.logger.Errorf("error on processing locations - %s", err)
 		return
@@ -702,7 +702,7 @@ func (e eventsLogic) formatDate(wtDate string) string {
 	return result
 }
 
-func (e eventsLogic) processLocation(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
+func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
 	locationEventMap := make(map[string]map[string]string)
 
 	for _, event := range allWebtoolsEvents {
