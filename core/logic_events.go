@@ -706,11 +706,13 @@ func (e eventsLogic) processLocation(allWebtoolsEvents []model.WebToolsEvent) ([
 	locationEventMap := make(map[string]map[string]string)
 
 	for _, event := range allWebtoolsEvents {
-		locationEventMap[event.EventID] = map[string]string{
-			"eventID":      event.EventID,
-			"location":     event.Location,
-			"sponspor":     event.Sponsor,
-			"calendarName": event.CalendarName,
+		if len(event.Location) > 0 {
+			locationEventMap[event.EventID] = map[string]string{
+				"eventID":      event.EventID,
+				"location":     event.Location,
+				"sponspor":     event.Sponsor,
+				"calendarName": event.CalendarName,
+			}
 		}
 	}
 
