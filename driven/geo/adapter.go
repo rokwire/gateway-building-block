@@ -78,7 +78,7 @@ func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string
 
 	if location == "" {
 		legacyLocation = &model.LegacyLocation{
-			ID:          eventID,
+			ID:          eventID, //arh...
 			Name:        calendarName,
 			Description: location,
 			Lat:         nil,
@@ -90,7 +90,7 @@ func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string
 	for name, cords := range DefinedLocation {
 		if location == name {
 			legacyLocation = &model.LegacyLocation{
-				ID:          eventID,
+				ID:          eventID, //arh...
 				Name:        name,
 				Description: location,
 				Lat:         &cords[0],
@@ -103,7 +103,7 @@ func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string
 	_, statiLocation := searchStaticLocation(calendarName, sponsor, location)
 	if statiLocation != nil {
 		legacyLocation = &model.LegacyLocation{
-			ID:          eventID,
+			ID:          eventID, //arh...
 			Name:        calendarName,
 			Description: statiLocation.Description,
 			Lat:         &statiLocation.Latitude,
@@ -115,7 +115,7 @@ func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string
 	locationFromGoogle, _ := l.findLocationFromGoogle(nil, location, eventID, calendarName)
 	if locationFromGoogle != nil {
 		legacyLocation = &model.LegacyLocation{
-			ID:          locationFromGoogle.ID,
+			ID:          locationFromGoogle.ID, //arh...
 			Name:        locationFromGoogle.Name,
 			Description: locationFromGoogle.Description,
 			Lat:         locationFromGoogle.Lat,
