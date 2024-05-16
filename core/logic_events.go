@@ -719,6 +719,13 @@ func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) (
 
 	e.logger.Infof("there are %d locations to be processed as not proccesed", len(notProccesed))
 
+	//process the locations which have not been processed
+	err = e.applyProcessLocations(notProccesed)
+	if err != nil {
+		e.logger.Error("Error on processing locations")
+		return nil, err
+	}
+
 	/*locationEventMap := make(map[string]map[string]string)
 
 	for _, event := range allWebtoolsEvents {
@@ -816,6 +823,35 @@ func (e eventsLogic) getNotProcessedLocations(locationsForProcessing []string) (
 	}
 
 	return notProcessedEvents, nil
+}
+
+func (e eventsLogic) applyProcessLocations(locations []string) error {
+	i := 0
+	for _, w := range locations {
+
+		log.Println(w)
+		/*	//process image
+			res, err := e.app.imageAdapter.ProcessImage(w)
+			if err != nil {
+				return err
+			}
+
+			if res == nil {
+				continue
+			}
+
+			//mark as processed
+			err = e.app.storage.InsertImageItem(*res)
+			if err != nil {
+				return err
+			}
+
+			e.logger.Infof("%d - %s image was processed: %s", i, res.ID, res.ImageURL)
+		*/
+		i++
+	}
+	return nil
+
 }
 
 func recurenceIDtoInt(s string) (*int, error) {
