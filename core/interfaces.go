@@ -127,7 +127,6 @@ type Storage interface {
 	FindCalendars(id string) (*[]model.UnitCalendar, error)
 
 	InitializeLegacyLocations() error
-	//not used
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
 
 	FindLegacyEventItems(context storage.TransactionContext) ([]model.LegacyEventItem, error)

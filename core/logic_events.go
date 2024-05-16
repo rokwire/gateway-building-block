@@ -711,6 +711,14 @@ func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) (
 
 	e.logger.Infof("there are %d locations for processing", len(forProcessingLocations))
 
+	//get the locations which are not processed
+	notProccesed, err := e.getNotProcessedLocations(forProcessingLocations)
+	if err != nil {
+		return nil, err
+	}
+
+	e.logger.Infof("there are %d locations to be processed as not proccesed", len(notProccesed))
+
 	/*locationEventMap := make(map[string]map[string]string)
 
 	for _, event := range allWebtoolsEvents {
@@ -787,6 +795,27 @@ func (e eventsLogic) getLocationsForProcessing(allWebtoolsEvents []model.WebTool
 		res = append(res, location)
 	}
 	return res, nil
+}
+
+func (e eventsLogic) getNotProcessedLocations(locationsForProcessing []string) ([]string, error) {
+	allProcessed, err := e.app.storage.FindLegacyLocations()
+	if err != nil {
+		return nil, err
+	}
+
+	processedMap := make(map[string]bool) // map to keep track of processed events
+	for _, item := range allProcessed {
+		processedMap[item.Name] = true
+	}
+
+	var notProcessedEvents []string
+	for _, loc := range locationsForProcessing {
+		if _, processed := processedMap[loc]; !processed {
+			notProcessedEvents = append(notProcessedEvents, loc)
+		}
+	}
+
+	return notProcessedEvents, nil
 }
 
 func recurenceIDtoInt(s string) (*int, error) {
