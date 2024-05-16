@@ -10,13 +10,6 @@ import (
 	"googlemaps.github.io/maps"
 )
 
-// GeoInfo is a struct to hold the geolocation information
-type GeoInfo struct {
-	Latitude    float64
-	Longitude   float64
-	Description string
-}
-
 /*
 var CalName2Location = map[string][2]float64{
 	"General Events":               {0.0, 0.0},
@@ -96,9 +89,9 @@ func (l Adapter) findLocationFromGoogle(location string) (*model.LegacyLocation,
 			Description: location, Lat: &lat, Long: &lng}
 
 		return &legacyLocation, nil
-	} else {
-		log.Printf("not found: %s", location)
 	}
+	log.Printf("not found: %s", location)
+
 	return nil, nil
 }
 

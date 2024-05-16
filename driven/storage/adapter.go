@@ -547,7 +547,7 @@ func (a *Adapter) InsertImageItem(items model.ContentImagesURL) error {
 	return nil
 }
 
-// FindILegacyLocationItems finds all legacy locations stored in the database
+// FindLegacyLocationItems finds all legacy locations stored in the database
 func (a *Adapter) FindLegacyLocationItems() ([]model.LegacyLocation, error) {
 	filter := bson.M{}
 	var data []model.LegacyLocation
