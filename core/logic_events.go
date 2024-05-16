@@ -199,7 +199,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
-	log.Println(durationInSeconds)
+	//log.Println(durationInSeconds)
 	//duration := time.Second * time.Duration(3)
 	duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
@@ -264,6 +264,13 @@ func (e eventsLogic) processWebToolsEvents() {
 		return
 	}
 
+	//process the locations before the main processing
+	locationsData, err := e.processLocations(allWebToolsEvents)
+	if err != nil {
+		e.logger.Errorf("error on processing locations - %s", err)
+		return
+	}
+
 	now := time.Now()
 
 	//in transaction
@@ -305,7 +312,7 @@ func (e eventsLogic) processWebToolsEvents() {
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now, imagesData)
+			le := e.constructLegacyEvent(wt, id, now, imagesData, locationsData)
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -341,7 +348,7 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) ([]m
 		return nil, err
 	}
 
-	e.logger.Infof("there are %d events to be processed as not proccesed", len(notProccesed))
+	e.logger.Infof("there are %d events to be image processed as not proccesed", len(notProccesed))
 
 	//process the images which have not been processed
 	err = e.applyProcessImages(notProccesed)
@@ -534,7 +541,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, locationsData []model.LegacyLocation) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -563,7 +570,6 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	outlookURL := fmt.Sprintf("https://calendars.illinois.edu/outlook2010/%s/%s.ics", g.CalendarID, g.EventID)
 
 	recurrenceID, _ := recurenceIDtoInt(g.RecurrenceID)
-	location := constructLocation(g.Location)
 	con := model.ContactLegacy{ContactName: g.CalendarName, ContactEmail: g.ContactEmail, ContactPhone: g.ContactName}
 	var contacts []model.ContactLegacy
 	contacts = append(contacts, con)
@@ -659,13 +665,14 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 
 	//image url
 	imageURL := e.getImageURL(g.EventID, imagesData)
+	loc := constructLocation(g, locationsData)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
 			DataModified: modifiedDate, DateCreated: createdDate,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
-			RecurrenceID: recurrenceID, Location: &location, Contacts: contatsLegacy,
+			RecurrenceID: recurrenceID, Location: loc, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
 			Tags: tags, TargetAudience: targetAudience, ImageURL: imageURL}}
 }
@@ -695,6 +702,106 @@ func (e eventsLogic) formatDate(wtDate string) string {
 	return result
 }
 
+func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
+	//get the locations for processing
+	forProcessingLocations, err := e.getLocationsForProcessing(allWebtoolsEvents)
+	if err != nil {
+		return nil, err
+	}
+
+	e.logger.Infof("there are %d locations for processing", len(forProcessingLocations))
+
+	//get the locations which are not processed
+	notProccesed, err := e.getNotProcessedLocations(forProcessingLocations)
+	if err != nil {
+		return nil, err
+	}
+
+	e.logger.Infof("there are %d locations to be processed as not proccesed", len(notProccesed))
+
+	//process the locations which have not been processed
+	err = e.applyProcessLocations(notProccesed)
+	if err != nil {
+		e.logger.Error("Error on processing locations")
+		return nil, err
+	}
+
+	//as we already have processed all locations just return this data to be used
+	locationsData, err := e.app.storage.FindLegacyLocationItems()
+	if err != nil {
+		return nil, err
+	}
+
+	return locationsData, nil
+}
+
+func (e eventsLogic) getLocationsForProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]string, error) {
+	locationsMap := make(map[string]bool)
+	for _, event := range allWebtoolsEvents {
+		if len(event.Location) == 0 {
+			continue
+		}
+
+		locationsMap[event.Location] = true
+	}
+
+	res := []string{}
+	for location := range locationsMap {
+		res = append(res, location)
+	}
+	return res, nil
+}
+
+func (e eventsLogic) getNotProcessedLocations(locationsForProcessing []string) ([]string, error) {
+	allProcessed, err := e.app.storage.FindLegacyLocations()
+	if err != nil {
+		return nil, err
+	}
+
+	processedMap := make(map[string]bool) // map to keep track of processed events
+	for _, item := range allProcessed {
+		processedMap[item.Name] = true
+	}
+
+	var notProcessedEvents []string
+	for _, loc := range locationsForProcessing {
+		if _, processed := processedMap[loc]; !processed {
+			notProcessedEvents = append(notProcessedEvents, loc)
+		}
+	}
+
+	return notProcessedEvents, nil
+}
+
+func (e eventsLogic) applyProcessLocations(locations []string) error {
+	i := 0
+	for _, loc := range locations {
+
+		//process the location
+		founded, err := e.geoBBAdapter.FindLocation(loc)
+		if err != nil {
+			return err
+		}
+
+		if founded == nil {
+			e.logger.Infof("%d - %s NOT found", i, loc)
+			continue
+		}
+
+		//mark as processed
+		err = e.app.storage.InsertLegacyLocationItem(*founded)
+		if err != nil {
+			return err
+		}
+
+		e.logger.Infof("%d - %s WAS found", i, loc)
+
+		i++
+	}
+	return nil
+
+}
+
 func recurenceIDtoInt(s string) (*int, error) {
 	// Parse string to int
 	parsedInt, err := strconv.Atoi(s)
@@ -709,65 +816,80 @@ func recurenceIDtoInt(s string) (*int, error) {
 	return result, nil
 }
 
-func constructLocation(location string) model.LocationLegacy {
+func constructLocation(event model.WebToolsEvent, locations []model.LegacyLocation) *model.LocationLegacy {
+	eventLocation := event.Location
+
+	//check for empty location
+	if len(eventLocation) == 0 {
+		emptyLocation := constructEmptyLocation(eventLocation)
+		return &emptyLocation
+	}
+
+	//in some cases we do not use the founded locations directly by the location key as in some cases the geo service(Google)
+	//gives bad results. In this case we have defined a new correct search key.
+
+	//try if need to change the key
+	searchKey := usePredefinedLocationKey(event.CalendarName, event.Sponsor, event.Location)
+	if searchKey == nil {
+		searchKey = &event.Location
+	}
+
+	//we have a search key, so try to find a location
+	founded := findLocation(*searchKey, locations)
+	if founded != nil {
+		//return it
+
+		return &model.LocationLegacy{Description: founded.Description,
+			Latitude: *founded.Lat, Longitude: *founded.Long}
+	}
+
+	//not found so return empty location
+	emptyLocation := constructEmptyLocation(eventLocation)
+	return &emptyLocation
+}
+
+func constructEmptyLocation(location string) model.LocationLegacy {
 	description := location
 	latitude := 0.0
 	longitude := 0.0
+	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
+}
 
-	if location == "Davenport 109A" {
-		latitude = 40.107335
-		longitude = -88.226069
-	} else if location == "Nevada Dance Studio (905 W. Nevada St.)" {
-		latitude = 40.105825
-		longitude = -88.219873
-	} else if location == "18th Ave Library, 175 W 18th Ave, Room 205, Oklahoma City, OK" {
-		latitude = 36.102183
-		longitude = -97.111245
-	} else if location == "Champaign County Fairgrounds" {
-		latitude = 40.1202191
-		longitude = -88.2178757
-	} else if location == "Student Union SLC Conference room" {
-		latitude = 39.727282
-		longitude = -89.617477
-	} else if location == "Armory, room 172 (the Innovation Studio)" {
-		latitude = 40.104749
-		longitude = -88.23195
-	} else if location == "Student Union Room 235" {
-		latitude = 39.727282
-		longitude = -89.617477
-	} else if location == "Uni 206, 210, 211" {
-		latitude = 40.11314
-		longitude = -88.225259
-	} else if location == "Uni 205, 206, 210" {
-		latitude = 40.11314
-		longitude = -88.225259
-	} else if location == "Southern Historical Association Combs Chandler 30" {
-		latitude = 38.258116
-		longitude = -85.756139
-	} else if location == "St. Louis, MO" {
-		latitude = 38.694237
-		longitude = -90.4493
-	} else if location == "Student Union SLC" {
-		latitude = 39.727282
-		longitude = -89.617477
-	} else if location == "Purdue University, West Lafayette, Indiana" {
-		latitude = 40.425012
-		longitude = -86.912645
-	} else if location == "MP 7" {
-		latitude = 40.100803
-		longitude = -88.23604
-	} else if location == "116 Roger Adams Lab" {
-		latitude = 40.107741
-		longitude = -88.224943
-	} else if location == "2700 Campus Way 45221" {
-		latitude = 39.131894
-		longitude = -84.519143
-	} else if location == "The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL" {
-		latitude = 40.1047044
-		longitude = -88.22901039999999
+// usePredefinedLocationKey looks for a static location based on the calendar name, sponsor, and location description
+func usePredefinedLocationKey(calendarName, sponsor, location string) *string {
+
+	type tip struct {
+		CalendarName    string
+		SponsorKeyword  string
+		LocationKeyword string
+		AccessName      string
 	}
 
-	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
+	var tip4CalALoc = []tip{
+		{CalendarName: "Krannert Center", SponsorKeyword: "", LocationKeyword: "studio", AccessName: "Krannert Center"},
+		{CalendarName: "Krannert Center", SponsorKeyword: "", LocationKeyword: "stage", AccessName: "Krannert Center"},
+		{CalendarName: "General Events", SponsorKeyword: "ncsa", LocationKeyword: "ncsa", AccessName: "NCSA"},
+		{CalendarName: "National Center for Supercomputing Applications master calendar", SponsorKeyword: "", LocationKeyword: "ncsa", AccessName: "NCSA"},
+	}
+
+	for _, tip := range tip4CalALoc {
+		if tip.CalendarName == calendarName &&
+			strings.Contains(strings.ToLower(sponsor), tip.SponsorKeyword) &&
+			strings.Contains(strings.ToLower(location), tip.LocationKeyword) {
+			return &tip.AccessName
+		}
+	}
+
+	return nil
+}
+
+func findLocation(loc string, locations []model.LegacyLocation) *model.LegacyLocation {
+	for _, location := range locations {
+		if location.Name == loc {
+			return &location
+		}
+	}
+	return nil
 }
 
 // Contacts

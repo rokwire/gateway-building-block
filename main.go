@@ -132,8 +132,7 @@ func main() {
 	}
 
 	// geo bb adapter
-	//geoBBGoogleAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"EVENTS_BB_ROKWIRE_API_KEY", true, true)
-	geoBBGoogleAPIKey := "1234"
+	geoBBGoogleAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"GOOGLE_KEY", true, true)
 	geoBBAdapter := geo.NewGeoBBAdapter(geoBBGoogleAPIKey, logger)
 
 	// application

@@ -101,7 +101,12 @@ type EventsBBAdapter interface {
 
 // GeoAdapter is used by core to get geo services
 type GeoAdapter interface {
-	TODO(location string)
+	FindLocation(location string) (*model.LegacyLocation, error)
+}
+
+// ImageAdapter  is used to precess images
+type ImageAdapter interface {
+	ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
@@ -127,7 +132,6 @@ type Storage interface {
 	FindCalendars(id string) (*[]model.UnitCalendar, error)
 
 	InitializeLegacyLocations() error
-	//not used
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
 
 	FindLegacyEventItems(context storage.TransactionContext) ([]model.LegacyEventItem, error)
@@ -144,6 +148,9 @@ type Storage interface {
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error
+
+	FindLegacyLocationItems() ([]model.LegacyLocation, error)
+	InsertLegacyLocationItem(items model.LegacyLocation) error
 }
 
 // StorageListener represents storage listener
@@ -194,9 +201,4 @@ type SuccessTeam interface {
 	GetSuccessTeam(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error)
 	GetPrimaryCareProvider(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
-}
-
-// ImageAdapter  is used to precess images
-type ImageAdapter interface {
-	ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error)
 }

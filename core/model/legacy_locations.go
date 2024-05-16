@@ -171,4 +171,70 @@ var DefaultLegacyLocations = LegacyLocationsListType{
 		Long:        floatToPointer(-88.224943),
 		Description: "116 Roger Adams Lab",
 	},
+
+	//START CalName2Location
+	{
+		ID:          uuid.NewString(),
+		Name:        "General Events",
+		Lat:         floatToPointer(0.0),
+		Long:        floatToPointer(0.0),
+		Description: "General Events",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Krannert Center",
+		Lat:         floatToPointer(40.1080244),
+		Long:        floatToPointer(-88.224704),
+		Description: "Krannert Center",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Library Calendar",
+		Lat:         floatToPointer(0.0),
+		Long:        floatToPointer(0.0),
+		Description: "Library Calendar",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Facility Hours",
+		Lat:         floatToPointer(0.0),
+		Long:        floatToPointer(0.0),
+		Description: "Facility Hours",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Beckman Main Calendar",
+		Lat:         floatToPointer(40.1157707),
+		Long:        floatToPointer(-88.229393),
+		Description: "Beckman Main Calendar",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Lincoln Hall Theater Events",
+		Lat:         floatToPointer(40.1066066),
+		Long:        floatToPointer(-88.2304212),
+		Description: "Lincoln Hall Theater Events",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Foellinger Auditorium Events",
+		Lat:         floatToPointer(40.1059431),
+		Long:        floatToPointer(-88.2294751),
+		Description: "Foellinger Auditorium Events",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "Department of Sociology",
+		Lat:         floatToPointer(40.1066528),
+		Long:        floatToPointer(-88.2305061),
+		Description: "Department of Sociology",
+	},
+	{
+		ID:          uuid.NewString(),
+		Name:        "NCSA",
+		Lat:         floatToPointer(40.1147743),
+		Long:        floatToPointer(-88.2252053),
+		Description: "NCSA",
+	},
+	//ENB CalName2Location
 }
