@@ -773,15 +773,20 @@ func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) (
 }
 
 func (e eventsLogic) getLocationsForProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]string, error) {
-	/*res := []model.WebToolsEvent{}
-	for _, w := range allWebtoolsEvents {
-		if w.LargeImageUploaded == "true" {
-			res = append(res, w)
+	locationsMap := make(map[string]bool)
+	for _, event := range allWebtoolsEvents {
+		if len(event.Location) == 0 {
+			continue
 		}
 
+		locationsMap[event.Location] = true
 	}
-	return res, nil */
-	return nil, nil
+
+	res := []string{}
+	for location := range locationsMap {
+		res = append(res, location)
+	}
+	return res, nil
 }
 
 func recurenceIDtoInt(s string) (*int, error) {
