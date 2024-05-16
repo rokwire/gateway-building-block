@@ -10,26 +10,11 @@ import (
 	"googlemaps.github.io/maps"
 )
 
-// Tip is a struct to hold localization tips
-type Tip struct {
-	CalendarName    string
-	SponsorKeyword  string
-	LocationKeyword string
-	AccessName      string
-}
-
 // GeoInfo is a struct to hold the geolocation information
 type GeoInfo struct {
 	Latitude    float64
 	Longitude   float64
 	Description string
-}
-
-var tip4CalALoc = []Tip{
-	{CalendarName: "Krannert Center", SponsorKeyword: "", LocationKeyword: "studio", AccessName: "Krannert Center"},
-	{CalendarName: "Krannert Center", SponsorKeyword: "", LocationKeyword: "stage", AccessName: "Krannert Center"},
-	{CalendarName: "General Events", SponsorKeyword: "ncsa", LocationKeyword: "ncsa", AccessName: "NCSA"},
-	{CalendarName: "National Center for Supercomputing Applications master calendar", SponsorKeyword: "", LocationKeyword: "ncsa", AccessName: "NCSA"},
 }
 
 /*
@@ -87,30 +72,6 @@ type Adapter struct {
 // FindLocation finds the location the location
 func (l Adapter) FindLocation(location string) (*model.LegacyLocation, error) {
 	return l.findLocationFromGoogle(location)
-}
-
-// searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
-func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInfo) {
-	/*for _, tip := range tip4CalALoc {
-		if tip.CalendarName == calendarName &&
-			strings.Contains(strings.ToLower(sponsor), tip.SponsorKeyword) &&
-			strings.Contains(strings.ToLower(location), tip.LocationKeyword) {
-			latLong, exists := CalName2Location[tip.AccessName]
-			if !exists {
-				return false, nil
-			}
-			geoInfo := GeoInfo{
-				Latitude:    latLong[0],
-				Longitude:   latLong[1],
-				Description: location,
-			}
-			return true, &geoInfo
-		}
-	}
-	return false, nil */
-
-	return false, nil
-
 }
 
 func (l Adapter) findLocationFromGoogle(location string) (*model.LegacyLocation, error) {

@@ -265,7 +265,7 @@ func (e eventsLogic) processWebToolsEvents() {
 	}
 
 	//process the locations before the main processing
-	locations, err := e.processLocations(allWebToolsEvents)
+	locationsData, err := e.processLocations(allWebToolsEvents)
 	if err != nil {
 		e.logger.Errorf("error on processing locations - %s", err)
 		return
@@ -312,7 +312,7 @@ func (e eventsLogic) processWebToolsEvents() {
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now, imagesData, locations)
+			le := e.constructLegacyEvent(wt, id, now, imagesData, locationsData)
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -541,7 +541,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, locations []model.LegacyLocation) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, locationsData []model.LegacyLocation) model.LegacyEventItem {
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -665,7 +665,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 
 	//image url
 	imageURL := e.getImageURL(g.EventID, imagesData)
-	loc := constructLocation(g.Location, locations)
+	loc := constructLocation(g, locationsData)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
@@ -726,65 +726,13 @@ func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) (
 		return nil, err
 	}
 
-	/*locationEventMap := make(map[string]map[string]string)
-
-	for _, event := range allWebtoolsEvents {
-		if len(event.Location) > 0 {
-			locationEventMap[event.EventID] = map[string]string{
-				"eventID":      event.EventID,
-				"location":     event.Location,
-				"sponspor":     event.Sponsor,
-				"calendarName": event.CalendarName,
-			}
-		}
-	}
-
-	locationFromTheDatabase, err := e.app.storage.FindLegacyLocationItems()
+	//as we already have processed all locations just return this data to be used
+	locationsData, err := e.app.storage.FindLegacyLocationItems()
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
-	newLocations := make(map[string]map[string]string)
-
-	for eventID, eventLocation := range locationEventMap {
-		found := false
-		for _, dbLocation := range locationFromTheDatabase {
-			if eventLocation["location"] == dbLocation.Name {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			newLocations[eventID] = map[string]string{
-				"ID":      eventID,
-				"Name":    eventLocation["location"],
-				"Sponsor": eventLocation["sponsor"],
-			}
-		}
-	}
-
-	// Process the values in the map
-	for eventID, eventData := range newLocations {
-		l, err := e.geoBBAdapter.ProcessLocation(eventID, eventData["Name"], eventData["Sponsor"], eventData["Name"])
-		if err != nil {
-			return nil, err
-		}
-		err = e.app.storage.InsertLegacyLocationItem(*l)
-		if err != nil {
-			return nil, err
-		}
-
-	}
-
-	location, err := e.app.storage.FindLegacyLocationItems()
-	if err != nil {
-		return nil, nil
-	}
-
-	return location, nil */
-
-	return nil, errors.New("not implemented")
+	return locationsData, nil
 }
 
 func (e eventsLogic) getLocationsForProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]string, error) {
@@ -868,11 +816,77 @@ func recurenceIDtoInt(s string) (*int, error) {
 	return result, nil
 }
 
-func constructLocation(loc string, locations []model.LegacyLocation) *model.LocationLegacy {
+func constructLocation(event model.WebToolsEvent, locations []model.LegacyLocation) *model.LocationLegacy {
+	eventLocation := event.Location
+
+	//check for empty location
+	if len(eventLocation) == 0 {
+		emptyLocation := constructEmptyLocation(eventLocation)
+		return &emptyLocation
+	}
+
+	//in some cases we do not use the founded locations directly by the location key as in some cases the geo service(Google)
+	//gives bad results. In this case we have defined a new correct search key.
+
+	//try if need to change the key
+	searchKey := usePredefinedLocationKey(event.CalendarName, event.Sponsor, event.Location)
+	if searchKey == nil {
+		searchKey = &event.Location
+	}
+
+	//we have a search key, so try to find a location
+	founded := findLocation(*searchKey, locations)
+	if founded != nil {
+		//return it
+
+		return &model.LocationLegacy{Description: founded.Description,
+			Latitude: *founded.Lat, Longitude: *founded.Long}
+	}
+
+	//not found so return empty location
+	emptyLocation := constructEmptyLocation(eventLocation)
+	return &emptyLocation
+}
+
+func constructEmptyLocation(location string) model.LocationLegacy {
+	description := location
+	latitude := 0.0
+	longitude := 0.0
+	return model.LocationLegacy{Description: description, Latitude: float64(latitude), Longitude: float64(longitude)}
+}
+
+// usePredefinedLocationKey looks for a static location based on the calendar name, sponsor, and location description
+func usePredefinedLocationKey(calendarName, sponsor, location string) *string {
+
+	type tip struct {
+		CalendarName    string
+		SponsorKeyword  string
+		LocationKeyword string
+		AccessName      string
+	}
+
+	var tip4CalALoc = []tip{
+		{CalendarName: "Krannert Center", SponsorKeyword: "", LocationKeyword: "studio", AccessName: "Krannert Center"},
+		{CalendarName: "Krannert Center", SponsorKeyword: "", LocationKeyword: "stage", AccessName: "Krannert Center"},
+		{CalendarName: "General Events", SponsorKeyword: "ncsa", LocationKeyword: "ncsa", AccessName: "NCSA"},
+		{CalendarName: "National Center for Supercomputing Applications master calendar", SponsorKeyword: "", LocationKeyword: "ncsa", AccessName: "NCSA"},
+	}
+
+	for _, tip := range tip4CalALoc {
+		if tip.CalendarName == calendarName &&
+			strings.Contains(strings.ToLower(sponsor), tip.SponsorKeyword) &&
+			strings.Contains(strings.ToLower(location), tip.LocationKeyword) {
+			return &tip.AccessName
+		}
+	}
+
+	return nil
+}
+
+func findLocation(loc string, locations []model.LegacyLocation) *model.LegacyLocation {
 	for _, location := range locations {
 		if location.Name == loc {
-			return &model.LocationLegacy{Description: location.Description,
-				Latitude: *location.Lat, Longitude: *location.Long}
+			return &location
 		}
 	}
 	return nil
