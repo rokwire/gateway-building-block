@@ -83,6 +83,12 @@ type Adapter struct {
 	log logs.Log
 }
 
+// FindLocation finds the location the location
+func (l Adapter) FindLocation(location string) (*model.LegacyLocation, error) {
+	//TODO
+	return nil, nil
+}
+
 // ProcessLocation process the location
 func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string) (*model.LegacyLocation, error) {
 	/*

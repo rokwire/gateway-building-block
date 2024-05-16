@@ -827,27 +827,27 @@ func (e eventsLogic) getNotProcessedLocations(locationsForProcessing []string) (
 
 func (e eventsLogic) applyProcessLocations(locations []string) error {
 	i := 0
-	for _, w := range locations {
+	for _, loc := range locations {
 
-		log.Println(w)
-		/*	//process image
-			res, err := e.app.imageAdapter.ProcessImage(w)
-			if err != nil {
-				return err
-			}
+		//process the location
+		founded, err := e.geoBBAdapter.FindLocation(loc)
+		if err != nil {
+			return err
+		}
 
-			if res == nil {
-				continue
-			}
+		if founded == nil {
+			e.logger.Infof("%d - %s NOT found", i, loc)
+			continue
+		}
 
-			//mark as processed
-			err = e.app.storage.InsertImageItem(*res)
-			if err != nil {
-				return err
-			}
+		//mark as processed
+		err = e.app.storage.InsertLegacyLocationItem(*founded)
+		if err != nil {
+			return err
+		}
 
-			e.logger.Infof("%d - %s image was processed: %s", i, res.ID, res.ImageURL)
-		*/
+		e.logger.Infof("%d - %s WAS found", i, loc)
+
 		i++
 	}
 	return nil

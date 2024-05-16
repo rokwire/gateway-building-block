@@ -101,7 +101,12 @@ type EventsBBAdapter interface {
 
 // GeoAdapter is used by core to get geo services
 type GeoAdapter interface {
-	ProcessLocation(eventID, calendarName, sponsor, location string) (*model.LegacyLocation, error)
+	FindLocation(location string) (*model.LegacyLocation, error)
+}
+
+// ImageAdapter  is used to precess images
+type ImageAdapter interface {
+	ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error)
 }
 
 // Storage is used by core to storage data - DB storage adapter, file storage adapter etc
@@ -196,9 +201,4 @@ type SuccessTeam interface {
 	GetSuccessTeam(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error)
 	GetPrimaryCareProvider(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
-}
-
-// ImageAdapter  is used to precess images
-type ImageAdapter interface {
-	ProcessImage(item model.WebToolsEvent) (*model.ContentImagesURL, error)
 }
