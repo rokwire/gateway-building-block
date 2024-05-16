@@ -348,7 +348,7 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) ([]m
 		return nil, err
 	}
 
-	e.logger.Infof("there are %d events to be processed as not proccesed", len(notProccesed))
+	e.logger.Infof("there are %d events to be image processed as not proccesed", len(notProccesed))
 
 	//process the images which have not been processed
 	err = e.applyProcessImages(notProccesed)
@@ -703,7 +703,15 @@ func (e eventsLogic) formatDate(wtDate string) string {
 }
 
 func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) ([]model.LegacyLocation, error) {
-	locationEventMap := make(map[string]map[string]string)
+	//get the locations for processing
+	forProcessingLocations, err := e.getLocationsForProcessing(allWebtoolsEvents)
+	if err != nil {
+		return nil, err
+	}
+
+	e.logger.Infof("there are %d locations for processing", len(forProcessingLocations))
+
+	/*locationEventMap := make(map[string]map[string]string)
 
 	for _, event := range allWebtoolsEvents {
 		if len(event.Location) > 0 {
@@ -759,7 +767,21 @@ func (e eventsLogic) processLocations(allWebtoolsEvents []model.WebToolsEvent) (
 		return nil, nil
 	}
 
-	return location, nil
+	return location, nil */
+
+	return nil, errors.New("not implemented")
+}
+
+func (e eventsLogic) getLocationsForProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]string, error) {
+	/*res := []model.WebToolsEvent{}
+	for _, w := range allWebtoolsEvents {
+		if w.LargeImageUploaded == "true" {
+			res = append(res, w)
+		}
+
+	}
+	return res, nil */
+	return nil, nil
 }
 
 func recurenceIDtoInt(s string) (*int, error) {

@@ -44,6 +44,7 @@ var CalName2Location = map[string][2]float64{
 	"NCSA":                         {40.1147743, -88.2252053},
 }*/
 
+/*
 var DefinedLocation = map[string][2]float64{
 	"Davenport 109A": {40.107335, -88.226069},
 	"Nevada Dance Studio (905 W. Nevada St.)":                       {40.105825, -88.219873},
@@ -73,7 +74,7 @@ var DefinedLocation = map[string][2]float64{
 	"Foellinger Auditorium Events": {40.1059431, -88.2294751},
 	"Department of Sociology":      {40.1066528, -88.2305061},
 	"NCSA":                         {40.1147743, -88.2252053},
-}
+} */
 
 // Adapter implements the GeoAdapter interface
 type Adapter struct {
@@ -84,59 +85,61 @@ type Adapter struct {
 
 // ProcessLocation process the location
 func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string) (*model.LegacyLocation, error) {
+	/*
+		var legacyLocation *model.LegacyLocation
 
-	var legacyLocation *model.LegacyLocation
-
-	if location == "" {
-		legacyLocation = &model.LegacyLocation{
-			ID:          eventID, //arh...
-			Name:        calendarName,
-			Description: location,
-			Lat:         nil,
-			Long:        nil,
-		}
-		return legacyLocation, nil
-	}
-
-	for name, cords := range DefinedLocation {
-		if location == name {
+		if location == "" {
 			legacyLocation = &model.LegacyLocation{
 				ID:          eventID, //arh...
-				Name:        name,
+				Name:        calendarName,
 				Description: location,
-				Lat:         &cords[0],
-				Long:        &cords[1],
+				Lat:         nil,
+				Long:        nil,
 			}
 			return legacyLocation, nil
 		}
-	}
 
-	_, statiLocation := searchStaticLocation(calendarName, sponsor, location)
-	if statiLocation != nil {
-		legacyLocation = &model.LegacyLocation{
-			ID:          eventID, //arh...
-			Name:        calendarName,
-			Description: statiLocation.Description,
-			Lat:         &statiLocation.Latitude,
-			Long:        &statiLocation.Longitude,
+		for name, cords := range DefinedLocation {
+			if location == name {
+				legacyLocation = &model.LegacyLocation{
+					ID:          eventID, //arh...
+					Name:        name,
+					Description: location,
+					Lat:         &cords[0],
+					Long:        &cords[1],
+				}
+				return legacyLocation, nil
+			}
 		}
-		return legacyLocation, nil
-	}
 
-	locationFromGoogle, _ := l.findLocationFromGoogle(nil, location, eventID, calendarName)
-	if locationFromGoogle != nil {
-		legacyLocation = &model.LegacyLocation{
-			ID:          locationFromGoogle.ID, //arh...
-			Name:        locationFromGoogle.Name,
-			Description: locationFromGoogle.Description,
-			Lat:         locationFromGoogle.Lat,
-			Long:        locationFromGoogle.Long,
+		_, statiLocation := searchStaticLocation(calendarName, sponsor, location)
+		if statiLocation != nil {
+			legacyLocation = &model.LegacyLocation{
+				ID:          eventID, //arh...
+				Name:        calendarName,
+				Description: statiLocation.Description,
+				Lat:         &statiLocation.Latitude,
+				Long:        &statiLocation.Longitude,
+			}
+			return legacyLocation, nil
 		}
-		return legacyLocation, nil
-	}
 
-	// Default return (if none of the conditions are met)
-	return legacyLocation, nil
+		locationFromGoogle, _ := l.findLocationFromGoogle(nil, location, eventID, calendarName)
+		if locationFromGoogle != nil {
+			legacyLocation = &model.LegacyLocation{
+				ID:          locationFromGoogle.ID, //arh...
+				Name:        locationFromGoogle.Name,
+				Description: locationFromGoogle.Description,
+				Lat:         locationFromGoogle.Lat,
+				Long:        locationFromGoogle.Long,
+			}
+			return legacyLocation, nil
+		}
+
+		// Default return (if none of the conditions are met)
+		return legacyLocation, nil */
+
+	return nil, nil
 }
 
 // searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
