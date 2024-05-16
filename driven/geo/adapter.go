@@ -4,7 +4,6 @@ import (
 	"application/core/model"
 	"context"
 	"log"
-	"strings"
 
 	"github.com/rokwire/logging-library-go/v2/logs"
 	"googlemaps.github.io/maps"
@@ -32,6 +31,7 @@ var tip4CalALoc = []Tip{
 	{CalendarName: "National Center for Supercomputing Applications master calendar", SponsorKeyword: "", LocationKeyword: "ncsa", AccessName: "NCSA"},
 }
 
+/*
 var CalName2Location = map[string][2]float64{
 	"General Events":               {0.0, 0.0},
 	"Krannert Center":              {40.1080244, -88.224704},
@@ -42,7 +42,7 @@ var CalName2Location = map[string][2]float64{
 	"Foellinger Auditorium Events": {40.1059431, -88.2294751},
 	"Department of Sociology":      {40.1066528, -88.2305061},
 	"NCSA":                         {40.1147743, -88.2252053},
-}
+}*/
 
 var DefinedLocation = map[string][2]float64{
 	"Davenport 109A": {40.107335, -88.226069},
@@ -62,6 +62,17 @@ var DefinedLocation = map[string][2]float64{
 	"116 Roger Adams Lab":   {40.107741, -88.224943},
 	"2700 Campus Way 45221": {39.131894, -84.519143},
 	"The Orange Room, Main Library - 1408 W. Gregory Drive, Champaign IL": {40.1047044, -88.22901039999999},
+
+	//CalName2Location
+	"General Events":               {0.0, 0.0},
+	"Krannert Center":              {40.1080244, -88.224704},
+	"Library Calendar":             {0.0, 0.0},
+	"Facility Hours":               {0.0, 0.0},
+	"Beckman Main Calendar":        {40.1157707, -88.229393},
+	"Lincoln Hall Theater Events":  {40.1066066, -88.2304212},
+	"Foellinger Auditorium Events": {40.1059431, -88.2294751},
+	"Department of Sociology":      {40.1066528, -88.2305061},
+	"NCSA":                         {40.1147743, -88.2252053},
 }
 
 // Adapter implements the GeoAdapter interface
@@ -130,7 +141,7 @@ func (l Adapter) ProcessLocation(eventID, calendarName, sponsor, location string
 
 // searchStaticLocation looks for a static location based on the calendar name, sponsor, and location description
 func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInfo) {
-	for _, tip := range tip4CalALoc {
+	/*for _, tip := range tip4CalALoc {
 		if tip.CalendarName == calendarName &&
 			strings.Contains(strings.ToLower(sponsor), tip.SponsorKeyword) &&
 			strings.Contains(strings.ToLower(location), tip.LocationKeyword) {
@@ -146,6 +157,8 @@ func searchStaticLocation(calendarName, sponsor, location string) (bool, *GeoInf
 			return true, &geoInfo
 		}
 	}
+	return false, nil */
+
 	return false, nil
 
 }
