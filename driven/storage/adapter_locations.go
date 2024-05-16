@@ -38,7 +38,7 @@ func (a *Adapter) InitializeLegacyLocations() error {
 func (a *Adapter) FindLegacyLocations() (model.LegacyLocationsListType, error) {
 
 	var list model.LegacyLocationsListType
-	err := a.db.legacyEvents.FindWithContext(a.context, bson.D{}, &list, options.Find().SetSort(bson.D{{Key: "name", Value: 1}}))
+	err := a.db.legacyLocations.FindWithContext(a.context, bson.D{}, &list, options.Find().SetSort(bson.D{{Key: "name", Value: 1}}))
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeEventLocations, nil, err)
 	}

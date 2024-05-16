@@ -56,6 +56,7 @@ type Application struct {
 
 	eventsBBAdapter EventsBBAdapter
 	imageAdapter    ImageAdapter
+	geoBBAdapter    GeoAdapter
 
 	//events logic
 	eventsLogic eventsLogic
@@ -94,6 +95,7 @@ func NewApplication(version string, build string,
 	storage Storage,
 	eventsBBAdapter EventsBBAdapter,
 	imageAdapter ImageAdapter,
+	geoBBAdapter GeoAdapter,
 	appntAdapters map[string]Appointments,
 	logger *logs.Logger) *Application {
 	application := Application{version: version, build: build, storage: storage, eventsBBAdapter: eventsBBAdapter, imageAdapter: imageAdapter, logger: logger, AppointmentAdapters: appntAdapters}
@@ -106,7 +108,7 @@ func NewApplication(version string, build string,
 	application.TPS = newAppTPS(&application)
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
-	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, *logger)
+	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, geoBBAdapter, *logger)
 
 	return &application
 }

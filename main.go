@@ -17,6 +17,7 @@ package main
 import (
 	"application/core"
 	"application/driven/eventsbb"
+	"application/driven/geo"
 	"application/driven/image"
 	"application/driven/storage"
 	"application/driven/uiucadapters"
@@ -130,8 +131,13 @@ func main() {
 		logger.Fatalf("Error initializing sports adapter: %v", err)
 	}
 
+	// geo bb adapter
+	geoBBGoogleAPIKey := envLoader.GetAndLogEnvVar(envPrefix+"GOOGLE_KEY", true, true)
+	geoBBAdapter := geo.NewGeoBBAdapter(geoBBGoogleAPIKey, logger)
+
 	// application
-	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter, imageAdapter, appointments, logger)
+	application := core.NewApplication(Version, Build, storageAdapter, eventsBBAdapter,
+		imageAdapter, geoBBAdapter, appointments, logger)
 	err = application.Start()
 	if err != nil {
 		logger.Fatalf("Cannot start the Application module: %v", err)
