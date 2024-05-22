@@ -598,10 +598,10 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 		startDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
 		startDateObj = &startDateObjTmp
 
-		endDate = g.EndDate
+		/*endDate = g.EndDate
 		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
 		endDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
-		endDateObj = &endDateObjTmp
+		endDateObj = &endDateObjTmp*/
 	} else if timeType == "START_AND_END_TIME" {
 		startDate = g.StartDate
 		startTime = g.StartTime
@@ -618,14 +618,13 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 		allDay = true
 
 		startDate = g.StartDate
-		endDate = g.EndDate
 		startDateTimeStr := fmt.Sprintf("%s 12:00 am", startDate)
 		startDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
 		startDateObj = &startDateObjTmp
 
-		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
-		endDateObj = &endDateObjTmp
+		/*	endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
+			endDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+			endDateObj = &endDateObjTmp */
 	}
 
 	startDateStr := ""
