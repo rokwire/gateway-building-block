@@ -584,7 +584,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	timeType := g.TimeType
 
 	var startDate, startTime, endDate, endTime string
-	var startDateObj, endDateObj time.Time
+	var startDateObj, endDateObj *time.Time
 
 	chicagoLocation, err := time.LoadLocation("America/Chicago")
 	if err != nil {
@@ -595,35 +595,47 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+		startDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+		startDateObj = &startDateObjTmp
 
-		endDate = g.EndDate
+		/*endDate = g.EndDate
 		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+		endDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+		endDateObj = &endDateObjTmp*/
 	} else if timeType == "START_AND_END_TIME" {
 		startDate = g.StartDate
 		startTime = g.StartTime
 		startDateTimeStr := fmt.Sprintf("%s %s", startDate, startTime)
-		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+		startDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+		startDateObj = &startDateObjTmp
 
 		endDate = g.EndDate
 		endTime = g.EndTime
 		endDateTimeStr := fmt.Sprintf("%s %s", endDate, endTime)
-		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+		endDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+		endDateObj = &endDateObjTmp
 	} else if timeType == "NONE" {
 		allDay = true
 
 		startDate = g.StartDate
-		endDate = g.EndDate
 		startDateTimeStr := fmt.Sprintf("%s 12:00 am", startDate)
-		startDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+		startDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", startDateTimeStr, chicagoLocation)
+		startDateObj = &startDateObjTmp
 
-		endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
-		endDateObj, _ = time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+		/*	endDateTimeStr := fmt.Sprintf("%s 11:59 pm", endDate)
+			endDateObjTmp, _ := time.ParseInLocation("1/2/2006 3:04 pm", endDateTimeStr, chicagoLocation)
+			endDateObj = &endDateObjTmp */
 	}
 
-	startDateStr := startDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
-	endDateStr := endDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	startDateStr := ""
+	endDateStr := ""
+
+	if startDateObj != nil {
+		startDateStr = startDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	}
+	if endDateObj != nil {
+		endDateStr = endDateObj.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
+	}
 
 	//end - start date + end date (+all day)
 
