@@ -57,16 +57,76 @@ type ServerResponse struct {
 	ErrorMessage   string `json:"error_text"`
 }
 
+// UIUCFloorPlanServerResponse represents a UIUC, floorplan specific server response
+type UIUCFloorPlanServerResponse struct {
+	Status          string `json:"status"`
+	HttpReturn      int    `json:"http_return"`
+	Collection      string `json:"collection"`
+	CountMarkers    int    `json:"count_markers"`
+	CountHighlights int    `json:"count_highights"`
+	CountResults    int    `json:"count_results"`
+	Errors          string `json:"errors"`
+	ErrorText       string `json:"error_text"`
+}
+
+// UIUCFloorPlanMarker respresents a UIUC floor plan marker
+type UIUCFloorPlanMarker struct {
+	RenderID    string `json:"render_id"`
+	Label       string `json:"label"`
+	Description string `json:"description"`
+	Display     string `json:"display"`
+	Icon        string `json:"icon"`
+}
+
+// UIUCFloorPlanHighlite represents a UIUC specific floor plan highlight
+type UIUCFloorPlanHighlite struct {
+	RenderID string `json:"render_id"`
+	Label    string `json:"label"`
+	Color    string `json:"color"`
+	Display  string `json:"display"`
+}
+
+// UIUCFloorPlan represents a UIUC floor plan object
+type UIUCFloorPlan struct {
+	BuildingNumber string                  `json:"building_number"`
+	BuildingFloor  string                  `json:"building_floor"`
+	SVGEncoding    string                  `json:"svg_encoding"`
+	SVG            string                  `json:"svg"`
+	Markers        []UIUCFloorPlanMarker   `json:"markers"`
+	Highlites      []UIUCFloorPlanHighlite `json:"highlites"`
+}
+
+// UIUCFloorPlanResult represents the full data returned from UIUC when querying a floorplan
+type UIUCFloorPlanResult struct {
+	Response UIUCFloorPlanServerResponse `json:"response"`
+	Result   UIUCFloorPlan               `json:"result"`
+}
+
 // ServerLocationData respresnts a UIUC specific data structure for building location data
 type ServerLocationData struct {
 	Response  ServerResponse   `json:"response"`
 	Buildings []CampusBuilding `json:"results"`
 }
 
+// NewFloorPlan creates a wayfinding floorplan instance from a UIUCFloorPlan instance
+func NewFloorPlan(fp UIUCFloorPlan) *model.FloorPlan {
+	newfp := model.FloorPlan{BuildingNumber: fp.BuildingNumber, BuildingFloor: fp.BuildingFloor, SVGEncoding: fp.SVGEncoding, SVG: fp.SVG}
+	for i := 0; i < len(fp.Markers); i++ {
+		newfp.Markers = append(newfp.Markers, model.FloorPlanMarker{RenderID: fp.Markers[i].RenderID, Label: fp.Markers[i].Label, Description: fp.Markers[i].Description,
+			Display: fp.Markers[i].Display, Icon: fp.Markers[i].Icon})
+	}
+	for j := 0; j < len(fp.Highlites); j++ {
+		newfp.Highlites = append(newfp.Highlites, model.FloorPlanHighlite{RenderID: fp.Highlites[j].RenderID, Label: fp.Highlites[j].Label, Color: fp.Highlites[j].Color,
+			Display: fp.Markers[j].Display})
+	}
+	return &newfp
+}
+
 // NewBuilding creates a wayfinding.Building instance from a campusBuilding,
 // including all active entrances for the building
 func NewBuilding(bldg CampusBuilding) *model.Building {
-	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2, FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude}
+	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2,
+		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number}
 	newBldg.Entrances = make([]model.Entrance, 0)
 	for _, n := range bldg.Entrances {
 		if n.Available {
