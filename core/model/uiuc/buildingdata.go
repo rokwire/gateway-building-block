@@ -99,7 +99,7 @@ type UIUCFloorPlan struct {
 // UIUCFloorPlanResult represents the full data returned from UIUC when querying a floorplan
 type UIUCFloorPlanResult struct {
 	Response UIUCFloorPlanServerResponse `json:"response"`
-	Result   UIUCFloorPlan               `json:"result"`
+	Result   UIUCFloorPlan               `json:"results"`
 }
 
 // ServerLocationData respresnts a UIUC specific data structure for building location data

@@ -161,6 +161,16 @@ func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string)
 
 }
 
+func (a appClient) GetFloorPlan(buildingnumber string, floornumber string) (*model.FloorPlan, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+
+	retData, err := a.LocationAdapter.GetFloorPlan(buildingnumber, floornumber, conf)
+	if err != nil {
+		return nil, 500, err
+	}
+	return retData, 200, nil
+}
+
 func (a appClient) GetPrimaryCareProvider(uin string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {
 	conf, _ := a.app.GetEnvConfigs()
 	retData, status, err := a.SuccessTeamAdapter.GetPrimaryCareProvider(uin, accesstoken, conf)

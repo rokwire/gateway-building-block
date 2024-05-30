@@ -236,6 +236,56 @@ func (h ClientAPIsHandler) getBuildings(l *logs.Log, r *http.Request, claims *to
 	return l.HTTPResponseSuccessJSON(resAsJSON)
 }
 
+// GetFloorPlan returns the requested floor plan
+// @Summary Return the floor plan for the floor and building specified
+// @Tags Client
+// @ID FloorPlan
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.FloorPlan
+// @Security RokwireAuth
+// @Router /wayfinding/floorplans [get]
+// @Param bldgid query string true "Building Number"
+// @Param floor query string true "Floor"
+func (h ClientAPIsHandler) getFloorPlan(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	bldgid := ""
+	floor := ""
+	reqParams := utils.ConstructFilter(r)
+
+	for _, v := range reqParams.Items {
+		if v.Field == "bldgid" {
+			bldgid = v.Value[0]
+		}
+		if v.Field == "floor" {
+			floor = v.Value[0]
+		}
+	}
+	if bldgid == "" || bldgid == "nil" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("bldgid"), nil, http.StatusBadRequest, false)
+	}
+
+	if floor == "" || floor == "nil" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("floor"), nil, http.StatusBadRequest, false)
+	}
+	fp, _, err := h.app.Client.GetFloorPlan(bldgid, floor)
+
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeFloorPlan, nil, err, http.StatusInternalServerError, true)
+	}
+
+	if fp == nil {
+		return l.HTTPResponseErrorAction(logutils.ActionFind, model.TypeFloorPlan, nil, err, http.StatusNotFound, true)
+
+	}
+	resAsJSON, err := json.Marshal(fp)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResult, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(resAsJSON)
+
+}
+
 // GetTermSessions returns a list of recent, current and upcoming term sessions
 // @Summary Get a list of term sessions centered on the calculated current session
 // @Tags Client

@@ -45,6 +45,7 @@ type Client interface {
 	GetSuccessTeam(uin string, unitid string, accessToken string) (*model.SuccessTeam, int, error)
 	GetPrimaryCareProvider(uin string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
+	GetFloorPlan(buildingnumber string, floornumber string) (*model.FloorPlan, int, error)
 }
 
 // Admin exposes administrative APIs for the driver adapters
@@ -184,6 +185,7 @@ type WayFinding interface {
 	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Entrance, error)
 	GetBuildings(conf *model.EnvConfigData) (*[]model.Building, error)
 	GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Building, error)
+	GetFloorPlan(bldgNum string, floornumber string, conf *model.EnvConfigData) (*model.FloorPlan, error)
 }
 
 // Appointments represents the adapter needed to interace with various appoinment data providers
