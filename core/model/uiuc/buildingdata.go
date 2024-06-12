@@ -45,6 +45,8 @@ type CampusBuilding struct {
 	Entrances   []CampusEntrance `json:"entrances"`
 	Latitude    float64          `json:"building_centroid_latitude"`
 	Longitude   float64          `json:"building_centroid_longitude"`
+	Floors      []string         `json:"floor_ids"`
+	Features    []string         `'json:"features"`
 }
 
 // ServerResponse represents a UIUC specific server response
@@ -133,6 +135,10 @@ func NewBuilding(bldg CampusBuilding) *model.Building {
 			newBldg.Entrances = append(newBldg.Entrances, *NewEntrance(n))
 		}
 	}
+
+	newBldg.Floors = append(newBldg.Floors, bldg.Floors...)
+	newBldg.Features = append(newBldg.Features, bldg.Features...)
+
 	return &newBldg
 }
 

@@ -50,4 +50,6 @@ type Building struct {
 	Entrances   []Entrance
 	Latitude    float64
 	Longitude   float64
+	Floors      []string
+	Features    []string
 }
