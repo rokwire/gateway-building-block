@@ -51,5 +51,20 @@ type Building struct {
 	Latitude    float64
 	Longitude   float64
 	Floors      []string
-	Features    []string
+	Features    []BuildingFeature
+}
+
+// BuildingFeature represents a feature found in buildings
+type BuildingFeature struct {
+	ID           string  `json:"_id" bson:"_id"`
+	BuildingID   string  `json:"building_id" bson:"building_id"`
+	EQIndicator  string  `json:"eq_indicator" bson:"eq_indicator"`
+	Name         string  `json:"name" bson:"name"`
+	FoundOnFloor string  `json:"found_on_floor" bson:"found_on_floor"`
+	FoundInRoom  string  `json:"found_in_room" bson:"found_in_room"`
+	IsADA        bool    `json:"is_ada" bson:"is_ada"`
+	IsExternal   bool    `json:"is_external" bson:"is_external"`
+	Comments     string  `json:"comments" bson:"comments"`
+	Latitude     float64 `json:"latitude" bson:"latitude"`
+	Longitude    float64 `json:"longitude" bson:"longitude"`
 }

@@ -16,6 +16,7 @@ package uiuc
 
 import (
 	model "application/core/model"
+	"strconv"
 )
 
 // CampusEntrance representes a campus specific building entrance
@@ -31,22 +32,37 @@ type CampusEntrance struct {
 
 // CampusBuilding represents a campus specific building
 type CampusBuilding struct {
-	UUID        string           `json:"uuid"`
-	Name        string           `json:"name"`
-	Number      string           `json:"number"`
-	FullAddress string           `json:"location"`
-	Address1    string           `json:"address_1"`
-	Address2    string           `json:"address_2"`
-	City        string           `json:"city"`
-	State       string           `json:"state"`
-	ZipCode     string           `json:"zipcode"`
-	ImageURL    string           `json:"image"`
-	MailCode    string           `json:"mailcode"`
-	Entrances   []CampusEntrance `json:"entrances"`
-	Latitude    float64          `json:"building_centroid_latitude"`
-	Longitude   float64          `json:"building_centroid_longitude"`
-	Floors      []string         `json:"floor_ids"`
-	Features    []string         `'json:"features"`
+	UUID        string                `json:"uuid"`
+	Name        string                `json:"name"`
+	Number      string                `json:"number"`
+	FullAddress string                `json:"location"`
+	Address1    string                `json:"address_1"`
+	Address2    string                `json:"address_2"`
+	City        string                `json:"city"`
+	State       string                `json:"state"`
+	ZipCode     string                `json:"zipcode"`
+	ImageURL    string                `json:"image"`
+	MailCode    string                `json:"mailcode"`
+	Entrances   []CampusEntrance      `json:"entrances"`
+	Latitude    float64               `json:"building_centroid_latitude"`
+	Longitude   float64               `json:"building_centroid_longitude"`
+	Floors      []string              `json:"floor_ids"`
+	Features    []UIUCBuildingFeature `'json:"features"`
+}
+
+// UIUCBuildingFeature represents a UIUC specific representation of features found in buildings
+type UIUCBuildingFeature struct {
+	ID           string  `json:"uuid"`
+	BuildingID   int     `json:"fk_building_id"`
+	EQIndicator  string  `json:"eq_indicator"`
+	Name         string  `json:"name"`
+	FoundOnFloor string  `json:"found_on_floor"`
+	FoundInRoom  string  `json:"found_in_room"`
+	IsADA        bool    `json:"is_ada"`
+	IsExternal   bool    `json:"is_external"`
+	Comments     string  `json:"comments"`
+	Latitude     float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
 }
 
 // ServerResponse represents a UIUC specific server response
@@ -137,7 +153,10 @@ func NewBuilding(bldg CampusBuilding) *model.Building {
 	}
 
 	newBldg.Floors = append(newBldg.Floors, bldg.Floors...)
-	newBldg.Features = append(newBldg.Features, bldg.Features...)
+	for _, n := range bldg.Features {
+
+		newBldg.Features = append(newBldg.Features, *NewFeature(n))
+	}
 
 	return &newBldg
 }
@@ -157,4 +176,11 @@ func NewBuildingList(bldgList *[]CampusBuilding) *[]model.Building {
 func NewEntrance(ent CampusEntrance) *model.Entrance {
 	newEnt := model.Entrance{ID: ent.UUID, Name: ent.Name, ADACompliant: ent.ADACompliant, Available: ent.Available, ImageURL: ent.ImageURL, Latitude: ent.Latitude, Longitude: ent.Longitude}
 	return &newEnt
+}
+
+// NewFeature creates a wayfinding.Feature instance from the campus data
+func NewFeature(f UIUCBuildingFeature) *model.BuildingFeature {
+	newFeature := model.BuildingFeature{ID: f.ID, BuildingID: strconv.Itoa(f.BuildingID), EQIndicator: f.EQIndicator, Name: f.Name, FoundOnFloor: f.FoundOnFloor, FoundInRoom: f.FoundInRoom,
+		IsADA: f.IsADA, IsExternal: f.IsExternal, Latitude: f.Latitude, Longitude: f.Longitude, Comments: f.Comments}
+	return &newFeature
 }
