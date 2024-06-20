@@ -17,6 +17,7 @@ package core
 import (
 	"application/core/model"
 	"application/driven/uiucadapters"
+	"time"
 
 	"encoding/json"
 	"os"
@@ -100,12 +101,18 @@ func (a appClient) GetEntrance(bldgID string, adaOnly bool, latitude float64, lo
 
 func (a appClient) GetBuildings() (*[]model.Building, error) {
 	conf, _ := a.app.GetEnvConfigs()
+	crntDate := time.Now()
+	diff := crntDate.Sub(a.app.CampusBuildings.LoadDate)
+	if diff.Hours() < 24 {
+		retData := a.app.CampusBuildings.Buildings
+		return &retData, nil
+	}
+
 	retData, err := a.LocationAdapter.GetBuildings(conf)
 	if err != nil {
 		return nil, err
 	}
 	return retData, nil
-
 }
 
 func (a appClient) GetContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error) {

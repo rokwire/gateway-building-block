@@ -16,6 +16,7 @@ package core
 
 import (
 	"application/core/model"
+	"time"
 
 	"github.com/rokwire/core-auth-library-go/v3/authutils"
 	"github.com/rokwire/logging-library-go/v2/errors"
@@ -47,6 +48,8 @@ type Application struct {
 	TPS     TPS     // expose to the drivers adapters
 	System  System  // expose to the drivers adapters
 	shared  Shared
+
+	CampusBuildings model.CachedBuildings //caches a list of all campus building data
 
 	AppointmentAdapters map[string]Appointments //expose to the different vendor specific appointment adapters
 
@@ -109,6 +112,10 @@ func NewApplication(version string, build string,
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
 	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, geoBBAdapter, *logger)
+
+	buildings, _ := application.Client.GetBuildings()
+	application.CampusBuildings.Buildings = *buildings
+	application.CampusBuildings.LoadDate = time.Now()
 
 	return &application
 }
