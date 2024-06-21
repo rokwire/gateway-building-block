@@ -17,6 +17,7 @@ package core
 import (
 	"application/core/model"
 	"application/driven/uiucadapters"
+	"strings"
 	"time"
 
 	"encoding/json"
@@ -100,6 +101,14 @@ func (a appClient) GetEntrance(bldgID string, adaOnly bool, latitude float64, lo
 }
 
 func (a appClient) GetBuildings() (*[]model.Building, error) {
+	retData, err := a.getCachedBuildings()
+	if err != nil {
+		return nil, err
+	}
+	return retData, nil
+}
+
+func (a appClient) getCachedBuildings() (*[]model.Building, error) {
 	conf, _ := a.app.GetEnvConfigs()
 	crntDate := time.Now()
 	diff := crntDate.Sub(a.app.CampusBuildings.LoadDate)
@@ -112,7 +121,29 @@ func (a appClient) GetBuildings() (*[]model.Building, error) {
 	if err != nil {
 		return nil, err
 	}
+	//any time we call out to get the list of buildings, we need to cache the results
+	a.app.CampusBuildings.Buildings = *retData
+	a.app.CampusBuildings.LoadDate = time.Now()
 	return retData, nil
+}
+
+func (a appClient) SearchBuildings(bldgName string, returnCompact bool) (*map[string]any, error) {
+	allbuildings, err := a.getCachedBuildings()
+	if err != nil {
+		return nil, err
+	}
+	var retData = make(map[string]any)
+	for _, v := range *allbuildings {
+		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(bldgName)) {
+			if returnCompact {
+				crntBldg := model.CompactBuilding{Name: v.Name, FullAddress: v.FullAddress, Latitude: v.Latitude, Longitude: v.Longitude, ImageURL: v.ImageURL, Number: v.Number}
+				retData[v.Name] = crntBldg
+			} else {
+				retData[v.Name] = v
+			}
+		}
+	}
+	return &retData, nil
 }
 
 func (a appClient) GetContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error) {

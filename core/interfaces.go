@@ -46,6 +46,7 @@ type Client interface {
 	GetPrimaryCareProvider(uin string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 	GetFloorPlan(buildingnumber string, floornumber string) (*model.FloorPlan, int, error)
+	SearchBuildings(bldgName string, returnCompact bool) (*map[string]any, error)
 }
 
 // Admin exposes administrative APIs for the driver adapters

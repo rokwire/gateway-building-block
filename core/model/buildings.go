@@ -54,6 +54,17 @@ type Building struct {
 	Features    []BuildingFeature
 }
 
+// CompactBuilding represents minimal building informaiton needed to display a builgins details on the details panel
+type CompactBuilding struct {
+	ID          string
+	Name        string
+	Number      string
+	FullAddress string
+	ImageURL    string
+	Latitude    float64
+	Longitude   float64
+}
+
 // BuildingFeature represents a feature found in buildings
 type BuildingFeature struct {
 	ID           string  `json:"_id" bson:"_id"`

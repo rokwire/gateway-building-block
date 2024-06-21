@@ -113,9 +113,11 @@ func NewApplication(version string, build string,
 	application.shared = newAppShared(&application)
 	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, geoBBAdapter, *logger)
 
-	buildings, _ := application.Client.GetBuildings()
-	application.CampusBuildings.Buildings = *buildings
-	application.CampusBuildings.LoadDate = time.Now()
+	_, err := application.Client.GetBuildings()
+	if err != nil {
+		//set to one day ago to force a retry and refresh
+		application.CampusBuildings.LoadDate = time.Now().AddDate(0, 0, -1)
+	}
 
 	return &application
 }

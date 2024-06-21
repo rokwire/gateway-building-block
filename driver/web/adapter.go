@@ -84,6 +84,7 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/wayfinding/entrance", a.wrapFunc(a.clientAPIsHandler.getEntrance, a.auth.client.Standard)).Methods("GET")
 	mainRouter.HandleFunc("/wayfinding/buildings", a.wrapFunc(a.clientAPIsHandler.getBuildings, a.auth.client.Standard)).Methods("GET")
 	mainRouter.HandleFunc("/wayfinding/floorplan", a.wrapFunc(a.clientAPIsHandler.getFloorPlan, a.auth.client.Standard)).Methods("GET")
+	mainRouter.HandleFunc("/wayfinding/searchbuildings", a.wrapFunc(a.clientAPIsHandler.searchBuildings, a.auth.client.Standard)).Methods("GET")
 
 	mainRouter.HandleFunc("/person/contactinfo", a.wrapFunc(a.clientAPIsHandler.getContactInfo, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/courses/giescourses", a.wrapFunc(a.clientAPIsHandler.getGiesCourses, a.auth.client.User)).Methods("GET")
