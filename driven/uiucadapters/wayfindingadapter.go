@@ -191,7 +191,7 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, apikey string, quer
 	return &campusBldgs, nil
 }
 
-func (uwf *UIUCWayFinding) getFloorPlanData(targetURL string, apikey string) (*uiuc.UIUCFloorPlan, error) {
+func (uwf *UIUCWayFinding) getFloorPlanData(targetURL string, apikey string) (*uiuc.CampusFloorPlan, error) {
 	method := "GET"
 
 	client := &http.Client{}
@@ -217,7 +217,7 @@ func (uwf *UIUCWayFinding) getFloorPlanData(targetURL string, apikey string) (*u
 		return nil, errors.New("bad request to api end point")
 	}
 
-	data := uiuc.UIUCFloorPlanResult{}
+	data := uiuc.CampusFloorPlanResult{}
 	err = json.Unmarshal(body, &data)
 
 	if err != nil {

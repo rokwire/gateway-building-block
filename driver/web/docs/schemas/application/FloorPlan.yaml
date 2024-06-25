@@ -1,0 +1,30 @@
+type: object
+required:
+- BuildingNumber
+- BuildingFloor
+- SVGEncoding
+- SVG
+- Markers
+- Highlites
+properties:
+  BuildingNumber:
+    type: string
+    readOnly: true
+  BuildingFloor:
+    type: string
+    readOnly: true
+  SVGEncoding:
+    type: string  
+    readOnly: true
+  SVG:
+    type: string
+  Markers:
+    type: array
+    items:
+      $ref: "./FloorPlanMarker.yaml"
+    readOnly: true
+  Features:
+    type: array
+    items:
+      $ref: "./FloorPlanHighlite.yaml"
+    readOnly: true

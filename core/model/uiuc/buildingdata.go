@@ -32,26 +32,26 @@ type CampusEntrance struct {
 
 // CampusBuilding represents a campus specific building
 type CampusBuilding struct {
-	UUID        string                `json:"uuid"`
-	Name        string                `json:"name"`
-	Number      string                `json:"number"`
-	FullAddress string                `json:"location"`
-	Address1    string                `json:"address_1"`
-	Address2    string                `json:"address_2"`
-	City        string                `json:"city"`
-	State       string                `json:"state"`
-	ZipCode     string                `json:"zipcode"`
-	ImageURL    string                `json:"image"`
-	MailCode    string                `json:"mailcode"`
-	Entrances   []CampusEntrance      `json:"entrances"`
-	Latitude    float64               `json:"building_centroid_latitude"`
-	Longitude   float64               `json:"building_centroid_longitude"`
-	Floors      []string              `json:"floor_ids"`
-	Features    []UIUCBuildingFeature `'json:"features"`
+	UUID        string                  `json:"uuid"`
+	Name        string                  `json:"name"`
+	Number      string                  `json:"number"`
+	FullAddress string                  `json:"location"`
+	Address1    string                  `json:"address_1"`
+	Address2    string                  `json:"address_2"`
+	City        string                  `json:"city"`
+	State       string                  `json:"state"`
+	ZipCode     string                  `json:"zipcode"`
+	ImageURL    string                  `json:"image"`
+	MailCode    string                  `json:"mailcode"`
+	Entrances   []CampusEntrance        `json:"entrances"`
+	Latitude    float64                 `json:"building_centroid_latitude"`
+	Longitude   float64                 `json:"building_centroid_longitude"`
+	Floors      []string                `json:"floor_ids"`
+	Features    []CampusBuildingFeature `'json:"features"`
 }
 
-// UIUCBuildingFeature represents a UIUC specific representation of features found in buildings
-type UIUCBuildingFeature struct {
+// CampusBuildingFeature represents a UIUC specific representation of features found in buildings
+type CampusBuildingFeature struct {
 	ID           string  `json:"uuid"`
 	BuildingID   int     `json:"fk_building_id"`
 	EQIndicator  string  `json:"eq_indicator"`
@@ -75,10 +75,10 @@ type ServerResponse struct {
 	ErrorMessage   string `json:"error_text"`
 }
 
-// UIUCFloorPlanServerResponse represents a UIUC, floorplan specific server response
-type UIUCFloorPlanServerResponse struct {
+// CampusFloorPlanServerResponse represents a UIUC, floorplan specific server response
+type CampusFloorPlanServerResponse struct {
 	Status          string `json:"status"`
-	HttpReturn      int    `json:"http_return"`
+	HTTPReturn      int    `json:"http_return"`
 	Collection      string `json:"collection"`
 	CountMarkers    int    `json:"count_markers"`
 	CountHighlights int    `json:"count_highights"`
@@ -87,8 +87,8 @@ type UIUCFloorPlanServerResponse struct {
 	ErrorText       string `json:"error_text"`
 }
 
-// UIUCFloorPlanMarker respresents a UIUC floor plan marker
-type UIUCFloorPlanMarker struct {
+// CampusFloorPlanMarker respresents a UIUC floor plan marker
+type CampusFloorPlanMarker struct {
 	RenderID    string `json:"render_id"`
 	Label       string `json:"label"`
 	Description string `json:"description"`
@@ -96,28 +96,28 @@ type UIUCFloorPlanMarker struct {
 	Icon        string `json:"icon"`
 }
 
-// UIUCFloorPlanHighlite represents a UIUC specific floor plan highlight
-type UIUCFloorPlanHighlite struct {
+// CampusFloorPlanHighlite represents a UIUC specific floor plan highlight
+type CampusFloorPlanHighlite struct {
 	RenderID string `json:"render_id"`
 	Label    string `json:"label"`
 	Color    string `json:"color"`
 	Display  string `json:"display"`
 }
 
-// UIUCFloorPlan represents a UIUC floor plan object
-type UIUCFloorPlan struct {
-	BuildingNumber string                  `json:"building_number"`
-	BuildingFloor  string                  `json:"building_floor"`
-	SVGEncoding    string                  `json:"svg_encoding"`
-	SVG            string                  `json:"svg"`
-	Markers        []UIUCFloorPlanMarker   `json:"markers"`
-	Highlites      []UIUCFloorPlanHighlite `json:"highlites"`
+// CampusFloorPlan represents a UIUC floor plan object
+type CampusFloorPlan struct {
+	BuildingNumber string                    `json:"building_number"`
+	BuildingFloor  string                    `json:"building_floor"`
+	SVGEncoding    string                    `json:"svg_encoding"`
+	SVG            string                    `json:"svg"`
+	Markers        []CampusFloorPlanMarker   `json:"markers"`
+	Highlites      []CampusFloorPlanHighlite `json:"highlites"`
 }
 
-// UIUCFloorPlanResult represents the full data returned from UIUC when querying a floorplan
-type UIUCFloorPlanResult struct {
-	Response UIUCFloorPlanServerResponse `json:"response"`
-	Result   UIUCFloorPlan               `json:"results"`
+// CampusFloorPlanResult represents the full data returned from UIUC when querying a floorplan
+type CampusFloorPlanResult struct {
+	Response CampusFloorPlanServerResponse `json:"response"`
+	Result   CampusFloorPlan               `json:"results"`
 }
 
 // ServerLocationData respresnts a UIUC specific data structure for building location data
@@ -127,7 +127,7 @@ type ServerLocationData struct {
 }
 
 // NewFloorPlan creates a wayfinding floorplan instance from a UIUCFloorPlan instance
-func NewFloorPlan(fp UIUCFloorPlan) *model.FloorPlan {
+func NewFloorPlan(fp CampusFloorPlan) *model.FloorPlan {
 	newfp := model.FloorPlan{BuildingNumber: fp.BuildingNumber, BuildingFloor: fp.BuildingFloor, SVGEncoding: fp.SVGEncoding, SVG: fp.SVG}
 	for i := 0; i < len(fp.Markers); i++ {
 		newfp.Markers = append(newfp.Markers, model.FloorPlanMarker{RenderID: fp.Markers[i].RenderID, Label: fp.Markers[i].Label, Description: fp.Markers[i].Description,
@@ -179,7 +179,7 @@ func NewEntrance(ent CampusEntrance) *model.Entrance {
 }
 
 // NewFeature creates a wayfinding.Feature instance from the campus data
-func NewFeature(f UIUCBuildingFeature) *model.BuildingFeature {
+func NewFeature(f CampusBuildingFeature) *model.BuildingFeature {
 	newFeature := model.BuildingFeature{ID: f.ID, BuildingID: strconv.Itoa(f.BuildingID), EQIndicator: f.EQIndicator, Name: f.Name, FoundOnFloor: f.FoundOnFloor, FoundInRoom: f.FoundInRoom,
 		IsADA: f.IsADA, IsExternal: f.IsExternal, Latitude: f.Latitude, Longitude: f.Longitude, Comments: f.Comments}
 	return &newFeature

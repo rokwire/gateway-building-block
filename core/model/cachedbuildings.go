@@ -25,7 +25,7 @@ const (
 	TypeCachedBuildings logutils.MessageDataType = "cached buildings"
 )
 
-// CachedBuildngs holds the building information from the building adapter
+// CachedBuildings holds the building information from the building adapter
 type CachedBuildings struct {
 	Buildings []Building `json:"buildings" bson:"buildings"`
 	LoadDate  time.Time  `json:"load_date" bson:"load_date"`

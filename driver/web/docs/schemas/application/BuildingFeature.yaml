@@ -1,0 +1,46 @@
+type: object
+required:
+- ID
+- BuildingID
+- EQIndicator
+- Name
+- FoundOnFloor
+- FoundInRoom
+- IsADA
+- IsExternal
+- Comments
+- Latitude
+- Longitude
+properties:
+  ID:
+    type: string
+    readOnly: true
+  BuildingID:
+    type: string
+    readOnly: true 
+  EQIndicator:
+    type: string
+    readOnly: true
+  Name:
+    type: string
+    readOnly: true
+  FoundOnFloor:
+    type: string
+    readOnly: true
+  FoundInRoom:
+    type: string
+    readOnly: true
+  IsADA:
+    type: boolean  
+    readOnly: true
+  IsExternal:
+    type: boolean
+  Comments:
+    type: string
+    readOnly: true
+  Latitude:
+    type: number 
+    readOnly: true
+  Longitude:
+    type: number
+    readOnly: true
