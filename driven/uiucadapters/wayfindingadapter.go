@@ -110,6 +110,20 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, la
 	return uiuc.NewBuilding((*cmpBldg)[0]), nil
 }
 
+// GetFloorPlan returns the requested floor plan
+func (uwf *UIUCWayFinding) GetFloorPlan(bldgNum string, floornumber string, conf *model.EnvConfigData) (*model.FloorPlan, error) {
+	apiURL := conf.WayFindingURL
+	apikey := conf.WayFindingKey
+
+	url := apiURL + "/floorplans/number/" + bldgNum + "/floor/" + floornumber
+
+	uiucfp, err := uwf.getFloorPlanData(url, apikey)
+	if err != nil {
+		return nil, err
+	}
+	return uiuc.NewFloorPlan(*uiucfp), nil
+}
+
 // the entrance list coming back from a ranged query to the API is sorted closest to farthest from
 // the user's coordinates. The first entrance in the list that is active and matches the ADA filter
 // will be the one to return
@@ -175,4 +189,43 @@ func (uwf *UIUCWayFinding) getBuildingData(targetURL string, apikey string, quer
 
 	campusBldgs := data.Buildings
 	return &campusBldgs, nil
+}
+
+func (uwf *UIUCWayFinding) getFloorPlanData(targetURL string, apikey string) (*uiuc.CampusFloorPlan, error) {
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, targetURL, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+apikey)
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode == 400 {
+		return nil, errors.New("bad request to api end point")
+	}
+
+	data := uiuc.CampusFloorPlanResult{}
+	err = json.Unmarshal(body, &data)
+
+	if err != nil {
+		return nil, err
+	}
+	if data.Response.Status == "failed" {
+		return nil, errors.New("building not found")
+	}
+	floorplan := data.Result
+	return &floorplan, nil
 }
