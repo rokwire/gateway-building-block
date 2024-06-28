@@ -135,7 +135,7 @@ func NewFloorPlan(fp CampusFloorPlan) *model.FloorPlan {
 	}
 	for j := 0; j < len(fp.Highlites); j++ {
 		newfp.Highlites = append(newfp.Highlites, model.FloorPlanHighlite{RenderID: fp.Highlites[j].RenderID, Label: fp.Highlites[j].Label, Color: fp.Highlites[j].Color,
-			Display: fp.Markers[j].Display})
+			Display: fp.Highlites[j].Display})
 	}
 	return &newfp
 }
