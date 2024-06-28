@@ -111,11 +111,24 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, la
 }
 
 // GetFloorPlan returns the requested floor plan
-func (uwf *UIUCWayFinding) GetFloorPlan(bldgNum string, floornumber string, conf *model.EnvConfigData) (*model.FloorPlan, error) {
+func (uwf *UIUCWayFinding) GetFloorPlan(bldgNum string, floornumber string, markers string, highlites string, conf *model.EnvConfigData) (*model.FloorPlan, error) {
 	apiURL := conf.WayFindingURL
 	apikey := conf.WayFindingKey
-
+	reqParams := "?"
 	url := apiURL + "/floorplans/number/" + bldgNum + "/floor/" + floornumber
+	if markers != "" {
+		reqParams += "render_markers=" + markers
+		if highlites != "" {
+			reqParams += "&"
+		}
+	}
+
+	if highlites != "" {
+		reqParams += "render_highlites=" + highlites
+	}
+	if reqParams != "?" {
+		url += reqParams
+	}
 
 	uiucfp, err := uwf.getFloorPlanData(url, apikey)
 	if err != nil {

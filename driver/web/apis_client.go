@@ -301,6 +301,9 @@ func (h ClientAPIsHandler) searchBuildings(l *logs.Log, r *http.Request, claims 
 func (h ClientAPIsHandler) getFloorPlan(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	bldgid := ""
 	floor := ""
+	markers := "on"
+	highlites := "on"
+
 	reqParams := utils.ConstructFilter(r)
 
 	for _, v := range reqParams.Items {
@@ -310,6 +313,13 @@ func (h ClientAPIsHandler) getFloorPlan(l *logs.Log, r *http.Request, claims *to
 		if v.Field == "floor" {
 			floor = v.Value[0]
 		}
+		if v.Field == "markers" {
+			markers = v.Value[0]
+		}
+
+		if v.Field == "highlites" {
+			highlites = v.Value[0]
+		}
 	}
 	if bldgid == "" || bldgid == "nil" {
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("bldgid"), nil, http.StatusBadRequest, false)
@@ -318,7 +328,7 @@ func (h ClientAPIsHandler) getFloorPlan(l *logs.Log, r *http.Request, claims *to
 	if floor == "" || floor == "nil" {
 		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("floor"), nil, http.StatusBadRequest, false)
 	}
-	fp, _, err := h.app.Client.GetFloorPlan(bldgid, floor)
+	fp, _, err := h.app.Client.GetFloorPlan(bldgid, floor, markers, highlites)
 
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeFloorPlan, nil, err, http.StatusInternalServerError, true)

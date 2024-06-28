@@ -199,10 +199,10 @@ func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string)
 
 }
 
-func (a appClient) GetFloorPlan(buildingnumber string, floornumber string) (*model.FloorPlan, int, error) {
+func (a appClient) GetFloorPlan(buildingnumber string, floornumber string, markers string, highlites string) (*model.FloorPlan, int, error) {
 	conf, _ := a.app.GetEnvConfigs()
 
-	retData, err := a.LocationAdapter.GetFloorPlan(buildingnumber, floornumber, conf)
+	retData, err := a.LocationAdapter.GetFloorPlan(buildingnumber, floornumber, markers, highlites, conf)
 	if err != nil {
 		return nil, 500, err
 	}
