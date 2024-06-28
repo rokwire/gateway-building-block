@@ -1,0 +1,18 @@
+type: object
+required:
+- RenderID
+- Label
+- Color
+- Display
+properties:
+  RenderID:
+    type: string
+    readOnly: true
+  Label:
+    type: string
+    readOnly: true
+  Color:
+    type: string  
+    readOnly: true
+  Display:
+    type: string

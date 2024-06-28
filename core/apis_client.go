@@ -17,6 +17,8 @@ package core
 import (
 	"application/core/model"
 	"application/driven/uiucadapters"
+	"strings"
+	"time"
 
 	"encoding/json"
 	"os"
@@ -99,13 +101,49 @@ func (a appClient) GetEntrance(bldgID string, adaOnly bool, latitude float64, lo
 }
 
 func (a appClient) GetBuildings() (*[]model.Building, error) {
-	conf, _ := a.app.GetEnvConfigs()
-	retData, err := a.LocationAdapter.GetBuildings(conf)
+	retData, err := a.getCachedBuildings()
 	if err != nil {
 		return nil, err
 	}
 	return retData, nil
+}
 
+func (a appClient) getCachedBuildings() (*[]model.Building, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	crntDate := time.Now()
+	diff := crntDate.Sub(a.app.CampusBuildings.LoadDate)
+	if diff.Hours() < 24 {
+		retData := a.app.CampusBuildings.Buildings
+		return &retData, nil
+	}
+
+	retData, err := a.LocationAdapter.GetBuildings(conf)
+	if err != nil {
+		return nil, err
+	}
+	//any time we call out to get the list of buildings, we need to cache the results
+	a.app.CampusBuildings.Buildings = *retData
+	a.app.CampusBuildings.LoadDate = time.Now()
+	return retData, nil
+}
+
+func (a appClient) SearchBuildings(bldgName string, returnCompact bool) (*map[string]any, error) {
+	allbuildings, err := a.getCachedBuildings()
+	if err != nil {
+		return nil, err
+	}
+	var retData = make(map[string]any)
+	for _, v := range *allbuildings {
+		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(bldgName)) {
+			if returnCompact {
+				crntBldg := model.CompactBuilding{Name: v.Name, FullAddress: v.FullAddress, Latitude: v.Latitude, Longitude: v.Longitude, ImageURL: v.ImageURL, Number: v.Number}
+				retData[v.Name] = crntBldg
+			} else {
+				retData[v.Name] = v
+			}
+		}
+	}
+	return &retData, nil
 }
 
 func (a appClient) GetContactInfo(uin string, accessToken string, mode string) (*model.Person, int, error) {
@@ -159,6 +197,16 @@ func (a appClient) GetSuccessTeam(uin string, unitid string, accesstoken string)
 	}
 	return retData, status, nil
 
+}
+
+func (a appClient) GetFloorPlan(buildingnumber string, floornumber string) (*model.FloorPlan, int, error) {
+	conf, _ := a.app.GetEnvConfigs()
+
+	retData, err := a.LocationAdapter.GetFloorPlan(buildingnumber, floornumber, conf)
+	if err != nil {
+		return nil, 500, err
+	}
+	return retData, 200, nil
 }
 
 func (a appClient) GetPrimaryCareProvider(uin string, accesstoken string) (*[]model.SuccessTeamMember, int, error) {

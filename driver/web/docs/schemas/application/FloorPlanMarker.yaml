@@ -1,0 +1,22 @@
+type: object
+required:
+- RenderID
+- Label
+- Description
+- Display
+- Icon
+properties:
+  RenderID:
+    type: string
+    readOnly: true
+  Label:
+    type: string
+    readOnly: true
+  Description:
+    type: string  
+    readOnly: true
+  Display:
+    type: string
+  Icon:
+    type: string
+    readOnly: true
