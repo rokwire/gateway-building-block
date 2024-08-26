@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unpublished] - 2024-08-26
+### Changed
+- Based on data coming back from LaundryView, uiuc laundry adapter now reutrns unknown as a status when the machine is offline and the out for service flag is 0. [#107]https://github.com/rokwire/gateway-building-block/issues/107
+
 ## [2.10.3] - 2024-06-28
 ### Changed
 - Added markers and highlites parameters to floor plans endpoint to allow client to set default state. [#103](https://github.com/rokwire/gateway-building-block/issues/103)
