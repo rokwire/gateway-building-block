@@ -111,7 +111,7 @@ func (lv *CSCLaundryView) GetLaundryRoom(roomid string, conf *model.EnvConfigDat
 
 		for i, appl := range lr.Appliances {
 			avgCycle, _ := strconv.Atoi(appl.AvgCycleTime)
-			rd.Appliances[i] = uiuc.NewAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining, appl.Label)
+			rd.Appliances[i] = uiuc.NewAppliance(appl.ApplianceKey, appl.ApplianceType, avgCycle, appl.Status, appl.TimeRemaining, appl.Label, appl.OutOfService)
 		}
 
 		if len(lv.laundryAssets) > 0 {

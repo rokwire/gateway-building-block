@@ -93,7 +93,7 @@ func NewLaundryRoom(id int, name string, status string, location *model.LaundryD
 }
 
 // NewAppliance returns an app formatted appliance ojbect from campus data
-func NewAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string, label string) *model.Appliance {
+func NewAppliance(id string, appliancetype string, cycletime int, status string, timeremaining string, label string, outofserviceflag string) *model.Appliance {
 
 	var finalStatus string
 	switch status {
@@ -101,11 +101,17 @@ func NewAppliance(id string, appliancetype string, cycletime int, status string,
 		finalStatus = "available"
 	case "In Use":
 		finalStatus = "in_use"
+	case "Offline":
+		if outofserviceflag == "1" {
+			finalStatus = "out_of_service"
+		} else {
+			finalStatus = "unknown"
+		}
 	default:
-		finalStatus = "out_of_service"
+		finalStatus = "unknown"
 	}
 
-	if finalStatus == "available" || finalStatus == "out_of_service" {
+	if finalStatus == "available" || finalStatus == "out_of_service" || finalStatus == "unknown" {
 		appl := model.Appliance{ID: id, ApplianceType: appliancetype, AverageCycleTime: cycletime, Status: finalStatus, Label: label}
 		return &appl
 	}
