@@ -16,6 +16,7 @@ package uiuc
 
 import (
 	model "application/core/model"
+	"slices"
 	"strconv"
 )
 
@@ -153,9 +154,28 @@ func NewBuilding(bldg CampusBuilding) *model.Building {
 	}
 
 	newBldg.Floors = append(newBldg.Floors, bldg.Floors...)
+	var featuredata = make(map[string]model.FeatureMapEntry, 0)
+
 	for _, n := range bldg.Features {
 
-		newBldg.Features = append(newBldg.Features, *NewFeature(n))
+		val, ok := featuredata[n.EQIndicator]
+		if ok {
+			if !slices.Contains(val.Floors, n.FoundOnFloor) {
+				val.Floors = append(val.Floors, n.FoundOnFloor)
+				featuredata[n.EQIndicator] = val
+			}
+
+		} else {
+			var floors = make([]string, 1)
+			floors[0] = n.FoundOnFloor
+			fme := model.FeatureMapEntry{Name: n.Name, Floors: floors}
+			featuredata[n.EQIndicator] = fme
+		}
+		//newBldg.Features = append(newBldg.Features, *NewFeature(n))
+	}
+	for key, value := range featuredata {
+		var feature = model.BuildingFeatureLocation{Key: key, Value: value}
+		newBldg.Features = append(newBldg.Features, feature)
 	}
 
 	return &newBldg
@@ -184,3 +204,5 @@ func NewFeature(f CampusBuildingFeature) *model.BuildingFeature {
 		IsADA: f.IsADA, IsExternal: f.IsExternal, Latitude: f.Latitude, Longitude: f.Longitude, Comments: f.Comments}
 	return &newFeature
 }
+
+// AddToFeatureMap adds the features floor and name

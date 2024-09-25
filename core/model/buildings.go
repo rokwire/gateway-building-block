@@ -51,7 +51,7 @@ type Building struct {
 	Latitude    float64
 	Longitude   float64
 	Floors      []string
-	Features    []BuildingFeature
+	Features    []BuildingFeatureLocation
 }
 
 // CompactBuilding represents minimal building informaiton needed to display a builgins details on the details panel
@@ -63,6 +63,19 @@ type CompactBuilding struct {
 	ImageURL    string
 	Latitude    float64
 	Longitude   float64
+	Features    []BuildingFeatureLocation
+}
+
+// BuildingFeatureLocation represents a list of where each feature belonging to a building can be found
+type BuildingFeatureLocation struct {
+	Key   string          `json:"key" bson:"key"`
+	Value FeatureMapEntry `json:"value" bson:"value"`
+}
+
+// FeatureMapEntry represents the floor data associated with a feature key for a building
+type FeatureMapEntry struct {
+	Name   string   `json:"name" bson:"name"`
+	Floors []string `json:"floors" bson:"floors"`
 }
 
 // BuildingFeature represents a feature found in buildings
