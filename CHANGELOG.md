@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## UnReleased - 2024-11-04
+### Changed
+- Pull a list of all known building features from the database. Use this to filter out any that we do not want to display in the app on the building details panel as well as merge groups of some feature codes into a single feature.
+
 ## [2.11.0] - 2024-09-24
 ### Changed
 - Building feature list is now a compact list of feature names paired with floors they exist on to make is easier to use for display and floorplan linking in the app

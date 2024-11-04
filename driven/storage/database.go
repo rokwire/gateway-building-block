@@ -38,10 +38,11 @@ type database struct {
 	dbClient *mongo.Client
 	logger   *logs.Logger
 
-	globalConfigs *collectionWrapper
-	configs       *collectionWrapper
-	examples      *collectionWrapper
-	unitcalendars *collectionWrapper
+	globalConfigs       *collectionWrapper
+	configs             *collectionWrapper
+	examples            *collectionWrapper
+	unitcalendars       *collectionWrapper
+	appbuildingfeatures *collectionWrapper
 
 	legacyEvents           *collectionWrapper
 	legacyLocations        *collectionWrapper
@@ -101,6 +102,8 @@ func (d *database) start() error {
 
 	unitcalendars := &collectionWrapper{database: d, coll: db.Collection("unitcalendars")}
 
+	appbuildingfeatures := &collectionWrapper{database: d, coll: db.Collection("building_features")}
+
 	legacyLocations := &collectionWrapper{database: d, coll: db.Collection("legacy_locations")}
 	err = d.applyLegacyLocationsChecks(legacyEvents)
 	if err != nil {
@@ -128,6 +131,7 @@ func (d *database) start() error {
 	d.examples = examples
 	d.legacyEvents = legacyEvents
 	d.unitcalendars = unitcalendars
+	d.appbuildingfeatures = appbuildingfeatures
 	d.legacyLocations = legacyLocations
 	d.webtoolsBlacklistItems = webtoolsBlacklistItems
 	d.processedImages = processedImages

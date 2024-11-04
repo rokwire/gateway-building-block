@@ -143,7 +143,7 @@ func NewFloorPlan(fp CampusFloorPlan) *model.FloorPlan {
 
 // NewBuilding creates a wayfinding.Building instance from a campusBuilding,
 // including all active entrances for the building
-func NewBuilding(bldg CampusBuilding) *model.Building {
+func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildingFeature) *model.Building {
 	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2,
 		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number}
 	newBldg.Entrances = make([]model.Entrance, 0)
@@ -158,21 +158,27 @@ func NewBuilding(bldg CampusBuilding) *model.Building {
 
 	for _, n := range bldg.Features {
 
-		val, ok := featuredata[n.EQIndicator]
+		//is this feature a known feature
+		kf := *knownFeatures
+		knownFeature, ok := kf[n.EQIndicator]
 		if ok {
-			if !slices.Contains(val.Floors, n.FoundOnFloor) {
-				val.Floors = append(val.Floors, n.FoundOnFloor)
-				featuredata[n.EQIndicator] = val
-			}
+			if knownFeature.ShowInApp {
+				//does featuredata already contain an element with the current EQIndicator as a key
+				newKey := knownFeature.AppCode
+				newName := knownFeature.AppName
+				addFeatureToList(newKey, newName, n.FoundOnFloor, &featuredata)
 
+			}
 		} else {
-			var floors = make([]string, 1)
-			floors[0] = n.FoundOnFloor
-			fme := model.FeatureMapEntry{Name: n.Name, Floors: floors}
-			featuredata[n.EQIndicator] = fme
+			//feature is not in the list of supported features, so add it.
+			//treat non-existent as supported
+			//does featuredata already contain an element with the current EQIndicator as a keuy
+			addFeatureToList(n.EQIndicator, n.Name, n.FoundOnFloor, &featuredata)
+
 		}
-		//newBldg.Features = append(newBldg.Features, *NewFeature(n))
+
 	}
+
 	for key, value := range featuredata {
 		var feature = model.BuildingFeatureLocation{Key: key, Value: value}
 		newBldg.Features = append(newBldg.Features, feature)
@@ -181,12 +187,30 @@ func NewBuilding(bldg CampusBuilding) *model.Building {
 	return &newBldg
 }
 
+func addFeatureToList(featureKey string, featureName string, foundOnFloor string, featuredata *map[string]model.FeatureMapEntry) {
+	fd := *featuredata
+	val, ok := fd[featureKey]
+	if ok {
+		//if so, does the value of that element (slice of strings) already contain the floor number
+		//if not add it
+		if !slices.Contains(val.Floors, foundOnFloor) {
+			val.Floors = append(val.Floors, foundOnFloor)
+			fd[featureKey] = val
+		}
+	} else { //feature data does not contain an element for this key
+		var floors = make([]string, 1)
+		floors[0] = foundOnFloor
+		fme := model.FeatureMapEntry{Name: featureName, Floors: floors}
+		fd[featureKey] = fme
+	}
+}
+
 // NewBuildingList returns a list of wayfinding buildings created frmo a list of campus building objects.
-func NewBuildingList(bldgList *[]CampusBuilding) *[]model.Building {
+func NewBuildingList(bldgList *[]CampusBuilding, knownBuildings *map[string]model.AppBuildingFeature) *[]model.Building {
 	retList := make([]model.Building, len(*bldgList))
 	for i := 0; i < len(*bldgList); i++ {
 		cmpsBldg := (*bldgList)[i]
-		crntBldng := NewBuilding(cmpsBldg)
+		crntBldng := NewBuilding(cmpsBldg, knownBuildings)
 		retList[i] = *crntBldng
 	}
 	return &retList

@@ -49,7 +49,8 @@ type Application struct {
 	System  System  // expose to the drivers adapters
 	shared  Shared
 
-	CampusBuildings model.CachedBuildings //caches a list of all campus building data
+	CampusBuildings model.CachedBuildings               //caches a list of all campus building data
+	AppBLdgFeatures map[string]model.AppBuildingFeature //caches the configured set of building features
 
 	AppointmentAdapters map[string]Appointments //expose to the different vendor specific appointment adapters
 
@@ -112,6 +113,15 @@ func NewApplication(version string, build string,
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
 	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, geoBBAdapter, *logger)
+
+	bldfeatures, blderr := application.shared.getBuildingFeatures()
+	if blderr != nil {
+
+	}
+	application.AppBLdgFeatures = make(map[string]model.AppBuildingFeature)
+	for _, bf := range bldfeatures {
+		application.AppBLdgFeatures[bf.CampusCode] = bf
+	}
 
 	_, err := application.Client.GetBuildings()
 	if err != nil {

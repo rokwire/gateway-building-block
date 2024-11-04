@@ -28,11 +28,12 @@ import (
 
 // UIUCWayFinding is a vendor specific structure that implements the BuildingLocation interface
 type UIUCWayFinding struct {
+	KnownBuildingFeatures *map[string]model.AppBuildingFeature
 }
 
 // NewUIUCWayFinding returns a new instance of a UIUCWayFinding struct
-func NewUIUCWayFinding() *UIUCWayFinding {
-	return &UIUCWayFinding{}
+func NewUIUCWayFinding(knownfeatures *map[string]model.AppBuildingFeature) *UIUCWayFinding {
+	return &UIUCWayFinding{KnownBuildingFeatures: knownfeatures}
 }
 
 // GetEntrance returns the active entrance closest to the user's position that meets the ADA Accessibility filter requirement
@@ -76,7 +77,7 @@ func (uwf *UIUCWayFinding) GetBuildings(conf *model.EnvConfigData) (*[]model.Bui
 	if err != nil {
 		return nil, err
 	}
-	returnList := uiuc.NewBuildingList(cmpBldgs)
+	returnList := uiuc.NewBuildingList(cmpBldgs, uwf.KnownBuildingFeatures)
 	return returnList, nil
 }
 
@@ -107,7 +108,7 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, la
 		bldg := model.Building{}
 		return &bldg, err
 	}
-	return uiuc.NewBuilding((*cmpBldg)[0]), nil
+	return uiuc.NewBuilding((*cmpBldg)[0], uwf.KnownBuildingFeatures), nil
 }
 
 // GetFloorPlan returns the requested floor plan

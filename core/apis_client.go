@@ -252,7 +252,7 @@ func newAppClient(app *Application) appClient {
 	client.ContactAdapter = uiucadapters.NewUIUCContactAdapter()
 	client.LaundryAdapter = uiucadapters.NewCSCLaundryAdapter(laundryAssets)
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
-	client.LocationAdapter = uiucadapters.NewUIUCWayFinding()
+	client.LocationAdapter = uiucadapters.NewUIUCWayFinding(&app.AppBLdgFeatures)
 	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter()
 	return client
 }

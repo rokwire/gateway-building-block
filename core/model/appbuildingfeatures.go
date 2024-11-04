@@ -12,28 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package core
+package model
 
 import (
-	"application/core/model"
+	"github.com/rokwire/logging-library-go/v2/logutils"
 )
 
-// appShared contains shared implementations
-type appShared struct {
-	app *Application
-}
+const (
+	//TypeAppBuildingFeature type
+	TypeAppBuildingFeature logutils.MessageDataType = "application building feature"
+)
 
-// getExample gets an Example by ID
-func (a appShared) getExample(orgID string, appID string, id string) (*model.Example, error) {
-	return a.app.storage.FindExample(orgID, appID, id)
-}
-
-// newAppShared creates new appShared
-func newAppShared(app *Application) appShared {
-	return appShared{app: app}
-}
-
-// getBuildingFeatures returns all building features
-func (a appShared) getBuildingFeatures() ([]model.AppBuildingFeature, error) {
-	return a.app.storage.LoadAppBuildingFeatures()
+// AppBuildingFeature represents the configured features for campus buildings
+type AppBuildingFeature struct {
+	CampusName string `json:"campus_name" bson:"campus_name"`
+	CampusCode string `json:"campus_code" bson:"campus_code"`
+	AppName    string `json:"app_name" bson:"app_name"`
+	AppCode    string `json:"app_code" bson:"app_code"`
+	ShowInApp  bool   `json:"show_in_app" bson:"show_in_app"`
 }
