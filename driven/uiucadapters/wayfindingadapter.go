@@ -226,12 +226,16 @@ func (uwf *UIUCWayFinding) getFloorPlanData(targetURL string, apikey string) (*u
 	if err != nil {
 		return nil, err
 	}
+	data := uiuc.CampusFloorPlanResult{}
 
 	if res.StatusCode == 400 {
 		return nil, errors.New("bad request to api end point")
 	}
+	if res.StatusCode == 500 {
+		emptyFloorPlan := data.Result
+		return &emptyFloorPlan, nil
+	}
 
-	data := uiuc.CampusFloorPlanResult{}
 	err = json.Unmarshal(body, &data)
 
 	if err != nil {
