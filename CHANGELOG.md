@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [UnReleased] - 2025-01-15
+### fixed
+- When the campus API fails to return a floor plan, the building block now returns an empty floor plan object instead of a 500 status
+
 ## [2.11.1] - 2024-11-04
 ### Changed
 - Pull a list of all known building features from the database. Use this to filter out any that we do not want to display in the app on the building details panel as well as merge groups of some feature codes into a single feature.
