@@ -1,6 +1,6 @@
 module application
 
-go 1.21
+go 1.23
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
@@ -13,7 +13,7 @@ require (
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.1
 	go.mongodb.org/mongo-driver v1.14.0
-	golang.org/x/sync v0.6.0
+	golang.org/x/sync v0.10.0
 	googlemaps.github.io/maps v1.7.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -29,7 +29,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -40,11 +39,11 @@ require (
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.11.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
+	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 )
 
