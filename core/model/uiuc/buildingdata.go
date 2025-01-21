@@ -49,6 +49,7 @@ type CampusBuilding struct {
 	Longitude   float64                 `json:"building_centroid_longitude"`
 	Floors      []string                `json:"floor_ids"`
 	Features    []CampusBuildingFeature `'json:"features"`
+	FloorsInFAM []string                `json:"floors_in_FAM"`
 }
 
 // CampusBuildingFeature represents a UIUC specific representation of features found in buildings
@@ -153,7 +154,7 @@ func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildin
 		}
 	}
 
-	newBldg.Floors = append(newBldg.Floors, bldg.Floors...)
+	newBldg.Floors = append(newBldg.Floors, bldg.FloorsInFAM...)
 	var featuredata = make(map[string]model.FeatureMapEntry, 0)
 
 	for _, n := range bldg.Features {
@@ -162,7 +163,8 @@ func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildin
 		kf := *knownFeatures
 		knownFeature, ok := kf[n.EQIndicator]
 		if ok {
-			if knownFeature.ShowInApp {
+			//some features that the app shows may exist on floors we do not want to show.
+			if knownFeature.ShowInApp && slices.Contains(newBldg.Floors, n.FoundOnFloor) {
 				//does featuredata already contain an element with the current EQIndicator as a key
 				newKey := knownFeature.AppCode
 				newName := knownFeature.AppName
@@ -173,7 +175,9 @@ func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildin
 			//feature is not in the list of supported features, so add it.
 			//treat non-existent as supported
 			//does featuredata already contain an element with the current EQIndicator as a keuy
-			addFeatureToList(n.EQIndicator, n.Name, n.FoundOnFloor, &featuredata)
+			if slices.Contains(newBldg.Floors, n.FoundOnFloor) {
+				addFeatureToList(n.EQIndicator, n.Name, n.FoundOnFloor, &featuredata)
+			}
 
 		}
 
