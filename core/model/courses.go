@@ -54,6 +54,7 @@ type CourseSection struct {
 	EndTime               string   `json:"endtime" bson:"endtime"`
 	Location              Building `json:"building" bson:"building"`
 	CourseReferenceNumber string   `json:"courseReferenceNumber" bson:"courseReferenceNumber"`
+	SectionNumber         string   `json:"course_section" bson:"course_section"`
 }
 
 // Course represents the full elements of a course
