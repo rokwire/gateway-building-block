@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [UnReleased] - 2025-01-15
 ### fixed
 - When the campus API fails to return a floor plan, the building block now returns an empty floor plan object instead of a 500 status
+### added
+- Add section number to course data for MyCourses
 
 ## [2.11.1] - 2024-11-04
 ### Changed

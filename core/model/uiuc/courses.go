@@ -148,14 +148,15 @@ func NewCourse(cr CourseRegistration, courseSectionSessionIndex int) *model.Cour
 	ret.InstructionMethod = cr.CourseSection.CourseSectionSession[courseSectionSessionIndex].ValidCourseScheduleType.Code
 	crn := cr.CourseSection.CourseReferenceNumber
 	css := cr.CourseSection.CourseSectionSession[courseSectionSessionIndex]
-	newCS := NewCourseSection(css, crn)
+	sn := cr.CourseSection.SectionNumber
+	newCS := NewCourseSection(css, crn, sn)
 	ret.Section = *newCS
 
 	return &ret
 }
 
 // NewCourseSection maps the coursesectionsession data from campus to the coursesection data sent back to the app
-func NewCourseSection(cs CourseSectionSession, crn string) *model.CourseSection {
+func NewCourseSection(cs CourseSectionSession, crn string, sn string) *model.CourseSection {
 	ret := model.CourseSection{}
 	ret.BuildingName = cs.ValidBuilding.Description
 	ret.Room = cs.Room
@@ -164,6 +165,7 @@ func NewCourseSection(cs CourseSectionSession, crn string) *model.CourseSection 
 	ret.StartTime = cs.StartTime
 	ret.EndTime = cs.EndTime
 	ret.InstructionType = cs.ValidCourseScheduleType.Code
+	ret.SectionNumber = sn
 
 	//we only want the primary instructor
 	if len(cs.CourseSectionInstructor) == 0 {
