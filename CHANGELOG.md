@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UnReleased] - 2025-01-15
+## [2.12.0] - 2025-01-22
 ### fixed
 - When the campus API fails to return a floor plan, the building block now returns an empty floor plan object instead of a 500 status
 ### added
