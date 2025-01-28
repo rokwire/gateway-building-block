@@ -123,11 +123,11 @@ func NewApplication(version string, build string,
 		application.AppBLdgFeatures[bf.CampusCode] = bf
 	}
 
-	_, err := application.Client.GetBuildings()
-	if err != nil {
-		//set to one day ago to force a retry and refresh
-		application.CampusBuildings.LoadDate = time.Now().AddDate(0, 0, -1)
-	}
+	//	_, err := application.Client.GetBuildings()
+	//	if err != nil {
+	//set to one day ago to force a retry and refresh
+	application.CampusBuildings.LoadDate = time.Now().AddDate(0, 0, -1)
+	//}
 
 	return &application
 }
