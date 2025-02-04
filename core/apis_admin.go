@@ -221,7 +221,11 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 }
 
 func (a appAdmin) GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
-	return nil, nil
+	legacyEvents, err := a.app.storage.FindAllWebtoolsLegacyEvents()
+	if err != nil {
+		return nil, err
+	}
+	return legacyEvents, nil
 }
 
 // newAppAdmin creates new appAdmin

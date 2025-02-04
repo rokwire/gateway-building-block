@@ -1,4 +1,6 @@
 type: object
 properties:
+  count:
+    type: integer
   calendar_id:
     type: string

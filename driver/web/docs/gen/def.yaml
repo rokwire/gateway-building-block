@@ -1607,6 +1607,8 @@ components:
     WebtoolsCalendarID:
       type: object
       properties:
+        count:
+          type: integer
         calendar_id:
           type: string
     _admin_req_update-configs:

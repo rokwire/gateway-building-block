@@ -396,6 +396,38 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
+func (a *Adapter) FindAllWebtoolsLegacyEvents() ([]model.WebToolsCalendarID, error) {
+	filter := bson.M{
+		"sync_process_source": "webtools-direct",
+	}
+
+	var list []model.LegacyEventItem
+	timeout := 15 * time.Second // 15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	// Map to store counts of unique originatingCalendarId
+	countMap := make(map[string]int)
+
+	for _, l := range list {
+		calendarID := l.Item.OriginatingCalendarID // Assuming this field exists in `LegacyEvent`
+		countMap[calendarID]++
+	}
+
+	// Convert map to slice of WebToolsCalendarID
+	var legacyEvents []model.WebToolsCalendarID
+	for id, count := range countMap {
+		legacyEvents = append(legacyEvents, model.WebToolsCalendarID{
+			Count: count,
+			Name:  id,
+		})
+	}
+
+	return legacyEvents, nil
+}
+
 // AddWebtoolsBlacklistData update data from the database
 func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
 	if dataSourceIDs != nil {
