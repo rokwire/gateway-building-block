@@ -99,6 +99,11 @@ type WebToolsItem struct {
 	Data []string `json:"data" bson:"data"`
 }
 
+// WebToolsCalendarID represents web tools originating calendar ids
+type WebToolsCalendarID struct {
+	Name string `json:"originatingCalendarId" bson:"originatingCalendarId"`
+}
+
 // LegacyEvent wrapper
 type LegacyEvent struct {
 	AllDay                bool            `json:"allDay" bson:"allDay"`

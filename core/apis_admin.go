@@ -220,6 +220,10 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 	return nil
 }
 
+func (a appAdmin) GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
+	return nil, nil
+}
+
 // newAppAdmin creates new appAdmin
 func newAppAdmin(app *Application) appAdmin {
 	return appAdmin{app: app}

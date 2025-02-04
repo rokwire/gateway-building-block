@@ -112,6 +112,8 @@ func (a Adapter) Start() {
 	adminRouter.HandleFunc("/webtools-blacklist", a.wrapFunc(a.adminAPIsHandler.getwebtoolsblacklist, a.auth.admin.Permissions)).Methods("GET")
 	adminRouter.HandleFunc("/webtools-blacklist", a.wrapFunc(a.adminAPIsHandler.removewebtoolsblacklist, a.auth.admin.Permissions)).Methods("DELETE")
 
+	adminRouter.HandleFunc("/webtools-calendarIDs", a.wrapFunc(a.adminAPIsHandler.getwebtoolsCalendarIDs, a.auth.admin.Permissions)).Methods("DELETE")
+
 	// BB APIs
 	bbsRouter := mainRouter.PathPrefix("/bbs").Subrouter()
 	bbsRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.bbsAPIsHandler.getExample, a.auth.bbs.Permissions)).Methods("GET")

@@ -312,6 +312,20 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 	return l.HTTPResponseSuccess()
 }
 
+func (h AdminAPIsHandler) getwebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	calendarIDs, err := h.app.Admin.GetWebtoolsCalendarIDs()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	data, err := json.Marshal(calendarIDs)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(data)
+}
+
 // NewAdminAPIsHandler creates new rest Handler instance
 func NewAdminAPIsHandler(app *core.Application) AdminAPIsHandler {
 	return AdminAPIsHandler{app: app}

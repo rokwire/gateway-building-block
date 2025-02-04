@@ -1,0 +1,4 @@
+type: object
+properties:
+  calendar_id:
+    type: string
