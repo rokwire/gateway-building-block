@@ -396,7 +396,8 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
-func (a *Adapter) FindAllWebtoolsLegacyEvents() ([]model.WebToolsCalendarID, error) {
+// FindAllWebtoolsCalendarIDs finds and counts all webtools calendar IDs
+func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
 	filter := bson.M{
 		"sync_process_source": "webtools-direct",
 	}
