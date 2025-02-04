@@ -412,7 +412,7 @@ func (a *Adapter) FindAllWebtoolsLegacyEvents() ([]model.WebToolsCalendarID, err
 	countMap := make(map[string]int)
 
 	for _, l := range list {
-		calendarID := l.Item.OriginatingCalendarID // Assuming this field exists in `LegacyEvent`
+		calendarID := l.Item.OriginatingCalendarID
 		countMap[calendarID]++
 	}
 
