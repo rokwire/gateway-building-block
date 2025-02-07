@@ -1,9 +1,9 @@
 put:
   tags:
   - Admin
-  summary: Remove calendarID to the legacy event
+  summary: Add calendarID to the legacy event
   description: |
-    Removes calendarID to the legacy event
+   Add calendarID to the legacy event
 
     **Auth:** Requires valid admin token with `webtools_calendarids`  permission
   security:
