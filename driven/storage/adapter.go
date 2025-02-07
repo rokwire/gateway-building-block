@@ -509,6 +509,21 @@ func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	return dataSource, nil
 }
 
+// FindWebtoolsLegacyEventByID finds webtool legacy event by the ID of the item
+func (a *Adapter) FindWebtoolsLegacyEventByID(id string) (*model.LegacyEventItem, error) {
+	filter := bson.M{
+		"sync_process_source": "webtools-direct",
+		"item.id":             id,
+	}
+	var legacy []model.LegacyEventItem
+	err := a.db.legacyEvents.Find(filter, &legacy, nil)
+	if err != nil {
+		return nil, err
+	}
+	webtoolsLegacyEvent := legacy[0]
+	return &webtoolsLegacyEvent, nil
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction

@@ -147,6 +147,7 @@ type Storage interface {
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 	FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
+	FindWebtoolsLegacyEventByID(id string) (*model.LegacyEventItem, error)
 
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error

@@ -18,3 +18,5 @@ p, delete_configs_gateway, /gateway/api/admin/configs, (GET),
 
 p, webtools_blacklist, /gateway/api/admin/webtools-blacklist, (GET)|(POST)|(PUT)|(DELETE), Webtools blacklist actions
 p, webtools_calendarids, /gateway/api/admin/webtools-calendarIDs, (GET), Webtools actions
+p, webtools_calendarids, /gateway/api/admin/webtools-calendarID/*, (PUT), Webtools actions
+
