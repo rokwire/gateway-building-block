@@ -228,6 +228,10 @@ func (a appAdmin) GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
 	return webtoolsCalendarIDs, nil
 }
 
+func (a appAdmin) RemoveWebtoolsCalendarID(id string, calendarID string) error {
+	return nil
+}
+
 // newAppAdmin creates new appAdmin
 func newAppAdmin(app *Application) appAdmin {
 	return appAdmin{app: app}

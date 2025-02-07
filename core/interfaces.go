@@ -66,6 +66,7 @@ type Admin interface {
 	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
 	RemoveWebtoolsBlackList(sourceids []string, calendarids []string) error
 	GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
+	RemoveWebtoolsCalendarID(id string, calendarID string) error
 }
 
 // BBs exposes Building Block APIs for the driver adapters

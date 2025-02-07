@@ -582,7 +582,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/admin/webtools-calendarIDs/remove:
+  /api/admin/webtools-calendarID/remove:
     put:
       tags:
         - Admin

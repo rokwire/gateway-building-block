@@ -312,7 +312,7 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 	return l.HTTPResponseSuccess()
 }
 
-func (h AdminAPIsHandler) getwebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+func (h AdminAPIsHandler) getWebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 	calendarIDs, err := h.app.Admin.GetWebtoolsCalendarIDs()
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
@@ -324,6 +324,25 @@ func (h AdminAPIsHandler) getwebtoolsCalendarIDs(l *logs.Log, r *http.Request, c
 	}
 
 	return l.HTTPResponseSuccessJSON(data)
+}
+
+func (h AdminAPIsHandler) removeWebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	webtoolsLegacyID := r.URL.Query().Get("id")
+	if webtoolsLegacyID == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+	}
+
+	originaitingCalendarID := r.URL.Query().Get("calendar_id")
+	if originaitingCalendarID == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("calendar_id"), nil, http.StatusBadRequest, false)
+	}
+
+	err := h.app.Admin.RemoveWebtoolsCalendarID(webtoolsLegacyID, originaitingCalendarID)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
 }
 
 // NewAdminAPIsHandler creates new rest Handler instance
