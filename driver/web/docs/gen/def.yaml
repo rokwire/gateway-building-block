@@ -582,7 +582,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  '/api/admin/webtools-calendarIDs/{id}/remove/{calendar_id}':
+  /api/admin/webtools-calendarIDs/remove:
     put:
       tags:
         - Admin
@@ -595,18 +595,17 @@ paths:
         - bearerAuth: []
       parameters:
         - name: id
-          in: path
-          description: ID of the legacy event
-          required: true
-          style: simple
+          in: query
+          description: Webtools legacy event item id
+          style: form
           explode: false
           schema:
             type: string
         - name: calendar_id
-          in: path
-          description: originaitingCalendarID
-          required: true
-          style: simple
+          in: query
+          description: Originaiting webtools legacy event calendarID
+          required: false
+          style: form
           explode: false
           schema:
             type: string
