@@ -235,7 +235,23 @@ func (a appAdmin) RemoveWebtoolsCalendarID(ids []string, calendarID string) erro
 	}
 	for _, w := range webtoolLegacyEvent {
 		if w.Item.OriginatingCalendarID == calendarID {
-			err := a.app.storage.RemoveWebtoolsCalendarIDs(calendarID)
+			err := a.app.storage.RemoveWebtoolsCalendarID(calendarID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (a appAdmin) AddWebtoolsCalendarID(ids []string, calendarID string) error {
+	webtoolLegacyEvent, err := a.app.storage.FindWebtoolsLegacyEventByID(ids)
+	if err != nil {
+		return err
+	}
+	for _, w := range webtoolLegacyEvent {
+		if w.Item.OriginatingCalendarID == "" {
+			err := a.app.storage.AddWebtoolsCalendarID(w.Item.ID, calendarID)
 			if err != nil {
 				return err
 			}

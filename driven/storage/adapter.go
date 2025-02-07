@@ -524,7 +524,7 @@ func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEvent
 
 	return webtoolsLegacyEvent, nil
 }
-func (a *Adapter) RemoveWebtoolsCalendarIDs(calendarID string) error {
+func (a *Adapter) RemoveWebtoolsCalendarID(calendarID string) error {
 	filter := bson.M{
 		"item.originatingCalendarId": calendarID,
 	}
@@ -534,6 +534,31 @@ func (a *Adapter) RemoveWebtoolsCalendarIDs(calendarID string) error {
 		},
 	}
 
+	_, err := a.db.legacyEvents.UpdateOne(a.context, filter, updateSource, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filter), err)
+	}
+
+	return nil
+}
+func (a *Adapter) AddWebtoolsCalendarID(id string, calendarID string) error {
+	// Define the filter to match documents with the given item.id and an empty/missing originatingCalendarId
+	filter := bson.M{
+		"item.id": id,
+		"$or": []bson.M{
+			{"item.originatingCalendarId": ""},                       // Matches empty string
+			{"item.originatingCalendarId": bson.M{"$exists": false}}, // Matches missing field
+		},
+	}
+
+	// Define the update operation
+	updateSource := bson.M{
+		"$set": bson.M{
+			"item.originatingCalendarId": calendarID,
+		},
+	}
+
+	// Execute UpdateOne
 	_, err := a.db.legacyEvents.UpdateOne(a.context, filter, updateSource, nil)
 	if err != nil {
 		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filter), err)

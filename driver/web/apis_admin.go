@@ -349,6 +349,29 @@ func (h AdminAPIsHandler) removeWebtoolsCalendarIDs(l *logs.Log, r *http.Request
 	return l.HTTPResponseSuccess()
 }
 
+func (h AdminAPIsHandler) addWebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	var webtoolsLegacyIDs []string
+	webtoolsLegacyIDsArg := r.URL.Query().Get("ids")
+	if webtoolsLegacyIDsArg != "" {
+		webtoolsLegacyIDs = strings.Split(webtoolsLegacyIDsArg, ",")
+	} else {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("ids"), nil, http.StatusBadRequest, false)
+
+	}
+
+	originaitingCalendarID := r.URL.Query().Get("calendar_id")
+	if originaitingCalendarID == "" {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("calendar_id"), nil, http.StatusBadRequest, false)
+	}
+
+	err := h.app.Admin.AddWebtoolsCalendarID(webtoolsLegacyIDs, originaitingCalendarID)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	return l.HTTPResponseSuccess()
+}
+
 // NewAdminAPIsHandler creates new rest Handler instance
 func NewAdminAPIsHandler(app *core.Application) AdminAPIsHandler {
 	return AdminAPIsHandler{app: app}

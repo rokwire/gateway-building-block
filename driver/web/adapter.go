@@ -114,6 +114,7 @@ func (a Adapter) Start() {
 
 	adminRouter.HandleFunc("/webtools-calendarIDs", a.wrapFunc(a.adminAPIsHandler.getWebtoolsCalendarIDs, a.auth.admin.Permissions)).Methods("GET")
 	adminRouter.HandleFunc("/webtools-calendarID/remove", a.wrapFunc(a.adminAPIsHandler.removeWebtoolsCalendarIDs, a.auth.admin.Permissions)).Methods("PUT")
+	adminRouter.HandleFunc("/webtools-calendarID/add", a.wrapFunc(a.adminAPIsHandler.addWebtoolsCalendarIDs, a.auth.admin.Permissions)).Methods("PUT")
 
 	// BB APIs
 	bbsRouter := mainRouter.PathPrefix("/bbs").Subrouter()
