@@ -509,19 +509,37 @@ func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	return dataSource, nil
 }
 
-// FindWebtoolsLegacyEventByID finds webtool legacy event by the ID of the item
-func (a *Adapter) FindWebtoolsLegacyEventByID(id string) (*model.LegacyEventItem, error) {
+// FindWebtoolsLegacyEventByID finds webtool legacy event by the IDs of the items
+func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error) {
 	filter := bson.M{
 		"sync_process_source": "webtools-direct",
-		"item.id":             id,
+		"item.id":             bson.M{"$in": ids}, // Correctly filter by multiple IDs
 	}
-	var legacy []model.LegacyEventItem
-	err := a.db.legacyEvents.Find(filter, &legacy, nil)
+
+	var webtoolsLegacyEvent []model.LegacyEventItem
+	err := a.db.legacyEvents.FindWithContext(nil, filter, &webtoolsLegacyEvent, nil) // Use Find instead of FindOne
 	if err != nil {
 		return nil, err
 	}
-	webtoolsLegacyEvent := legacy[0]
-	return &webtoolsLegacyEvent, nil
+
+	return webtoolsLegacyEvent, nil
+}
+func (a *Adapter) RemoveWebtoolsCalendarIDs(calendarID string) error {
+	filter := bson.M{
+		"item.originatingCalendarId": calendarID,
+	}
+	updateSource := bson.M{
+		"$set": bson.M{
+			"item.originatingCalendarId": "",
+		},
+	}
+
+	_, err := a.db.legacyEvents.UpdateOne(a.context, filter, updateSource, nil)
+	if err != nil {
+		return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filter), err)
+	}
+
+	return nil
 }
 
 // PerformTransaction performs a transaction

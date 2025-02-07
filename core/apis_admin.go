@@ -16,7 +16,6 @@ package core
 
 import (
 	"application/core/model"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -229,13 +228,19 @@ func (a appAdmin) GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
 	return webtoolsCalendarIDs, nil
 }
 
-func (a appAdmin) RemoveWebtoolsCalendarID(id string, calendarID string) error {
-	webtoolLegacyEvent, err := a.app.storage.FindWebtoolsLegacyEventByID(id)
+func (a appAdmin) RemoveWebtoolsCalendarID(ids []string, calendarID string) error {
+	webtoolLegacyEvent, err := a.app.storage.FindWebtoolsLegacyEventByID(ids)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(webtoolLegacyEvent)
+	for _, w := range webtoolLegacyEvent {
+		if w.Item.OriginatingCalendarID == calendarID {
+			err := a.app.storage.RemoveWebtoolsCalendarIDs(calendarID)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 

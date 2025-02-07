@@ -9,9 +9,10 @@ put:
   security:
     - bearerAuth: []
   parameters:
-    - name: id
+    - name: _ids
       in: query
-      description: Webtools legacy event item id
+      description: A comma-separated list of webtools legacy item ids
+      required: false
       style: form
       explode: false
       schema:

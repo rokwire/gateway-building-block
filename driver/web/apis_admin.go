@@ -327,9 +327,13 @@ func (h AdminAPIsHandler) getWebtoolsCalendarIDs(l *logs.Log, r *http.Request, c
 }
 
 func (h AdminAPIsHandler) removeWebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	webtoolsLegacyID := r.URL.Query().Get("id")
-	if webtoolsLegacyID == "" {
-		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("id"), nil, http.StatusBadRequest, false)
+	var webtoolsLegacyIDs []string
+	webtoolsLegacyIDsArg := r.URL.Query().Get("ids")
+	if webtoolsLegacyIDsArg != "" {
+		webtoolsLegacyIDs = strings.Split(webtoolsLegacyIDsArg, ",")
+	} else {
+		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("ids"), nil, http.StatusBadRequest, false)
+
 	}
 
 	originaitingCalendarID := r.URL.Query().Get("calendar_id")
@@ -337,7 +341,7 @@ func (h AdminAPIsHandler) removeWebtoolsCalendarIDs(l *logs.Log, r *http.Request
 		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("calendar_id"), nil, http.StatusBadRequest, false)
 	}
 
-	err := h.app.Admin.RemoveWebtoolsCalendarID(webtoolsLegacyID, originaitingCalendarID)
+	err := h.app.Admin.RemoveWebtoolsCalendarID(webtoolsLegacyIDs, originaitingCalendarID)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
