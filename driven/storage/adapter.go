@@ -524,6 +524,8 @@ func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEvent
 
 	return webtoolsLegacyEvent, nil
 }
+
+// RemoveWebtoolsCalendarID removes originatig calendarID from webtools events
 func (a *Adapter) RemoveWebtoolsCalendarID(calendarID string) error {
 	filter := bson.M{
 		"item.originatingCalendarId": calendarID,
@@ -541,6 +543,8 @@ func (a *Adapter) RemoveWebtoolsCalendarID(calendarID string) error {
 
 	return nil
 }
+
+// AddWebtoolsCalendarID removes originatig calendarID from webtools events
 func (a *Adapter) AddWebtoolsCalendarID(id string, calendarID string) error {
 	// Define the filter to match documents with the given item.id and an empty/missing originatingCalendarId
 	filter := bson.M{
