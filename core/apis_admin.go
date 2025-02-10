@@ -228,38 +228,6 @@ func (a appAdmin) GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
 	return webtoolsCalendarIDs, nil
 }
 
-func (a appAdmin) RemoveWebtoolsCalendarID(ids []string, calendarID string) error {
-	webtoolLegacyEvent, err := a.app.storage.FindWebtoolsLegacyEventByID(ids)
-	if err != nil {
-		return err
-	}
-	for _, w := range webtoolLegacyEvent {
-		if w.Item.OriginatingCalendarID == calendarID {
-			err := a.app.storage.RemoveWebtoolsCalendarID(calendarID)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func (a appAdmin) AddWebtoolsCalendarID(ids []string, calendarID string) error {
-	webtoolLegacyEvent, err := a.app.storage.FindWebtoolsLegacyEventByID(ids)
-	if err != nil {
-		return err
-	}
-	for _, w := range webtoolLegacyEvent {
-		if w.Item.OriginatingCalendarID == "" {
-			err := a.app.storage.AddWebtoolsCalendarID(w.Item.ID, calendarID)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 // newAppAdmin creates new appAdmin
 func newAppAdmin(app *Application) appAdmin {
 	return appAdmin{app: app}

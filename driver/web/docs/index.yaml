@@ -68,11 +68,7 @@ paths:
   /api/admin/webtools-blacklist:
     $ref: "./resources/admin/webtools-blacklist.yaml"  
   /api/admin/webtools-calendarIDs:
-    $ref: "./resources/admin/webtools-calendarIDs.yaml" 
-  /api/admin/webtools-calendarID/remove:
-    $ref: "./resources/admin/webtools-calendarIDs-remove.yaml"    
-  /api/admin/webtools-calendarID/add:
-    $ref: "./resources/admin/webtools-calendarIDs-add.yaml"      
+    $ref: "./resources/admin/webtools-calendarIDs.yaml"      
 
   # BBs
   /api/bbs/examples/{id}:

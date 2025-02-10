@@ -66,8 +66,6 @@ type Admin interface {
 	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
 	RemoveWebtoolsBlackList(sourceids []string, calendarids []string) error
 	GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
-	RemoveWebtoolsCalendarID(ids []string, calendarID string) error
-	AddWebtoolsCalendarID(ids []string, calendarID string) error
 }
 
 // BBs exposes Building Block APIs for the driver adapters
@@ -153,8 +151,6 @@ type Storage interface {
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
-	RemoveWebtoolsCalendarID(calendarID string) error
-	AddWebtoolsCalendarID(id string, calendarID string) error
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error

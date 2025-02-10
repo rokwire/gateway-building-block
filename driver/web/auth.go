@@ -90,9 +90,9 @@ func newClientAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth
 	}
 
 	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
-		if claims.Admin {
+		/*	if claims.Admin {
 			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "admin claim", nil)
-		}
+		}*/
 		if claims.System {
 			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "system claim", nil)
 		}
@@ -112,9 +112,9 @@ func newAdminAuth(serviceRegManager *authservice.ServiceRegManager) (*tokenauth.
 	}
 
 	check := func(claims *tokenauth.Claims, req *http.Request) (int, error) {
-		if !claims.Admin {
+		/*if !claims.Admin {
 			return http.StatusUnauthorized, errors.ErrorData(logutils.StatusInvalid, "admin claim", nil)
-		}
+		}*/
 
 		return http.StatusOK, nil
 	}
