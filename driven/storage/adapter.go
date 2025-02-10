@@ -509,6 +509,18 @@ func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	return dataSource, nil
 }
 
+// FindWebtoolsBlacklistData finds all webtools blacklist from the database
+func (a *Adapter) FindWebtoolsCalendarIDsBlacklistData() ([]model.WebToolsItem, error) {
+	filterSource := bson.M{"name": "webtools_calendar_ids"}
+	var dataSource []model.WebToolsItem
+	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return dataSource, nil
+}
+
 // FindWebtoolsLegacyEventByID finds webtool legacy event by the IDs of the items
 func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error) {
 	filter := bson.M{

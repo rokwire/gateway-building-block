@@ -220,12 +220,20 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 	return nil
 }
 
-func (a appAdmin) GetWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
+func (a appAdmin) GetWebtoolsCalendarIDs() (*model.WebToolsCalendarIDs, error) {
 	webtoolsCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
 	if err != nil {
 		return nil, err
 	}
-	return webtoolsCalendarIDs, nil
+
+	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsCalendarIDsBlacklistData()
+	if err != nil {
+		return nil, err
+	}
+
+	response := model.WebToolsCalendarIDs{WebtoolsOriginaitingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginaitingCalendarIDs: blacklistedCalendarIDs}
+
+	return &response, nil
 }
 
 // newAppAdmin creates new appAdmin

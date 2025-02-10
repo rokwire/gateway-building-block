@@ -105,6 +105,12 @@ type WebToolsCalendarID struct {
 	Name  string `json:"originatingCalendarId" bson:"originatingCalendarId"`
 }
 
+// WebToolsCalendarIDs represents web tools originating calendar ids
+type WebToolsCalendarIDs struct {
+	WebtoolsOriginaitingCalendarIDs    []WebToolsCalendarID `json:"calendar_ids"`
+	BlackListedOriginaitingCalendarIDs []WebToolsItem       `json:"blacklisted_calendar_ids"`
+}
+
 // LegacyEvent wrapper
 type LegacyEvent struct {
 	AllDay                bool            `json:"allDay" bson:"allDay"`
