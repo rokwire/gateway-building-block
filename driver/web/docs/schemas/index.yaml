@@ -31,6 +31,8 @@ WebtoolsBlacklistItems:
   $ref: "./application/WebtoolsBlacklistItems.yaml" 
 WebtoolsCalendarID: 
   $ref: "./application/WebtoolsCalendarID.yaml"   
+WebtoolsCalendarIDs: 
+  $ref: "./application/WebtoolsCalendarIDs.yaml"     
 
 # ADMIN section
 

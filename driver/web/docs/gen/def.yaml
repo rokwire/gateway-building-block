@@ -573,9 +573,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WebtoolsCalendarID'
+                $ref: '#/components/schemas/WebtoolsCalendarIDs'
         '400':
           description: Bad request
         '401':
@@ -1611,6 +1609,17 @@ components:
           type: integer
         calendar_id:
           type: string
+    WebtoolsCalendarIDs:
+      type: object
+      properties:
+        webtools_calendar_ids:
+          type: array
+          items:
+            - $ref: '#/components/schemas/WebtoolsCalendarID'
+        blacklisted_calendar_ids:
+          type: array
+          items:
+            - $ref: '#/components/schemas/WebtoolsBlacklistItems'
     _admin_req_update-configs:
       required:
         - type

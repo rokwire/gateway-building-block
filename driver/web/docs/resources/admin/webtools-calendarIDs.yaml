@@ -12,9 +12,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: "../../schemas/application/WebtoolsCalendarID.yaml"
+            $ref: "../../schemas/application/WebtoolsCalendarIDs.yaml"
     400:
       description: Bad request
     401:
