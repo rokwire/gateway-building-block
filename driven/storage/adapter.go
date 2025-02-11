@@ -430,7 +430,7 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, erro
 }
 
 // AddWebtoolsBlacklistData update data from the database
-func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginaitingCalendarIDs []string) error {
 	if dataSourceIDs != nil {
 		filterSource := bson.M{"name": "webtools_events_ids"}
 		updateSource := bson.M{
@@ -456,7 +456,20 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 		if err != nil {
 			return errors.WrapErrorAction(logutils.ActionUpdate, "", filterArgs(filterCalendar), err)
 		}
+	}
 
+	if dataOriginaitingCalendarIDs != nil {
+		filterCalendar := bson.M{"name": "webtools_originaiting_calendar_ids"}
+		updateCalendar := bson.M{
+			"$addToSet": bson.M{
+				"data": bson.M{"$each": dataOriginaitingCalendarIDs},
+			},
+		}
+
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+		if err != nil {
+			return errors.WrapErrorAction(logutils.ActionUpdate, "", filterArgs(filterCalendar), err)
+		}
 	}
 
 	return nil

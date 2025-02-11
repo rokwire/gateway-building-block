@@ -193,8 +193,8 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 	return nil
 }
 
-func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string) error {
-	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs)
+func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginaitingCalendarIDs []string) error {
+	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs, dataOriginaitingCalendarIDs)
 	if err != nil {
 		return nil
 	}
