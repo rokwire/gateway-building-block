@@ -483,6 +483,11 @@ paths:
                   nullable: true
                   items:
                     type: string
+                data_originaiting_calendar_ids:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
       responses:
         '200':
           description: Success
@@ -537,6 +542,14 @@ paths:
           schema:
             type: string
         - name: calendar_ids
+          in: query
+          description: A comma-separated list of ids
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: originaiting_calendar_ids
           in: query
           description: A comma-separated list of ids
           required: false
