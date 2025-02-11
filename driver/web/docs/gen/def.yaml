@@ -1628,11 +1628,11 @@ components:
         webtools_calendar_ids:
           type: array
           items:
-            - $ref: '#/components/schemas/WebtoolsCalendarID'
+            $ref: '#/components/schemas/WebtoolsCalendarID'
         blacklisted_calendar_ids:
           type: array
           items:
-            - $ref: '#/components/schemas/WebtoolsBlacklistItems'
+            $ref: '#/components/schemas/WebtoolsBlacklistItems'
     _admin_req_update-configs:
       required:
         - type
