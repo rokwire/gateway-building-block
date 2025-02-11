@@ -226,7 +226,7 @@ func (a appAdmin) GetWebtoolsCalendarIDs() (*model.WebToolsCalendarIDs, error) {
 		return nil, err
 	}
 
-	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsCalendarIDsBlacklistData()
+	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginaitingCalendarIDsBlacklistData()
 	if err != nil {
 		return nil, err
 	}

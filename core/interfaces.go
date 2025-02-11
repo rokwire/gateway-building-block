@@ -151,7 +151,7 @@ type Storage interface {
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
-	FindWebtoolsCalendarIDsBlacklistData() ([]model.WebToolsItem, error)
+	FindWebtoolsOriginaitingCalendarIDsBlacklistData() ([]model.WebToolsItem, error)
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error

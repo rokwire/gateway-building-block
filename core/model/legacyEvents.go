@@ -107,8 +107,8 @@ type WebToolsCalendarID struct {
 
 // WebToolsCalendarIDs represents web tools originating calendar ids
 type WebToolsCalendarIDs struct {
-	WebtoolsOriginaitingCalendarIDs    []WebToolsCalendarID `json:"calendar_ids"`
-	BlackListedOriginaitingCalendarIDs []WebToolsItem       `json:"blacklisted_calendar_ids"`
+	WebtoolsOriginaitingCalendarIDs    []WebToolsCalendarID `json:"originaiting_calendar_ids"`
+	BlackListedOriginaitingCalendarIDs []WebToolsItem       `json:"blacklisted_originaiting_calendar_ids"`
 }
 
 // LegacyEvent wrapper
