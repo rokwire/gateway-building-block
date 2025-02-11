@@ -193,8 +193,8 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 	return nil
 }
 
-func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginaitingCalendarIDs []string) error {
-	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs, dataOriginaitingCalendarIDs)
+func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error {
+	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs, dataOriginatingCalendarIDs)
 	if err != nil {
 		return nil
 	}
@@ -226,12 +226,12 @@ func (a appAdmin) GetWebtoolsCalendarIDs() (*model.WebToolsCalendarIDs, error) {
 		return nil, err
 	}
 
-	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginaitingCalendarIDsBlacklistData()
+	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsBlacklistData()
 	if err != nil {
 		return nil, err
 	}
 
-	response := model.WebToolsCalendarIDs{WebtoolsOriginaitingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginaitingCalendarIDs: blacklistedCalendarIDs}
+	response := model.WebToolsCalendarIDs{WebtoolsOriginatingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginatingCalendarIDs: blacklistedCalendarIDs}
 
 	return &response, nil
 }

@@ -262,16 +262,16 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 		}
 	}
 
-	var dataOriginaitingCalendarIDs []string
-	if requestData.DataOriginaitingCalendarIds != nil {
-		for _, w := range *requestData.DataOriginaitingCalendarIds {
+	var dataOriginatingCalendarIDs []string
+	if requestData.DataOriginatingCalendarIds != nil {
+		for _, w := range *requestData.DataOriginatingCalendarIds {
 			if w != "" {
-				dataOriginaitingCalendarIDs = append(dataOriginaitingCalendarIDs, w)
+				dataOriginatingCalendarIDs = append(dataOriginatingCalendarIDs, w)
 			}
 		}
 	}
 
-	err = h.app.Admin.AddWebtoolsBlackList(dataSourceIDs, dataCalendarIDs, dataOriginaitingCalendarIDs)
+	err = h.app.Admin.AddWebtoolsBlackList(dataSourceIDs, dataCalendarIDs, dataOriginatingCalendarIDs)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}

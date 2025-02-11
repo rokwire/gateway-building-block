@@ -246,15 +246,15 @@ type DeleteApiAdminWebtoolsBlacklistParams struct {
 	// CalendarIds A comma-separated list of ids
 	CalendarIds *string `form:"calendar_ids,omitempty" json:"calendar_ids,omitempty"`
 
-	// OriginaitingCalendarIds A comma-separated list of ids
-	OriginaitingCalendarIds *string `form:"originaiting_calendar_ids,omitempty" json:"originaiting_calendar_ids,omitempty"`
+	// OriginatingCalendarIds A comma-separated list of ids
+	OriginatingCalendarIds *string `form:"originating_calendar_ids,omitempty" json:"originating_calendar_ids,omitempty"`
 }
 
 // PutApiAdminWebtoolsBlacklistJSONBody defines parameters for PutApiAdminWebtoolsBlacklist.
 type PutApiAdminWebtoolsBlacklistJSONBody struct {
-	DataCalendarIds             *[]string `json:"data_calendar_ids"`
-	DataOriginaitingCalendarIds *[]string `json:"data_originaiting_calendar_ids"`
-	DataSourceIds               *[]string `json:"data_source_ids"`
+	DataCalendarIds            *[]string `json:"data_calendar_ids"`
+	DataOriginatingCalendarIds *[]string `json:"data_originating_calendar_ids"`
+	DataSourceIds              *[]string `json:"data_source_ids"`
 }
 
 // GetApiBbsAppointmentsPeopleParams defines parameters for GetApiBbsAppointmentsPeople.

@@ -430,7 +430,7 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, erro
 }
 
 // AddWebtoolsBlacklistData update data from the database
-func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginaitingCalendarIDs []string) error {
+func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error {
 	if dataSourceIDs != nil {
 		filterSource := bson.M{"name": "webtools_events_ids"}
 		updateSource := bson.M{
@@ -458,11 +458,11 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 		}
 	}
 
-	if dataOriginaitingCalendarIDs != nil {
-		filterCalendar := bson.M{"name": "webtools_originaiting_calendar_ids"}
+	if dataOriginatingCalendarIDs != nil {
+		filterCalendar := bson.M{"name": "webtools_originating_calendar_ids"}
 		updateCalendar := bson.M{
 			"$addToSet": bson.M{
-				"data": bson.M{"$each": dataOriginaitingCalendarIDs},
+				"data": bson.M{"$each": dataOriginatingCalendarIDs},
 			},
 		}
 
@@ -522,9 +522,9 @@ func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	return dataSource, nil
 }
 
-// FindWebtoolsOriginaitingCalendarIDsBlacklistData finds all webtools blacklist from the database
-func (a *Adapter) FindWebtoolsOriginaitingCalendarIDsBlacklistData() ([]model.WebToolsItem, error) {
-	filterSource := bson.M{"name": "webtools_originaiting_calendar_ids"}
+// FindWebtoolsOriginatingCalendarIDsBlacklistData finds all webtools blacklist from the database
+func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error) {
+	filterSource := bson.M{"name": "webtools_originating_calendar_ids"}
 	var dataSource []model.WebToolsItem
 	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
 	if err != nil {

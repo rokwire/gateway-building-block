@@ -483,7 +483,7 @@ paths:
                   nullable: true
                   items:
                     type: string
-                data_originaiting_calendar_ids:
+                data_originating_calendar_ids:
                   type: array
                   nullable: true
                   items:
@@ -549,7 +549,7 @@ paths:
           explode: false
           schema:
             type: string
-        - name: originaiting_calendar_ids
+        - name: originating_calendar_ids
           in: query
           description: A comma-separated list of ids
           required: false
