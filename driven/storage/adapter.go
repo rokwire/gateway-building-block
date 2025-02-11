@@ -477,7 +477,7 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 }
 
 // RemoveWebtoolsBlacklistData update data from the database
-func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error {
 	if dataSourceIDs != nil {
 		filterSource := bson.M{"name": "webtools_events_ids"}
 		updateSource := bson.M{
@@ -496,6 +496,21 @@ func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 		updateCalendar := bson.M{
 			"$pull": bson.M{
 				"data": bson.M{"$in": dataCalendarIDs},
+			},
+		}
+
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+		if err != nil {
+			return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+		}
+
+	}
+
+	if dataOriginatingCalendarIdsList != nil {
+		filterCalendar := bson.M{"name": "webtools_originating_calendar_ids"}
+		updateCalendar := bson.M{
+			"$pull": bson.M{
+				"data": bson.M{"$in": dataOriginatingCalendarIdsList},
 			},
 		}
 

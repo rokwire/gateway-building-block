@@ -211,8 +211,8 @@ func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsItem, error) {
 	return blacklist, nil
 }
 
-func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []string) error {
-	err := a.app.storage.RemoveWebtoolsBlacklistData(sourceIds, calendarids)
+func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []string, originatingCalendarIdsList []string) error {
+	err := a.app.storage.RemoveWebtoolsBlacklistData(sourceIds, calendarids, originatingCalendarIdsList)
 	if err != nil {
 		return nil
 	}

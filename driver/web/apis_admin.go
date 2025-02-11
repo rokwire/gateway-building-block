@@ -313,7 +313,16 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 		calendarIdsList = nil
 	}
 
-	err := h.app.Admin.RemoveWebtoolsBlackList(sourceIdsList, calendarIdsList)
+	var originatingCalendarIdsList []string
+	originatingCalendarIdsArg := r.URL.Query().Get("originaiting_calendar_ids")
+
+	if originatingCalendarIdsArg != "" {
+		originatingCalendarIdsList = strings.Split(originatingCalendarIdsArg, ",")
+	} else {
+		originatingCalendarIdsList = nil
+	}
+
+	err := h.app.Admin.RemoveWebtoolsBlackList(sourceIdsList, calendarIdsList, originatingCalendarIdsList)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}

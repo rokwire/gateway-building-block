@@ -64,7 +64,7 @@ type Admin interface {
 	DeleteConfig(id string, claims *tokenauth.Claims) error
 	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
 	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
-	RemoveWebtoolsBlackList(sourceids []string, calendarids []string) error
+	RemoveWebtoolsBlackList(sourceids []string, calendarids []string, originatingCalendarIdsList []string) error
 	GetWebtoolsCalendarIDs() (*model.WebToolsCalendarIDs, error)
 }
 
@@ -150,7 +150,7 @@ type Storage interface {
 
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
-	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
+	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error
 	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error)
 
 	FindImageItems() ([]model.ContentImagesURL, error)
