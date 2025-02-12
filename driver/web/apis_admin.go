@@ -314,7 +314,7 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 	}
 
 	var originatingCalendarIdsList []string
-	originatingCalendarIdsArg := r.URL.Query().Get("originaiting_calendar_ids")
+	originatingCalendarIdsArg := r.URL.Query().Get("originating_calendar_ids")
 
 	if originatingCalendarIdsArg != "" {
 		originatingCalendarIdsList = strings.Split(originatingCalendarIdsArg, ",")
