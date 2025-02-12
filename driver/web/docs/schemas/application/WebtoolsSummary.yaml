@@ -3,7 +3,7 @@ properties:
   webtools_calendar_ids:
     type: array
     items:
-      $ref: "./WebtoolsCalendarID.yaml"
+      $ref: "./WebtoolsSummaryItem.yaml"
   blacklisted_calendar_ids:
     type: array
     items:

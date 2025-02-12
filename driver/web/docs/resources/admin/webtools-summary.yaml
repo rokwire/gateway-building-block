@@ -1,9 +1,9 @@
 get:
   tags:
   - Admin
-  summary: Get all webtools calendar ids
+  summary: Get webtools summary
   description: |
-    Get all webtools calendar ids
+    Get webtools summary
   security:
     - bearerAuth: []
   responses:
@@ -12,7 +12,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../schemas/application/WebtoolsCalendarIDs.yaml"
+            $ref: "../../schemas/application/WebtoolsSummary.yaml"
     400:
       description: Bad request
     401:

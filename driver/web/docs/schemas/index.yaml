@@ -29,10 +29,10 @@ Question:
   $ref: "./application/Question.yaml"
 WebtoolsBlacklistItems: 
   $ref: "./application/WebtoolsBlacklistItems.yaml" 
-WebtoolsCalendarID: 
-  $ref: "./application/WebtoolsCalendarID.yaml"   
-WebtoolsCalendarIDs: 
-  $ref: "./application/WebtoolsCalendarIDs.yaml"     
+WebtoolsSummaryItem: 
+  $ref: "./application/WebtoolsSummaryItem.yaml"   
+WebtoolsSummary: 
+  $ref: "./application/WebtoolsSummary.yaml"     
 
 # ADMIN section
 

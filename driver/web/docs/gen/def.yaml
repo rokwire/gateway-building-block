@@ -571,13 +571,13 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/admin/webtools-calendarIDs:
+  /api/admin/webtools-summary:
     get:
       tags:
         - Admin
-      summary: Get all webtools calendar ids
+      summary: Get webtools summary
       description: |
-        Get all webtools calendar ids
+        Get webtools summary
       security:
         - bearerAuth: []
       responses:
@@ -586,7 +586,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebtoolsCalendarIDs'
+                $ref: '#/components/schemas/WebtoolsSummary'
         '400':
           description: Bad request
         '401':
@@ -1615,20 +1615,20 @@ components:
           type: array
           items:
             type: string
-    WebtoolsCalendarID:
+    WebtoolsSummaryItem:
       type: object
       properties:
         count:
           type: integer
         calendar_id:
           type: string
-    WebtoolsCalendarIDs:
+    WebtoolsSummary:
       type: object
       properties:
         webtools_calendar_ids:
           type: array
           items:
-            $ref: '#/components/schemas/WebtoolsCalendarID'
+            $ref: '#/components/schemas/WebtoolsSummaryItem'
         blacklisted_calendar_ids:
           type: array
           items:
