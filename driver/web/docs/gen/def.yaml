@@ -1620,16 +1620,16 @@ components:
       properties:
         count:
           type: integer
-        calendar_id:
+        id:
           type: string
     WebtoolsSummary:
       type: object
       properties:
-        webtools_calendar_ids:
+        originating_calendar_ids:
           type: array
           items:
             $ref: '#/components/schemas/WebtoolsSummaryItem'
-        blacklisted_calendar_ids:
+        blacklisted_originating_calendar_ids:
           type: array
           items:
             $ref: '#/components/schemas/WebtoolsBlacklistItems'

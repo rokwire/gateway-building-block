@@ -178,14 +178,14 @@ type WebtoolsBlacklistItems struct {
 
 // WebtoolsSummary defines model for WebtoolsSummary.
 type WebtoolsSummary struct {
-	BlacklistedCalendarIds *[]WebtoolsBlacklistItems `json:"blacklisted_calendar_ids,omitempty"`
-	WebtoolsCalendarIds    *[]WebtoolsSummaryItem    `json:"webtools_calendar_ids,omitempty"`
+	BlacklistedOriginatingCalendarIds *[]WebtoolsBlacklistItems `json:"blacklisted_originating_calendar_ids,omitempty"`
+	OriginatingCalendarIds            *[]WebtoolsSummaryItem    `json:"originating_calendar_ids,omitempty"`
 }
 
 // WebtoolsSummaryItem defines model for WebtoolsSummaryItem.
 type WebtoolsSummaryItem struct {
-	CalendarId *string `json:"calendar_id,omitempty"`
-	Count      *int    `json:"count,omitempty"`
+	Count *int    `json:"count,omitempty"`
+	Id    *string `json:"id,omitempty"`
 }
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
