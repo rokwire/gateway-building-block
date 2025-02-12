@@ -105,7 +105,7 @@ type WebToolsCalendarID struct {
 	Name  string `json:"id" bson:"originatingCalendarId"`
 }
 
-// WebToolsCalendarIDs represents web tools originating calendar ids
+// WebToolsSummary represents web tools summary
 type WebToolsSummary struct {
 	WebtoolsOriginatingCalendarIDs    []WebToolsCalendarID `json:"originating_calendar_ids"`
 	BlackListedOriginatingCalendarIDs []WebToolsItem       `json:"blacklisted_originating_calendar_ids"`
