@@ -459,17 +459,24 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 	}
 
 	if dataOriginatingCalendarIDs != nil {
-		filterCalendar := bson.M{"name": "webtools_originating_calendar_ids"}
+		filterCalendar := bson.M{
+			"_id":  "3",
+			"name": "webtools_originating_calendar_ids",
+		}
+
 		updateCalendar := bson.M{
 			"$addToSet": bson.M{
 				"data": bson.M{"$each": dataOriginatingCalendarIDs},
 			},
 		}
 
-		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+		opts := options.Update().SetUpsert(true) //create webtools_originating_calendar_ids if it does not exist
+
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, opts)
 		if err != nil {
 			return errors.WrapErrorAction(logutils.ActionUpdate, "", filterArgs(filterCalendar), err)
 		}
+
 	}
 
 	return nil
