@@ -102,11 +102,11 @@ type WebToolsItem struct {
 // WebToolsCalendarID represents web tools originating calendar ids
 type WebToolsCalendarID struct {
 	Count int    `json:"count"`
-	Name  string `json:"originatingCalendarId" bson:"originatingCalendarId"`
+	Name  string `json:"id" bson:"originatingCalendarId"`
 }
 
 // WebToolsCalendarIDs represents web tools originating calendar ids
-type WebToolsCalendarIDs struct {
+type WebToolsSummary struct {
 	WebtoolsOriginatingCalendarIDs    []WebToolsCalendarID `json:"originating_calendar_ids"`
 	BlackListedOriginatingCalendarIDs []WebToolsItem       `json:"blacklisted_originating_calendar_ids"`
 }

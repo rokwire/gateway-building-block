@@ -330,8 +330,8 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 	return l.HTTPResponseSuccess()
 }
 
-func (h AdminAPIsHandler) getWebtoolsCalendarIDs(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	calendarIDs, err := h.app.Admin.GetWebtoolsCalendarIDs()
+func (h AdminAPIsHandler) getWebtoolsSummary(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	calendarIDs, err := h.app.Admin.GetWebtoolsSummary()
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
