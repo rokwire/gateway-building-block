@@ -193,8 +193,8 @@ func (a appAdmin) DeleteConfig(id string, claims *tokenauth.Claims) error {
 	return nil
 }
 
-func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string) error {
-	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs)
+func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error {
+	err := a.app.storage.AddWebtoolsBlacklistData(dataSourceIDs, dataCalendarIDs, dataOriginatingCalendarIDs)
 	if err != nil {
 		return nil
 	}
@@ -211,13 +211,29 @@ func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsItem, error) {
 	return blacklist, nil
 }
 
-func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []string) error {
-	err := a.app.storage.RemoveWebtoolsBlacklistData(sourceIds, calendarids)
+func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []string, originatingCalendarIdsList []string) error {
+	err := a.app.storage.RemoveWebtoolsBlacklistData(sourceIds, calendarids, originatingCalendarIdsList)
 	if err != nil {
 		return nil
 	}
 
 	return nil
+}
+
+func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
+	webtoolsCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
+	if err != nil {
+		return nil, err
+	}
+
+	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsBlacklistData()
+	if err != nil {
+		return nil, err
+	}
+
+	response := model.WebToolsSummary{WebtoolsOriginatingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginatingCalendarIDs: blacklistedCalendarIDs}
+
+	return &response, nil
 }
 
 // newAppAdmin creates new appAdmin

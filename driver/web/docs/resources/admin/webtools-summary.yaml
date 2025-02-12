@@ -1,0 +1,21 @@
+get:
+  tags:
+  - Admin
+  summary: Get webtools summary
+  description: |
+    Get webtools summary
+  security:
+    - bearerAuth: []
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/WebtoolsSummary.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error    

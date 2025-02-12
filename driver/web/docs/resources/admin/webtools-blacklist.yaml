@@ -75,6 +75,14 @@ delete:
       explode: false
       schema:
         type: string    
+    - name: originating_calendar_ids
+      in: query
+      description: A comma-separated list of ids
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string       
   responses:
     200:
       description: Success

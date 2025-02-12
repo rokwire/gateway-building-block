@@ -396,8 +396,41 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
+// FindAllWebtoolsCalendarIDs finds and counts all webtools calendar IDs
+func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
+	filter := bson.M{
+		"sync_process_source": "webtools-direct",
+	}
+
+	var list []model.LegacyEventItem
+	timeout := 15 * time.Second // 15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	// Map to store counts of unique originatingCalendarId
+	countMap := make(map[string]int)
+
+	for _, l := range list {
+		calendarID := l.Item.OriginatingCalendarID
+		countMap[calendarID]++
+	}
+
+	// Convert map to slice of WebToolsCalendarID
+	var legacyEvents []model.WebToolsCalendarID
+	for id, count := range countMap {
+		legacyEvents = append(legacyEvents, model.WebToolsCalendarID{
+			Count: count,
+			Name:  id,
+		})
+	}
+
+	return legacyEvents, nil
+}
+
 // AddWebtoolsBlacklistData update data from the database
-func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error {
 	if dataSourceIDs != nil {
 		filterSource := bson.M{"name": "webtools_events_ids"}
 		updateSource := bson.M{
@@ -423,6 +456,26 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 		if err != nil {
 			return errors.WrapErrorAction(logutils.ActionUpdate, "", filterArgs(filterCalendar), err)
 		}
+	}
+
+	if dataOriginatingCalendarIDs != nil {
+		filterCalendar := bson.M{
+			"_id":  "3",
+			"name": "webtools_originating_calendar_ids",
+		}
+
+		updateCalendar := bson.M{
+			"$addToSet": bson.M{
+				"data": bson.M{"$each": dataOriginatingCalendarIDs},
+			},
+		}
+
+		opts := options.Update().SetUpsert(true) //create webtools_originating_calendar_ids if it does not exist
+
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, opts)
+		if err != nil {
+			return errors.WrapErrorAction(logutils.ActionUpdate, "", filterArgs(filterCalendar), err)
+		}
 
 	}
 
@@ -431,7 +484,7 @@ func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarI
 }
 
 // RemoveWebtoolsBlacklistData update data from the database
-func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error {
+func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error {
 	if dataSourceIDs != nil {
 		filterSource := bson.M{"name": "webtools_events_ids"}
 		updateSource := bson.M{
@@ -460,6 +513,21 @@ func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 
 	}
 
+	if dataOriginatingCalendarIdsList != nil {
+		filterCalendar := bson.M{"name": "webtools_originating_calendar_ids"}
+		updateCalendar := bson.M{
+			"$pull": bson.M{
+				"data": bson.M{"$in": dataOriginatingCalendarIdsList},
+			},
+		}
+
+		_, err := a.db.webtoolsBlacklistItems.UpdateOne(a.context, filterCalendar, updateCalendar, nil)
+		if err != nil {
+			return errors.WrapErrorAction(logutils.ActionUpdate, model.TypeExample, filterArgs(filterCalendar), err)
+		}
+
+	}
+
 	return nil
 
 }
@@ -474,6 +542,34 @@ func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	}
 
 	return dataSource, nil
+}
+
+// FindWebtoolsOriginatingCalendarIDsBlacklistData finds all webtools blacklist from the database
+func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error) {
+	filterSource := bson.M{"name": "webtools_originating_calendar_ids"}
+	var dataSource []model.WebToolsItem
+	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return dataSource, nil
+}
+
+// FindWebtoolsLegacyEventByID finds webtool legacy event by the IDs of the items
+func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error) {
+	filter := bson.M{
+		"sync_process_source": "webtools-direct",
+		"item.id":             bson.M{"$in": ids}, // Correctly filter by multiple IDs
+	}
+
+	var webtoolsLegacyEvent []model.LegacyEventItem
+	err := a.db.legacyEvents.FindWithContext(nil, filter, &webtoolsLegacyEvent, nil) // Use Find instead of FindOne
+	if err != nil {
+		return nil, err
+	}
+
+	return webtoolsLegacyEvent, nil
 }
 
 // PerformTransaction performs a transaction

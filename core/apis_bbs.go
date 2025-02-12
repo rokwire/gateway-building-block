@@ -131,6 +131,12 @@ func (a appBBs) isBlacklisted(blacklists []model.WebToolsItem, event model.Legac
 					return true
 				}
 			}
+		case "webtools_originating_calendar_ids":
+			for _, id := range blacklist.Data {
+				if event.OriginatingCalendarID == id {
+					return true
+				}
+			}
 		}
 	}
 	return false
