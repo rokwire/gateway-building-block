@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Rokwire Gateway Building Block API
   description: Gateway Building Block API Documentation
-  version: 2.12.3
+  version: 2.13.0
 servers:
   - url: 'https://api.rokwire.illinois.edu/gateway'
     description: Production server
@@ -67,6 +67,8 @@ paths:
     $ref: "./resources/admin/configs-id.yaml"
   /api/admin/webtools-blacklist:
     $ref: "./resources/admin/webtools-blacklist.yaml"  
+  /api/admin/webtools-summary:
+    $ref: "./resources/admin/webtools-summary.yaml"      
 
   # BBs
   /api/bbs/examples/{id}:

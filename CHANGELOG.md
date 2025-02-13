@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+## [2.13.0] - 2025-02-13
+### Added
+- Get all webtools calendar ids [#125] (https://github.com/rokwire/gateway-building-block/issues/125)
+
 ## [2.12.3] - 2025-01-28
 ### Changed
 - updated launch procedures to skip pre-loading the wayfinding data.

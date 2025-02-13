@@ -62,9 +62,10 @@ type Admin interface {
 	CreateConfig(config model.Config, claims *tokenauth.Claims) (*model.Config, error)
 	UpdateConfig(config model.Config, claims *tokenauth.Claims) error
 	DeleteConfig(id string, claims *tokenauth.Claims) error
-	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string) error
+	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
 	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
-	RemoveWebtoolsBlackList(sourceids []string, calendarids []string) error
+	RemoveWebtoolsBlackList(sourceids []string, calendarids []string, originatingCalendarIdsList []string) error
+	GetWebtoolsSummary() (*model.WebToolsSummary, error)
 }
 
 // BBs exposes Building Block APIs for the driver adapters
@@ -144,10 +145,13 @@ type Storage interface {
 	DeleteLegacyEventsBySourceID(context storage.TransactionContext, sourceID string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
+	FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
+	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
 
 	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
-	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
-	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string) error
+	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
+	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error
+	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error)
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error
