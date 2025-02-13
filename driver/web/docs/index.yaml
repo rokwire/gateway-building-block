@@ -67,6 +67,8 @@ paths:
     $ref: "./resources/admin/configs-id.yaml"
   /api/admin/webtools-blacklist:
     $ref: "./resources/admin/webtools-blacklist.yaml"  
+  /api/admin/webtools-summary:
+    $ref: "./resources/admin/webtools-summary.yaml"      
 
   # BBs
   /api/bbs/examples/{id}:

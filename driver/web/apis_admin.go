@@ -262,7 +262,16 @@ func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, cla
 		}
 	}
 
-	err = h.app.Admin.AddWebtoolsBlackList(dataSourceIDs, dataCalendarIDs)
+	var dataOriginatingCalendarIDs []string
+	if requestData.DataOriginatingCalendarIds != nil {
+		for _, w := range *requestData.DataOriginatingCalendarIds {
+			if w != "" {
+				dataOriginatingCalendarIDs = append(dataOriginatingCalendarIDs, w)
+			}
+		}
+	}
+
+	err = h.app.Admin.AddWebtoolsBlackList(dataSourceIDs, dataCalendarIDs, dataOriginatingCalendarIDs)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
@@ -304,12 +313,35 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 		calendarIdsList = nil
 	}
 
-	err := h.app.Admin.RemoveWebtoolsBlackList(sourceIdsList, calendarIdsList)
+	var originatingCalendarIdsList []string
+	originatingCalendarIdsArg := r.URL.Query().Get("originating_calendar_ids")
+
+	if originatingCalendarIdsArg != "" {
+		originatingCalendarIdsList = strings.Split(originatingCalendarIdsArg, ",")
+	} else {
+		originatingCalendarIdsList = nil
+	}
+
+	err := h.app.Admin.RemoveWebtoolsBlackList(sourceIdsList, calendarIdsList, originatingCalendarIdsList)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
 
 	return l.HTTPResponseSuccess()
+}
+
+func (h AdminAPIsHandler) getWebtoolsSummary(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	calendarIDs, err := h.app.Admin.GetWebtoolsSummary()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	data, err := json.Marshal(calendarIDs)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(data)
 }
 
 // NewAdminAPIsHandler creates new rest Handler instance
