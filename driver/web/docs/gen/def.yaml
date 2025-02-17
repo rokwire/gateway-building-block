@@ -578,6 +578,8 @@ paths:
       summary: Get webtools summary
       description: |
         Get webtools summary
+
+         **Auth:** Requires valid admin token and "all_webtools" permission
       security:
         - bearerAuth: []
       responses:
