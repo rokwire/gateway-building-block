@@ -32,7 +32,9 @@ WebtoolsBlacklistItems:
 WebtoolsSummaryItem: 
   $ref: "./application/WebtoolsSummaryItem.yaml"   
 WebtoolsSummary: 
-  $ref: "./application/WebtoolsSummary.yaml"     
+  $ref: "./application/WebtoolsSummary.yaml"    
+WebtoolsSummaryList: 
+  $ref: "./application/WebtoolsSummaryList.yaml"    
 
 # ADMIN section
 

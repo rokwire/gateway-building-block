@@ -1635,6 +1635,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WebtoolsBlacklistItems'
+    WebtoolsSummaryList:
+      type: object
+      properties:
+        total_calendars_count:
+          type: integer
+        total_events_count:
+          type: integer
+        webtools_originating_calendar_ids:
+          items:
+            $ref: '#/components/schemas/WebtoolsSummary'
+        webtools_calendar_ids:
+          items:
+            $ref: '#/components/schemas/WebtoolsSummary'
+        webtools_events_ids:
+          items:
+            $ref: '#/components/schemas/WebtoolsSummary'
     _admin_req_update-configs:
       required:
         - type
