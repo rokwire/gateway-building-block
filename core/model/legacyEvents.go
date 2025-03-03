@@ -99,16 +99,52 @@ type WebToolsItem struct {
 	Data []string `json:"data" bson:"data"`
 }
 
-// WebToolsCalendarID represents web tools originating calendar ids
-type WebToolsCalendarID struct {
+// WebToolsOriginatingCalendarID represents web tools originating calendar ids
+type WebToolsOriginatingCalendarID struct {
 	Count int    `json:"count"`
 	Name  string `json:"id" bson:"originatingCalendarId"`
 }
 
-// WebToolsSummary represents web tools summary
+// WebToolsOriginatingCalendarIDsSummary represents web tools summary
+type WebToolsOriginatingCalendarIDsSummary struct {
+	WebtoolsOriginatingCalendarIDs    []WebToolsOriginatingCalendarID `json:"list"`
+	BlackListedOriginatingCalendarIDs []WebToolsItem                  `json:"blacklisted_originating_calendar_ids"`
+}
+
+// WebToolsCalendarID represents web tools originating calendar ids
+type WebToolsCalendarID struct {
+	Count int    `json:"count"`
+	Name  string `json:"id" bson:"calendarId"`
+}
+
+// WebToolsCalendarIDsSummary represents web tools summary
+type WebToolsCalendarIDsSummary struct {
+	WebtoolsCalendarIDs    []WebToolsCalendarID `json:"list"`
+	BlackListedCalendarIDs []WebToolsItem       `json:"blacklisted_calendar_ids"`
+}
+
+// WebToolsEventID represents web tools originating calendar ids
+type WebToolsEventID struct {
+	Count int    `json:"count"`
+	Name  string `json:"id" bson:"dataSourceEventId"`
+}
+
+// WebToolsEventIDsSummary represents web tools summary
+type WebToolsEventIDsSummary struct {
+	WebtoolsEventIDs    []WebToolsEventID `json:"list"`
+	BlackListedEventIDs []WebToolsItem    `json:"blacklisted_events_ids"`
+}
+
 type WebToolsSummary struct {
-	WebtoolsOriginatingCalendarIDs    []WebToolsCalendarID `json:"originating_calendar_ids"`
-	BlackListedOriginatingCalendarIDs []WebToolsItem       `json:"blacklisted_originating_calendar_ids"`
+	EventsCount   int          `json:"total_calendars_count"`
+	CalendarCount int          `json:"total_events_count"`
+	SummaryList   *SummaryList `json:"summary_list"`
+}
+
+type SummaryList struct {
+	EventIDs               *WebToolsEventIDsSummary               `json:"webtools_events_ids"`
+	OriginatingCalendarIDs *WebToolsOriginatingCalendarIDsSummary `json:"webtools_originating_calendar_ids"`
+	CalendarIDs            *WebToolsCalendarIDsSummary            `json:"webtools_calendar_ids"`
 }
 
 // LegacyEvent wrapper
