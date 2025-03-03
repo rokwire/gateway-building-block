@@ -1627,6 +1627,33 @@ components:
     WebtoolsSummary:
       type: object
       properties:
+        total_calendars_count:
+          type: integer
+        total_events_count:
+          type: integer
+        webtools_calendar_ids:
+          items:
+            $ref: '#/components/schemas/WebtoolsCalendarIDsSummary'
+        webtools_originating_calendar_ids:
+          items:
+            $ref: '#/components/schemas/WebtoolsOriginatingCalendarIDsSummary'
+        webtools_events_ids:
+          items:
+            $ref: '#/components/schemas/WebtoolsEventsIDsSummary'
+    WebtoolsCalendarIDsSummary:
+      type: object
+      properties:
+        calendar_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebtoolsSummaryItem'
+        blacklisted_calendar_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebtoolsBlacklistItems'
+    WebtoolsOriginatingCalendarIDsSummary:
+      type: object
+      properties:
         originating_calendar_ids:
           type: array
           items:
@@ -1635,22 +1662,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WebtoolsBlacklistItems'
-    WebtoolsSummaryList:
+    WebtoolsEventsIDsSummary:
       type: object
       properties:
-        total_calendars_count:
-          type: integer
-        total_events_count:
-          type: integer
-        webtools_originating_calendar_ids:
+        events_ids:
+          type: array
           items:
-            $ref: '#/components/schemas/WebtoolsSummary'
-        webtools_calendar_ids:
+            $ref: '#/components/schemas/WebtoolsSummaryItem'
+        blacklisted_events_ids:
+          type: array
           items:
-            $ref: '#/components/schemas/WebtoolsSummary'
-        webtools_events_ids:
-          items:
-            $ref: '#/components/schemas/WebtoolsSummary'
+            $ref: '#/components/schemas/WebtoolsBlacklistItems'
     _admin_req_update-configs:
       required:
         - type

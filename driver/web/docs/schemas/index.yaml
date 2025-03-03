@@ -33,8 +33,13 @@ WebtoolsSummaryItem:
   $ref: "./application/WebtoolsSummaryItem.yaml"   
 WebtoolsSummary: 
   $ref: "./application/WebtoolsSummary.yaml"    
-WebtoolsSummaryList: 
-  $ref: "./application/WebtoolsSummaryList.yaml"    
+WebtoolsCalendarIDsSummary: 
+  $ref: "./application/WebtoolsCalendarIDsSummary.yaml"
+WebtoolsOriginatingCalendarIDsSummary: 
+  $ref: "./application/WebtoolsOriginatingCalendarIDsSummary.yaml"
+WebtoolsEventsIDsSummary: 
+  $ref: "./application/WebtoolsEventsIDsSummary.yaml"
+   
 
 # ADMIN section
 

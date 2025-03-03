@@ -1,0 +1,10 @@
+type: object
+properties:
+  events_ids:
+    type: array
+    items:
+      $ref: "./WebtoolsSummaryItem.yaml"
+  blacklisted_events_ids:
+    type: array
+    items:
+      $ref: "./WebtoolsBlacklistItems.yaml"

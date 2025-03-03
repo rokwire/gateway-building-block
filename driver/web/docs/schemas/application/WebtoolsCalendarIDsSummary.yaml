@@ -1,0 +1,10 @@
+type: object
+properties:
+  calendar_ids:
+    type: array
+    items:
+      $ref: "./WebtoolsSummaryItem.yaml"
+  blacklisted_calendar_ids:
+    type: array
+    items:
+      $ref: "./WebtoolsBlacklistItems.yaml"

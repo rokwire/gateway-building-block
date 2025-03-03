@@ -176,10 +176,31 @@ type WebtoolsBlacklistItems struct {
 	Name *string   `json:"name,omitempty"`
 }
 
-// WebtoolsSummary defines model for WebtoolsSummary.
-type WebtoolsSummary struct {
+// WebtoolsCalendarIDsSummary defines model for WebtoolsCalendarIDsSummary.
+type WebtoolsCalendarIDsSummary struct {
+	BlacklistedCalendarIds *[]WebtoolsBlacklistItems `json:"blacklisted_calendar_ids,omitempty"`
+	CalendarIds            *[]WebtoolsSummaryItem    `json:"calendar_ids,omitempty"`
+}
+
+// WebtoolsEventsIDsSummary defines model for WebtoolsEventsIDsSummary.
+type WebtoolsEventsIDsSummary struct {
+	BlacklistedEventsIds *[]WebtoolsBlacklistItems `json:"blacklisted_events_ids,omitempty"`
+	EventsIds            *[]WebtoolsSummaryItem    `json:"events_ids,omitempty"`
+}
+
+// WebtoolsOriginatingCalendarIDsSummary defines model for WebtoolsOriginatingCalendarIDsSummary.
+type WebtoolsOriginatingCalendarIDsSummary struct {
 	BlacklistedOriginatingCalendarIds *[]WebtoolsBlacklistItems `json:"blacklisted_originating_calendar_ids,omitempty"`
 	OriginatingCalendarIds            *[]WebtoolsSummaryItem    `json:"originating_calendar_ids,omitempty"`
+}
+
+// WebtoolsSummary defines model for WebtoolsSummary.
+type WebtoolsSummary struct {
+	TotalCalendarsCount            *int         `json:"total_calendars_count,omitempty"`
+	TotalEventsCount               *int         `json:"total_events_count,omitempty"`
+	WebtoolsCalendarIds            *interface{} `json:"webtools_calendar_ids,omitempty"`
+	WebtoolsEventsIds              *interface{} `json:"webtools_events_ids,omitempty"`
+	WebtoolsOriginatingCalendarIds *interface{} `json:"webtools_originating_calendar_ids,omitempty"`
 }
 
 // WebtoolsSummaryItem defines model for WebtoolsSummaryItem.
