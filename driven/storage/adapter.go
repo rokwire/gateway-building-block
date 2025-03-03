@@ -397,7 +397,7 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 }
 
 // FindAllWebtoolsCalendarIDs finds and counts all webtools calendar IDs
-func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
+func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsOriginatingCalendarID, error) {
 	filter := bson.M{
 		"sync_process_source": "webtools-direct",
 	}
@@ -418,15 +418,15 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, erro
 	}
 
 	// Convert map to slice of WebToolsCalendarID
-	var legacyEvents []model.WebToolsCalendarID
+	var originatingCalendarID []model.WebToolsOriginatingCalendarID
 	for id, count := range countMap {
-		legacyEvents = append(legacyEvents, model.WebToolsCalendarID{
+		originatingCalendarID = append(originatingCalendarID, model.WebToolsOriginatingCalendarID{
 			Count: count,
 			Name:  id,
 		})
 	}
 
-	return legacyEvents, nil
+	return originatingCalendarID, nil
 }
 
 // AddWebtoolsBlacklistData update data from the database
