@@ -397,7 +397,7 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 }
 
 // FindAllWebtoolsCalendarIDs finds and counts all webtools calendar IDs
-func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsOriginatingCalendarID, error) {
+func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsOriginatingCalendarID, []model.WebToolsItem, error) {
 	filter := bson.M{
 		"sync_process_source": "webtools-direct",
 	}
@@ -406,7 +406,7 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsOriginatingCalen
 	timeout := 15 * time.Second // 15 seconds timeout
 	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Map to store counts of unique originatingCalendarId
@@ -426,7 +426,14 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsOriginatingCalen
 		})
 	}
 
-	return originatingCalendarID, nil
+	filterSource := bson.M{"name": "webtools_originating_calendar_ids"}
+	var blackListedOriginatingCalendarIDs []model.WebToolsItem
+	err = a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &blackListedOriginatingCalendarIDs, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return originatingCalendarID, blackListedOriginatingCalendarIDs, nil
 }
 
 // AddWebtoolsBlacklistData update data from the database
@@ -535,18 +542,6 @@ func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 // FindWebtoolsBlacklistData finds all webtools blacklist from the database
 func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
 	filterSource := bson.M{}
-	var dataSource []model.WebToolsItem
-	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return dataSource, nil
-}
-
-// FindWebtoolsOriginatingCalendarIDsBlacklistData finds all webtools blacklist from the database
-func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error) {
-	filterSource := bson.M{"name": "webtools_originating_calendar_ids"}
 	var dataSource []model.WebToolsItem
 	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
 	if err != nil {
