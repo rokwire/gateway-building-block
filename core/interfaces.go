@@ -147,6 +147,7 @@ type Storage interface {
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
 	FindWebtoolsOriginatingCalendarIDsSummary() ([]model.WebToolsOriginatingCalendarID, []model.WebToolsItem, error)
 	FindWebtoolsCalendarIDsSummary() ([]model.WebToolsCalendarID, []model.WebToolsItem, error)
+	FindWebtoolsEventIDsSummary() ([]model.WebToolsEventID, []model.WebToolsItem, error)
 
 	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
 

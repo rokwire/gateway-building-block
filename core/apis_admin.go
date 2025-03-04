@@ -231,9 +231,15 @@ func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
 		return nil, err
 	}
 
+	webtoolsEventIDs, blackListedEventIDs, err := a.app.storage.FindWebtoolsEventIDsSummary()
+	if err != nil {
+		return nil, err
+	}
+
 	originatingCalendarIDs := model.WebToolsOriginatingCalendarIDsSummary{WebtoolsOriginatingCalendarIDs: webtoolsOriginatingCalendarIDs, BlackListedOriginatingCalendarIDs: blackListedOriginatingCalendarIDs}
 	calendarIDs := model.WebToolsCalendarIDsSummary{WebtoolsCalendarIDs: webtoolsCalendarIDs, BlackListedCalendarIDs: blackListedCalendarIDs}
-	summaryList := model.SummaryList{OriginatingCalendarIDs: &originatingCalendarIDs, CalendarIDs: &calendarIDs}
+	eventIDs := model.WebToolsEventIDsSummary{WebtoolsEventIDs: webtoolsEventIDs, BlackListedEventIDs: blackListedEventIDs}
+	summaryList := model.SummaryList{OriginatingCalendarIDs: &originatingCalendarIDs, CalendarIDs: &calendarIDs, EventIDs: &eventIDs}
 
 	response := model.WebToolsSummary{SummaryList: &summaryList}
 

@@ -476,6 +476,47 @@ func (a *Adapter) FindWebtoolsCalendarIDsSummary() ([]model.WebToolsCalendarID, 
 	return calendarID, blackListedCalendarIDs, nil
 }
 
+// FindWebtoolsEventsrIDsSummary finds and counts all webtools events and the blacklisted onces
+func (a *Adapter) FindWebtoolsEventIDsSummary() ([]model.WebToolsEventID, []model.WebToolsItem, error) {
+	filter := bson.M{
+		"sync_process_source": "webtools-direct",
+	}
+
+	var list []model.LegacyEventItem
+	timeout := 15 * time.Second // 15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	countMap := make(map[string]int)
+	nameMap := make(map[string]string)
+
+	for _, l := range list {
+		eventID := l.Item.DataSourceEventID
+		countMap[eventID]++
+		nameMap[eventID] = l.Item.OriginatingCalendarName
+	}
+
+	var eventID []model.WebToolsEventID
+	for id, count := range countMap {
+		eventID = append(eventID, model.WebToolsEventID{
+			Count: count,
+			ID:    id,
+			Name:  nameMap[id],
+		})
+	}
+
+	filterSource := bson.M{"name": "webtools_events_ids"}
+	var blackListedOriginatingCalendarIDs []model.WebToolsItem
+	err = a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &blackListedOriginatingCalendarIDs, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return eventID, blackListedOriginatingCalendarIDs, nil
+}
+
 // AddWebtoolsBlacklistData update data from the database
 func (a *Adapter) AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error {
 	if dataSourceIDs != nil {
