@@ -409,20 +409,21 @@ func (a *Adapter) FindWebtoolsOriginatingCalendarIDsSummary() ([]model.WebToolsO
 		return nil, nil, err
 	}
 
-	// Map to store counts of unique originatingCalendarId
 	countMap := make(map[string]int)
+	nameMap := make(map[string]string)
 
 	for _, l := range list {
 		calendarID := l.Item.OriginatingCalendarID
 		countMap[calendarID]++
+		nameMap[calendarID] = l.Item.OriginatingCalendarName
 	}
 
-	// Convert map to slice of WebToolsCalendarID
 	var originatingCalendarID []model.WebToolsOriginatingCalendarID
 	for id, count := range countMap {
 		originatingCalendarID = append(originatingCalendarID, model.WebToolsOriginatingCalendarID{
 			Count: count,
-			Name:  id,
+			ID:    id,
+			Name:  nameMap[id],
 		})
 	}
 
@@ -449,7 +450,6 @@ func (a *Adapter) FindWebtoolsCalendarIDsSummary() ([]model.WebToolsCalendarID, 
 		return nil, nil, err
 	}
 
-	// Map to store counts of unique originatingCalendarId
 	countMap := make(map[string]int)
 
 	for _, l := range list {
@@ -462,7 +462,7 @@ func (a *Adapter) FindWebtoolsCalendarIDsSummary() ([]model.WebToolsCalendarID, 
 	for id, count := range countMap {
 		calendarID = append(calendarID, model.WebToolsCalendarID{
 			Count: count,
-			Name:  id,
+			ID:    id,
 		})
 	}
 
