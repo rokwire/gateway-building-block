@@ -396,7 +396,7 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
-func (a *Adapter) CountLegacyEvents(events []model.LegacyEvent) (int64, error) {
+func (a *Adapter) CountWebtoolsLegacyEvents() (int64, error) {
 	filter := bson.M{}
 
 	count, err := a.db.legacyEvents.CountDocuments(nil, filter)
@@ -404,6 +404,53 @@ func (a *Adapter) CountLegacyEvents(events []model.LegacyEvent) (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (a *Adapter) GetCalendarEventsCount() (int, error) {
+	leEvents, err := a.FindAllLegacyEvents()
+	if err != nil {
+		return 0, err
+	}
+
+	blacklist, err := a.FindWebtoolsBlacklistData()
+	if err != nil {
+		return 0, err
+	}
+
+	count := 0
+	for _, le := range leEvents {
+		if !a.isBlacklisted(blacklist, le) {
+			count++
+		}
+	}
+
+	return count, nil
+}
+
+func (a *Adapter) isBlacklisted(blacklists []model.WebToolsItem, event model.LegacyEvent) bool {
+	for _, blacklist := range blacklists {
+		switch blacklist.Name {
+		case "webtools_events_ids":
+			for _, id := range blacklist.Data {
+				if event.DataSourceEventID == id {
+					return true
+				}
+			}
+		case "webtools_calendar_ids":
+			for _, id := range blacklist.Data {
+				if event.CalendarID == id {
+					return true
+				}
+			}
+		case "webtools_originating_calendar_ids":
+			for _, id := range blacklist.Data {
+				if event.OriginatingCalendarID == id {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // FindWebtoolsOriginatingCalendarIDsSummary finds and counts all webtools originating calendar IDs and the blacklisted onces

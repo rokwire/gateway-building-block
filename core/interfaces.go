@@ -145,10 +145,11 @@ type Storage interface {
 	DeleteLegacyEventsBySourceID(context storage.TransactionContext, sourceID string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindAllLegacyEvents() ([]model.LegacyEvent, error)
-	CountLegacyEvents(events []model.LegacyEvent) (int64, error)
+	CountWebtoolsLegacyEvents() (int64, error)
 	FindWebtoolsOriginatingCalendarIDsSummary() ([]model.WebToolsOriginatingCalendarID, []model.WebToolsItem, error)
 	FindWebtoolsCalendarIDsSummary() ([]model.WebToolsCalendarID, []model.WebToolsItem, error)
 	FindWebtoolsEventIDsSummary() ([]model.WebToolsEventID, []model.WebToolsItem, error)
+	GetCalendarEventsCount() (int, error)
 
 	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
 
