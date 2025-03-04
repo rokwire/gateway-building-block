@@ -221,7 +221,7 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 }
 
 func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
-	webtoolsOriginatingCalendarIDs, blackListedOriginatingCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
+	webtoolsOriginatingCalendarIDs, blackListedOriginatingCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsSummary()
 	if err != nil {
 		return nil, err
 	}
