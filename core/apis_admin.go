@@ -221,6 +221,13 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 }
 
 func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
+	webtoolsEvents, err := a.app.storage.FindAllLegacyEvents()
+	if err != nil {
+		return nil, err
+	}
+
+	webtoolsEventsCount, err := a.app.storage.CountLegacyEvents(webtoolsEvents)
+
 	webtoolsOriginatingCalendarIDs, blackListedOriginatingCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsSummary()
 	if err != nil {
 		return nil, err
@@ -241,7 +248,7 @@ func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
 	eventIDs := model.WebToolsEventIDsSummary{WebtoolsEventIDs: webtoolsEventIDs, BlackListedEventIDs: blackListedEventIDs}
 	summaryList := model.SummaryList{OriginatingCalendarIDs: &originatingCalendarIDs, CalendarIDs: &calendarIDs, EventIDs: &eventIDs}
 
-	response := model.WebToolsSummary{SummaryList: &summaryList}
+	response := model.WebToolsSummary{EventsCount: int(webtoolsEventsCount), SummaryList: &summaryList}
 
 	return &response, nil
 

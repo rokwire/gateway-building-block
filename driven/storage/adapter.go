@@ -396,6 +396,16 @@ func (a *Adapter) FindAllLegacyEvents() ([]model.LegacyEvent, error) {
 	return legacyEvents, err
 }
 
+func (a *Adapter) CountLegacyEvents(events []model.LegacyEvent) (int64, error) {
+	filter := bson.M{}
+
+	count, err := a.db.legacyEvents.CountDocuments(nil, filter)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 // FindWebtoolsOriginatingCalendarIDsSummary finds and counts all webtools originating calendar IDs and the blacklisted onces
 func (a *Adapter) FindWebtoolsOriginatingCalendarIDsSummary() ([]model.WebToolsOriginatingCalendarID, []model.WebToolsItem, error) {
 	filter := bson.M{

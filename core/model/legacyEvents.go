@@ -138,8 +138,8 @@ type WebToolsEventIDsSummary struct {
 }
 
 type WebToolsSummary struct {
-	EventsCount   int          `json:"total_calendars_count"`
-	CalendarCount int          `json:"total_events_count"`
+	EventsCount   int          `json:"total_events_count"`
+	CalendarCount int          `json:"total_calendars_count"`
 	SummaryList   *SummaryList `json:"summary_list"`
 }
 
