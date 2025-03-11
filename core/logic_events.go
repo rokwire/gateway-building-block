@@ -21,7 +21,6 @@ import (
 	"application/core/model"
 	"application/driven/storage"
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -48,16 +47,10 @@ type eventsLogic struct {
 
 func (e eventsLogic) start() error {
 
-	//1. check if the initial import must be applied - it happens only once!
-	err := e.importInitialEventsFromEventsBB()
-	if err != nil {
-		return err
-	}
-
-	//2. set up web tools timer
+	//1. set up web tools timer
 	go e.setupWebToolsTimer()
 
-	//3. initialize event locations db if needs
+	//2. initialize event locations db if needs
 	go e.initializeDB()
 
 	return nil
@@ -70,101 +63,6 @@ func (e eventsLogic) initializeDB() {
 	if err != nil {
 		e.logger.Errorf("error on initialzing legacy locations db: %s", err)
 	}
-}
-
-func (e eventsLogic) importInitialEventsFromEventsBB() error {
-	importProcessed := false
-
-	//in transaction
-	err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-
-		//first check if need to import
-		config, err := e.app.storage.FindGlobalConfig(context, "initial-legacy-events-import")
-		if err != nil {
-			return err
-		}
-		if config == nil {
-			return errors.New("no initial legacy events import config added")
-		}
-		processed := config.Data["processed"].(bool)
-		if processed {
-			importProcessed = true
-			return nil //no need to execute processing
-		}
-
-		// we make initial import
-
-		//load the events
-		events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
-		if err != nil {
-			return err
-		}
-
-		//they cannot be 0
-		eventsCount := len(events)
-		if eventsCount == 0 {
-			return errors.New("cannot have 0 events, there is an error")
-		}
-
-		e.logger.Infof("Got %d events from events BB", eventsCount)
-
-		//there are a lot of duplicate items(dataSourceEventId), so we need to fix them
-		fixedEvents := []model.LegacyEvent{}
-		addedItemMap := map[string]bool{}
-		for _, item := range events {
-			if len(item.DataSourceEventID) == 0 {
-				//there are a lot of such items absiously they are used, so add them
-				fixedEvents = append(fixedEvents, item)
-			} else {
-				if _, exists := addedItemMap[item.DataSourceEventID]; exists {
-					e.logger.Infof("Already added %s, so do nothing", item.DataSourceEventID)
-				} else {
-					//not added, so adding it
-					fixedEvents = append(fixedEvents, item)
-
-					//mark it as added
-					addedItemMap[item.DataSourceEventID] = true
-				}
-			}
-		}
-
-		e.logger.Infof("Got %d events after the events fix", len(fixedEvents))
-
-		//prepare the list which we will store
-		syncProcessSource := "events-bb-initial"
-		now := time.Now()
-		resultList := make([]model.LegacyEventItem, len(fixedEvents))
-		for i, le := range fixedEvents {
-			leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
-			resultList[i] = leItem
-		}
-
-		//insert the initial events
-		_, err = e.app.storage.InsertLegacyEvents(context, resultList)
-		if err != nil {
-			return err
-		}
-
-		//mark as processed
-		config.Data["processed"] = true
-		err = e.app.storage.SaveGlobalConfig(context, *config)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}, 60000)
-
-	if err != nil {
-		return err
-	}
-
-	if importProcessed {
-		e.logger.Info("Initial events already imported")
-	} else {
-		e.logger.Info("Successfuly imported initial events")
-	}
-	return nil
 }
 
 func (e eventsLogic) setupWebToolsTimer() {
