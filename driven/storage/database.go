@@ -193,6 +193,12 @@ func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) erro
 		return err
 	}
 
+	//status name
+	err = legacyEvents.AddIndex(bson.D{primitive.E{Key: "status.name", Value: 1}}, false)
+	if err != nil {
+		return err
+	}
+
 	//TODO - add other - source event id - calendar id?
 
 	d.logger.Info("legacy events passed")
