@@ -181,14 +181,32 @@ func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
 func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) error {
 	d.logger.Info("apply legacy events checks.....")
 
-	//id
-	err := legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.id", Value: 1}}, true)
+	//sync_process_source
+	err := legacyEvents.AddIndex(bson.D{primitive.E{Key: "sync_process_source", Value: 1}}, false)
 	if err != nil {
 		return err
 	}
 
-	//sourceId
+	//id
+	err = legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.id", Value: 1}}, true)
+	if err != nil {
+		return err
+	}
+
+	//source id
 	err = legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.sourceId", Value: 1}}, false)
+	if err != nil {
+		return err
+	}
+
+	//calendar id
+	err = legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.calendarId", Value: 1}}, false)
+	if err != nil {
+		return err
+	}
+
+	//originating calendar id
+	err = legacyEvents.AddIndex(bson.D{primitive.E{Key: "item.originatingCalendarId", Value: 1}}, false)
 	if err != nil {
 		return err
 	}
@@ -198,8 +216,6 @@ func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) erro
 	if err != nil {
 		return err
 	}
-
-	//TODO - add other - source event id - calendar id?
 
 	d.logger.Info("legacy events passed")
 	return nil
