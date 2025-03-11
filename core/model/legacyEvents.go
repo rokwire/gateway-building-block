@@ -168,12 +168,19 @@ type SubEvents struct {
 
 // LegacyEventItem represents legacy event entity which contains legacy event + other sync info
 type LegacyEventItem struct {
-	SyncProcessSource string    `bson:"sync_process_source"` //webtools-direct or events-bb-initial or events-tps-api
-	SyncDate          time.Time `bson:"sync_date"`
+	SyncProcessSource string            `bson:"sync_process_source"` //webtools-direct or events-bb-initial or events-tps-api
+	SyncDate          time.Time         `bson:"sync_date"`
+	Status            LegacyEventStatus `bson:"status"`
 
 	Item LegacyEvent `bson:"item"`
 
 	CreateInfo *CreateInfo `bson:"create_info"`
+}
+
+// LegacyEventStatus represents legacy event status
+type LegacyEventStatus struct {
+	Name          string  `bson:"name"` //valid or ignored
+	ReasonIgnored *string `bson:"reason_ignored"`
 }
 
 // ContactLegacy represents event legacy contacts
