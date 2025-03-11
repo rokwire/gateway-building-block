@@ -680,8 +680,9 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	loc := constructLocation(g, locationsData)
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
-		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
-			DataModified: modifiedDate, DateCreated: createdDate,
+		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy,
+			OriginatingCalendarID: g.OriginatingCalendarID, OriginatingCalendarName: g.OriginatingCalendarName,
+			IsVirtial: isVirtual, DataModified: modifiedDate, DateCreated: createdDate,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: loc, Contacts: contatsLegacy,

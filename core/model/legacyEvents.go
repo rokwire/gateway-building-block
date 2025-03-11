@@ -113,39 +113,40 @@ type WebToolsSummary struct {
 
 // LegacyEvent wrapper
 type LegacyEvent struct {
-	AllDay                bool            `json:"allDay" bson:"allDay"`
-	CalendarID            string          `json:"calendarId" bson:"calendarId"`
-	Category              string          `json:"category" bson:"category"`
-	Subcategory           string          `json:"subcategory" bson:"subcategory"`
-	CreatedBy             string          `json:"createdBy" bson:"createdBy"`
-	LongDescription       string          `json:"longDescription" bson:"longDescription"`
-	DataModified          string          `json:"dataModified" bson:"dataModified"`
-	DataSourceEventID     string          `json:"dataSourceEventId" bson:"dataSourceEventId"`
-	DateCreated           string          `json:"dateCreated" bson:"dateCreated"`
-	EndDate               string          `json:"endDate" bson:"endDate"`
-	EventID               string          `json:"eventId" bson:"eventId"`
-	IcalURL               string          `json:"icalUrl" bson:"icalUrl"`
-	ID                    string          `json:"id" bson:"id"`
-	ImageURL              *string         `json:"imageURL" bson:"imageURL"`
-	IsEventFree           bool            `json:"isEventFree" bson:"isEventFree"`
-	IsVirtial             bool            `json:"isVirtual" bson:"isVirtual"`
-	Location              *LocationLegacy `json:"location" bson:"location"`
-	OriginatingCalendarID string          `json:"originatingCalendarId" bson:"originatingCalendarId"`
-	OutlookURL            string          `json:"outlookUrl" bson:"outlookUrl"`
-	RecurrenceID          *int            `json:"recurrenceId" bson:"recurrenceId"`
-	IsSuperEvent          bool            `json:"isSuperEvent" bson:"isSuperEvent"`
-	RecurringFlag         bool            `json:"recurringFlag" bson:"recurringFlag"`
-	SourceID              string          `json:"sourceId" bson:"sourceId"`
-	Sponsor               string          `json:"sponsor" bson:"sponsor"`
-	StartDate             string          `json:"startDate" bson:"startDate"`
-	Title                 string          `json:"title" bson:"title"`
-	TitleURL              string          `json:"titleURL" bson:"titleURL"`
-	Tags                  *[]string       `json:"tags" bson:"tags"`
-	TargetAudience        *[]string       `json:"targetAudience" bson:"targetAudience"`
-	RegistrationURL       string          `json:"registrationURL" bson:"registrationURL"`
-	Contacts              []ContactLegacy `json:"contacts" bson:"contacts"`
-	SubEvents             []SubEvents     `json:"subEvents" bson:"subEvents"`
-	Cost                  string          `json:"cost" bson:"cost"`
+	AllDay                  bool            `json:"allDay" bson:"allDay"`
+	CalendarID              string          `json:"calendarId" bson:"calendarId"`
+	Category                string          `json:"category" bson:"category"`
+	Subcategory             string          `json:"subcategory" bson:"subcategory"`
+	CreatedBy               string          `json:"createdBy" bson:"createdBy"`
+	LongDescription         string          `json:"longDescription" bson:"longDescription"`
+	DataModified            string          `json:"dataModified" bson:"dataModified"`
+	DataSourceEventID       string          `json:"dataSourceEventId" bson:"dataSourceEventId"`
+	DateCreated             string          `json:"dateCreated" bson:"dateCreated"`
+	EndDate                 string          `json:"endDate" bson:"endDate"`
+	EventID                 string          `json:"eventId" bson:"eventId"`
+	IcalURL                 string          `json:"icalUrl" bson:"icalUrl"`
+	ID                      string          `json:"id" bson:"id"`
+	ImageURL                *string         `json:"imageURL" bson:"imageURL"`
+	IsEventFree             bool            `json:"isEventFree" bson:"isEventFree"`
+	IsVirtial               bool            `json:"isVirtual" bson:"isVirtual"`
+	Location                *LocationLegacy `json:"location" bson:"location"`
+	OriginatingCalendarID   string          `json:"originatingCalendarId" bson:"originatingCalendarId"`
+	OriginatingCalendarName string          `json:"originatingCalendarName" bson:"originatingCalendarName"`
+	OutlookURL              string          `json:"outlookUrl" bson:"outlookUrl"`
+	RecurrenceID            *int            `json:"recurrenceId" bson:"recurrenceId"`
+	IsSuperEvent            bool            `json:"isSuperEvent" bson:"isSuperEvent"`
+	RecurringFlag           bool            `json:"recurringFlag" bson:"recurringFlag"`
+	SourceID                string          `json:"sourceId" bson:"sourceId"`
+	Sponsor                 string          `json:"sponsor" bson:"sponsor"`
+	StartDate               string          `json:"startDate" bson:"startDate"`
+	Title                   string          `json:"title" bson:"title"`
+	TitleURL                string          `json:"titleURL" bson:"titleURL"`
+	Tags                    *[]string       `json:"tags" bson:"tags"`
+	TargetAudience          *[]string       `json:"targetAudience" bson:"targetAudience"`
+	RegistrationURL         string          `json:"registrationURL" bson:"registrationURL"`
+	Contacts                []ContactLegacy `json:"contacts" bson:"contacts"`
+	SubEvents               []SubEvents     `json:"subEvents" bson:"subEvents"`
+	Cost                    string          `json:"cost" bson:"cost"`
 }
 
 // LocationLegacy represents event legacy location

@@ -36,18 +36,19 @@ type legacyEvent struct {
 		Latitude    float64 `bson:"latitude"`
 		Longitude   float64 `bson:"longitude"`
 	} `bson:"location"`
-	OriginatingCalendarID string  `bson:"originatingCalendarId"`
-	OutlookURL            string  `bson:"outlookUrl"`
-	RecurrenceID          *int    `bson:"recurrenceId"`
-	IsSuperEvent          bool    `bson:"isSuperEvent"`
-	RecurringFlag         bool    `bson:"recurringFlag"`
-	SourceID              string  `bson:"sourceId"`
-	Sponsor               string  `bson:"sponsor"`
-	StartDate             string  `bson:"startDate"`
-	Title                 string  `bson:"title"`
-	TitleURL              *string `bson:"titleURL"`
-	RegistrationURL       *string `bson:"registrationURL"`
-	SubEvents             []struct {
+	OriginatingCalendarID   string  `bson:"originatingCalendarId"`
+	OriginatingCalendarName string  `bson:"originatingCalendarName"`
+	OutlookURL              string  `bson:"outlookUrl"`
+	RecurrenceID            *int    `bson:"recurrenceId"`
+	IsSuperEvent            bool    `bson:"isSuperEvent"`
+	RecurringFlag           bool    `bson:"recurringFlag"`
+	SourceID                string  `bson:"sourceId"`
+	Sponsor                 string  `bson:"sponsor"`
+	StartDate               string  `bson:"startDate"`
+	Title                   string  `bson:"title"`
+	TitleURL                *string `bson:"titleURL"`
+	RegistrationURL         *string `bson:"registrationURL"`
+	SubEvents               []struct {
 		ID         string `bson:"id"`
 		IsFeatured bool   `bson:"isFeatured"`
 		Track      string `bson:"track"`
