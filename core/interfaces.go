@@ -148,7 +148,7 @@ type Storage interface {
 	FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
 	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
 
-	FindWebtoolsBlacklistData() ([]model.WebToolsItem, error)
+	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error
 	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error)

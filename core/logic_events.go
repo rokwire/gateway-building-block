@@ -351,7 +351,11 @@ func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
 func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsEvents []model.WebToolsEvent) (map[string]model.LegacyEventStatus, error) {
 	statuses := map[string]model.LegacyEventStatus{}
 
-	//TODO - blacklist
+	//we need to manage the black list items
+	blacklistsItems, err := e.app.storage.FindWebtoolsBlacklistData(context)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, wte := range allWebtoolsEvents {
 		statusName := "valid"
@@ -365,9 +369,16 @@ func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsE
 			reasonIgnored = &reason
 		}
 
-		//whitelisted categories
+		//white listed categories rule
 		inWhitelist, reason := e.applyWhitelistCategoriesRule(wte)
 		if !inWhitelist {
+			statusName = "ignored"
+			reasonIgnored = reason
+		}
+
+		//black lists rule
+		isBlacklisted, reason := e.applyBlacklistsRule(wte, blacklistsItems)
+		if isBlacklisted {
 			statusName = "ignored"
 			reasonIgnored = reason
 		}
@@ -395,6 +406,13 @@ func (e eventsLogic) applyWhitelistCategoriesRule(wt model.WebToolsEvent) (bool,
 		return false, &reason
 	}
 	return true, nil
+}
+
+// returns reason
+func (e eventsLogic) applyBlacklistsRule(wt model.WebToolsEvent, blacklistsItems []model.WebToolsItem) (bool, *string) {
+	//TODO
+	reason := fmt.Sprintf("black lists bla bla %s", "fsd")
+	return true, &reason
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {

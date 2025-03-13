@@ -204,7 +204,7 @@ func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs [
 
 func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsItem, error) {
 
-	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionInsert, model.TypeConfig, nil, err)
 	}

@@ -533,10 +533,10 @@ func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 }
 
 // FindWebtoolsBlacklistData finds all webtools blacklist from the database
-func (a *Adapter) FindWebtoolsBlacklistData() ([]model.WebToolsItem, error) {
+func (a *Adapter) FindWebtoolsBlacklistData(context TransactionContext) ([]model.WebToolsItem, error) {
 	filterSource := bson.M{}
 	var dataSource []model.WebToolsItem
-	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
+	err := a.db.webtoolsBlacklistItems.FindWithContext(context, filterSource, &dataSource, nil)
 	if err != nil {
 		return nil, err
 	}

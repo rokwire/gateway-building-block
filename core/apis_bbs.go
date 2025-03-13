@@ -98,7 +98,7 @@ func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 		return nil, err
 	}
 
-	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
 		return nil, err
 	}
