@@ -77,7 +77,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 	}
 
 	//wait until it is the correct moment from the day
-	location, err := time.LoadLocation("America/Chicago")
+	/*location, err := time.LoadLocation("America/Chicago")
 	if err != nil {
 		e.logger.Errorf("Error getting location:%s\n", err.Error())
 	}
@@ -96,10 +96,10 @@ func (e eventsLogic) setupWebToolsTimer() {
 		e.logger.Infof("setupWebToolsTimer -> the web tools process has already been processed today, so the first process will be tomorrow")
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
-	}
+	} */
 	//log.Println(durationInSeconds)
-	//duration := time.Second * time.Duration(3)
-	duration := time.Second * time.Duration(durationInSeconds)
+	duration := time.Second * time.Duration(3)
+	//duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
 
 	e.dailyWebToolsTimer = time.NewTimer(duration)
@@ -386,10 +386,7 @@ func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebTools
 
 func (e eventsLogic) isAllDay(wt model.WebToolsEvent) bool {
 	timeType := wt.TimeType
-	if timeType == "NONE" {
-		return true
-	}
-	return false
+	return timeType == "NONE"
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
