@@ -34,6 +34,22 @@ import (
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
 
+var whitelistCategoryMap = map[string]string{
+	"exhibition":               "Exhibits",
+	"festival/celebration":     "Festivals and Celebrations",
+	"film screening":           "Film Screenings",
+	"performance":              "Performances",
+	"lecture":                  "Speakers and Seminars",
+	"seminar/symposium":        "Speakers and Seminars",
+	"conference/workshop":      "Conferences and Workshops",
+	"reception/open house":     "Receptions and Open House Events",
+	"social/informal event":    "Social and Informal Events",
+	"professional development": "Career Development",
+	"health/fitness":           "Recreation, Health and Fitness",
+	"sporting event":           "Club Athletics",
+	"sidearm":                  "Big 10 Athletics",
+}
+
 type eventsLogic struct {
 	app    *Application
 	logger logs.Logger
@@ -340,11 +356,18 @@ func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsE
 		var reasonIgnored *string
 
 		//all day rule
-		allDay := e.isAllDayRule(wte)
+		allDay := e.applyAllDayRule(wte)
 		if allDay {
 			statusName = "ignored"
 			reason := "skipping event as all day is true"
 			reasonIgnored = &reason
+		}
+
+		//whitelisted categories
+		inWhitelist, reason := e.applyWhitelistCategoriesRule(wte)
+		if !inWhitelist {
+			statusName = "ignored"
+			reasonIgnored = reason
 		}
 
 		status := model.LegacyEventStatus{Name: statusName, ReasonIgnored: reasonIgnored}
@@ -405,9 +428,22 @@ func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsE
 	*/
 }
 
-func (e eventsLogic) isAllDayRule(wt model.WebToolsEvent) bool {
+func (e eventsLogic) applyAllDayRule(wt model.WebToolsEvent) bool {
 	timeType := wt.TimeType
 	return timeType == "NONE"
+}
+
+// returns reason
+func (e eventsLogic) applyWhitelistCategoriesRule(wt model.WebToolsEvent) (bool, *string) {
+	category := wt.EventType
+	lowerCategory := strings.ToLower(category)
+
+	_, exists := whitelistCategoryMap[lowerCategory]
+	if !exists {
+		reason := fmt.Sprintf("skipping event as category is %s", category)
+		return false, &reason
+	}
+	return true, nil
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
