@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	"slices"
+
 	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
@@ -410,9 +412,45 @@ func (e eventsLogic) applyWhitelistCategoriesRule(wt model.WebToolsEvent) (bool,
 
 // returns reason
 func (e eventsLogic) applyBlacklistsRule(wt model.WebToolsEvent, blacklistsItems []model.WebToolsItem) (bool, *string) {
-	//TODO
-	reason := fmt.Sprintf("black lists bla bla %s", "fsd")
-	return true, &reason
+	if len(blacklistsItems) == 0 {
+		return false, nil
+	}
+
+	for _, item := range blacklistsItems {
+		itemName := item.Name
+		itemsList := item.Data
+
+		//webtools_events_ids
+		if itemName == "webtools_events_ids" {
+			if len(itemsList) > 0 {
+				if slices.Contains(itemsList, wt.EventID) {
+					reason := fmt.Sprintf("black listed by id %s", wt.EventID)
+					return true, &reason
+				}
+			}
+		}
+
+		//webtools_calendar_ids
+		if itemName == "webtools_calendar_ids" {
+			if len(itemsList) > 0 {
+				if slices.Contains(itemsList, wt.CalendarID) {
+					reason := fmt.Sprintf("black listed by calendar id %s", wt.CalendarID)
+					return true, &reason
+				}
+			}
+		}
+
+		//webtools_originating_calendar_ids
+		if itemName == "webtools_originating_calendar_ids" {
+			if len(itemsList) > 0 {
+				if slices.Contains(itemsList, wt.OriginatingCalendarID) {
+					reason := fmt.Sprintf("black listed by originating calendar %s", wt.OriginatingCalendarName)
+					return true, &reason
+				}
+			}
+		}
+	}
+	return false, nil
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
