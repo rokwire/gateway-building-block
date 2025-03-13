@@ -586,13 +586,13 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, stat
 
 	//category
 	lowerCategory := strings.ToLower(g.EventType)
-	finalCategory := g.EventType //by default
-	if usedCategory, exists := whitelistCategoryMap[lowerCategory]; exists {
-		finalCategory = usedCategory
+	category := g.EventType //by default
+	if foundCategory, exists := whitelistCategoryMap[lowerCategory]; exists {
+		category = foundCategory
 	}
 
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Status: status,
-		Item: model.LegacyEvent{ID: id, Category: finalCategory, CreatedBy: createdBy,
+		Item: model.LegacyEvent{ID: id, Category: category, CreatedBy: createdBy,
 			OriginatingCalendarID: g.OriginatingCalendarID, OriginatingCalendarName: g.OriginatingCalendarName,
 			IsVirtial: isVirtual, DataModified: modifiedDate, DateCreated: createdDate,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
