@@ -181,7 +181,7 @@ func (d *database) applyExamplesChecks(examples *collectionWrapper) error {
 func (d *database) applyLegacyEventsChecks(legacyEvents *collectionWrapper) error {
 	d.logger.Info("apply legacy events checks.....")
 
-	//sync_process_source
+	//sync process source
 	err := legacyEvents.AddIndex(bson.D{primitive.E{Key: "sync_process_source", Value: 1}}, false)
 	if err != nil {
 		return err
