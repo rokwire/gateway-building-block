@@ -335,11 +335,19 @@ func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
 func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsEvents []model.WebToolsEvent) (map[string]model.LegacyEventStatus, error) {
 	statuses := map[string]model.LegacyEventStatus{}
 
-	//TODO
 	for _, wte := range allWebtoolsEvents {
-		reasonIgnored := "bla bla"
-		status := model.LegacyEventStatus{Name: "ignored", ReasonIgnored: &reasonIgnored}
+		statusName := "valid"
+		var reasonIgnored *string
 
+		//all day rule
+		allDay := e.isAllDayRule(wte)
+		if allDay {
+			statusName = "ignored"
+			reason := "skipping event as all day is true"
+			reasonIgnored = &reason
+		}
+
+		status := model.LegacyEventStatus{Name: statusName, ReasonIgnored: reasonIgnored}
 		statuses[wte.EventID] = status
 	}
 
@@ -373,14 +381,6 @@ func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsE
 	   		category := currentWte.EventType
 	   		lowerCategory := strings.ToLower(category)
 
-	   		//ignore all day events
-	   		allDay := e.isAllDay(currentWte)
-	   		if allDay {
-	   			e.logger.Info("skipping event as all day is true")
-	   			ignored++
-	   			continue
-	   		}
-
 	   		//get only the events which have a category from the whitelist
 	   		if newCategory, ok := categoryMap[lowerCategory]; ok {
 	   			currentWte.EventType = newCategory
@@ -405,7 +405,7 @@ func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsE
 	*/
 }
 
-func (e eventsLogic) isAllDay(wt model.WebToolsEvent) bool {
+func (e eventsLogic) isAllDayRule(wt model.WebToolsEvent) bool {
 	timeType := wt.TimeType
 	return timeType == "NONE"
 }
