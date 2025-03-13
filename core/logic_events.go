@@ -198,7 +198,7 @@ func (e eventsLogic) processWebToolsEvents() {
 		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
 
 		//3. apply rules
-		statuses, err := e.applyRules(allWebToolsEvents)
+		statuses, err := e.applyRules(context, allWebToolsEvents)
 		if err != nil {
 			e.logger.Errorf("error on apply rules web tools events - %s", err)
 			return err
@@ -332,7 +332,7 @@ func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
 }
 
 // valid or ignored
-func (e eventsLogic) applyRules(allWebtoolsEvents []model.WebToolsEvent) (map[string]model.LegacyEventStatus, error) {
+func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsEvents []model.WebToolsEvent) (map[string]model.LegacyEventStatus, error) {
 	statuses := map[string]model.LegacyEventStatus{}
 
 	//TODO
