@@ -21,6 +21,7 @@ import (
 	"application/core/model"
 	"application/driven/storage"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -196,21 +197,27 @@ func (e eventsLogic) processWebToolsEvents() {
 
 		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
 
-		//3. we have a requirement to ignore events or modify them before applying
-		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+		//3. apply rules
+		statuses, err := e.applyRules(allWebToolsEvents)
 		if err != nil {
-			e.logger.Errorf("error on ignoring web tools events - %s", err)
+			e.logger.Errorf("error on apply rules web tools events - %s", err)
 			return err
 		}
 
 		//4. now you have to convert all allWebToolsEvents into legacy events
 		newLegacyEvents := []model.LegacyEventItem{}
-		for _, wt := range modifiedWebToolsEvents {
+		for _, wt := range allWebToolsEvents {
 
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now, imagesData, locationsData)
+			//get status
+			status, exists := statuses[wt.EventID]
+			if !exists {
+				return errors.New("status not found for " + wt.EventID)
+			}
+
+			le := e.constructLegacyEvent(wt, id, status, now, imagesData, locationsData)
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -324,64 +331,78 @@ func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
 
 }
 
-// ignore or modify webtools events
-func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
-	modifiedList := []model.WebToolsEvent{}
+// valid or ignored
+func (e eventsLogic) applyRules(allWebtoolsEvents []model.WebToolsEvent) (map[string]model.LegacyEventStatus, error) {
+	statuses := map[string]model.LegacyEventStatus{}
 
-	ignored := 0
-	modified := 0
-
-	//whitelist with categories which we care + map for category conversions
-	categoryMap := map[string]string{
-		"exhibition":               "Exhibits",
-		"festival/celebration":     "Festivals and Celebrations",
-		"film screening":           "Film Screenings",
-		"performance":              "Performances",
-		"lecture":                  "Speakers and Seminars",
-		"seminar/symposium":        "Speakers and Seminars",
-		"conference/workshop":      "Conferences and Workshops",
-		"reception/open house":     "Receptions and Open House Events",
-		"social/informal event":    "Social and Informal Events",
-		"professional development": "Career Development",
-		"health/fitness":           "Recreation, Health and Fitness",
-		"sporting event":           "Club Athletics",
-		"sidearm":                  "Big 10 Athletics",
-	}
-
+	//TODO
 	for _, wte := range allWebtoolsEvents {
-		currentWte := wte
-		category := currentWte.EventType
-		lowerCategory := strings.ToLower(category)
+		reasonIgnored := "bla bla"
+		status := model.LegacyEventStatus{Name: "ignored", ReasonIgnored: &reasonIgnored}
 
-		//ignore all day events
-		allDay := e.isAllDay(currentWte)
-		if allDay {
-			e.logger.Info("skipping event as all day is true")
-			ignored++
-			continue
-		}
-
-		//get only the events which have a category from the whitelist
-		if newCategory, ok := categoryMap[lowerCategory]; ok {
-			currentWte.EventType = newCategory
-			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
-
-			modified++
-		} else {
-			e.logger.Infof("skipping event as category is %s", category)
-			ignored++
-			continue
-		}
-
-		//add it to the modified list
-		modifiedList = append(modifiedList, currentWte)
+		statuses[wte.EventID] = status
 	}
 
-	e.logger.Infof("ignored events count is %d", ignored)
-	e.logger.Infof("modified events count is %d", modified)
-	e.logger.Infof("final modified list is %d", len(modifiedList))
+	return statuses, nil
+	/*
+	   modifiedList := []model.WebToolsEvent{}
 
-	return modifiedList, nil
+	   ignored := 0
+	   modified := 0
+
+	   //whitelist with categories which we care + map for category conversions
+
+	   	categoryMap := map[string]string{
+	   		"exhibition":               "Exhibits",
+	   		"festival/celebration":     "Festivals and Celebrations",
+	   		"film screening":           "Film Screenings",
+	   		"performance":              "Performances",
+	   		"lecture":                  "Speakers and Seminars",
+	   		"seminar/symposium":        "Speakers and Seminars",
+	   		"conference/workshop":      "Conferences and Workshops",
+	   		"reception/open house":     "Receptions and Open House Events",
+	   		"social/informal event":    "Social and Informal Events",
+	   		"professional development": "Career Development",
+	   		"health/fitness":           "Recreation, Health and Fitness",
+	   		"sporting event":           "Club Athletics",
+	   		"sidearm":                  "Big 10 Athletics",
+	   	}
+
+	   	for _, wte := range allWebtoolsEvents {
+	   		currentWte := wte
+	   		category := currentWte.EventType
+	   		lowerCategory := strings.ToLower(category)
+
+	   		//ignore all day events
+	   		allDay := e.isAllDay(currentWte)
+	   		if allDay {
+	   			e.logger.Info("skipping event as all day is true")
+	   			ignored++
+	   			continue
+	   		}
+
+	   		//get only the events which have a category from the whitelist
+	   		if newCategory, ok := categoryMap[lowerCategory]; ok {
+	   			currentWte.EventType = newCategory
+	   			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
+
+	   			modified++
+	   		} else {
+	   			e.logger.Infof("skipping event as category is %s", category)
+	   			ignored++
+	   			continue
+	   		}
+
+	   		//add it to the modified list
+	   		modifiedList = append(modifiedList, currentWte)
+	   	}
+
+	   e.logger.Infof("ignored events count is %d", ignored)
+	   e.logger.Infof("modified events count is %d", modified)
+	   e.logger.Infof("final modified list is %d", len(modifiedList))
+
+	   return modifiedList, nil
+	*/
 }
 
 func (e eventsLogic) isAllDay(wt model.WebToolsEvent) bool {
@@ -436,7 +457,9 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, locationsData []model.LegacyLocation) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, status model.LegacyEventStatus,
+	now time.Time, imagesData []model.ContentImagesURL, locationsData []model.LegacyLocation) model.LegacyEventItem {
+
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -574,7 +597,7 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	imageURL := e.getImageURL(g.EventID, imagesData)
 	loc := constructLocation(g, locationsData)
 
-	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
+	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Status: status,
 		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy,
 			OriginatingCalendarID: g.OriginatingCalendarID, OriginatingCalendarName: g.OriginatingCalendarName,
 			IsVirtial: isVirtual, DataModified: modifiedDate, DateCreated: createdDate,
