@@ -30,9 +30,27 @@ import (
 	"strings"
 	"time"
 
+	"slices"
+
 	"github.com/google/uuid"
 	"github.com/rokwire/logging-library-go/v2/logs"
 )
+
+var whitelistCategoryMap = map[string]string{
+	"exhibition":               "Exhibits",
+	"festival/celebration":     "Festivals and Celebrations",
+	"film screening":           "Film Screenings",
+	"performance":              "Performances",
+	"lecture":                  "Speakers and Seminars",
+	"seminar/symposium":        "Speakers and Seminars",
+	"conference/workshop":      "Conferences and Workshops",
+	"reception/open house":     "Receptions and Open House Events",
+	"social/informal event":    "Social and Informal Events",
+	"professional development": "Career Development",
+	"health/fitness":           "Recreation, Health and Fitness",
+	"sporting event":           "Club Athletics",
+	"sidearm":                  "Big 10 Athletics",
+}
 
 type eventsLogic struct {
 	app    *Application
@@ -48,16 +66,13 @@ type eventsLogic struct {
 
 func (e eventsLogic) start() error {
 
-	//1. check if the initial import must be applied - it happens only once!
-	err := e.importInitialEventsFromEventsBB()
-	if err != nil {
-		return err
-	}
+	//0. process webtools events - to be removed
+	e.processWebToolsEvents()
 
-	//2. set up web tools timer
+	//1. set up web tools timer
 	go e.setupWebToolsTimer()
 
-	//3. initialize event locations db if needs
+	//2. initialize event locations db if needs
 	go e.initializeDB()
 
 	return nil
@@ -70,101 +85,6 @@ func (e eventsLogic) initializeDB() {
 	if err != nil {
 		e.logger.Errorf("error on initialzing legacy locations db: %s", err)
 	}
-}
-
-func (e eventsLogic) importInitialEventsFromEventsBB() error {
-	importProcessed := false
-
-	//in transaction
-	err := e.app.storage.PerformTransaction(func(context storage.TransactionContext) error {
-
-		//first check if need to import
-		config, err := e.app.storage.FindGlobalConfig(context, "initial-legacy-events-import")
-		if err != nil {
-			return err
-		}
-		if config == nil {
-			return errors.New("no initial legacy events import config added")
-		}
-		processed := config.Data["processed"].(bool)
-		if processed {
-			importProcessed = true
-			return nil //no need to execute processing
-		}
-
-		// we make initial import
-
-		//load the events
-		events, err := e.eventsBBAdapter.LoadAllLegacyEvents()
-		if err != nil {
-			return err
-		}
-
-		//they cannot be 0
-		eventsCount := len(events)
-		if eventsCount == 0 {
-			return errors.New("cannot have 0 events, there is an error")
-		}
-
-		e.logger.Infof("Got %d events from events BB", eventsCount)
-
-		//there are a lot of duplicate items(dataSourceEventId), so we need to fix them
-		fixedEvents := []model.LegacyEvent{}
-		addedItemMap := map[string]bool{}
-		for _, item := range events {
-			if len(item.DataSourceEventID) == 0 {
-				//there are a lot of such items absiously they are used, so add them
-				fixedEvents = append(fixedEvents, item)
-			} else {
-				if _, exists := addedItemMap[item.DataSourceEventID]; exists {
-					e.logger.Infof("Already added %s, so do nothing", item.DataSourceEventID)
-				} else {
-					//not added, so adding it
-					fixedEvents = append(fixedEvents, item)
-
-					//mark it as added
-					addedItemMap[item.DataSourceEventID] = true
-				}
-			}
-		}
-
-		e.logger.Infof("Got %d events after the events fix", len(fixedEvents))
-
-		//prepare the list which we will store
-		syncProcessSource := "events-bb-initial"
-		now := time.Now()
-		resultList := make([]model.LegacyEventItem, len(fixedEvents))
-		for i, le := range fixedEvents {
-			leItem := model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Item: le}
-			resultList[i] = leItem
-		}
-
-		//insert the initial events
-		_, err = e.app.storage.InsertLegacyEvents(context, resultList)
-		if err != nil {
-			return err
-		}
-
-		//mark as processed
-		config.Data["processed"] = true
-		err = e.app.storage.SaveGlobalConfig(context, *config)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}, 60000)
-
-	if err != nil {
-		return err
-	}
-
-	if importProcessed {
-		e.logger.Info("Initial events already imported")
-	} else {
-		e.logger.Info("Successfuly imported initial events")
-	}
-	return nil
 }
 
 func (e eventsLogic) setupWebToolsTimer() {
@@ -298,21 +218,27 @@ func (e eventsLogic) processWebToolsEvents() {
 
 		//at this moment the all webtools items are removed from the database and we can add what comes from webtools
 
-		//3. we have a requirement to ignore events or modify them before applying
-		modifiedWebToolsEvents, err := e.modifyWebtoolsEventsList(allWebToolsEvents)
+		//3. apply rules
+		statuses, err := e.applyRules(context, allWebToolsEvents)
 		if err != nil {
-			e.logger.Errorf("error on ignoring web tools events - %s", err)
+			e.logger.Errorf("error on apply rules web tools events - %s", err)
 			return err
 		}
 
 		//4. now you have to convert all allWebToolsEvents into legacy events
 		newLegacyEvents := []model.LegacyEventItem{}
-		for _, wt := range modifiedWebToolsEvents {
+		for _, wt := range allWebToolsEvents {
 
 			//prepare the id
 			id := e.prepareID(wt.EventID, existingLegacyIdsMap)
 
-			le := e.constructLegacyEvent(wt, id, now, imagesData, locationsData)
+			//get status
+			status, exists := statuses[wt.EventID]
+			if !exists {
+				return errors.New("status not found for " + wt.EventID)
+			}
+
+			le := e.constructLegacyEvent(wt, id, status, now, imagesData, locationsData)
 			newLegacyEvents = append(newLegacyEvents, le)
 		}
 
@@ -426,72 +352,108 @@ func (e eventsLogic) applyProcessImages(item []model.WebToolsEvent) error {
 
 }
 
-// ignore or modify webtools events
-func (e eventsLogic) modifyWebtoolsEventsList(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
-	modifiedList := []model.WebToolsEvent{}
+// valid or ignored
+func (e eventsLogic) applyRules(context storage.TransactionContext, allWebtoolsEvents []model.WebToolsEvent) (map[string]model.LegacyEventStatus, error) {
+	statuses := map[string]model.LegacyEventStatus{}
 
-	ignored := 0
-	modified := 0
-
-	//whitelist with categories which we care + map for category conversions
-	categoryMap := map[string]string{
-		"exhibition":               "Exhibits",
-		"festival/celebration":     "Festivals and Celebrations",
-		"film screening":           "Film Screenings",
-		"performance":              "Performances",
-		"lecture":                  "Speakers and Seminars",
-		"seminar/symposium":        "Speakers and Seminars",
-		"conference/workshop":      "Conferences and Workshops",
-		"reception/open house":     "Receptions and Open House Events",
-		"social/informal event":    "Social and Informal Events",
-		"professional development": "Career Development",
-		"health/fitness":           "Recreation, Health and Fitness",
-		"sporting event":           "Club Athletics",
-		"sidearm":                  "Big 10 Athletics",
+	//we need to manage the black list items
+	blacklistsItems, err := e.app.storage.FindWebtoolsBlacklistData(context)
+	if err != nil {
+		return nil, err
 	}
 
 	for _, wte := range allWebtoolsEvents {
-		currentWte := wte
-		category := currentWte.EventType
-		lowerCategory := strings.ToLower(category)
+		statusName := "valid"
+		var reasonIgnored *string
 
-		//ignore all day events
-		allDay := e.isAllDay(currentWte)
+		//all day rule
+		allDay := e.applyAllDayRule(wte)
 		if allDay {
-			e.logger.Info("skipping event as all day is true")
-			ignored++
-			continue
+			statusName = "ignored"
+			reason := "skipping event as all day is true"
+			reasonIgnored = &reason
 		}
 
-		//get only the events which have a category from the whitelist
-		if newCategory, ok := categoryMap[lowerCategory]; ok {
-			currentWte.EventType = newCategory
-			e.logger.Infof("modifying event category from %s to %s", category, newCategory)
-
-			modified++
-		} else {
-			e.logger.Infof("skipping event as category is %s", category)
-			ignored++
-			continue
+		//white listed categories rule
+		inWhitelist, reason := e.applyWhitelistCategoriesRule(wte)
+		if !inWhitelist {
+			statusName = "ignored"
+			reasonIgnored = reason
 		}
 
-		//add it to the modified list
-		modifiedList = append(modifiedList, currentWte)
+		//black lists rule
+		isBlacklisted, reason := e.applyBlacklistsRule(wte, blacklistsItems)
+		if isBlacklisted {
+			statusName = "ignored"
+			reasonIgnored = reason
+		}
+
+		status := model.LegacyEventStatus{Name: statusName, ReasonIgnored: reasonIgnored}
+		statuses[wte.EventID] = status
 	}
 
-	e.logger.Infof("ignored events count is %d", ignored)
-	e.logger.Infof("modified events count is %d", modified)
-	e.logger.Infof("final modified list is %d", len(modifiedList))
-
-	return modifiedList, nil
+	return statuses, nil
 }
 
-func (e eventsLogic) isAllDay(wt model.WebToolsEvent) bool {
+func (e eventsLogic) applyAllDayRule(wt model.WebToolsEvent) bool {
 	timeType := wt.TimeType
-	if timeType == "NONE" {
-		return true
+	return timeType == "NONE"
+}
+
+// returns reason
+func (e eventsLogic) applyWhitelistCategoriesRule(wt model.WebToolsEvent) (bool, *string) {
+	category := wt.EventType
+	lowerCategory := strings.ToLower(category)
+
+	_, exists := whitelistCategoryMap[lowerCategory]
+	if !exists {
+		reason := fmt.Sprintf("skipping event as category is %s", category)
+		return false, &reason
 	}
-	return false
+	return true, nil
+}
+
+// returns reason
+func (e eventsLogic) applyBlacklistsRule(wt model.WebToolsEvent, blacklistsItems []model.WebToolsItem) (bool, *string) {
+	if len(blacklistsItems) == 0 {
+		return false, nil
+	}
+
+	for _, item := range blacklistsItems {
+		itemName := item.Name
+		itemsList := item.Data
+
+		//webtools_events_ids
+		if itemName == "webtools_events_ids" {
+			if len(itemsList) > 0 {
+				if slices.Contains(itemsList, wt.EventID) {
+					reason := fmt.Sprintf("black listed by id %s", wt.EventID)
+					return true, &reason
+				}
+			}
+		}
+
+		//webtools_calendar_ids
+		if itemName == "webtools_calendar_ids" {
+			if len(itemsList) > 0 {
+				if slices.Contains(itemsList, wt.CalendarID) {
+					reason := fmt.Sprintf("black listed by calendar id %s", wt.CalendarID)
+					return true, &reason
+				}
+			}
+		}
+
+		//webtools_originating_calendar_ids
+		if itemName == "webtools_originating_calendar_ids" {
+			if len(itemsList) > 0 {
+				if slices.Contains(itemsList, wt.OriginatingCalendarID) {
+					reason := fmt.Sprintf("black listed by originating calendar %s", wt.OriginatingCalendarName)
+					return true, &reason
+				}
+			}
+		}
+	}
+	return false, nil
 }
 
 func (e eventsLogic) prepareID(currentWTEventID string, existingLegacyIdsMap map[string]string) string {
@@ -541,7 +503,9 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 	return allWebToolsEvents, nil
 }
 
-func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now time.Time, imagesData []model.ContentImagesURL, locationsData []model.LegacyLocation) model.LegacyEventItem {
+func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, status model.LegacyEventStatus,
+	now time.Time, imagesData []model.ContentImagesURL, locationsData []model.LegacyLocation) model.LegacyEventItem {
+
 	syncProcessSource := "webtools-direct"
 
 	createdBy := g.CreatedBy
@@ -679,9 +643,17 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, now 
 	imageURL := e.getImageURL(g.EventID, imagesData)
 	loc := constructLocation(g, locationsData)
 
-	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now,
-		Item: model.LegacyEvent{ID: id, Category: g.EventType, CreatedBy: createdBy, OriginatingCalendarID: g.OriginatingCalendarID, IsVirtial: isVirtual,
-			DataModified: modifiedDate, DateCreated: createdDate,
+	//category
+	lowerCategory := strings.ToLower(g.EventType)
+	category := g.EventType //by default
+	if foundCategory, exists := whitelistCategoryMap[lowerCategory]; exists {
+		category = foundCategory
+	}
+
+	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Status: status,
+		Item: model.LegacyEvent{ID: id, Category: category, CreatedBy: createdBy,
+			OriginatingCalendarID: g.OriginatingCalendarID, OriginatingCalendarName: g.OriginatingCalendarName,
+			IsVirtial: isVirtual, DataModified: modifiedDate, DateCreated: createdDate,
 			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: loc, Contacts: contatsLegacy,
