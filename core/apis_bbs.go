@@ -93,7 +93,8 @@ func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, a
 
 func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 
-	leEvents, err := a.app.storage.FindAllLegacyEvents()
+	status := "valid"
+	leEvents, err := a.app.storage.FindLegacyEvents(&status)
 	if err != nil {
 		return nil, err
 	}
