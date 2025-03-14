@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 ### Changed
-- Events summary APIs [#132](https://github.com/rokwire/gateway-building-block/issues/132)
+- Events summary APIs - part 1 [#132](https://github.com/rokwire/gateway-building-block/issues/132)
 
 ## [2.13.1] - 2025-02-17
 ### Fixed
