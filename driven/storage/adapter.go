@@ -376,8 +376,13 @@ func (a *Adapter) DeleteLegacyEventsByIDsAndCreator(context TransactionContext, 
 }
 
 // FindLegacyEvents finds legacy events by params
-func (a *Adapter) FindLegacyEvents(status *string) ([]model.LegacyEvent, error) {
+func (a *Adapter) FindLegacyEvents(source *string, status *string) ([]model.LegacyEvent, error) {
 	filter := bson.D{}
+
+	//source
+	if source != nil {
+		filter = append(filter, primitive.E{Key: "sync_process_source", Value: *source})
+	}
 
 	//status
 	if status != nil {
