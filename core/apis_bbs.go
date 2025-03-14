@@ -93,53 +93,25 @@ func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, a
 
 func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 
-	leEvents, err := a.app.storage.FindAllLegacyEvents()
+	//on startup - status.name = "valid" - remove when deployed everywhere
+	status := "valid"
+	leEvents, err := a.app.storage.FindLegacyEvents(nil, &status)
 	if err != nil {
 		return nil, err
 	}
 
-	blacklist, err := a.app.storage.FindWebtoolsBlacklistData()
+	//until the events-tps-api are not recreated with status.name = "valid" we must get them
+	source := "events-tps-api"
+	tpsAPIEvents, err := a.app.storage.FindLegacyEvents(&source, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var newLegacyEvents []model.LegacyEvent
-	for _, le := range leEvents {
+	//merge both slices
+	allEvents := append(leEvents, tpsAPIEvents...)
 
-		isBlacklisted := a.isBlacklisted(blacklist, le)
-		if !isBlacklisted {
-			newLegacyEvents = append(newLegacyEvents, le)
-		}
-	}
+	return allEvents, nil
 
-	return newLegacyEvents, nil
-
-}
-
-func (a appBBs) isBlacklisted(blacklists []model.WebToolsItem, event model.LegacyEvent) bool {
-	for _, blacklist := range blacklists {
-		switch blacklist.Name {
-		case "webtools_events_ids":
-			for _, id := range blacklist.Data {
-				if event.DataSourceEventID == id {
-					return true
-				}
-			}
-		case "webtools_calendar_ids":
-			for _, id := range blacklist.Data {
-				if event.CalendarID == id {
-					return true
-				}
-			}
-		case "webtools_originating_calendar_ids":
-			for _, id := range blacklist.Data {
-				if event.OriginatingCalendarID == id {
-					return true
-				}
-			}
-		}
-	}
-	return false
 }
 
 // newAppBBs creates new appBBs

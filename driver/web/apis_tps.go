@@ -105,8 +105,11 @@ func (h TPSAPIsHandler) createEvents(l *logs.Log, r *http.Request, claims *token
 			Sponsor: utils.GetString(w.Sponsor), Subcategory: utils.GetString(w.Subcategory), Title: utils.GetString(w.Title),
 			TitleURL: utils.GetString(w.TitleUrl), Contacts: contacts, Location: &location, Tags: &tags, TargetAudience: &targetAudience}
 
+		status := model.LegacyEventStatus{Name: "valid", ReasonIgnored: nil}
+
 		createdEvent := model.LegacyEventItem{
 			SyncProcessSource: syncSourse, SyncDate: syncDate,
+			Status:     status,
 			Item:       legacyEvent,
 			CreateInfo: &createInfo}
 
