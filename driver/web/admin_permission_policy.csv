@@ -19,6 +19,6 @@ p, delete_configs_gateway, /gateway/api/admin/configs, (GET),
 p, webtools_blacklist, /gateway/api/admin/webtools-blacklist, (GET)|(POST)|(PUT)|(DELETE), Webtools blacklist actions
 p, all_webtools, /gateway/api/admin/webtools-summary, (GET)|(POST)|(PUT)|(DELETE), Webtools actions
 
-p, get_legacy_event, /gateway/api/admin/legacyEvents, (GET)|(POST)|(PUT)|(DELETE), Legacy Event actions
+p, get_legacy_event, /gateway/api/admin/legacy-events, (GET)|(POST)|(PUT)|(DELETE), Legacy Event actions
 
 

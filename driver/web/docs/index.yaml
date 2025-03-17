@@ -69,7 +69,7 @@ paths:
     $ref: "./resources/admin/webtools-blacklist.yaml"  
   /api/admin/webtools-summary:
     $ref: "./resources/admin/webtools-summary.yaml"    
-  /api/admin/legacyEvents:
+  /api/admin/legacy-events:
     $ref: "./resources/admin/legacy-events.yaml"     
 
   # BBs
