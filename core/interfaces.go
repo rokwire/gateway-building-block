@@ -148,6 +148,7 @@ type Storage interface {
 	FindLegacyEvents(source *string, status *string) ([]model.LegacyEvent, error)
 	FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
 	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
+	FindLegacyEventsByParams(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 
 	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.WebToolsItem, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error

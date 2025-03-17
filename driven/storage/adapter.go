@@ -583,6 +583,44 @@ func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEvent
 	return webtoolsLegacyEvent, nil
 }
 
+// FindLegacyEventsByParams finds legacy event by the params of the items
+func (a *Adapter) FindLegacyEventsByParams(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
+	filter := bson.D{}
+
+	//source
+	if source != nil {
+		filter = append(filter, primitive.E{Key: "sync_process_source", Value: *source})
+	}
+
+	//status
+	if status != nil {
+		filter = append(filter, primitive.E{Key: "status.name", Value: *status})
+	}
+
+	//dataSourceEventId
+	if dataSourceEventId != nil {
+		filter = append(filter, primitive.E{Key: "item.dataSourceEventId", Value: *dataSourceEventId})
+	}
+
+	//calendarId
+	if calendarId != nil {
+		filter = append(filter, primitive.E{Key: "item.calendarId", Value: *calendarId})
+	}
+
+	//originatingCalendarId
+	if originatingCalendarID != nil {
+		filter = append(filter, primitive.E{Key: "item.originatingCalendarId", Value: *originatingCalendarID})
+	}
+
+	var events []model.LegacyEventItem
+	err := a.db.legacyEvents.FindWithContext(nil, filter, &events, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
+
 // PerformTransaction performs a transaction
 func (a *Adapter) PerformTransaction(transaction func(context TransactionContext) error, timeoutMilliSeconds int64) error {
 	// transaction

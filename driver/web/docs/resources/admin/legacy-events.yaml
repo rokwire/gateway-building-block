@@ -19,7 +19,7 @@ get:
         type: string
     - name: source 
       in: query
-      description: source - webtools/tps api(campus rec)
+      description: source - "webtools-direct"/"events-tps-api" api(campus rec)
       required: false
       style: form
       explode: false
