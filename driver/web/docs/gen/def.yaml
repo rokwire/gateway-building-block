@@ -595,7 +595,7 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/admin/legacy-events:
+  /api/admin/legacyEvents:
     get:
       tags:
         - Admin
