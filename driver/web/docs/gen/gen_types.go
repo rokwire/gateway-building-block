@@ -127,6 +127,21 @@ type LegacyEvent struct {
 	TitleUrl              *string          `json:"titleUrl,omitempty"`
 }
 
+// LegacyEventItem defines model for LegacyEventItem.
+type LegacyEventItem struct {
+	CreateInfo        *interface{} `json:"create_info,omitempty"`
+	Item              *interface{} `json:"item,omitempty"`
+	Status            *interface{} `json:"status,omitempty"`
+	SyncDate          *string      `json:"sync_date,omitempty"`
+	SyncProcessSource *string      `json:"sync_process_source,omitempty"`
+}
+
+// LegacyEventStatus defines model for LegacyEventStatus.
+type LegacyEventStatus struct {
+	Name          *string `json:"name,omitempty"`
+	ReasonIgnored *string `json:"reason_ignored"`
+}
+
 // LocationLegacy defines model for LocationLegacy.
 type LocationLegacy struct {
 	Description *string  `json:"description,omitempty"`
@@ -236,6 +251,24 @@ type TpsReqCreateEventLocation struct {
 type GetApiAdminConfigsParams struct {
 	// Type config type
 	Type *string `form:"type,omitempty" json:"type,omitempty"`
+}
+
+// GetApiAdminLegacyEventsParams defines parameters for GetApiAdminLegacyEvents.
+type GetApiAdminLegacyEventsParams struct {
+	// Status status - valid / ignored
+	Status *string `form:"status,omitempty" json:"status,omitempty"`
+
+	// Source source - webtools/tps api(campus rec)
+	Source *string `form:"source,omitempty" json:"source,omitempty"`
+
+	// Id dataSourceEventId of the event
+	Id *string `form:"id,omitempty" json:"id,omitempty"`
+
+	// CalendarId calendar_id of the event
+	CalendarId *string `form:"calendarId,omitempty" json:"calendarId,omitempty"`
+
+	// OriginatingCalendarID originatingCal of the event
+	OriginatingCalendarID *string `form:"originatingCalendarID,omitempty" json:"originatingCalendarID,omitempty"`
 }
 
 // DeleteApiAdminWebtoolsBlacklistParams defines parameters for DeleteApiAdminWebtoolsBlacklist.

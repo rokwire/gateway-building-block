@@ -595,6 +595,71 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/admin/legacy-events:
+    get:
+      tags:
+        - Admin
+      summary: Get legacy events
+      description: |
+        Get existing legacy events by search parameters
+
+        **Auth:** Requires valid admin token with "get_legacy_event" permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: status - valid / ignored
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          description: source - webtools/tps api(campus rec)
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: dataSourceEventId of the event
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: calendarId
+          in: query
+          description: calendar_id of the event
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: originatingCalendarID
+          in: query
+          description: originatingCal of the event
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegacyEventItem'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   '/api/bbs/examples/{id}':
     get:
       tags:
@@ -1635,6 +1700,35 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WebtoolsBlacklistItems'
+    LegacyEventItem:
+      type: object
+      properties:
+        sync_process_source:
+          type: string
+        sync_date:
+          type: string
+        status:
+          items:
+            $ref: '#/components/schemas/LegacyEventStatus'
+        item:
+          items:
+            $ref: '#/components/schemas/LegacyEvent'
+        create_info:
+          items:
+            type: object
+            properties:
+              time:
+                type: string
+              account_id:
+                type: string
+    LegacyEventStatus:
+      type: object
+      properties:
+        name:
+          type: string
+        reason_ignored:
+          type: string
+          nullable: true
     _admin_req_update-configs:
       required:
         - type

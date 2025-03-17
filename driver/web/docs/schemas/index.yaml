@@ -33,6 +33,10 @@ WebtoolsSummaryItem:
   $ref: "./application/WebtoolsSummaryItem.yaml"   
 WebtoolsSummary: 
   $ref: "./application/WebtoolsSummary.yaml"     
+LegacyEventItem: 
+  $ref: "./application/LegacyEventItem.yaml" 
+LegacyEventStatus: 
+  $ref: "./application/LegacyEventStatus.yaml"        
 
 # ADMIN section
 
