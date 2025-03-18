@@ -108,8 +108,8 @@ type WebToolsItems struct {
 
 // WebToolsItems represents web tools originating calendar ids
 type WebToolsSource struct {
-	Count         int           `json:"count"`
-	WebToolsItems WebToolsItems `json:"webtools-source"`
+	Count         int             `json:"count"`
+	WebToolsItems []WebToolsItems `json:"webtools-source"`
 }
 
 // TPsItems represents web tools originating calendar ids
@@ -121,8 +121,8 @@ type TPsItems struct {
 
 // TPsSource represents web tools originating calendar ids
 type TPsSource struct {
-	Count         int      `json:"count"`
-	WebToolsItems TPsItems `json:"tps_api"`
+	Count         int        `json:"count"`
+	WebToolsItems []TPsItems `json:"tps_api"`
 }
 
 // WebToolsSummary represents web tools summary

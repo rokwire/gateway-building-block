@@ -230,20 +230,43 @@ func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourc
 }
 
 func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
-	/*	webtoolsCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
-		if err != nil {
-			return nil, err
+	allEvents, err := a.app.storage.FindAllEvents()
+	if err != nil {
+		return nil, err
+	}
+	var valid []model.LegacyEventItem
+	var ignored []model.LegacyEventItem
+
+	for _, e := range allEvents {
+		if e.Status.Name == "valid" {
+			valid = append(valid, e)
+		} else if e.Status.Name == "ignored" {
+			ignored = append(ignored, e)
 		}
+	}
 
-		blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsBlacklistData()
-		if err != nil {
-			return nil, err
-		}
+	validWebtools, ignoredWebtools, err := a.app.storage.FindValidIgnoredWebtoolsDirectEvents()
+	if err != nil {
+		return nil, err
+	}
 
-		response := model.WebToolsSummary{WebtoolsOriginatingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginatingCalendarIDs: blacklistedCalendarIDs}
+	validTPs, ignoredTPs, err := a.app.storage.FindValidIgnoredTPsEvents()
+	if err != nil {
+		return nil, err
+	}
+	totalCount := validWebtools.Count + ignoredWebtools.Count + validTPs.Count + ignoredTPs.Count
 
-		return &response, */
-	return nil, nil
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	validEvents := model.Valid{WebtoolsSource: *validWebtools, TpsAPI: *validTPs}
+	ignoredEvents := model.Ignored{WebtoolsSource: *ignoredWebtools, TpsAPI: *ignoredTPs}
+
+	summary := model.WebToolsSummary{AllEventsCount: len(allEvents), ValidEventsCount: len(valid), IgnoredEventsCount: len(ignored),
+		TotalOriginatingCalendars: totalCount, Valid: validEvents, Ignored: ignoredEvents, Blacklists: blacklist}
+	return &summary, nil
 }
 
 // newAppAdmin creates new appAdmin

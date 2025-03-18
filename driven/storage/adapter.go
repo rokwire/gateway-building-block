@@ -407,11 +407,9 @@ func (a *Adapter) FindLegacyEvents(source *string, status *string) ([]model.Lega
 	return legacyEvents, err
 }
 
-// FindAllWebtoolsCalendarIDs finds and counts all webtools calendar IDs
-func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsItems, error) {
-	filter := bson.M{
-		"sync_process_source": "webtools-direct",
-	}
+// FindAllEvents finds and counts all webtools calendar IDs
+func (a *Adapter) FindAllEvents() ([]model.LegacyEventItem, error) {
+	filter := bson.M{}
 
 	var list []model.LegacyEventItem
 	timeout := 15 * time.Second // 15 seconds timeout
@@ -420,24 +418,103 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsItems, error) {
 		return nil, err
 	}
 
-	// Map to store counts of unique originatingCalendarId
+	return list, nil
+}
+
+// FindValidIgnoredWebtoolsDirectEvents finds and counts all valid and ignored webtools source
+func (a *Adapter) FindValidIgnoredWebtoolsDirectEvents() (*model.WebToolsSource, *model.WebToolsSource, error) {
+	filter := bson.M{
+		"sync_process_source": "webtools-direct",
+	}
+
+	var list []model.LegacyEventItem
+	timeout := 15 * time.Second // 15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Map to store counts of unique originatingCalendarId and names
 	countMap := make(map[string]int)
+	nameMap := make(map[string]string) // To store corresponding names
 
 	for _, l := range list {
 		calendarID := l.Item.OriginatingCalendarID
+		calendarName := l.Item.OriginatingCalendarName
 		countMap[calendarID]++
+		nameMap[calendarID] = calendarName // Store the latest name for the ID
 	}
 
-	// Convert map to slice of WebToolsCalendarID
+	// Convert map to slice of WebToolsItems
 	var legacyEvents []model.WebToolsItems
 	for id, count := range countMap {
 		legacyEvents = append(legacyEvents, model.WebToolsItems{
 			Count: count,
-			Name:  id,
+			ID:    id,
+			Name:  nameMap[id], // Assign the name from nameMap
 		})
 	}
 
-	return legacyEvents, nil
+	var validWebtoolsSource model.WebToolsSource
+	var ignoredWebtoolsSource model.WebToolsSource
+
+	for _, v := range list {
+		if v.Status.Name == "valid" {
+			validWebtoolsSource = model.WebToolsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
+		} else if v.Status.Name == "ignored" {
+			ignoredWebtoolsSource = model.WebToolsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
+		}
+	}
+
+	return &validWebtoolsSource, &ignoredWebtoolsSource, nil
+}
+
+// FindValidIgnoredTPsEvents finds and counts all valid and ignored tps source
+func (a *Adapter) FindValidIgnoredTPsEvents() (*model.TPsSource, *model.TPsSource, error) {
+	filter := bson.M{
+		"sync_process_source": "events-tps-api",
+	}
+
+	var list []model.LegacyEventItem
+	timeout := 15 * time.Second // 15 seconds timeout
+	err := a.db.legacyEvents.FindWithParams(nil, filter, &list, nil, &timeout)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Map to store counts of unique originatingCalendarId and names
+	countMap := make(map[string]int)
+	nameMap := make(map[string]string) // To store corresponding names
+
+	for _, l := range list {
+		calendarID := l.Item.OriginatingCalendarID
+		calendarName := l.Item.OriginatingCalendarName
+		countMap[calendarID]++
+		nameMap[calendarID] = calendarName // Store the latest name for the ID
+	}
+
+	// Convert map to slice of WebToolsItems
+	var legacyEvents []model.TPsItems
+	for id, count := range countMap {
+		legacyEvents = append(legacyEvents, model.TPsItems{
+			Count: count,
+			ID:    id,
+			Name:  nameMap[id], // Assign the name from nameMap
+		})
+	}
+
+	var validTPsApi model.TPsSource
+	var ignoredTPsApi model.TPsSource
+
+	for _, v := range list {
+		if v.Status.Name == "valid" {
+			validTPsApi = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
+		} else if v.Status.Name == "ignored" {
+			ignoredTPsApi = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
+		}
+	}
+
+	return &validTPsApi, &ignoredTPsApi, nil
 }
 
 // AddWebtoolsBlacklistData update data from the database
@@ -565,22 +642,6 @@ func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.Bla
 	}
 
 	return dataSource, nil
-}
-
-// FindWebtoolsLegacyEventByID finds webtool legacy event by the IDs of the items
-func (a *Adapter) FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error) {
-	filter := bson.M{
-		"sync_process_source": "webtools-direct",
-		"item.id":             bson.M{"$in": ids}, // Correctly filter by multiple IDs
-	}
-
-	var webtoolsLegacyEvent []model.LegacyEventItem
-	err := a.db.legacyEvents.FindWithContext(nil, filter, &webtoolsLegacyEvent, nil) // Use Find instead of FindOne
-	if err != nil {
-		return nil, err
-	}
-
-	return webtoolsLegacyEvent, nil
 }
 
 // FindLegacyEventsByParams finds legacy event by the params of the items
