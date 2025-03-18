@@ -27,16 +27,25 @@ TimeSlot:
   $ref: "./application/TimeSlot.yaml"
 Question:
   $ref: "./application/Question.yaml"
-WebtoolsBlacklistItems: 
-  $ref: "./application/WebtoolsBlacklistItems.yaml" 
+BlacklistItems: 
+  $ref: "./application/BlacklistItems.yaml" 
 WebtoolsSummaryItem: 
   $ref: "./application/WebtoolsSummaryItem.yaml"   
-WebtoolsSummary: 
-  $ref: "./application/WebtoolsSummary.yaml"     
+WebtoolsSource: 
+  $ref: "./application/WebtoolsSource.yaml"     
 LegacyEventItem: 
   $ref: "./application/LegacyEventItem.yaml" 
 LegacyEventStatus: 
-  $ref: "./application/LegacyEventStatus.yaml"        
+  $ref: "./application/LegacyEventStatus.yaml"   
+ValidIgnored: 
+  $ref: "./application/ValidIgnored.yaml"     
+TPsSource: 
+  $ref: "./application/TPsSource.yaml" 
+TPsSummaryItem: 
+  $ref: "./application/TPsSummaryItem.yaml"  
+SummaryEvents: 
+  $ref: "./application/SummaryEvents.yaml"          
+
 
 # ADMIN section
 

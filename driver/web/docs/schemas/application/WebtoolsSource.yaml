@@ -1,0 +1,8 @@
+type: object
+properties:
+  count:
+    type: integer
+  webtools_source:
+    type: array
+    items:
+      $ref: "./WebtoolsSource.yaml"

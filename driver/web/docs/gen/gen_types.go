@@ -33,6 +33,12 @@ type AppointmentPost struct {
 	UserExternalIds ExternalUserID    `json:"user_external_ids"`
 }
 
+// BlacklistItems defines model for BlacklistItems.
+type BlacklistItems struct {
+	Data *[]string `json:"data,omitempty"`
+	Name *string   `json:"name,omitempty"`
+}
+
 // BuildingBlockAppointment defines model for BuildingBlockAppointment.
 type BuildingBlockAppointment struct {
 	EndTime *string `json:"end_time,omitempty"`
@@ -172,6 +178,17 @@ type SubEvents struct {
 	Track      *string `json:"track,omitempty"`
 }
 
+// SummaryEvents defines model for SummaryEvents.
+type SummaryEvents struct {
+	AllEventsCount            *int              `json:"all_events_count,omitempty"`
+	Blacklists                *[]BlacklistItems `json:"blacklists,omitempty"`
+	Ignored                   *interface{}      `json:"ignored,omitempty"`
+	IgnoredEventsCount        *int              `json:"ignored_events_count,omitempty"`
+	TotalOriginatingCalendars *int              `json:"total_originating_calendars,omitempty"`
+	Valid                     *interface{}      `json:"valid,omitempty"`
+	ValidEventsCount          *int              `json:"valid_events_count,omitempty"`
+}
+
 // TimeSlot defines model for TimeSlot.
 type TimeSlot struct {
 	Capacity   int                    `json:"capacity"`
@@ -185,22 +202,16 @@ type TimeSlot struct {
 	UnitId     *int                   `json:"unit_id,omitempty"`
 }
 
-// WebtoolsBlacklistItems defines model for WebtoolsBlacklistItems.
-type WebtoolsBlacklistItems struct {
-	Data *[]string `json:"data,omitempty"`
-	Name *string   `json:"name,omitempty"`
+// ValidIgnored defines model for ValidIgnored.
+type ValidIgnored struct {
+	TpsApi         *interface{} `json:"tps_api,omitempty"`
+	WebtoolsSource *interface{} `json:"webtools_source,omitempty"`
 }
 
-// WebtoolsSummary defines model for WebtoolsSummary.
-type WebtoolsSummary struct {
-	BlacklistedOriginatingCalendarIds *[]WebtoolsBlacklistItems `json:"blacklisted_originating_calendar_ids,omitempty"`
-	OriginatingCalendarIds            *[]WebtoolsSummaryItem    `json:"originating_calendar_ids,omitempty"`
-}
-
-// WebtoolsSummaryItem defines model for WebtoolsSummaryItem.
-type WebtoolsSummaryItem struct {
-	Count *int    `json:"count,omitempty"`
-	Id    *string `json:"id,omitempty"`
+// WebtoolsSource defines model for WebtoolsSource.
+type WebtoolsSource struct {
+	Count          *int              `json:"count,omitempty"`
+	WebtoolsSource *[]WebtoolsSource `json:"webtools_source,omitempty"`
 }
 
 // TpsReqCreateEvent defines model for _tps_req_create-event.
@@ -258,7 +269,7 @@ type GetApiAdminLegacyEventsParams struct {
 	// Status status - valid / ignored
 	Status *string `form:"status,omitempty" json:"status,omitempty"`
 
-	// Source source - webtools/tps api(campus rec)
+	// Source source - "webtools-direct"/"events-tps-api" api(campus rec)
 	Source *string `form:"source,omitempty" json:"source,omitempty"`
 
 	// Id dataSourceEventId of the event

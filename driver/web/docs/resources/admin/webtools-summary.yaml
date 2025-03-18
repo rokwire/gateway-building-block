@@ -5,7 +5,7 @@ get:
   description: |
     Get webtools summary
 
-     **Auth:** Requires valid admin token and "all_webtools" permission
+     **Auth:** Requires valid admin token and "all_events_summary" permission
   security:
     - bearerAuth: []
   responses:
@@ -14,7 +14,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../schemas/application/WebtoolsSummary.yaml"
+            $ref: "../../schemas/application/SummaryEvents.yaml"
     400:
       description: Bad request
     401:

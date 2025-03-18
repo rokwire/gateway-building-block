@@ -1,0 +1,21 @@
+type: object
+properties:
+  all_events_count:
+    type: integer
+  valid_events_count:
+    type: integer  
+  ignored_events_count:
+    type: integer   
+  total_originating_calendars:
+    type: integer  
+  valid:
+    items:
+      $ref: "./ValidIgnored.yaml"
+  ignored:
+    items:
+      $ref: "./ValidIgnored.yaml"    
+  blacklists:
+    type: array
+    items:
+      $ref: "./BlacklistItems.yaml"    
+

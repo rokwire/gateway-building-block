@@ -515,7 +515,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WebtoolsBlacklistItems'
+                  $ref: '#/components/schemas/BlacklistItems'
         '400':
           description: Bad request
         '401':
@@ -579,7 +579,7 @@ paths:
       description: |
         Get webtools summary
 
-         **Auth:** Requires valid admin token and "all_webtools" permission
+         **Auth:** Requires valid admin token and "all_events_summary" permission
       security:
         - bearerAuth: []
       responses:
@@ -588,7 +588,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebtoolsSummary'
+                $ref: '#/components/schemas/SummaryEvents'
         '400':
           description: Bad request
         '401':
@@ -617,7 +617,7 @@ paths:
             type: string
         - name: source
           in: query
-          description: source - webtools/tps api(campus rec)
+          description: source - "webtools-direct"/"events-tps-api" api(campus rec)
           required: false
           style: form
           explode: false
@@ -1673,7 +1673,7 @@ components:
         question:
           type: string
           readOnly: true
-    WebtoolsBlacklistItems:
+    BlacklistItems:
       type: object
       properties:
         name:
@@ -1689,17 +1689,17 @@ components:
           type: integer
         id:
           type: string
-    WebtoolsSummary:
+        name:
+          type: string
+    WebtoolsSource:
       type: object
       properties:
-        originating_calendar_ids:
+        count:
+          type: integer
+        webtools_source:
           type: array
           items:
-            $ref: '#/components/schemas/WebtoolsSummaryItem'
-        blacklisted_originating_calendar_ids:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebtoolsBlacklistItems'
+            $ref: '#/components/schemas/WebtoolsSource'
     LegacyEventItem:
       type: object
       properties:
@@ -1729,6 +1729,54 @@ components:
         reason_ignored:
           type: string
           nullable: true
+    ValidIgnored:
+      type: object
+      properties:
+        webtools_source:
+          items:
+            $ref: '#/components/schemas/WebtoolsSource'
+        tps_api:
+          items:
+            $ref: '#/components/schemas/WebtoolsSource'
+    TPsSource:
+      type: object
+      properties:
+        count:
+          type: integer
+        webtools_source:
+          type: array
+          items:
+            $ref: '#/components/schemas/TPsSummaryItem'
+    TPsSummaryItem:
+      type: object
+      properties:
+        count:
+          type: integer
+        id:
+          type: string
+        name:
+          type: string
+    SummaryEvents:
+      type: object
+      properties:
+        all_events_count:
+          type: integer
+        valid_events_count:
+          type: integer
+        ignored_events_count:
+          type: integer
+        total_originating_calendars:
+          type: integer
+        valid:
+          items:
+            $ref: '#/components/schemas/ValidIgnored'
+        ignored:
+          items:
+            $ref: '#/components/schemas/ValidIgnored'
+        blacklists:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlacklistItems'
     _admin_req_update-configs:
       required:
         - type
