@@ -1699,7 +1699,7 @@ components:
         webtools_source:
           type: array
           items:
-            $ref: '#/components/schemas/WebtoolsSource'
+            $ref: '#/components/schemas/WebtoolsSummaryItem'
     LegacyEventItem:
       type: object
       properties:
@@ -1737,13 +1737,13 @@ components:
             $ref: '#/components/schemas/WebtoolsSource'
         tps_api:
           items:
-            $ref: '#/components/schemas/WebtoolsSource'
+            $ref: '#/components/schemas/TPsSource'
     TPsSource:
       type: object
       properties:
         count:
           type: integer
-        webtools_source:
+        tps_api:
           type: array
           items:
             $ref: '#/components/schemas/TPsSummaryItem'
