@@ -63,7 +63,7 @@ type Admin interface {
 	UpdateConfig(config model.Config, claims *tokenauth.Claims) error
 	DeleteConfig(id string, claims *tokenauth.Claims) error
 	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
-	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
+	GetWebtoolsBlackList() ([]model.Blacklist, error)
 	RemoveWebtoolsBlackList(sourceids []string, calendarids []string, originatingCalendarIdsList []string) error
 	GetWebtoolsSummary() (*model.WebToolsSummary, error)
 	GetLegacyEventsItems(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
@@ -146,14 +146,14 @@ type Storage interface {
 	DeleteLegacyEventsBySourceID(context storage.TransactionContext, sourceID string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindLegacyEvents(source *string, status *string) ([]model.LegacyEvent, error)
-	FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
+	FindAllWebtoolsCalendarIDs() ([]model.WebToolsItems, error)
 	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
 	FindLegacyEventsByParams(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 
-	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.WebToolsItem, error)
+	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.Blacklist, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error
-	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error)
+	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.Blacklist, error)
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error

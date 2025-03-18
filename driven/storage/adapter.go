@@ -408,7 +408,7 @@ func (a *Adapter) FindLegacyEvents(source *string, status *string) ([]model.Lega
 }
 
 // FindAllWebtoolsCalendarIDs finds and counts all webtools calendar IDs
-func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error) {
+func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsItems, error) {
 	filter := bson.M{
 		"sync_process_source": "webtools-direct",
 	}
@@ -429,9 +429,9 @@ func (a *Adapter) FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, erro
 	}
 
 	// Convert map to slice of WebToolsCalendarID
-	var legacyEvents []model.WebToolsCalendarID
+	var legacyEvents []model.WebToolsItems
 	for id, count := range countMap {
-		legacyEvents = append(legacyEvents, model.WebToolsCalendarID{
+		legacyEvents = append(legacyEvents, model.WebToolsItems{
 			Count: count,
 			Name:  id,
 		})
@@ -544,9 +544,9 @@ func (a *Adapter) RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalend
 }
 
 // FindWebtoolsBlacklistData finds all webtools blacklist from the database
-func (a *Adapter) FindWebtoolsBlacklistData(context TransactionContext) ([]model.WebToolsItem, error) {
+func (a *Adapter) FindWebtoolsBlacklistData(context TransactionContext) ([]model.Blacklist, error) {
 	filterSource := bson.M{}
-	var dataSource []model.WebToolsItem
+	var dataSource []model.Blacklist
 	err := a.db.webtoolsBlacklistItems.FindWithContext(context, filterSource, &dataSource, nil)
 	if err != nil {
 		return nil, err
@@ -556,9 +556,9 @@ func (a *Adapter) FindWebtoolsBlacklistData(context TransactionContext) ([]model
 }
 
 // FindWebtoolsOriginatingCalendarIDsBlacklistData finds all webtools blacklist from the database
-func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error) {
+func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.Blacklist, error) {
 	filterSource := bson.M{"name": "webtools_originating_calendar_ids"}
-	var dataSource []model.WebToolsItem
+	var dataSource []model.Blacklist
 	err := a.db.webtoolsBlacklistItems.FindWithContext(a.context, filterSource, &dataSource, nil)
 	if err != nil {
 		return nil, err

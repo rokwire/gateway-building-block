@@ -202,7 +202,7 @@ func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs [
 	return nil
 }
 
-func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsItem, error) {
+func (a appAdmin) GetWebtoolsBlackList() ([]model.Blacklist, error) {
 
 	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
@@ -230,19 +230,20 @@ func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourc
 }
 
 func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
-	webtoolsCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
-	if err != nil {
-		return nil, err
-	}
+	/*	webtoolsCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
+		if err != nil {
+			return nil, err
+		}
 
-	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsBlacklistData()
-	if err != nil {
-		return nil, err
-	}
+		blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsBlacklistData()
+		if err != nil {
+			return nil, err
+		}
 
-	response := model.WebToolsSummary{WebtoolsOriginatingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginatingCalendarIDs: blacklistedCalendarIDs}
+		response := model.WebToolsSummary{WebtoolsOriginatingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginatingCalendarIDs: blacklistedCalendarIDs}
 
-	return &response, nil
+		return &response, */
+	return nil, nil
 }
 
 // newAppAdmin creates new appAdmin
