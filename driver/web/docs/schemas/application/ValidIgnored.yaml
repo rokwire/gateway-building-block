@@ -5,7 +5,7 @@ properties:
       $ref: "./WebtoolsSource.yaml"
   tps_api:
     items:
-      $ref: "./WebtoolsSource.yaml"    
+      $ref: "./TPsSource.yaml"    
      
 
   
