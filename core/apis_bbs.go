@@ -93,25 +93,14 @@ func (a appBBs) DeleteAppointment(uin string, providerid int, sourceid string, a
 
 func (a appBBs) GetLegacyEvents() ([]model.LegacyEvent, error) {
 
-	//on startup - status.name = "valid" - remove when deployed everywhere
+	//get all valid
 	status := "valid"
 	leEvents, err := a.app.storage.FindLegacyEvents(nil, &status)
 	if err != nil {
 		return nil, err
 	}
 
-	//until the events-tps-api are not recreated with status.name = "valid" we must get them
-	source := "events-tps-api"
-	tpsAPIEvents, err := a.app.storage.FindLegacyEvents(&source, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	//merge both slices
-	allEvents := append(leEvents, tpsAPIEvents...)
-
-	return allEvents, nil
-
+	return leEvents, nil
 }
 
 // newAppBBs creates new appBBs
