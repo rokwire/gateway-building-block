@@ -66,9 +66,6 @@ type eventsLogic struct {
 
 func (e eventsLogic) start() error {
 
-	//0. process webtools events - to be removed
-	e.processWebToolsEvents()
-
 	//1. set up web tools timer
 	go e.setupWebToolsTimer()
 

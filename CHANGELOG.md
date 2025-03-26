@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Expose get legacy events and get summary events API [#135](https://github.com/rokwire/gateway-building-block/issues/135)
 
+### Changed
+- Remove temporary code for data setup [#137](https://github.com/rokwire/gateway-building-block/issues/137)
+
 ## [2.14.0] - 2025-03-14
 ### Changed
 - Events summary APIs - part 1 [#132](https://github.com/rokwire/gateway-building-block/issues/132)
