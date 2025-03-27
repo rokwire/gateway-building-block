@@ -102,8 +102,8 @@ type Blacklist struct {
 // WebToolsItems represents web tools originating calendar ids
 type WebToolsItems struct {
 	Count int    `json:"count"`
-	ID    string `json:"id" bson:"originatingCalendarId"`
-	Name  string `json:"Name" bson:"originatingCalendarName"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
 }
 
 // WebToolsItems represents web tools originating calendar ids
