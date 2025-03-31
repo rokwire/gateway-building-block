@@ -99,8 +99,8 @@ type Blacklist struct {
 	Data []string `json:"data" bson:"data"`
 }
 
-// WebToolsItems represents web tools items
-type WebToolsItems struct {
+// WebToolsOriginatingCalendar represents web tools originating calendar
+type WebToolsOriginatingCalendar struct {
 	Count int    `json:"count"`
 	ID    string `json:"id"`
 	Name  string `json:"name"`
@@ -108,21 +108,13 @@ type WebToolsItems struct {
 
 // WebToolsSource represents web tools source
 type WebToolsSource struct {
-	Count         int             `json:"count"`
-	WebToolsItems []WebToolsItems `json:"webtools-source"`
+	Count         int                           `json:"count"`
+	WebToolsItems []WebToolsOriginatingCalendar `json:"originating_calendars"`
 }
 
-// TPsItems represents tps items
-type TPsItems struct {
-	Count int    `json:"count"`
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-}
-
-// TPsSource represents web tools originating calendar ids
+// TPsSource represents tps api
 type TPsSource struct {
-	Count         int        `json:"count"`
-	WebToolsItems []TPsItems `json:"tps_api"`
+	Count int `json:"count"`
 }
 
 // EventsSummary represents events summary

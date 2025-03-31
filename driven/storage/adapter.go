@@ -446,25 +446,25 @@ func (a *Adapter) FindValidIgnoredWebtoolsDirectEvents() (*model.WebToolsSource,
 	}
 
 	// Convert map to slice of WebToolsItems
-	var legacyEvents []model.WebToolsItems
-	for id, count := range countMap {
-		legacyEvents = append(legacyEvents, model.WebToolsItems{
-			Count: count,
-			ID:    id,
-			Name:  nameMap[id], // Assign the name from nameMap
-		})
-	}
+	/*	var legacyEvents []model.WebToolsItems
+		for id, count := range countMap {
+			legacyEvents = append(legacyEvents, model.WebToolsItems{
+				Count: count,
+				ID:    id,
+				Name:  nameMap[id], // Assign the name from nameMap
+			})
+		} */
 
 	var validWebtoolsSource model.WebToolsSource
 	var ignoredWebtoolsSource model.WebToolsSource
 
-	for _, v := range list {
+	/*for _, v := range list {
 		if v.Status.Name == "valid" {
 			validWebtoolsSource = model.WebToolsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
 		} else if v.Status.Name == "ignored" {
 			ignoredWebtoolsSource = model.WebToolsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
 		}
-	}
+	} */
 
 	return &validWebtoolsSource, &ignoredWebtoolsSource, nil
 }
@@ -494,25 +494,25 @@ func (a *Adapter) FindValidIgnoredTPsEvents() (*model.TPsSource, *model.TPsSourc
 	}
 
 	// Convert map to slice of WebToolsItems
-	var legacyEvents []model.TPsItems
+	/*var legacyEvents []model.TPsItems
 	for id, count := range countMap {
 		legacyEvents = append(legacyEvents, model.TPsItems{
 			Count: count,
 			ID:    id,
 			Name:  nameMap[id], // Assign the name from nameMap
 		})
-	}
+	} */
 
 	var validTPsAPI model.TPsSource
 	var ignoredTPsAPI model.TPsSource
 
-	for _, v := range list {
+	/*for _, v := range list {
 		if v.Status.Name == "valid" {
 			validTPsAPI = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
 		} else if v.Status.Name == "ignored" {
 			ignoredTPsAPI = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
 		}
-	}
+	} */
 
 	return &validTPsAPI, &ignoredTPsAPI, nil
 }
