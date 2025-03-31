@@ -230,11 +230,28 @@ func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourc
 }
 
 func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
-	allEvents, err := a.app.storage.FindAllEvents()
+	//get all valid
+	validStatus := "valid"
+	validEvents, err := a.app.storage.FindLegacyEvents(nil, &validStatus)
 	if err != nil {
 		return nil, err
 	}
-	var valid []model.LegacyEventItem
+
+	//get all ignored
+	ignoredStatus := "ignored"
+	ignoredEvents, err := a.app.storage.FindLegacyEvents(nil, &ignoredStatus)
+	if err != nil {
+		return nil, err
+	}
+
+	validEventsCount := len(validEvents)
+	ignoredEventsCount := len(ignoredEvents)
+	allEventsCount := validEventsCount + ignoredEventsCount
+	/*allEvents, err := a.app.storage.FindAllEvents()
+	if err != nil {
+		return nil, err
+	} */
+	/*var valid []model.LegacyEventItem
 	var ignored []model.LegacyEventItem
 
 	for _, e := range allEvents {
@@ -254,18 +271,23 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	if err != nil {
 		return nil, err
 	}
-	totalCount := validWebtools.Count + ignoredWebtools.Count + validTPs.Count + ignoredTPs.Count
+	totalCount := validWebtools.Count + ignoredWebtools.Count + validTPs.Count + ignoredTPs.Count */
 
 	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
 		return nil, err
 	}
 
-	validEvents := model.Valid{WebtoolsSource: *validWebtools, TpsAPI: *validTPs}
-	ignoredEvents := model.Ignored{WebtoolsSource: *ignoredWebtools, TpsAPI: *ignoredTPs}
+	//validEvents := model.Valid{WebtoolsSource: *validWebtools, TpsAPI: *validTPs}
+	//ignoredEvents := model.Ignored{WebtoolsSource: *ignoredWebtools, TpsAPI: *ignoredTPs}
 
-	summary := model.EventsSummary{AllEventsCount: len(allEvents), ValidEventsCount: len(valid), IgnoredEventsCount: len(ignored),
-		TotalOriginatingCalendars: totalCount, Valid: validEvents, Ignored: ignoredEvents, Blacklists: blacklist}
+	summary := model.EventsSummary{AllEventsCount: allEventsCount,
+		ValidEventsCount:   validEventsCount,
+		IgnoredEventsCount: ignoredEventsCount,
+		/*	TotalOriginatingCalendars: totalCount,
+			Valid: validEvents,
+			Ignored: ignoredEvents, */
+		Blacklists: blacklist}
 	return &summary, nil
 }
 
