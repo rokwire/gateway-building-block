@@ -229,7 +229,7 @@ func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourc
 	return events, nil
 }
 
-func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
+func (a appAdmin) GetEventsSummary() (*model.WebToolsSummary, error) {
 	allEvents, err := a.app.storage.FindAllEvents()
 	if err != nil {
 		return nil, err

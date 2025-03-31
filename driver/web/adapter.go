@@ -116,7 +116,7 @@ func (a Adapter) Start() {
 	adminRouter.HandleFunc("/events/webtools-blacklist", a.wrapFunc(a.adminAPIsHandler.addwebtoolsblacklist, a.auth.admin.Permissions)).Methods("PUT")
 	adminRouter.HandleFunc("/events/webtools-blacklist", a.wrapFunc(a.adminAPIsHandler.getwebtoolsblacklist, a.auth.admin.Permissions)).Methods("GET")
 	adminRouter.HandleFunc("/events/webtools-blacklist", a.wrapFunc(a.adminAPIsHandler.removewebtoolsblacklist, a.auth.admin.Permissions)).Methods("DELETE")
-	adminRouter.HandleFunc("/webtools-summary", a.wrapFunc(a.adminAPIsHandler.getWebtoolsSummary, a.auth.admin.Permissions)).Methods("GET")
+	adminRouter.HandleFunc("/events/summary", a.wrapFunc(a.adminAPIsHandler.getEventsSummary, a.auth.admin.Permissions)).Methods("GET")
 	//adminRouter.HandleFunc("/legacy-events", a.wrapFunc(a.adminAPIsHandler.legacyEvents, a.auth.admin.Permissions)).Methods("GET")
 
 	// BB APIs
