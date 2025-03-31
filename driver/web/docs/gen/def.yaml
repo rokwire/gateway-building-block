@@ -566,7 +566,7 @@ paths:
       description: |
         Add webtools blacklist data
 
-        **Auth:** Requires valid admin token and `all_events_summary` permission
+        **Auth:** Requires valid admin token and `all_events` permission
       security:
         - bearerAuth: []
       requestBody:
@@ -591,7 +591,7 @@ paths:
       description: |
         Get all webtools blacklist items
 
-         **Auth:** Requires valid admin token and `all_events_summary` permission
+         **Auth:** Requires valid admin token and `all_events` permission
       security:
         - bearerAuth: []
       responses:
@@ -616,7 +616,7 @@ paths:
       description: |
         Deletes webtools blacklist items.
 
-        **Auth:** Requires valid admin token and `all_events_summary` permission
+        **Auth:** Requires valid admin token and `all_events` permission
       security:
         - bearerAuth: []
       parameters:
@@ -658,15 +658,15 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/admin/webtools-summary:
+  /api/admin/events/summary:
     get:
       tags:
         - Admin
-      summary: Get webtools summary
+      summary: Get events summary
       description: |
-        Get webtools summary
+        Get events summary
 
-         **Auth:** Requires valid admin token and "all_events_summary" permission
+         **Auth:** Requires valid admin token and `all_events` permission
       security:
         - bearerAuth: []
       responses:

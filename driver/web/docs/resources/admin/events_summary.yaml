@@ -1,11 +1,11 @@
 get:
   tags:
   - Admin
-  summary: Get webtools summary
+  summary: Get events summary
   description: |
-    Get webtools summary
+    Get events summary
 
-     **Auth:** Requires valid admin token and "all_events_summary" permission
+     **Auth:** Requires valid admin token and `all_events` permission
   security:
     - bearerAuth: []
   responses:

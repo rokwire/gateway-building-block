@@ -69,8 +69,8 @@ paths:
     $ref: "./resources/admin/webtools-blacklist.yaml"
   /api/admin/events/webtools-blacklist:
     $ref: "./resources/admin/events_webtools-blacklist.yaml"    
-  /api/admin/webtools-summary:
-    $ref: "./resources/admin/webtools-summary.yaml"    
+  /api/admin/events/summary:
+    $ref: "./resources/admin/events_summary.yaml"    
   #/api/admin/legacy-events:
   #  $ref: "./resources/admin/legacy-events.yaml"     
 
