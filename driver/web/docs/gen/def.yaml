@@ -582,7 +582,7 @@ paths:
       description: |
         Add webtools blacklist data
 
-        **Auth:** Requires valid admin token and "webtools_blacklist" permission
+        **Auth:** Requires valid admin token and `all_events_summary` permission
       security:
         - bearerAuth: []
       requestBody:
@@ -607,7 +607,7 @@ paths:
       description: |
         Get all webtools blacklist items
 
-         **Auth:** Requires valid admin token and "webtools_blacklist" permission
+         **Auth:** Requires valid admin token and `all_events_summary` permission
       security:
         - bearerAuth: []
       responses:
@@ -632,7 +632,7 @@ paths:
       description: |
         Deletes webtools blacklist items.
 
-        **Auth:** Requires valid admin token and "webtools_blacklist" permission
+        **Auth:** Requires valid admin token and `all_events_summary` permission
       security:
         - bearerAuth: []
       parameters:
