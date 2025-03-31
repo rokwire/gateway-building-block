@@ -247,6 +247,9 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	validEventsCount := len(validEvents)
 	ignoredEventsCount := len(ignoredEvents)
 	allEventsCount := validEventsCount + ignoredEventsCount
+
+	valid := model.Valid{}
+	ignored := model.Ignored{}
 	/*allEvents, err := a.app.storage.FindAllEvents()
 	if err != nil {
 		return nil, err
@@ -284,9 +287,9 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	summary := model.EventsSummary{AllEventsCount: allEventsCount,
 		ValidEventsCount:   validEventsCount,
 		IgnoredEventsCount: ignoredEventsCount,
-		/*	TotalOriginatingCalendars: totalCount,
-			Valid: validEvents,
-			Ignored: ignoredEvents, */
+		/*	TotalOriginatingCalendars: totalCount, */
+		Valid:      valid,
+		Ignored:    ignored,
 		Blacklists: blacklist}
 	return &summary, nil
 }
