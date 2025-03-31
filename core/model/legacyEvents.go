@@ -115,8 +115,8 @@ type WebToolsSource struct {
 // TPsItems represents web tools originating calendar ids
 type TPsItems struct {
 	Count int    `json:"count"`
-	ID    string `json:"id" bson:"originatingCalendarId"`
-	Name  string `json:"Name" bson:"originatingCalendarName"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
 }
 
 // TPsSource represents web tools originating calendar ids
