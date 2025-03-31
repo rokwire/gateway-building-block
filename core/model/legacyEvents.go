@@ -99,20 +99,20 @@ type Blacklist struct {
 	Data []string `json:"data" bson:"data"`
 }
 
-// WebToolsItems represents web tools originating calendar ids
+// WebToolsItems represents web tools items
 type WebToolsItems struct {
 	Count int    `json:"count"`
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 }
 
-// WebToolsItems represents web tools originating calendar ids
+// WebToolsSource represents web tools source
 type WebToolsSource struct {
 	Count         int             `json:"count"`
 	WebToolsItems []WebToolsItems `json:"webtools-source"`
 }
 
-// TPsItems represents web tools originating calendar ids
+// TPsItems represents tps items
 type TPsItems struct {
 	Count int    `json:"count"`
 	ID    string `json:"id"`
@@ -136,11 +136,13 @@ type WebToolsSummary struct {
 	Blacklists                []Blacklist `json:"blacklists"`
 }
 
+// Valid represents valid entity in the events summary
 type Valid struct {
 	WebtoolsSource WebToolsSource `json:"webtools_source"`
 	TpsAPI         TPsSource      `json:"tps_api"`
 }
 
+// Ignored represents ignored entity in the events summary
 type Ignored struct {
 	WebtoolsSource WebToolsSource `json:"webtools_source"`
 	TpsAPI         TPsSource      `json:"tps_api"`

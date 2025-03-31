@@ -358,16 +358,16 @@ func (h AdminAPIsHandler) legacyEvents(l *logs.Log, r *http.Request, claims *tok
 		status = &statusParam
 	}
 
-	var dataSourceEventId *string
-	dataSourceEventIdParam := r.URL.Query().Get("id")
-	if len(dataSourceEventIdParam) > 0 {
-		dataSourceEventId = &dataSourceEventIdParam
+	var dataSourceEventID *string
+	dataSourceEventIDParam := r.URL.Query().Get("id")
+	if len(dataSourceEventIDParam) > 0 {
+		dataSourceEventID = &dataSourceEventIDParam
 	}
 
-	var calendarId *string
-	calendarIdParam := r.URL.Query().Get("calendar_id")
-	if len(calendarIdParam) > 0 {
-		calendarId = &calendarIdParam
+	var calendarID *string
+	calendarIDParam := r.URL.Query().Get("calendar_id")
+	if len(calendarIDParam) > 0 {
+		calendarID = &calendarIDParam
 	}
 	var originatingCalendarID *string
 	originatingCalendarIDParam := r.URL.Query().Get("originating_calendar_id")
@@ -375,7 +375,7 @@ func (h AdminAPIsHandler) legacyEvents(l *logs.Log, r *http.Request, claims *tok
 		originatingCalendarID = &originatingCalendarIDParam
 	}
 
-	legacyEvents, err := h.app.Admin.GetLegacyEventsItems(source, status, dataSourceEventId, calendarId, originatingCalendarID)
+	legacyEvents, err := h.app.Admin.GetLegacyEventsItems(source, status, dataSourceEventID, calendarID, originatingCalendarID)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}

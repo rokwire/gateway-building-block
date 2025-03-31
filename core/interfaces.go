@@ -66,7 +66,7 @@ type Admin interface {
 	GetWebtoolsBlackList() ([]model.Blacklist, error)
 	RemoveWebtoolsBlackList(sourceids []string, calendarids []string, originatingCalendarIdsList []string) error
 	GetWebtoolsSummary() (*model.WebToolsSummary, error)
-	GetLegacyEventsItems(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
+	GetLegacyEventsItems(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 }
 
 // BBs exposes Building Block APIs for the driver adapters
@@ -149,7 +149,7 @@ type Storage interface {
 	FindAllEvents() ([]model.LegacyEventItem, error)
 	FindValidIgnoredWebtoolsDirectEvents() (*model.WebToolsSource, *model.WebToolsSource, error)
 	FindValidIgnoredTPsEvents() (*model.TPsSource, *model.TPsSource, error)
-	FindLegacyEventsByParams(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
+	FindLegacyEventsByParams(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 
 	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.Blacklist, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error

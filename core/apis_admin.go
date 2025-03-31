@@ -220,9 +220,9 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 	return nil
 }
 
-func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
+func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
 
-	events, err := a.app.storage.FindLegacyEventsByParams(source, status, dataSourceEventId, calendarId, originatingCalendarID)
+	events, err := a.app.storage.FindLegacyEventsByParams(source, status, dataSourceEventID, calendarID, originatingCalendarID)
 	if err != nil {
 		return nil, err
 	}

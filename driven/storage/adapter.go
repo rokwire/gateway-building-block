@@ -503,18 +503,18 @@ func (a *Adapter) FindValidIgnoredTPsEvents() (*model.TPsSource, *model.TPsSourc
 		})
 	}
 
-	var validTPsApi model.TPsSource
-	var ignoredTPsApi model.TPsSource
+	var validTPsAPI model.TPsSource
+	var ignoredTPsAPI model.TPsSource
 
 	for _, v := range list {
 		if v.Status.Name == "valid" {
-			validTPsApi = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
+			validTPsAPI = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
 		} else if v.Status.Name == "ignored" {
-			ignoredTPsApi = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
+			ignoredTPsAPI = model.TPsSource{Count: len(legacyEvents), WebToolsItems: legacyEvents}
 		}
 	}
 
-	return &validTPsApi, &ignoredTPsApi, nil
+	return &validTPsAPI, &ignoredTPsAPI, nil
 }
 
 // AddWebtoolsBlacklistData update data from the database
@@ -645,7 +645,7 @@ func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.Bla
 }
 
 // FindLegacyEventsByParams finds legacy event by the params of the items
-func (a *Adapter) FindLegacyEventsByParams(source *string, status *string, dataSourceEventId *string, calendarId *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
+func (a *Adapter) FindLegacyEventsByParams(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
 	filter := bson.D{}
 
 	//source
@@ -658,17 +658,17 @@ func (a *Adapter) FindLegacyEventsByParams(source *string, status *string, dataS
 		filter = append(filter, primitive.E{Key: "status.name", Value: *status})
 	}
 
-	//dataSourceEventId
-	if dataSourceEventId != nil {
-		filter = append(filter, primitive.E{Key: "item.dataSourceEventId", Value: *dataSourceEventId})
+	//dataSourceEventID
+	if dataSourceEventID != nil {
+		filter = append(filter, primitive.E{Key: "item.dataSourceEventId", Value: *dataSourceEventID})
 	}
 
-	//calendarId
-	if calendarId != nil {
-		filter = append(filter, primitive.E{Key: "item.calendarId", Value: *calendarId})
+	//calendarID
+	if calendarID != nil {
+		filter = append(filter, primitive.E{Key: "item.calendarId", Value: *calendarID})
 	}
 
-	//originatingCalendarId
+	//originatingCalendarID
 	if originatingCalendarID != nil {
 		filter = append(filter, primitive.E{Key: "item.originatingCalendarId", Value: *originatingCalendarID})
 	}
