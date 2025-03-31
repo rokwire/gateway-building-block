@@ -16,9 +16,7 @@ p, update_configs_gateway, /gateway/api/admin/configs, (GET)|(POST),
 p, delete_configs_gateway, /gateway/api/admin/configs/*, (GET)|(DELETE), Delete gateway configs
 p, delete_configs_gateway, /gateway/api/admin/configs, (GET),
 
-p, webtools_blacklist, /gateway/api/admin/webtools-blacklist, (GET)|(POST)|(PUT)|(DELETE), Webtools blacklist actions
-p, all_events_summary, /gateway/api/admin/webtools-summary, (GET)|(POST)|(PUT)|(DELETE), Webtools actions
-
-p, all_events_summary, /gateway/api/admin/legacy-events, (GET)|(POST)|(PUT)|(DELETE), Legacy Event actions
+p, webtools_blacklist, /gateway/api/admin/webtools-blacklist, (GET)|(POST)|(PUT)|(DELETE), [DEPRECATED]Webtools blacklist actions
+p, all_events, /gateway/api/admin/events/*, (GET)|(POST)|(PUT)|(DELETE), Events actions
 
 
