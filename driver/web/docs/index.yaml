@@ -66,7 +66,9 @@ paths:
   /api/admin/configs/{id}:
     $ref: "./resources/admin/configs-id.yaml"
   /api/admin/webtools-blacklist:
-    $ref: "./resources/admin/webtools-blacklist.yaml"  
+    $ref: "./resources/admin/webtools-blacklist.yaml"
+  /api/admin/events/webtools-blacklist:
+    $ref: "./resources/admin/events_webtools-blacklist.yaml"    
   /api/admin/webtools-summary:
     $ref: "./resources/admin/webtools-summary.yaml"    
   #/api/admin/legacy-events:
