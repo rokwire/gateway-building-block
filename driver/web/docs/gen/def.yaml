@@ -472,23 +472,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data_source_ids:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
-                data_calendar_ids:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
-                data_originating_calendar_ids:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
+              $ref: '#/components/schemas/_admin_req_add-webtools-blacklist'
       responses:
         '200':
           description: Success
@@ -590,7 +574,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/paths/~1api~1admin~1webtools-blacklist/put/requestBody/content/application~1json/schema'
+              $ref: '#/components/schemas/_admin_req_add-webtools-blacklist'
       responses:
         '200':
           description: Success
@@ -1837,6 +1821,24 @@ components:
         data:
           anyOf:
             - $ref: '#/components/schemas/EnvConfigData'
+    _admin_req_add-webtools-blacklist:
+      type: object
+      properties:
+        data_source_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
+        data_calendar_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
+        data_originating_calendar_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
     _tps_req_create-event:
       type: object
       properties:

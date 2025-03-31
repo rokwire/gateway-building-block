@@ -219,6 +219,13 @@ type WebtoolsSummaryItem struct {
 	Name  *string `json:"name,omitempty"`
 }
 
+// AdminReqAddWebtoolsBlacklist defines model for _admin_req_add-webtools-blacklist.
+type AdminReqAddWebtoolsBlacklist struct {
+	DataCalendarIds            *[]string `json:"data_calendar_ids"`
+	DataOriginatingCalendarIds *[]string `json:"data_originating_calendar_ids"`
+	DataSourceIds              *[]string `json:"data_source_ids"`
+}
+
 // TpsReqCreateEvent defines model for _tps_req_create-event.
 type TpsReqCreateEvent struct {
 	AllDay            *bool                       `json:"all_day,omitempty"`
@@ -269,8 +276,8 @@ type GetApiAdminConfigsParams struct {
 	Type *string `form:"type,omitempty" json:"type,omitempty"`
 }
 
-// DeleteApiAdminWebtoolsBlacklistParams defines parameters for DeleteApiAdminWebtoolsBlacklist.
-type DeleteApiAdminWebtoolsBlacklistParams struct {
+// DeleteApiAdminEventsWebtoolsBlacklistParams defines parameters for DeleteApiAdminEventsWebtoolsBlacklist.
+type DeleteApiAdminEventsWebtoolsBlacklistParams struct {
 	// SourceIds A comma-separated list of ids
 	SourceIds *string `form:"source_ids,omitempty" json:"source_ids,omitempty"`
 
@@ -281,11 +288,16 @@ type DeleteApiAdminWebtoolsBlacklistParams struct {
 	OriginatingCalendarIds *string `form:"originating_calendar_ids,omitempty" json:"originating_calendar_ids,omitempty"`
 }
 
-// PutApiAdminWebtoolsBlacklistJSONBody defines parameters for PutApiAdminWebtoolsBlacklist.
-type PutApiAdminWebtoolsBlacklistJSONBody struct {
-	DataCalendarIds            *[]string `json:"data_calendar_ids"`
-	DataOriginatingCalendarIds *[]string `json:"data_originating_calendar_ids"`
-	DataSourceIds              *[]string `json:"data_source_ids"`
+// DeleteApiAdminWebtoolsBlacklistParams defines parameters for DeleteApiAdminWebtoolsBlacklist.
+type DeleteApiAdminWebtoolsBlacklistParams struct {
+	// SourceIds A comma-separated list of ids
+	SourceIds *string `form:"source_ids,omitempty" json:"source_ids,omitempty"`
+
+	// CalendarIds A comma-separated list of ids
+	CalendarIds *string `form:"calendar_ids,omitempty" json:"calendar_ids,omitempty"`
+
+	// OriginatingCalendarIds A comma-separated list of ids
+	OriginatingCalendarIds *string `form:"originating_calendar_ids,omitempty" json:"originating_calendar_ids,omitempty"`
 }
 
 // GetApiBbsAppointmentsPeopleParams defines parameters for GetApiBbsAppointmentsPeople.
@@ -390,6 +402,9 @@ type PostApiAdminConfigsJSONRequestBody = Config
 // PutApiAdminConfigsIdJSONRequestBody defines body for PutApiAdminConfigsId for application/json ContentType.
 type PutApiAdminConfigsIdJSONRequestBody = Config
 
+// PutApiAdminEventsWebtoolsBlacklistJSONRequestBody defines body for PutApiAdminEventsWebtoolsBlacklist for application/json ContentType.
+type PutApiAdminEventsWebtoolsBlacklistJSONRequestBody = AdminReqAddWebtoolsBlacklist
+
 // PostApiAdminExamplesJSONRequestBody defines body for PostApiAdminExamples for application/json ContentType.
 type PostApiAdminExamplesJSONRequestBody = Example
 
@@ -397,7 +412,7 @@ type PostApiAdminExamplesJSONRequestBody = Example
 type PutApiAdminExamplesIdJSONRequestBody = Example
 
 // PutApiAdminWebtoolsBlacklistJSONRequestBody defines body for PutApiAdminWebtoolsBlacklist for application/json ContentType.
-type PutApiAdminWebtoolsBlacklistJSONRequestBody PutApiAdminWebtoolsBlacklistJSONBody
+type PutApiAdminWebtoolsBlacklistJSONRequestBody = AdminReqAddWebtoolsBlacklist
 
 // PostApiBbsAppointmentsJSONRequestBody defines body for PostApiBbsAppointments for application/json ContentType.
 type PostApiBbsAppointmentsJSONRequestBody = AppointmentPost

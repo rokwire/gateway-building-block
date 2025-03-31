@@ -238,7 +238,7 @@ func (h AdminAPIsHandler) deleteConfig(l *logs.Log, r *http.Request, claims *tok
 }
 
 func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	var requestData Def.PutApiAdminWebtoolsBlacklistJSONBody
+	var requestData Def.AdminReqAddWebtoolsBlacklist
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionUnmarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, true)

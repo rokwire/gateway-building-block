@@ -52,6 +52,8 @@ SummaryEvents:
 ## admin configs API
 _admin_req_update-configs:
   $ref: "./apis/admin/update-configs/Request.yaml"
+_admin_req_add-webtools-blacklist:
+  $ref: "./apis/admin/add-webtools-blacklist/Request.yaml"
 
 # end ADMIN section
 
