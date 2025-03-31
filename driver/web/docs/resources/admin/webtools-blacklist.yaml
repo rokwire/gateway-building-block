@@ -8,6 +8,7 @@ put:
     **Auth:** Requires valid admin token and "webtools_blacklist" permission
   security:
     - bearerAuth: []
+  deprecated: true
   requestBody:
     description: list of the ids that needs to be blacklisted
     content:
@@ -33,6 +34,7 @@ get:
      **Auth:** Requires valid admin token and "webtools_blacklist" permission
   security:
     - bearerAuth: []
+  deprecated: true
   responses:
     200:
       description: Success
@@ -58,6 +60,7 @@ delete:
     **Auth:** Requires valid admin token and "webtools_blacklist" permission
   security:
     - bearerAuth: []
+  deprecated: true
   parameters:
     - name: source_ids
       in: query
