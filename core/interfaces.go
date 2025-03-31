@@ -65,7 +65,7 @@ type Admin interface {
 	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
 	GetWebtoolsBlackList() ([]model.Blacklist, error)
 	RemoveWebtoolsBlackList(sourceids []string, calendarids []string, originatingCalendarIdsList []string) error
-	GetEventsSummary() (*model.WebToolsSummary, error)
+	GetEventsSummary() (*model.EventsSummary, error)
 	GetLegacyEventsItems(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 }
 

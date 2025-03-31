@@ -229,7 +229,7 @@ func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourc
 	return events, nil
 }
 
-func (a appAdmin) GetEventsSummary() (*model.WebToolsSummary, error) {
+func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	allEvents, err := a.app.storage.FindAllEvents()
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func (a appAdmin) GetEventsSummary() (*model.WebToolsSummary, error) {
 	validEvents := model.Valid{WebtoolsSource: *validWebtools, TpsAPI: *validTPs}
 	ignoredEvents := model.Ignored{WebtoolsSource: *ignoredWebtools, TpsAPI: *ignoredTPs}
 
-	summary := model.WebToolsSummary{AllEventsCount: len(allEvents), ValidEventsCount: len(valid), IgnoredEventsCount: len(ignored),
+	summary := model.EventsSummary{AllEventsCount: len(allEvents), ValidEventsCount: len(valid), IgnoredEventsCount: len(ignored),
 		TotalOriginatingCalendars: totalCount, Valid: validEvents, Ignored: ignoredEvents, Blacklists: blacklist}
 	return &summary, nil
 }

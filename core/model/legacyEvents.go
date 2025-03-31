@@ -125,8 +125,8 @@ type TPsSource struct {
 	WebToolsItems []TPsItems `json:"tps_api"`
 }
 
-// WebToolsSummary represents web tools summary
-type WebToolsSummary struct {
+// EventsSummary represents events summary
+type EventsSummary struct {
 	AllEventsCount            int         `json:"all_events_count"`
 	ValidEventsCount          int         `json:"valid_events_count"`
 	IgnoredEventsCount        int         `json:"ignored_events_count"`
