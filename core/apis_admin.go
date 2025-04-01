@@ -243,8 +243,10 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	ignoredEventsCount := 0
 
 	//var validWebtoolsSource model.WebToolsSource
+	var validWebtoolsCount int
 	var validTpsAPICount int
 
+	var ignoredWebtoolsCount int
 	var ignoredTpsAPICount int
 
 	//prepare summary data
@@ -256,7 +258,9 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 
 			syncProcessSource := eventItem.SyncProcessSource
 			if syncProcessSource == "webtools-direct" {
+				validWebtoolsCount++
 
+				//TODO
 			} else if syncProcessSource == "events-tps-api" {
 				validTpsAPICount++
 			}
@@ -266,7 +270,9 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 
 			syncProcessSource := eventItem.SyncProcessSource
 			if syncProcessSource == "webtools-direct" {
+				ignoredWebtoolsCount++
 
+				//TODO
 			} else if syncProcessSource == "events-tps-api" {
 				ignoredTpsAPICount++
 			}
@@ -274,8 +280,15 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 		}
 	}
 
-	valid := model.Valid{TpsAPI: model.TPsSource{Count: validTpsAPICount}}
-	ignored := model.Ignored{TpsAPI: model.TPsSource{Count: ignoredTpsAPICount}}
+	validWebtoolsSource := model.WebToolsSource{Count: validWebtoolsCount}
+
+	ignoredWebtoolsSource := model.WebToolsSource{Count: ignoredWebtoolsCount}
+
+	valid := model.Valid{WebtoolsSource: validWebtoolsSource,
+		TpsAPI: model.TPsSource{Count: validTpsAPICount}}
+
+	ignored := model.Ignored{WebtoolsSource: ignoredWebtoolsSource,
+		TpsAPI: model.TPsSource{Count: ignoredTpsAPICount}}
 
 	//process valid
 	/*for _, le := range validEvents {
