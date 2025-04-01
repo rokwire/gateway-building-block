@@ -336,43 +336,11 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	ignored := model.Ignored{WebtoolsSource: ignoredWebtoolsSource,
 		TpsAPI: model.TPsSource{Count: ignoredTpsAPICount}}
 
-	//process valid
-	/*for _, le := range validEvents {
-
-	} */
-	/*allEvents, err := a.app.storage.FindAllEvents()
-	if err != nil {
-		return nil, err
-	} */
-	/*var valid []model.LegacyEventItem
-	var ignored []model.LegacyEventItem
-
-	for _, e := range allEvents {
-		if e.Status.Name == "valid" {
-			valid = append(valid, e)
-		} else if e.Status.Name == "ignored" {
-			ignored = append(ignored, e)
-		}
-	}
-
-	validWebtools, ignoredWebtools, err := a.app.storage.FindValidIgnoredWebtoolsDirectEvents()
-	if err != nil {
-		return nil, err
-	}
-
-	validTPs, ignoredTPs, err := a.app.storage.FindValidIgnoredTPsEvents()
-	if err != nil {
-		return nil, err
-	}
-	totalCount := validWebtools.Count + ignoredWebtools.Count + validTPs.Count + ignoredTPs.Count */
-
+	//blacklists
 	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
 		return nil, err
 	}
-
-	//validEvents := model.Valid{WebtoolsSource: *validWebtools, TpsAPI: *validTPs}
-	//ignoredEvents := model.Ignored{WebtoolsSource: *ignoredWebtools, TpsAPI: *ignoredTPs}
 
 	summary := model.EventsSummary{AllEventsCount: allEventsCount,
 		ValidEventsCount:   validEventsCount,
