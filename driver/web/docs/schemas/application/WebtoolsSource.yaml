@@ -1,0 +1,8 @@
+type: object
+properties:
+  count:
+    type: integer
+  originating_calendar:
+    type: array
+    items:
+      $ref: "./OriginatingCalendarItem.yaml"

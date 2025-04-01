@@ -93,22 +93,51 @@ type WebToolsEvent struct {
 	} `xml:"topic"`
 }
 
-// WebToolsItem represents web tools blacklist ids
-type WebToolsItem struct {
+// Blacklist represents web tools blacklist ids
+type Blacklist struct {
 	Name string   `json:"name" bson:"name"`
 	Data []string `json:"data" bson:"data"`
 }
 
-// WebToolsCalendarID represents web tools originating calendar ids
-type WebToolsCalendarID struct {
+// WebToolsOriginatingCalendar represents web tools originating calendar
+type WebToolsOriginatingCalendar struct {
 	Count int    `json:"count"`
-	Name  string `json:"id" bson:"originatingCalendarId"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
 }
 
-// WebToolsSummary represents web tools summary
-type WebToolsSummary struct {
-	WebtoolsOriginatingCalendarIDs    []WebToolsCalendarID `json:"originating_calendar_ids"`
-	BlackListedOriginatingCalendarIDs []WebToolsItem       `json:"blacklisted_originating_calendar_ids"`
+// WebToolsSource represents web tools source
+type WebToolsSource struct {
+	Count         int                           `json:"count"`
+	WebToolsItems []WebToolsOriginatingCalendar `json:"originating_calendars"`
+}
+
+// TPsSource represents tps api
+type TPsSource struct {
+	Count int `json:"count"`
+}
+
+// EventsSummary represents events summary
+type EventsSummary struct {
+	AllEventsCount            int         `json:"all_events_count"`
+	ValidEventsCount          int         `json:"valid_events_count"`
+	IgnoredEventsCount        int         `json:"ignored_events_count"`
+	TotalOriginatingCalendars int         `json:"total_originating_calendars"`
+	Valid                     Valid       `json:"valid"`
+	Ignored                   Ignored     `json:"ignored"`
+	Blacklists                []Blacklist `json:"blacklists"`
+}
+
+// Valid represents valid entity in the events summary
+type Valid struct {
+	WebtoolsSource WebToolsSource `json:"webtools_source"`
+	TpsAPI         TPsSource      `json:"tps_api"`
+}
+
+// Ignored represents ignored entity in the events summary
+type Ignored struct {
+	WebtoolsSource WebToolsSource `json:"webtools_source"`
+	TpsAPI         TPsSource      `json:"tps_api"`
 }
 
 // LegacyEvent wrapper

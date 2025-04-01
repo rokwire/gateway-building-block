@@ -1,0 +1,15 @@
+type: object
+properties:
+  sync_process_source:
+    type: string
+  sync_date:
+    type: string
+  status:
+    items:
+      $ref: "./LegacyEventStatus.yaml"    
+  item:
+    items:
+      $ref: "./LegacyEvent.yaml"     
+  create_info:
+    items:
+      $ref: "./CreateInfo.yaml"        

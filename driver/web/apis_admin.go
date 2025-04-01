@@ -238,7 +238,7 @@ func (h AdminAPIsHandler) deleteConfig(l *logs.Log, r *http.Request, claims *tok
 }
 
 func (h AdminAPIsHandler) addwebtoolsblacklist(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	var requestData Def.PutApiAdminWebtoolsBlacklistJSONBody
+	var requestData Def.AdminReqAddWebtoolsBlacklist
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionUnmarshal, logutils.TypeRequestBody, nil, err, http.StatusBadRequest, true)
@@ -330,13 +330,57 @@ func (h AdminAPIsHandler) removewebtoolsblacklist(l *logs.Log, r *http.Request, 
 	return l.HTTPResponseSuccess()
 }
 
-func (h AdminAPIsHandler) getWebtoolsSummary(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
-	calendarIDs, err := h.app.Admin.GetWebtoolsSummary()
+func (h AdminAPIsHandler) getEventsSummary(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	summary, err := h.app.Admin.GetEventsSummary()
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
 
-	data, err := json.Marshal(calendarIDs)
+	data, err := json.Marshal(summary)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(data)
+}
+
+func (h AdminAPIsHandler) legacyEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	var source *string
+	sourceParam := r.URL.Query().Get("source")
+	if len(sourceParam) > 0 {
+		source = &sourceParam
+	}
+
+	var status *string
+	statusParam := r.URL.Query().Get("status")
+	if len(statusParam) > 0 {
+		status = &statusParam
+	}
+
+	var dataSourceEventID *string
+	dataSourceEventIDParam := r.URL.Query().Get("id")
+	if len(dataSourceEventIDParam) > 0 {
+		dataSourceEventID = &dataSourceEventIDParam
+	}
+
+	var calendarID *string
+	calendarIDParam := r.URL.Query().Get("calendar_id")
+	if len(calendarIDParam) > 0 {
+		calendarID = &calendarIDParam
+	}
+	var originatingCalendarID *string
+	originatingCalendarIDParam := r.URL.Query().Get("originating_calendar_id")
+	if len(originatingCalendarIDParam) > 0 {
+		originatingCalendarID = &originatingCalendarIDParam
+	}
+
+	legacyEvents, err := h.app.Admin.GetLegacyEventsItems(source, status, dataSourceEventID, calendarID, originatingCalendarID)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
+	}
+
+	data, err := json.Marshal(legacyEvents)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
 	}

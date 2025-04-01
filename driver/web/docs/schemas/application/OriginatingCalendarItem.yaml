@@ -4,3 +4,8 @@ properties:
     type: integer
   id:
     type: string
+  name:
+    type: string  
+
+
+

@@ -466,28 +466,13 @@ paths:
         **Auth:** Requires valid admin token and "webtools_blacklist" permission
       security:
         - bearerAuth: []
+      deprecated: true
       requestBody:
         description: list of the ids that needs to be blacklisted
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                data_source_ids:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
-                data_calendar_ids:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
-                data_originating_calendar_ids:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
+              $ref: '#/components/schemas/_admin_req_add-webtools-blacklist'
       responses:
         '200':
           description: Success
@@ -507,6 +492,7 @@ paths:
          **Auth:** Requires valid admin token and "webtools_blacklist" permission
       security:
         - bearerAuth: []
+      deprecated: true
       responses:
         '200':
           description: Success
@@ -515,7 +501,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WebtoolsBlacklistItems'
+                  $ref: '#/components/schemas/BlacklistItems'
         '400':
           description: Bad request
         '401':
@@ -530,6 +516,107 @@ paths:
         Deletes webtools blacklist items.
 
         **Auth:** Requires valid admin token and "webtools_blacklist" permission
+      security:
+        - bearerAuth: []
+      deprecated: true
+      parameters:
+        - name: source_ids
+          in: query
+          description: A comma-separated list of ids
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: calendar_ids
+          in: query
+          description: A comma-separated list of ids
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: originating_calendar_ids
+          in: query
+          description: A comma-separated list of ids
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/admin/events/webtools-blacklist:
+    put:
+      tags:
+        - Admin
+      summary: Add webtools blacklist data
+      description: |
+        Add webtools blacklist data
+
+        **Auth:** Requires valid admin token and `all_events` permission
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: list of the ids that needs to be blacklisted
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/_admin_req_add-webtools-blacklist'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    get:
+      tags:
+        - Admin
+      summary: Get all webtools blacklist item
+      description: |
+        Get all webtools blacklist items
+
+         **Auth:** Requires valid admin token and `all_events` permission
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlacklistItems'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+    delete:
+      tags:
+        - Admin
+      summary: Delete webtools blacklist item
+      description: |
+        Deletes webtools blacklist items.
+
+        **Auth:** Requires valid admin token and `all_events` permission
       security:
         - bearerAuth: []
       parameters:
@@ -571,15 +658,15 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
-  /api/admin/webtools-summary:
+  /api/admin/events/summary:
     get:
       tags:
         - Admin
-      summary: Get webtools summary
+      summary: Get events summary
       description: |
-        Get webtools summary
+        Get events summary
 
-         **Auth:** Requires valid admin token and "all_webtools" permission
+         **Auth:** Requires valid admin token and `all_events` permission
       security:
         - bearerAuth: []
       responses:
@@ -588,7 +675,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebtoolsSummary'
+                $ref: '#/components/schemas/SummaryEvents'
         '400':
           description: Bad request
         '401':
@@ -1608,7 +1695,7 @@ components:
         question:
           type: string
           readOnly: true
-    WebtoolsBlacklistItems:
+    BlacklistItems:
       type: object
       properties:
         name:
@@ -1617,24 +1704,88 @@ components:
           type: array
           items:
             type: string
-    WebtoolsSummaryItem:
+    OriginatingCalendarItem:
       type: object
       properties:
         count:
           type: integer
         id:
           type: string
-    WebtoolsSummary:
+        name:
+          type: string
+    WebtoolsSource:
       type: object
       properties:
-        originating_calendar_ids:
+        count:
+          type: integer
+        originating_calendar:
           type: array
           items:
-            $ref: '#/components/schemas/WebtoolsSummaryItem'
-        blacklisted_originating_calendar_ids:
+            $ref: '#/components/schemas/OriginatingCalendarItem'
+    LegacyEventItem:
+      type: object
+      properties:
+        sync_process_source:
+          type: string
+        sync_date:
+          type: string
+        status:
+          items:
+            $ref: '#/components/schemas/LegacyEventStatus'
+        item:
+          items:
+            $ref: '#/components/schemas/LegacyEvent'
+        create_info:
+          items:
+            type: object
+            properties:
+              time:
+                type: string
+              account_id:
+                type: string
+    LegacyEventStatus:
+      type: object
+      properties:
+        name:
+          type: string
+        reason_ignored:
+          type: string
+          nullable: true
+    ValidIgnored:
+      type: object
+      properties:
+        webtools_source:
+          items:
+            $ref: '#/components/schemas/WebtoolsSource'
+        tps_api:
+          items:
+            $ref: '#/components/schemas/TPsSource'
+    TPsSource:
+      type: object
+      properties:
+        count:
+          type: integer
+    SummaryEvents:
+      type: object
+      properties:
+        all_events_count:
+          type: integer
+        valid_events_count:
+          type: integer
+        ignored_events_count:
+          type: integer
+        total_originating_calendars:
+          type: integer
+        valid:
+          items:
+            $ref: '#/components/schemas/ValidIgnored'
+        ignored:
+          items:
+            $ref: '#/components/schemas/ValidIgnored'
+        blacklists:
           type: array
           items:
-            $ref: '#/components/schemas/WebtoolsBlacklistItems'
+            $ref: '#/components/schemas/BlacklistItems'
     _admin_req_update-configs:
       required:
         - type
@@ -1657,6 +1808,24 @@ components:
         data:
           anyOf:
             - $ref: '#/components/schemas/EnvConfigData'
+    _admin_req_add-webtools-blacklist:
+      type: object
+      properties:
+        data_source_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
+        data_calendar_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
+        data_originating_calendar_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
     _tps_req_create-event:
       type: object
       properties:

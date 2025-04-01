@@ -202,7 +202,7 @@ func (a appAdmin) AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs [
 	return nil
 }
 
-func (a appAdmin) GetWebtoolsBlackList() ([]model.WebToolsItem, error) {
+func (a appAdmin) GetWebtoolsBlackList() ([]model.Blacklist, error) {
 
 	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
@@ -220,20 +220,140 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 	return nil
 }
 
-func (a appAdmin) GetWebtoolsSummary() (*model.WebToolsSummary, error) {
-	webtoolsCalendarIDs, err := a.app.storage.FindAllWebtoolsCalendarIDs()
+func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
+
+	events, err := a.app.storage.FindLegacyEventsByParams(source, status, dataSourceEventID, calendarID, originatingCalendarID)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
+}
+
+func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
+	//get all items
+	statuses := []string{"valid", "ignored"}
+	allEvents, err := a.app.storage.FindLegacyEventItems(nil, &statuses)
 	if err != nil {
 		return nil, err
 	}
 
-	blacklistedCalendarIDs, err := a.app.storage.FindWebtoolsOriginatingCalendarIDsBlacklistData()
+	allEventsCount := len(allEvents)
+
+	validEventsCount := 0
+	ignoredEventsCount := 0
+
+	validOriginatingCalendar := map[string][]any{} //key - originatingCalendarID, index 0 - name, index 1 - count
+	var validWebtoolsCount int
+	var validTpsAPICount int
+
+	ignoredOriginatingCalendar := map[string][]any{} //key - originatingCalendarID, index 0 - name, index 1 - count
+	var ignoredWebtoolsCount int
+	var ignoredTpsAPICount int
+
+	totalOriginatingCalendars := map[string]bool{}
+
+	//prepare summary data
+	for _, eventItem := range allEvents {
+		status := eventItem.Status.Name
+		legacyEvent := eventItem.Item
+
+		if status == "valid" {
+			validEventsCount++
+
+			syncProcessSource := eventItem.SyncProcessSource
+			if syncProcessSource == "webtools-direct" {
+				validWebtoolsCount++
+
+				originatingCalendarID := legacyEvent.OriginatingCalendarID
+				originatingCalendarName := legacyEvent.OriginatingCalendarName
+
+				if existing, ok := validOriginatingCalendar[originatingCalendarID]; ok {
+					// increment count
+					existing[1] = existing[1].(int) + 1
+					validOriginatingCalendar[originatingCalendarID] = existing
+				} else {
+					// initialize with name and count = 1
+					validOriginatingCalendar[originatingCalendarID] = []any{originatingCalendarName, 1}
+				}
+
+			} else if syncProcessSource == "events-tps-api" {
+				validTpsAPICount++
+			}
+
+		} else if status == "ignored" {
+			ignoredEventsCount++
+
+			syncProcessSource := eventItem.SyncProcessSource
+			if syncProcessSource == "webtools-direct" {
+				ignoredWebtoolsCount++
+
+				originatingCalendarID := legacyEvent.OriginatingCalendarID
+				originatingCalendarName := legacyEvent.OriginatingCalendarName
+
+				if existing, ok := ignoredOriginatingCalendar[originatingCalendarID]; ok {
+					// increment count
+					existing[1] = existing[1].(int) + 1
+					ignoredOriginatingCalendar[originatingCalendarID] = existing
+				} else {
+					// initialize with name and count = 1
+					ignoredOriginatingCalendar[originatingCalendarID] = []any{originatingCalendarName, 1}
+				}
+
+			} else if syncProcessSource == "events-tps-api" {
+				ignoredTpsAPICount++
+			}
+
+		}
+
+		totalOriginatingCalendars[legacyEvent.OriginatingCalendarID] = true
+	}
+
+	//valid
+	validWebtoolsItems := make([]model.WebToolsOriginatingCalendar, len(validOriginatingCalendar))
+	validIndex := 0
+	for originatingCalendarID, data := range validOriginatingCalendar {
+		originatingName := data[0].(string)
+		count := data[1].(int)
+
+		validWebtoolsItems[validIndex] = model.WebToolsOriginatingCalendar{ID: originatingCalendarID,
+			Name: originatingName, Count: count}
+		validIndex++
+	}
+	validWebtoolsSource := model.WebToolsSource{Count: validWebtoolsCount, WebToolsItems: validWebtoolsItems}
+
+	//ignored
+	ignoredWebtoolsItems := make([]model.WebToolsOriginatingCalendar, len(ignoredOriginatingCalendar))
+	ignoredIndex := 0
+	for originatingCalendarID, data := range ignoredOriginatingCalendar {
+		originatingName := data[0].(string)
+		count := data[1].(int)
+
+		ignoredWebtoolsItems[ignoredIndex] = model.WebToolsOriginatingCalendar{ID: originatingCalendarID,
+			Name: originatingName, Count: count}
+		ignoredIndex++
+	}
+	ignoredWebtoolsSource := model.WebToolsSource{Count: ignoredWebtoolsCount, WebToolsItems: ignoredWebtoolsItems}
+
+	valid := model.Valid{WebtoolsSource: validWebtoolsSource,
+		TpsAPI: model.TPsSource{Count: validTpsAPICount}}
+
+	ignored := model.Ignored{WebtoolsSource: ignoredWebtoolsSource,
+		TpsAPI: model.TPsSource{Count: ignoredTpsAPICount}}
+
+	//blacklists
+	blacklist, err := a.app.storage.FindWebtoolsBlacklistData(nil)
 	if err != nil {
 		return nil, err
 	}
 
-	response := model.WebToolsSummary{WebtoolsOriginatingCalendarIDs: webtoolsCalendarIDs, BlackListedOriginatingCalendarIDs: blacklistedCalendarIDs}
-
-	return &response, nil
+	summary := model.EventsSummary{AllEventsCount: allEventsCount,
+		ValidEventsCount:          validEventsCount,
+		IgnoredEventsCount:        ignoredEventsCount,
+		TotalOriginatingCalendars: len(totalOriginatingCalendars),
+		Valid:                     valid,
+		Ignored:                   ignored,
+		Blacklists:                blacklist}
+	return &summary, nil
 }
 
 // newAppAdmin creates new appAdmin

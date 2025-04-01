@@ -5,10 +5,9 @@ put:
   description: |
     Add webtools blacklist data
 
-    **Auth:** Requires valid admin token and "webtools_blacklist" permission
+    **Auth:** Requires valid admin token and `all_events` permission
   security:
     - bearerAuth: []
-  deprecated: true
   requestBody:
     description: list of the ids that needs to be blacklisted
     content:
@@ -31,10 +30,9 @@ get:
   description: |
     Get all webtools blacklist items
 
-     **Auth:** Requires valid admin token and "webtools_blacklist" permission
+     **Auth:** Requires valid admin token and `all_events` permission
   security:
     - bearerAuth: []
-  deprecated: true
   responses:
     200:
       description: Success
@@ -57,10 +55,9 @@ delete:
   description: |
     Deletes webtools blacklist items.
 
-    **Auth:** Requires valid admin token and "webtools_blacklist" permission
+    **Auth:** Requires valid admin token and `all_events` permission
   security:
     - bearerAuth: []
-  deprecated: true
   parameters:
     - name: source_ids
       in: query

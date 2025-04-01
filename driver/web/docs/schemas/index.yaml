@@ -27,18 +27,31 @@ TimeSlot:
   $ref: "./application/TimeSlot.yaml"
 Question:
   $ref: "./application/Question.yaml"
-WebtoolsBlacklistItems: 
-  $ref: "./application/WebtoolsBlacklistItems.yaml" 
-WebtoolsSummaryItem: 
-  $ref: "./application/WebtoolsSummaryItem.yaml"   
-WebtoolsSummary: 
-  $ref: "./application/WebtoolsSummary.yaml"     
+BlacklistItems: 
+  $ref: "./application/BlacklistItems.yaml" 
+OriginatingCalendarItem: 
+  $ref: "./application/OriginatingCalendarItem.yaml"   
+WebtoolsSource: 
+  $ref: "./application/WebtoolsSource.yaml"     
+LegacyEventItem: 
+  $ref: "./application/LegacyEventItem.yaml" 
+LegacyEventStatus: 
+  $ref: "./application/LegacyEventStatus.yaml"   
+ValidIgnored: 
+  $ref: "./application/ValidIgnored.yaml"     
+TPsSource: 
+  $ref: "./application/TPsSource.yaml" 
+SummaryEvents: 
+  $ref: "./application/SummaryEvents.yaml"          
+
 
 # ADMIN section
 
 ## admin configs API
 _admin_req_update-configs:
   $ref: "./apis/admin/update-configs/Request.yaml"
+_admin_req_add-webtools-blacklist:
+  $ref: "./apis/admin/add-webtools-blacklist/Request.yaml"
 
 # end ADMIN section
 

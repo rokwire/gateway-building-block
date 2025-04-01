@@ -63,9 +63,10 @@ type Admin interface {
 	UpdateConfig(config model.Config, claims *tokenauth.Claims) error
 	DeleteConfig(id string, claims *tokenauth.Claims) error
 	AddWebtoolsBlackList(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
-	GetWebtoolsBlackList() ([]model.WebToolsItem, error)
+	GetWebtoolsBlackList() ([]model.Blacklist, error)
 	RemoveWebtoolsBlackList(sourceids []string, calendarids []string, originatingCalendarIdsList []string) error
-	GetWebtoolsSummary() (*model.WebToolsSummary, error)
+	GetEventsSummary() (*model.EventsSummary, error)
+	GetLegacyEventsItems(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 }
 
 // BBs exposes Building Block APIs for the driver adapters
@@ -138,20 +139,19 @@ type Storage interface {
 	InitializeLegacyLocations() error
 	FindLegacyLocations() (model.LegacyLocationsListType, error)
 
-	FindLegacyEventItems(context storage.TransactionContext) ([]model.LegacyEventItem, error)
+	FindLegacyEventItems(context storage.TransactionContext, statuses *[]string) ([]model.LegacyEventItem, error)
 	FindLegacyEventItemsBySourceID(context storage.TransactionContext, sourceID string) ([]model.LegacyEventItem, error)
 	InsertLegacyEvents(context storage.TransactionContext, items []model.LegacyEventItem) ([]model.LegacyEventItem, error)
 	DeleteLegacyEventsByIDs(context storage.TransactionContext, Ids map[string]string) error
 	DeleteLegacyEventsBySourceID(context storage.TransactionContext, sourceID string) error
 	DeleteLegacyEventsByIDsAndCreator(context storage.TransactionContext, ids []string, accountID string) error
 	FindLegacyEvents(source *string, status *string) ([]model.LegacyEvent, error)
-	FindAllWebtoolsCalendarIDs() ([]model.WebToolsCalendarID, error)
-	FindWebtoolsLegacyEventByID(ids []string) ([]model.LegacyEventItem, error)
+	FindLegacyEventsByParams(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error)
 
-	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.WebToolsItem, error)
+	FindWebtoolsBlacklistData(context storage.TransactionContext) ([]model.Blacklist, error)
 	AddWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIDs []string) error
 	RemoveWebtoolsBlacklistData(dataSourceIDs []string, dataCalendarIDs []string, dataOriginatingCalendarIdsList []string) error
-	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.WebToolsItem, error)
+	FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.Blacklist, error)
 
 	FindImageItems() ([]model.ContentImagesURL, error)
 	InsertImageItem(items model.ContentImagesURL) error

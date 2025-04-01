@@ -411,7 +411,7 @@ func (e eventsLogic) applyWhitelistCategoriesRule(wt model.WebToolsEvent) (bool,
 }
 
 // returns reason
-func (e eventsLogic) applyBlacklistsRule(wt model.WebToolsEvent, blacklistsItems []model.WebToolsItem) (bool, *string) {
+func (e eventsLogic) applyBlacklistsRule(wt model.WebToolsEvent, blacklistsItems []model.Blacklist) (bool, *string) {
 	if len(blacklistsItems) == 0 {
 		return false, nil
 	}

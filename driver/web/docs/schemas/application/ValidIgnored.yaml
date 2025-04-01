@@ -1,0 +1,11 @@
+type: object
+properties:
+  webtools_source:
+    items:
+      $ref: "./WebtoolsSource.yaml"
+  tps_api:
+    items:
+      $ref: "./TPsSource.yaml"    
+     
+
+  
