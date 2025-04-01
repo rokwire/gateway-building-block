@@ -16,6 +16,7 @@ package core
 
 import (
 	"application/core/model"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -250,6 +251,19 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 
 	valid := model.Valid{}
 	ignored := model.Ignored{}
+
+	statuses := []string{"valid", "ignored"}
+	allEvents, err := a.app.storage.FindLegacyEventItems(nil, &statuses)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(allEvents)
+
+	//process valid
+	/*for _, le := range validEvents {
+
+	} */
 	/*allEvents, err := a.app.storage.FindAllEvents()
 	if err != nil {
 		return nil, err

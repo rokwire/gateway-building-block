@@ -279,12 +279,17 @@ func (a *Adapter) DeleteConfig(id string) error {
 	return nil
 }
 
-// FindLegacyEventItems finds all legacy events
-func (a *Adapter) FindLegacyEventItems(context TransactionContext) ([]model.LegacyEventItem, error) {
-	filter := bson.M{}
+// FindLegacyEventItems finds legacy events items
+func (a *Adapter) FindLegacyEventItems(context TransactionContext, statuses *[]string) ([]model.LegacyEventItem, error) {
+	filter := bson.D{}
+
+	//statuses
+	if statuses != nil {
+		filter = append(filter, primitive.E{Key: "status.name", Value: primitive.M{"$in": *statuses}})
+	}
+
 	var data []model.LegacyEventItem
-	timeout := 15 * time.Second //15 seconds timeout
-	err := a.db.legacyEvents.FindWithParams(context, filter, &data, nil, &timeout)
+	err := a.db.legacyEvents.FindWithContext(context, filter, &data, nil)
 	if err != nil {
 		return nil, errors.WrapErrorAction(logutils.ActionFind, model.TypeExample, filterArgs(nil), err)
 	}
