@@ -246,6 +246,7 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	var validWebtoolsCount int
 	var validTpsAPICount int
 
+	ignoredOriginatingCalendar := map[string][]any{} //key - originatingCalendarID, index 0 - name, index 1 - count
 	var ignoredWebtoolsCount int
 	var ignoredTpsAPICount int
 
@@ -284,7 +285,18 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 			if syncProcessSource == "webtools-direct" {
 				ignoredWebtoolsCount++
 
-				//TODO
+				originatingCalendarID := legacyEvent.OriginatingCalendarID
+				originatingCalendarName := legacyEvent.OriginatingCalendarName
+
+				if existing, ok := ignoredOriginatingCalendar[originatingCalendarID]; ok {
+					// increment count
+					existing[1] = existing[1].(int) + 1
+					ignoredOriginatingCalendar[originatingCalendarID] = existing
+				} else {
+					// initialize with name and count = 1
+					ignoredOriginatingCalendar[originatingCalendarID] = []any{originatingCalendarName, 1}
+				}
+
 			} else if syncProcessSource == "events-tps-api" {
 				ignoredTpsAPICount++
 			}
@@ -292,6 +304,7 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 		}
 	}
 
+	//valid
 	validWebtoolsItems := make([]model.WebToolsOriginatingCalendar, len(validOriginatingCalendar))
 	validIndex := 0
 	for originatingCalendarID, data := range validOriginatingCalendar {
@@ -304,7 +317,18 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	}
 	validWebtoolsSource := model.WebToolsSource{Count: validWebtoolsCount, WebToolsItems: validWebtoolsItems}
 
-	ignoredWebtoolsSource := model.WebToolsSource{Count: ignoredWebtoolsCount}
+	//ignored
+	ignoredWebtoolsItems := make([]model.WebToolsOriginatingCalendar, len(ignoredOriginatingCalendar))
+	ignoredIndex := 0
+	for originatingCalendarID, data := range ignoredOriginatingCalendar {
+		originatingName := data[0].(string)
+		count := data[1].(int)
+
+		ignoredWebtoolsItems[ignoredIndex] = model.WebToolsOriginatingCalendar{ID: originatingCalendarID,
+			Name: originatingName, Count: count}
+		ignoredIndex++
+	}
+	ignoredWebtoolsSource := model.WebToolsSource{Count: ignoredWebtoolsCount, WebToolsItems: ignoredWebtoolsItems}
 
 	valid := model.Valid{WebtoolsSource: validWebtoolsSource,
 		TpsAPI: model.TPsSource{Count: validTpsAPICount}}
