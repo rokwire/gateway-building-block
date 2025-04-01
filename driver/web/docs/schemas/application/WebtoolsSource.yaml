@@ -2,7 +2,7 @@ type: object
 properties:
   count:
     type: integer
-  webtools_source:
+  originating_calendar:
     type: array
     items:
-      $ref: "./WebtoolsSummaryItem.yaml"
+      $ref: "./OriginatingCalendarItem.yaml"

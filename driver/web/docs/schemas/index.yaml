@@ -29,8 +29,8 @@ Question:
   $ref: "./application/Question.yaml"
 BlacklistItems: 
   $ref: "./application/BlacklistItems.yaml" 
-WebtoolsSummaryItem: 
-  $ref: "./application/WebtoolsSummaryItem.yaml"   
+OriginatingCalendarItem: 
+  $ref: "./application/OriginatingCalendarItem.yaml"   
 WebtoolsSource: 
   $ref: "./application/WebtoolsSource.yaml"     
 LegacyEventItem: 

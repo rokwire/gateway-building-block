@@ -1704,7 +1704,7 @@ components:
           type: array
           items:
             type: string
-    WebtoolsSummaryItem:
+    OriginatingCalendarItem:
       type: object
       properties:
         count:
@@ -1718,10 +1718,10 @@ components:
       properties:
         count:
           type: integer
-        webtools_source:
+        originating_calendar:
           type: array
           items:
-            $ref: '#/components/schemas/WebtoolsSummaryItem'
+            $ref: '#/components/schemas/OriginatingCalendarItem'
     LegacyEventItem:
       type: object
       properties:

@@ -140,6 +140,13 @@ type LocationLegacy struct {
 	Longitude   *float32 `json:"longitude,omitempty"`
 }
 
+// OriginatingCalendarItem defines model for OriginatingCalendarItem.
+type OriginatingCalendarItem struct {
+	Count *int    `json:"count,omitempty"`
+	Id    *string `json:"id,omitempty"`
+	Name  *string `json:"name,omitempty"`
+}
+
 // Question defines model for Question.
 type Question struct {
 	Id           *string   `json:"id,omitempty"`
@@ -200,15 +207,8 @@ type ValidIgnored struct {
 
 // WebtoolsSource defines model for WebtoolsSource.
 type WebtoolsSource struct {
-	Count          *int                   `json:"count,omitempty"`
-	WebtoolsSource *[]WebtoolsSummaryItem `json:"webtools_source,omitempty"`
-}
-
-// WebtoolsSummaryItem defines model for WebtoolsSummaryItem.
-type WebtoolsSummaryItem struct {
-	Count *int    `json:"count,omitempty"`
-	Id    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
+	Count               *int                       `json:"count,omitempty"`
+	OriginatingCalendar *[]OriginatingCalendarItem `json:"originating_calendar,omitempty"`
 }
 
 // AdminReqAddWebtoolsBlacklist defines model for _admin_req_add-webtools-blacklist.
