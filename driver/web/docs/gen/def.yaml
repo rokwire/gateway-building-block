@@ -1765,19 +1765,6 @@ components:
       properties:
         count:
           type: integer
-        tps_api:
-          type: array
-          items:
-            $ref: '#/components/schemas/TPsSummaryItem'
-    TPsSummaryItem:
-      type: object
-      properties:
-        count:
-          type: integer
-        id:
-          type: string
-        name:
-          type: string
     SummaryEvents:
       type: object
       properties:

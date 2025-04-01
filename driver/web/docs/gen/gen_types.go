@@ -176,15 +176,7 @@ type SummaryEvents struct {
 
 // TPsSource defines model for TPsSource.
 type TPsSource struct {
-	Count  *int              `json:"count,omitempty"`
-	TpsApi *[]TPsSummaryItem `json:"tps_api,omitempty"`
-}
-
-// TPsSummaryItem defines model for TPsSummaryItem.
-type TPsSummaryItem struct {
-	Count *int    `json:"count,omitempty"`
-	Id    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
+	Count *int `json:"count,omitempty"`
 }
 
 // TimeSlot defines model for TimeSlot.

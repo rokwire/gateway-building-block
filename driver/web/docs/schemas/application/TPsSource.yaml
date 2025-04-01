@@ -2,7 +2,3 @@ type: object
 properties:
   count:
     type: integer
-  tps_api:
-    type: array
-    items:
-      $ref: "./TPsSummaryItem.yaml"

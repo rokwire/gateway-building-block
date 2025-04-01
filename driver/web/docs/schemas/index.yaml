@@ -41,8 +41,6 @@ ValidIgnored:
   $ref: "./application/ValidIgnored.yaml"     
 TPsSource: 
   $ref: "./application/TPsSource.yaml" 
-TPsSummaryItem: 
-  $ref: "./application/TPsSummaryItem.yaml"  
 SummaryEvents: 
   $ref: "./application/SummaryEvents.yaml"          
 
