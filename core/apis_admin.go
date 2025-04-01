@@ -250,6 +250,8 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	var ignoredWebtoolsCount int
 	var ignoredTpsAPICount int
 
+	totalOriginatingCalendars := map[string]bool{}
+
 	//prepare summary data
 	for _, eventItem := range allEvents {
 		status := eventItem.Status.Name
@@ -302,6 +304,8 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 			}
 
 		}
+
+		totalOriginatingCalendars[legacyEvent.OriginatingCalendarID] = true
 	}
 
 	//valid
@@ -343,12 +347,12 @@ func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	}
 
 	summary := model.EventsSummary{AllEventsCount: allEventsCount,
-		ValidEventsCount:   validEventsCount,
-		IgnoredEventsCount: ignoredEventsCount,
-		/*	TotalOriginatingCalendars: totalCount, */
-		Valid:      valid,
-		Ignored:    ignored,
-		Blacklists: blacklist}
+		ValidEventsCount:          validEventsCount,
+		IgnoredEventsCount:        ignoredEventsCount,
+		TotalOriginatingCalendars: len(totalOriginatingCalendars),
+		Valid:                     valid,
+		Ignored:                   ignored,
+		Blacklists:                blacklist}
 	return &summary, nil
 }
 
