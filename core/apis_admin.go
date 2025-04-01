@@ -16,7 +16,6 @@ package core
 
 import (
 	"application/core/model"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -231,34 +230,52 @@ func (a appAdmin) GetLegacyEventsItems(source *string, status *string, dataSourc
 }
 
 func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
-	//get all valid
-	validStatus := "valid"
-	validEvents, err := a.app.storage.FindLegacyEvents(nil, &validStatus)
-	if err != nil {
-		return nil, err
-	}
-
-	//get all ignored
-	ignoredStatus := "ignored"
-	ignoredEvents, err := a.app.storage.FindLegacyEvents(nil, &ignoredStatus)
-	if err != nil {
-		return nil, err
-	}
-
-	validEventsCount := len(validEvents)
-	ignoredEventsCount := len(ignoredEvents)
-	allEventsCount := validEventsCount + ignoredEventsCount
-
-	valid := model.Valid{}
-	ignored := model.Ignored{}
-
+	//get all items
 	statuses := []string{"valid", "ignored"}
 	allEvents, err := a.app.storage.FindLegacyEventItems(nil, &statuses)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(allEvents)
+	allEventsCount := len(allEvents)
+
+	validEventsCount := 0
+	ignoredEventsCount := 0
+
+	//var validWebtoolsSource model.WebToolsSource
+	var validTpsAPICount int
+
+	var ignoredTpsAPICount int
+
+	//prepare summary data
+	for _, eventItem := range allEvents {
+		status := eventItem.Status.Name
+
+		if status == "valid" {
+			validEventsCount++
+
+			syncProcessSource := eventItem.SyncProcessSource
+			if syncProcessSource == "webtools-direct" {
+
+			} else if syncProcessSource == "events-tps-api" {
+				validTpsAPICount++
+			}
+
+		} else if status == "ignored" {
+			ignoredEventsCount++
+
+			syncProcessSource := eventItem.SyncProcessSource
+			if syncProcessSource == "webtools-direct" {
+
+			} else if syncProcessSource == "events-tps-api" {
+				ignoredTpsAPICount++
+			}
+
+		}
+	}
+
+	valid := model.Valid{TpsAPI: model.TPsSource{Count: validTpsAPICount}}
+	ignored := model.Ignored{TpsAPI: model.TPsSource{Count: ignoredTpsAPICount}}
 
 	//process valid
 	/*for _, le := range validEvents {
