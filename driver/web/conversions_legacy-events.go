@@ -19,6 +19,68 @@ import (
 	Def "application/driver/web/docs/gen"
 )
 
+// LegacyEventItem
+
+func legacyEventItemToDef(item model.LegacyEventItem) Def.LegacyEventItem {
+
+	status := legacyEventStatusToDef(item.Status)
+	legacyEvent := legacyEventToDef(item.Item)
+	return Def.LegacyEventItem{Source: item.SyncProcessSource,
+		Status: status, LegacyEvent: legacyEvent}
+}
+
+func legacyEventsItemsToDef(items []model.LegacyEventItem) []Def.LegacyEventItem {
+	result := make([]Def.LegacyEventItem, len(items))
+	for i, item := range items {
+		result[i] = legacyEventItemToDef(item)
+	}
+	return result
+}
+
+// LegacyEvent
+
+func legacyEventToDef(item model.LegacyEvent) Def.LegacyEvent {
+	return Def.LegacyEvent{
+		AllDay:                  item.AllDay,
+		CalendarId:              item.CalendarID,
+		Category:                item.Category,
+		Cost:                    item.Cost,
+		CreatedBy:               item.CreatedBy,
+		DataModified:            item.DataModified,
+		DataSourceEventId:       item.DataSourceEventID,
+		DateCreated:             item.DateCreated,
+		EndDate:                 item.EndDate,
+		EventId:                 item.EventID,
+		IcalUrl:                 item.IcalURL,
+		Id:                      item.ID,
+		ImageUrl:                item.ImageURL,
+		IsEventFree:             item.IsEventFree,
+		IsSuperEvent:            item.IsSuperEvent,
+		IsVirtual:               item.IsVirtial,
+		LongDescription:         item.LongDescription,
+		OriginatingCalendarId:   item.OriginatingCalendarID,
+		OriginatingCalendarName: item.OriginatingCalendarName,
+		OutlookUrl:              item.OutlookURL,
+		RecurrenceId:            item.RecurrenceID,
+		RecurringFlag:           item.RecurringFlag,
+		RegistrationUrl:         item.RegistrationURL,
+		SourceId:                item.SourceID,
+		Sponsor:                 item.Sponsor,
+		StartDate:               item.StartDate,
+		Subcategory:             item.Subcategory,
+		Tags:                    item.Tags,
+		TargetAudience:          item.TargetAudience,
+		Title:                   item.Title,
+		TitleUrl:                item.TitleURL,
+	}
+}
+
+// LegacyEventStatus
+
+func legacyEventStatusToDef(item model.LegacyEventStatus) Def.LegacyEventStatus {
+	return Def.LegacyEventStatus{Name: item.Name, ReasonIgnored: item.ReasonIgnored}
+}
+
 // ContactsLegacy
 func contactToDef(item Def.TpsReqCreateEventContact) model.ContactLegacy {
 

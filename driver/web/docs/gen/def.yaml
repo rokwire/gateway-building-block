@@ -682,6 +682,73 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/admin/events/load:
+    get:
+      tags:
+        - Admin
+      summary: Load events
+      description: |
+        Get existing events by search parameters
+
+         **Auth:** Requires valid admin token and `all_events` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: status - `valid` / `ignored`
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: source
+          in: query
+          description: source - `webtools-direct` / `events-tps-api`
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: data-source-event-id
+          in: query
+          description: data source event id of the event
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: calendar-id
+          in: query
+          description: calendar id of the event
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: originating-calendar-id
+          in: query
+          description: originating calendar id of the event
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LegacyEventItem'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   '/api/bbs/examples/{id}':
     get:
       tags:
@@ -1414,9 +1481,35 @@ components:
           type: string
     LegacyEvent:
       type: object
+      required:
+        - all_day
+        - calendar_id
+        - category
+        - subcategory
+        - created_by
+        - long_description
+        - data_modified
+        - data_source_event_id
+        - date_created
+        - end_date
+        - event_id
+        - ical_url
+        - id
+        - is_event_free
+        - is_virtual
+        - originating_calendar_id
+        - originating_calendar_name
+        - outlook_url
+        - is_super_event
+        - recurring_flag
+        - source_id
+        - sponsor
+        - start_date
+        - title
+        - title_url
+        - registration_url
+        - cost
       properties:
-        id:
-          type: string
         all_day:
           type: boolean
         calendar_id:
@@ -1425,62 +1518,68 @@ components:
           type: string
         subcategory:
           type: string
-        createdBy:
+        created_by:
           type: string
-        longDescription:
+        long_description:
           type: string
-        dataModified:
+        data_modified:
           type: string
-        dataSourceEventId:
+        data_source_event_id:
           type: string
-        dateCreated:
+        date_created:
           type: string
-        endDate:
+        end_date:
           type: string
         event_id:
           type: string
-        icalURL:
+        ical_url:
           type: string
-        imageURL:
+        id:
+          type: string
+        image_url:
           type: string
           nullable: true
-        isEventFree:
+        is_event_free:
           type: boolean
-        isVirtual:
+        is_virtual:
           type: boolean
         originating_calendar_id:
           type: string
-        outlookUrl:
+        originating_calendar_name:
+          type: string
+        outlook_url:
           type: string
         recurrence_id:
-          type: string
-        isSuperEvent:
+          type: integer
+          nullable: true
+        is_super_event:
           type: boolean
-        recurringFlag:
+        recurring_flag:
           type: boolean
         source_id:
           type: string
         sponsor:
           type: string
-        startDate:
+        start_date:
           type: string
         title:
           type: string
-        titleUrl:
+        title_url:
           type: string
-        registrationURL:
-          type: string
-        contacts:
+        tags:
           type: array
           items:
-            $ref: '#/components/schemas/ContactLegacy'
-        subeEvents:
+            type: string
+          nullable: true
+        target_audience:
           type: array
           items:
-            $ref: '#/components/schemas/SubEvents'
-        location:
-          items:
-            $ref: '#/components/schemas/LocationLegacy'
+            type: string
+          nullable: true
+        registration_url:
+          type: string
+        cost:
+          type: string
     LocationLegacy:
       type: object
       properties:
@@ -1724,27 +1823,21 @@ components:
             $ref: '#/components/schemas/OriginatingCalendarItem'
     LegacyEventItem:
       type: object
+      required:
+        - source
+        - status
+        - legacy_event
       properties:
-        sync_process_source:
-          type: string
-        sync_date:
+        source:
           type: string
         status:
-          items:
-            $ref: '#/components/schemas/LegacyEventStatus'
-        item:
-          items:
-            $ref: '#/components/schemas/LegacyEvent'
-        create_info:
-          items:
-            type: object
-            properties:
-              time:
-                type: string
-              account_id:
-                type: string
+          $ref: '#/components/schemas/LegacyEventStatus'
+        legacy_event:
+          $ref: '#/components/schemas/LegacyEvent'
     LegacyEventStatus:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string

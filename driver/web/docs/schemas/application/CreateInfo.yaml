@@ -1,6 +1,0 @@
-type: object
-properties:
-  time:
-    type: string
-  account_id:
-    type: string

@@ -71,8 +71,8 @@ paths:
     $ref: "./resources/admin/events_webtools-blacklist.yaml"    
   /api/admin/events/summary:
     $ref: "./resources/admin/events_summary.yaml"    
-  #/api/admin/legacy-events:
-  #  $ref: "./resources/admin/legacy-events.yaml"     
+  /api/admin/events/load:
+    $ref: "./resources/admin/events_load.yaml"     
 
   # BBs
   /api/bbs/examples/{id}:

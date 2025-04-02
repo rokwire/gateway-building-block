@@ -280,12 +280,32 @@ func (a *Adapter) DeleteConfig(id string) error {
 }
 
 // FindLegacyEventItems finds legacy events items
-func (a *Adapter) FindLegacyEventItems(context TransactionContext, statuses *[]string) ([]model.LegacyEventItem, error) {
+func (a *Adapter) FindLegacyEventItems(context TransactionContext, source *string, statuses *[]string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
 	filter := bson.D{}
+
+	//source
+	if source != nil {
+		filter = append(filter, primitive.E{Key: "sync_process_source", Value: *source})
+	}
 
 	//statuses
 	if statuses != nil {
 		filter = append(filter, primitive.E{Key: "status.name", Value: primitive.M{"$in": *statuses}})
+	}
+
+	//dataSourceEventID
+	if dataSourceEventID != nil {
+		filter = append(filter, primitive.E{Key: "item.dataSourceEventId", Value: *dataSourceEventID})
+	}
+
+	//calendarID
+	if calendarID != nil {
+		filter = append(filter, primitive.E{Key: "item.calendarId", Value: *calendarID})
+	}
+
+	//originatingCalendarID
+	if originatingCalendarID != nil {
+		filter = append(filter, primitive.E{Key: "item.originatingCalendarId", Value: *originatingCalendarID})
 	}
 
 	var data []model.LegacyEventItem
@@ -537,44 +557,6 @@ func (a *Adapter) FindWebtoolsOriginatingCalendarIDsBlacklistData() ([]model.Bla
 	}
 
 	return dataSource, nil
-}
-
-// FindLegacyEventsByParams finds legacy event by the params of the items
-func (a *Adapter) FindLegacyEventsByParams(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
-	filter := bson.D{}
-
-	//source
-	if source != nil {
-		filter = append(filter, primitive.E{Key: "sync_process_source", Value: *source})
-	}
-
-	//status
-	if status != nil {
-		filter = append(filter, primitive.E{Key: "status.name", Value: *status})
-	}
-
-	//dataSourceEventID
-	if dataSourceEventID != nil {
-		filter = append(filter, primitive.E{Key: "item.dataSourceEventId", Value: *dataSourceEventID})
-	}
-
-	//calendarID
-	if calendarID != nil {
-		filter = append(filter, primitive.E{Key: "item.calendarId", Value: *calendarID})
-	}
-
-	//originatingCalendarID
-	if originatingCalendarID != nil {
-		filter = append(filter, primitive.E{Key: "item.originatingCalendarId", Value: *originatingCalendarID})
-	}
-
-	var events []model.LegacyEventItem
-	err := a.db.legacyEvents.FindWithContext(nil, filter, &events, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return events, nil
 }
 
 // PerformTransaction performs a transaction
