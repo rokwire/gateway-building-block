@@ -704,7 +704,7 @@ paths:
             type: string
         - name: source
           in: query
-          description: source - `webtools` / `tps-api`
+          description: source - `webtools-direct` / `events-tps-api`
           required: false
           style: form
           explode: false

@@ -266,7 +266,7 @@ type GetApiAdminEventsLoadParams struct {
 	// Status status - `valid` / `ignored`
 	Status *string `form:"status,omitempty" json:"status,omitempty"`
 
-	// Source source - `webtools` / `tps-api`
+	// Source source - `webtools-direct` / `events-tps-api`
 	Source *string `form:"source,omitempty" json:"source,omitempty"`
 
 	// DataSourceEventId data source event id of the event
