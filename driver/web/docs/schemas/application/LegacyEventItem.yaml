@@ -2,6 +2,7 @@ type: object
 required:
   - source
   - status
+  - legacy_event
 properties:
   source:
     type: string

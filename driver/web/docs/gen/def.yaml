@@ -1826,6 +1826,7 @@ components:
       required:
         - source
         - status
+        - legacy_event
       properties:
         source:
           type: string
@@ -1835,6 +1836,8 @@ components:
           $ref: '#/components/schemas/LegacyEvent'
     LegacyEventStatus:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string

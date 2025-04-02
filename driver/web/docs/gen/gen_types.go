@@ -129,14 +129,14 @@ type LegacyEvent struct {
 
 // LegacyEventItem defines model for LegacyEventItem.
 type LegacyEventItem struct {
-	LegacyEvent *LegacyEvent      `json:"legacy_event,omitempty"`
+	LegacyEvent LegacyEvent       `json:"legacy_event"`
 	Source      string            `json:"source"`
 	Status      LegacyEventStatus `json:"status"`
 }
 
 // LegacyEventStatus defines model for LegacyEventStatus.
 type LegacyEventStatus struct {
-	Name          *string `json:"name,omitempty"`
+	Name          string  `json:"name"`
 	ReasonIgnored *string `json:"reason_ignored"`
 }
 

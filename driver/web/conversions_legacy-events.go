@@ -23,9 +23,10 @@ import (
 
 func legacyEventItemToDef(item model.LegacyEventItem) Def.LegacyEventItem {
 
-	//status
-	//legacy event
-	return Def.LegacyEventItem{Source: item.SyncProcessSource}
+	status := legacyEventStatusToDef(item.Status)
+	legacyEvent := legacyEventToDef(item.Item)
+	return Def.LegacyEventItem{Source: item.SyncProcessSource,
+		Status: status, LegacyEvent: legacyEvent}
 }
 
 func legacyEventsItemsToDef(items []model.LegacyEventItem) []Def.LegacyEventItem {
@@ -34,6 +35,20 @@ func legacyEventsItemsToDef(items []model.LegacyEventItem) []Def.LegacyEventItem
 		result[i] = legacyEventItemToDef(item)
 	}
 	return result
+}
+
+// LegacyEvent
+
+func legacyEventToDef(item model.LegacyEvent) Def.LegacyEvent {
+
+	//TODO
+	return Def.LegacyEvent{}
+}
+
+// LegacyEventStatus
+
+func legacyEventStatusToDef(item model.LegacyEventStatus) Def.LegacyEventStatus {
+	return Def.LegacyEventStatus{Name: item.Name, ReasonIgnored: item.ReasonIgnored}
 }
 
 // ContactsLegacy
