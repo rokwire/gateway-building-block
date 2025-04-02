@@ -135,11 +135,10 @@ type LegacyEvent struct {
 
 // LegacyEventItem defines model for LegacyEventItem.
 type LegacyEventItem struct {
-	CreateInfo        *interface{} `json:"create_info,omitempty"`
-	Item              *interface{} `json:"item,omitempty"`
-	Status            *interface{} `json:"status,omitempty"`
-	SyncDate          *string      `json:"sync_date,omitempty"`
-	SyncProcessSource *string      `json:"sync_process_source,omitempty"`
+	CreateInfo *interface{}      `json:"create_info,omitempty"`
+	Item       *interface{}      `json:"item,omitempty"`
+	Source     string            `json:"source"`
+	Status     LegacyEventStatus `json:"status"`
 }
 
 // LegacyEventStatus defines model for LegacyEventStatus.

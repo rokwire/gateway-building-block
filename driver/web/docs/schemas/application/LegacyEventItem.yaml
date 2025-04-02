@@ -1,12 +1,12 @@
 type: object
+required:
+  - source
+  - status
 properties:
-  sync_process_source:
-    type: string
-  sync_date:
+  source:
     type: string
   status:
-    items:
-      $ref: "./LegacyEventStatus.yaml"    
+    $ref: "./LegacyEventStatus.yaml"    
   item:
     items:
       $ref: "./LegacyEvent.yaml"     

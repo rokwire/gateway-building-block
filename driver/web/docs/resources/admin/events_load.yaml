@@ -55,7 +55,9 @@ get:
         content:
           application/json:
             schema:
-              $ref: "../../schemas/application/LegacyEventItem.yaml"
+              type: array
+              items:
+                $ref: "../../schemas/application/LegacyEventItem.yaml"
       400:
         description: Bad request
       401:
