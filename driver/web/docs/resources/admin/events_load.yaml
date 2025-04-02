@@ -1,17 +1,17 @@
 get:
   tags:
   - Admin
-  summary: Get legacy events
+  summary: Load events
   description: |
-    Get existing legacy events by search parameters
+    Get existing events by search parameters
 
-    **Auth:** Requires valid admin token with "get_legacy_event" permission
+     **Auth:** Requires valid admin token and `all_events` permission
   security:
     - bearerAuth: []
   parameters:
     - name: status
       in: query
-      description: status - valid / ignored
+      description: status - `valid` / `ignored`
       required: false
       style: form
       explode: false
@@ -19,31 +19,31 @@ get:
         type: string
     - name: source 
       in: query
-      description: source - "webtools-direct"/"events-tps-api" api(campus rec)
+      description: source - `webtools` / `tps-api`
       required: false
       style: form
       explode: false
       schema:
         type: string
-    - name: id 
+    - name: data-source-event-id 
       in: query
-      description: dataSourceEventId of the event
+      description: data source event id of the event
       required: false
       style: form
       explode: false
       schema:
         type: string
-    - name: calendarId
+    - name: calendar-id
       in: query
-      description: calendar_id of the event
+      description: calendar id of the event
       required: false
       style: form
       explode: false
       schema:
         type: string    
-    - name: originatingCalendarID
+    - name: originating-calendar-id
       in: query
-      description: originatingCal of the event
+      description: originating calendar id of the event
       required: false
       style: form
       explode: false

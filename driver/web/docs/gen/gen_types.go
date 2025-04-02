@@ -285,20 +285,20 @@ type GetApiAdminConfigsParams struct {
 
 // GetApiAdminEventsLoadParams defines parameters for GetApiAdminEventsLoad.
 type GetApiAdminEventsLoadParams struct {
-	// Status status - valid / ignored
+	// Status status - `valid` / `ignored`
 	Status *string `form:"status,omitempty" json:"status,omitempty"`
 
-	// Source source - "webtools-direct"/"events-tps-api" api(campus rec)
+	// Source source - `webtools` / `tps-api`
 	Source *string `form:"source,omitempty" json:"source,omitempty"`
 
-	// Id dataSourceEventId of the event
-	Id *string `form:"id,omitempty" json:"id,omitempty"`
+	// DataSourceEventId data source event id of the event
+	DataSourceEventId *string `form:"data-source-event-id,omitempty" json:"data-source-event-id,omitempty"`
 
-	// CalendarId calendar_id of the event
-	CalendarId *string `form:"calendarId,omitempty" json:"calendarId,omitempty"`
+	// CalendarId calendar id of the event
+	CalendarId *string `form:"calendar-id,omitempty" json:"calendar-id,omitempty"`
 
-	// OriginatingCalendarID originatingCal of the event
-	OriginatingCalendarID *string `form:"originatingCalendarID,omitempty" json:"originatingCalendarID,omitempty"`
+	// OriginatingCalendarId originating calendar id of the event
+	OriginatingCalendarId *string `form:"originating-calendar-id,omitempty" json:"originating-calendar-id,omitempty"`
 }
 
 // DeleteApiAdminEventsWebtoolsBlacklistParams defines parameters for DeleteApiAdminEventsWebtoolsBlacklist.
