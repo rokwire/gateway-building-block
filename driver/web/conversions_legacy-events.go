@@ -40,9 +40,39 @@ func legacyEventsItemsToDef(items []model.LegacyEventItem) []Def.LegacyEventItem
 // LegacyEvent
 
 func legacyEventToDef(item model.LegacyEvent) Def.LegacyEvent {
-
-	//TODO
-	return Def.LegacyEvent{}
+	return Def.LegacyEvent{
+		AllDay:                  item.AllDay,
+		CalendarId:              item.CalendarID,
+		Category:                item.Category,
+		Cost:                    item.Cost,
+		CreatedBy:               item.CreatedBy,
+		DataModified:            item.DataModified,
+		DataSourceEventId:       item.DataSourceEventID,
+		DateCreated:             item.DateCreated,
+		EndDate:                 item.EndDate,
+		EventId:                 item.EventID,
+		IcalUrl:                 item.IcalURL,
+		Id:                      item.ID,
+		ImageUrl:                item.ImageURL,
+		IsEventFree:             item.IsEventFree,
+		IsSuperEvent:            item.IsSuperEvent,
+		IsVirtual:               item.IsVirtial,
+		LongDescription:         item.LongDescription,
+		OriginatingCalendarId:   item.OriginatingCalendarID,
+		OriginatingCalendarName: item.OriginatingCalendarName,
+		OutlookUrl:              item.OutlookURL,
+		RecurrenceId:            item.RecurrenceID,
+		RecurringFlag:           item.RecurringFlag,
+		RegistrationUrl:         item.RegistrationURL,
+		SourceId:                item.SourceID,
+		Sponsor:                 item.Sponsor,
+		StartDate:               item.StartDate,
+		Subcategory:             item.Subcategory,
+		Tags:                    item.Tags,
+		TargetAudience:          item.TargetAudience,
+		Title:                   item.Title,
+		TitleUrl:                item.TitleURL,
+	}
 }
 
 // LegacyEventStatus
