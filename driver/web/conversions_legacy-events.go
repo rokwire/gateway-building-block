@@ -19,6 +19,23 @@ import (
 	Def "application/driver/web/docs/gen"
 )
 
+// LegacyEventItem
+
+func legacyEventItemToDef(item model.LegacyEventItem) Def.LegacyEventItem {
+
+	//status
+	//legacy event
+	return Def.LegacyEventItem{Source: item.SyncProcessSource}
+}
+
+func legacyEventsItemsToDef(items []model.LegacyEventItem) []Def.LegacyEventItem {
+	result := make([]Def.LegacyEventItem, len(items))
+	for i, item := range items {
+		result[i] = legacyEventItemToDef(item)
+	}
+	return result
+}
+
 // ContactsLegacy
 func contactToDef(item Def.TpsReqCreateEventContact) model.ContactLegacy {
 

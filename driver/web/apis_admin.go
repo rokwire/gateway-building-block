@@ -380,7 +380,9 @@ func (h AdminAPIsHandler) loadEvents(l *logs.Log, r *http.Request, claims *token
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
 
-	data, err := json.Marshal(events)
+	resEvents := legacyEventsItemsToDef(events)
+
+	data, err := json.Marshal(resEvents)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
 	}
