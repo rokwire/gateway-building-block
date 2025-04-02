@@ -344,7 +344,7 @@ func (h AdminAPIsHandler) getEventsSummary(l *logs.Log, r *http.Request, claims 
 	return l.HTTPResponseSuccessJSON(data)
 }
 
-func (h AdminAPIsHandler) legacyEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+func (h AdminAPIsHandler) loadEvents(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
 
 	var source *string
 	sourceParam := r.URL.Query().Get("source")
@@ -359,28 +359,28 @@ func (h AdminAPIsHandler) legacyEvents(l *logs.Log, r *http.Request, claims *tok
 	}
 
 	var dataSourceEventID *string
-	dataSourceEventIDParam := r.URL.Query().Get("id")
+	dataSourceEventIDParam := r.URL.Query().Get("data-source-event-id")
 	if len(dataSourceEventIDParam) > 0 {
 		dataSourceEventID = &dataSourceEventIDParam
 	}
 
 	var calendarID *string
-	calendarIDParam := r.URL.Query().Get("calendar_id")
+	calendarIDParam := r.URL.Query().Get("calendar-id")
 	if len(calendarIDParam) > 0 {
 		calendarID = &calendarIDParam
 	}
 	var originatingCalendarID *string
-	originatingCalendarIDParam := r.URL.Query().Get("originating_calendar_id")
+	originatingCalendarIDParam := r.URL.Query().Get("originating-calendar-id")
 	if len(originatingCalendarIDParam) > 0 {
 		originatingCalendarID = &originatingCalendarIDParam
 	}
 
-	legacyEvents, err := h.app.Admin.GetLegacyEventsItems(source, status, dataSourceEventID, calendarID, originatingCalendarID)
+	events, err := h.app.Admin.GetEventsItems(source, status, dataSourceEventID, calendarID, originatingCalendarID)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionCreate, model.TypeConfig, nil, err, http.StatusInternalServerError, true)
 	}
 
-	data, err := json.Marshal(legacyEvents)
+	data, err := json.Marshal(events)
 	if err != nil {
 		return l.HTTPResponseErrorAction(logutils.ActionMarshal, model.TypeConfig, nil, err, http.StatusInternalServerError, false)
 	}
