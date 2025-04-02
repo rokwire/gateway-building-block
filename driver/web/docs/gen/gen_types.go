@@ -72,13 +72,6 @@ type Config_Data struct {
 	union json.RawMessage
 }
 
-// ContactLegacy defines model for ContactLegacy.
-type ContactLegacy struct {
-	ContactEmail *string `json:"contactEmail,omitempty"`
-	ContactName  *string `json:"contactName,omitempty"`
-	ContactPhone *string `json:"contactPhone,omitempty"`
-}
-
 // EnvConfigData defines model for EnvConfigData.
 type EnvConfigData struct {
 	ExampleEnv string `json:"example_env"`
@@ -101,57 +94,50 @@ type ExternalUserID struct {
 
 // LegacyEvent defines model for LegacyEvent.
 type LegacyEvent struct {
-	AllDay                *bool            `json:"all_day,omitempty"`
-	CalendarId            *string          `json:"calendar_id,omitempty"`
-	Category              *string          `json:"category,omitempty"`
-	Contacts              *[]ContactLegacy `json:"contacts,omitempty"`
-	CreatedBy             *string          `json:"createdBy,omitempty"`
-	DataModified          *string          `json:"dataModified,omitempty"`
-	DataSourceEventId     *string          `json:"dataSourceEventId,omitempty"`
-	DateCreated           *string          `json:"dateCreated,omitempty"`
-	EndDate               *string          `json:"endDate,omitempty"`
-	EventId               *string          `json:"event_id,omitempty"`
-	IcalURL               *string          `json:"icalURL,omitempty"`
-	Id                    *string          `json:"id,omitempty"`
-	ImageURL              *string          `json:"imageURL"`
-	IsEventFree           *bool            `json:"isEventFree,omitempty"`
-	IsSuperEvent          *bool            `json:"isSuperEvent,omitempty"`
-	IsVirtual             *bool            `json:"isVirtual,omitempty"`
-	Location              *interface{}     `json:"location,omitempty"`
-	LongDescription       *string          `json:"longDescription,omitempty"`
-	OriginatingCalendarId *string          `json:"originating_calendar_id,omitempty"`
-	OutlookUrl            *string          `json:"outlookUrl,omitempty"`
-	RecurrenceId          *string          `json:"recurrence_id,omitempty"`
-	RecurringFlag         *bool            `json:"recurringFlag,omitempty"`
-	RegistrationURL       *string          `json:"registrationURL,omitempty"`
-	SourceId              *string          `json:"source_id,omitempty"`
-	Sponsor               *string          `json:"sponsor,omitempty"`
-	StartDate             *string          `json:"startDate,omitempty"`
-	Subcategory           *string          `json:"subcategory,omitempty"`
-	SubeEvents            *[]SubEvents     `json:"subeEvents,omitempty"`
-	Title                 *string          `json:"title,omitempty"`
-	TitleUrl              *string          `json:"titleUrl,omitempty"`
+	AllDay                  bool      `json:"all_day"`
+	CalendarId              string    `json:"calendar_id"`
+	Category                string    `json:"category"`
+	Cost                    string    `json:"cost"`
+	CreatedBy               string    `json:"created_by"`
+	DataModified            string    `json:"data_modified"`
+	DataSourceEventId       string    `json:"data_source_event_id"`
+	DateCreated             string    `json:"date_created"`
+	EndDate                 string    `json:"end_date"`
+	EventId                 string    `json:"event_id"`
+	IcalUrl                 string    `json:"ical_url"`
+	Id                      string    `json:"id"`
+	ImageUrl                *string   `json:"image_url"`
+	IsEventFree             bool      `json:"is_event_free"`
+	IsSuperEvent            bool      `json:"is_super_event"`
+	IsVirtual               bool      `json:"is_virtual"`
+	LongDescription         string    `json:"long_description"`
+	OriginatingCalendarId   string    `json:"originating_calendar_id"`
+	OriginatingCalendarName string    `json:"originating_calendar_name"`
+	OutlookUrl              string    `json:"outlook_url"`
+	RecurrenceId            *int      `json:"recurrence_id"`
+	RecurringFlag           bool      `json:"recurring_flag"`
+	RegistrationUrl         string    `json:"registration_url"`
+	SourceId                string    `json:"source_id"`
+	Sponsor                 string    `json:"sponsor"`
+	StartDate               string    `json:"start_date"`
+	Subcategory             string    `json:"subcategory"`
+	Tags                    *[]string `json:"tags"`
+	TargetAudience          *[]string `json:"target_audience"`
+	Title                   string    `json:"title"`
+	TitleUrl                string    `json:"title_url"`
 }
 
 // LegacyEventItem defines model for LegacyEventItem.
 type LegacyEventItem struct {
-	CreateInfo *interface{}      `json:"create_info,omitempty"`
-	Item       *interface{}      `json:"item,omitempty"`
-	Source     string            `json:"source"`
-	Status     LegacyEventStatus `json:"status"`
+	LegacyEvent *LegacyEvent      `json:"legacy_event,omitempty"`
+	Source      string            `json:"source"`
+	Status      LegacyEventStatus `json:"status"`
 }
 
 // LegacyEventStatus defines model for LegacyEventStatus.
 type LegacyEventStatus struct {
 	Name          *string `json:"name,omitempty"`
 	ReasonIgnored *string `json:"reason_ignored"`
-}
-
-// LocationLegacy defines model for LocationLegacy.
-type LocationLegacy struct {
-	Description *string  `json:"description,omitempty"`
-	Latitude    *float32 `json:"latitude,omitempty"`
-	Longitude   *float32 `json:"longitude,omitempty"`
 }
 
 // OriginatingCalendarItem defines model for OriginatingCalendarItem.
@@ -175,13 +161,6 @@ type Question struct {
 type QuestionAnswer struct {
 	QuestionId *string   `json:"question_id,omitempty"`
 	Values     *[]string `json:"values,omitempty"`
-}
-
-// SubEvents defines model for SubEvents.
-type SubEvents struct {
-	Id         *string `json:"id,omitempty"`
-	IsFeatured *bool   `json:"isFeatured,omitempty"`
-	Track      *string `json:"track,omitempty"`
 }
 
 // SummaryEvents defines model for SummaryEvents.

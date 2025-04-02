@@ -7,9 +7,5 @@ properties:
     type: string
   status:
     $ref: "./LegacyEventStatus.yaml"    
-  item:
-    items:
-      $ref: "./LegacyEvent.yaml"     
-  create_info:
-    items:
-      $ref: "./CreateInfo.yaml"        
+  legacy_event:
+    $ref: "./LegacyEvent.yaml"
