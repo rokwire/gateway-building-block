@@ -222,7 +222,13 @@ func (a appAdmin) RemoveWebtoolsBlackList(sourceIds []string, calendarids []stri
 
 func (a appAdmin) GetEventsItems(source *string, status *string, dataSourceEventID *string, calendarID *string, originatingCalendarID *string) ([]model.LegacyEventItem, error) {
 
-	events, err := a.app.storage.FindLegacyEventsByParams(source, status, dataSourceEventID, calendarID, originatingCalendarID)
+	//status
+	var statuses *[]string
+	if status != nil {
+		statuses = &[]string{*status}
+	}
+
+	events, err := a.app.storage.FindLegacyEventItems(nil, source, statuses, dataSourceEventID, calendarID, originatingCalendarID)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +238,7 @@ func (a appAdmin) GetEventsItems(source *string, status *string, dataSourceEvent
 func (a appAdmin) GetEventsSummary() (*model.EventsSummary, error) {
 	//get all items
 	statuses := []string{"valid", "ignored"}
-	allEvents, err := a.app.storage.FindLegacyEventItems(nil, &statuses)
+	allEvents, err := a.app.storage.FindLegacyEventItems(nil, nil, &statuses, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
