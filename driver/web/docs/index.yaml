@@ -33,6 +33,14 @@ paths:
   # Client
   /api/examples/{id}:
     $ref: "./resources/client/examples-id.yaml"
+  /api/wayfinidng/buildng:
+    $ref: "./resources/client/building.yaml"
+  /api/wayfinding/buildings:
+    $ref: "./resources/client/buildings.yaml"
+  /api/wayfinding/floorplan:
+    $ref: "./resources/client/floorplan.yaml"
+  /api/termsessions/listcurrent:
+    $ref: "./resources/client/termsessions.yaml"
   #/api/laundry/rooms:
   #  $ref: "./resources/client/laundryrooms.yaml"
   #/api/laundry/room:

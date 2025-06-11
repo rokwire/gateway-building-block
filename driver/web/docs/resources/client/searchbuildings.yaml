@@ -1,0 +1,40 @@
+get:
+  tags:
+  - Client
+  summary: Returns a list of buildings matching the requested name
+  description: |
+    Returns every building in the campus buildings list that contains the name parameter in the building name property. If the verbose parameter is omitted, the respone will return a compact building for each matching entry.
+
+    **Auth:** Requires valid first-party service account token with `get_building` permission
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: name
+    in: query
+    description: String to search for in the building name
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+  - name: v
+    in: query
+    description: Set to 1 or omit to return a compact bulding result. Set to 2 to return a verbose building result.
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: number
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/Building.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

@@ -42,7 +42,23 @@ ValidIgnored:
 TPsSource: 
   $ref: "./application/TPsSource.yaml" 
 SummaryEvents: 
-  $ref: "./application/SummaryEvents.yaml"          
+  $ref: "./application/SummaryEvents.yaml" 
+Building:
+  $ref: "./application/Building.yaml" 
+FloorPlan:
+  $ref: "./application/FloorPlan.yaml"
+FloorPlanHighlite:
+  $ref: "./application/FloorPlanHighlite.yaml"
+FloorPlanMarker:
+  $ref: "./application/FloorPlanMarker.yaml"
+BuildingFeature:
+  $ref: "./application/BuildingFeature.yaml"
+Entrance:
+  $ref: "./application/Entrance.yaml" 
+CompactBuilding:
+  $ref: "./application/CompactBuilding.yaml"
+TermSession:
+  $ref: "./application/TermSession.yaml"
 
 
 # ADMIN section

@@ -76,6 +76,170 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/wayfinidng/buildng:
+    get:
+      tags:
+        - Client
+      summary: Gets building information
+      description: |
+        Gets building information by id
+
+        **Auth:** Requires valid first-party service account token with `get_building` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: Building id
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: adaOnly
+          in: query
+          description: Prioritize ADA accessible entrances in the response
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: boolean
+        - name: lat
+          in: query
+          description: lattidue of the user's location
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: double
+        - name: long
+          in: query
+          description: longitude of the user's location
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: double
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/wayfinding/buildings:
+    get:
+      tags:
+        - Client
+      summary: Gets all campus buildings
+      description: |
+        Gets all campus buildings with coordinates, entrances, floors and features
+
+        **Auth:** Requires valid first-party service account token with `get_building` permission
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/Building'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/wayfinding/floorplan:
+    get:
+      tags:
+        - Client
+      summary: Returns the markup required to display the requested floor plan.
+      description: |
+        Returns the markup and data structures needed to display an svg of the request floor plan.
+
+        **Auth:** Requires valid first-party service account token with `get_building` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bldgid
+          in: query
+          description: The building id for the selected building
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: floor
+          in: query
+          description: Identifier of the floor to retrieve.
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: markers
+          in: query
+          description: 'If omitted, the value is set to "on". Indicates the initial state of all the marker on the floor plan. Values are "on" or "off".'
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: number
+        - name: highlites
+          in: query
+          description: 'If omitted, the values is set to "on". Indicates the initial state of all the highlites on the flloor plan. Values are "on" or "off".'
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FloorPlan'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/termsessions/listcurrent:
+    get:
+      tags:
+        - Client
+      summary: Returns a list of current term sessions
+      description: |
+        Based on the current date, returns 4 term sessions for campus. If the current month is between 6 and 12, the current fall term is assumed and returned with the upcomign spring semester, the last summer semster and the previous spring semester. If the current month is less than 6, returns the current spring semester, the upcoming summer and fall semesters and the previous fall semester.
+
+        **Auth:** Requires valid first-party service account token with `get_building` permission
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/TermSession'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   /api/admin/examples:
     post:
       tags:
@@ -1879,6 +2043,278 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BlacklistItems'
+    Building:
+      type: object
+      required:
+        - ID
+        - Number
+        - Name
+        - FullAddress
+        - Address1
+        - Address2
+        - City
+        - State
+        - ZipCode
+        - ImageURL
+        - MailCode
+        - Entrances
+        - Latitude
+        - Longitude
+        - Floors
+        - Features
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        Number:
+          type: string
+          readOnly: true
+        FullAddress:
+          type: string
+          readOnly: true
+        Address1:
+          type: string
+        Address2:
+          type: string
+          readOnly: true
+        City:
+          type: string
+          readOnly: true
+        State:
+          type: string
+          readOnly: true
+        ZipCode:
+          type: string
+          readOnly: true
+        ImageURL:
+          type: string
+          readOnly: true
+        MailCode:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+        Entrances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entrance'
+          readOnly: true
+        Floors:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        Features:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuildingFeature'
+          readOnly: true
+    FloorPlan:
+      type: object
+      required:
+        - BuildingNumber
+        - BuildingFloor
+        - SVGEncoding
+        - SVG
+        - Markers
+        - Highlites
+      properties:
+        BuildingNumber:
+          type: string
+          readOnly: true
+        BuildingFloor:
+          type: string
+          readOnly: true
+        SVGEncoding:
+          type: string
+          readOnly: true
+        SVG:
+          type: string
+        Markers:
+          type: array
+          items:
+            $ref: '#/components/schemas/FloorPlanMarker'
+          readOnly: true
+        Features:
+          type: array
+          items:
+            $ref: '#/components/schemas/FloorPlanHighlite'
+          readOnly: true
+    FloorPlanHighlite:
+      type: object
+      required:
+        - RenderID
+        - Label
+        - Color
+        - Display
+      properties:
+        RenderID:
+          type: string
+          readOnly: true
+        Label:
+          type: string
+          readOnly: true
+        Color:
+          type: string
+          readOnly: true
+        Display:
+          type: string
+    FloorPlanMarker:
+      type: object
+      required:
+        - RenderID
+        - Label
+        - Description
+        - Display
+        - Icon
+      properties:
+        RenderID:
+          type: string
+          readOnly: true
+        Label:
+          type: string
+          readOnly: true
+        Description:
+          type: string
+          readOnly: true
+        Display:
+          type: string
+        Icon:
+          type: string
+          readOnly: true
+    BuildingFeature:
+      type: object
+      required:
+        - ID
+        - BuildingID
+        - EQIndicator
+        - Name
+        - FoundOnFloor
+        - FoundInRoom
+        - IsADA
+        - IsExternal
+        - Comments
+        - Latitude
+        - Longitude
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        BuildingID:
+          type: string
+          readOnly: true
+        EQIndicator:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        FoundOnFloor:
+          type: string
+          readOnly: true
+        FoundInRoom:
+          type: string
+          readOnly: true
+        IsADA:
+          type: boolean
+          readOnly: true
+        IsExternal:
+          type: boolean
+        Comments:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+    Entrance:
+      type: object
+      required:
+        - ID
+        - Name
+        - ADACompliant
+        - Available
+        - ImageURL
+        - Latitude
+        - Longitude
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        ADACopmliant:
+          type: boolean
+          readOnly: true
+        Available:
+          type: boolean
+        ImageUrl:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+    CompactBuilding:
+      type: object
+      required:
+        - ID
+        - Number
+        - Name
+        - FullAddress
+        - ImageURL
+        - Latitude
+        - Longitude
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        Number:
+          type: string
+          readOnly: true
+        FullAddress:
+          type: string
+          readOnly: true
+        ImageURL:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+    TermSession:
+      type: object
+      required:
+        - term
+        - termid
+        - is_current
+      properties:
+        term:
+          type: string
+          readOnly: true
+        termid:
+          type: string
+          readOnly: true
+        is_current:
+          type: boolean
+          readOnly: true
     _admin_req_update-configs:
       required:
         - type

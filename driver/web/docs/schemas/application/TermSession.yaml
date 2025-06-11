@@ -1,0 +1,15 @@
+type: object
+required:
+- term
+- termid
+- is_current
+properties:
+  term:
+    type: string
+    readOnly: true
+  termid:
+    type: string
+    readOnly: true
+  is_current:
+    type: boolean  
+    readOnly: true

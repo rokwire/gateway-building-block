@@ -1,0 +1,24 @@
+get:
+  tags:
+  - Client
+  summary: Returns a list of current term sessions
+  description: |
+    Based on the current date, returns 4 term sessions for campus. If the current month is between 6 and 12, the current fall term is assumed and returned with the upcomign spring semester, the last summer semster and the previous spring semester. If the current month is less than 6, returns the current spring semester, the upcoming summer and fall semesters and the previous fall semester.
+
+    **Auth:** Requires valid first-party service account token with `get_building` permission
+  security:
+    - bearerAuth: []
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          type: array
+          items:
+            $ref: "../../schemas/application/TermSession.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error
