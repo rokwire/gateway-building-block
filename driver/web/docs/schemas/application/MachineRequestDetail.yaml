@@ -1,0 +1,25 @@
+type: object
+required:
+- MachineID
+- Message
+- OpenIssue
+- ProblemCodes
+- MachineType
+properties:
+  MachineID:
+    type: string
+    readOnly: true
+  Message:
+    type: string
+    readOnly: true
+  OpenIssue:
+    type: boolean
+    readOnly: true
+  ProblemCodes:
+    type: array
+    items:
+      type: string
+    readOnly: true
+  MachineType:
+    type: string
+    readOnly: true 

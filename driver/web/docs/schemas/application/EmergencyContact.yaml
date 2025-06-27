@@ -1,0 +1,21 @@
+type: object
+required:
+- Priority
+- RelationShip
+- FirstName
+- LastName
+- Address
+properties:
+  Priority:
+    type: string
+    readOnly: true
+  RelationShip:
+    $ref: "./CodeDescType.yaml"
+  FirstName:
+    type: string
+    readOnly: true
+  LastName:
+    type: string
+    readOnly: true
+  Address:
+    $ref: "./Address.yaml" 

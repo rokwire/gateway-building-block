@@ -1,0 +1,13 @@
+type: object
+required:
+- Name
+- Floors
+properties:
+  Name:
+    type: string
+    readOnly: true
+  Floors:
+    type: array
+    items:
+      type: string
+    readOnly: true 

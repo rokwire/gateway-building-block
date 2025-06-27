@@ -1,0 +1,32 @@
+type: object
+required:
+- machineid
+- problemcode
+- firstname
+- lastname
+- email
+properties:
+  machineid:
+    type: string
+    description: The unique service tag ID of the laundry machine
+  problemcode:
+    type: string
+    description: The problem code describing the issue with the machine
+  comments:
+    type: string
+    nullable: true
+    description: Additional comments about the problem (optional)
+  firstname:
+    type: string
+    description: First name of the person submitting the request
+  lastname:
+    type: string
+    description: Last name of the person submitting the request
+  phone:
+    type: string
+    nullable: true
+    description: Phone number of the person submitting the request (optional)
+  email:
+    type: string
+    format: email
+    description: Email address of the person submitting the request 

@@ -1,0 +1,27 @@
+type: object
+required:
+- term
+- subject
+- number
+- section
+- title
+- instructor
+properties:
+  term:
+    type: string
+    readOnly: true
+  subject:
+    type: string
+    readOnly: true
+  number:
+    type: string
+    readOnly: true
+  section:
+    type: string
+    readOnly: true
+  title:
+    type: string
+    readOnly: true
+  instructor:
+    type: string
+    readOnly: true 

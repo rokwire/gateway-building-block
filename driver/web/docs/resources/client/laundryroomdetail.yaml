@@ -1,0 +1,80 @@
+get:
+  tags:
+  - Client
+  summary: Get detailed information about a specific laundry room
+  description: |
+    Returns detailed information about a specific laundry room including the number of washers and dryers, 
+    a list of all appliances (machines) in the room with their current status, and location details.
+    
+    **Auth:** Requires valid first-party service account token with appropriate permissions
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: id
+    in: query
+    description: The unique identifier of the laundry room
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+      example: "1"
+  responses:
+    200:
+      description: Success - Returns detailed laundry room information
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/RoomDetail.yaml"
+          example:
+            NumWashers: 8
+            NumDryers: 6
+            RoomName: "Illini Tower Laundry"
+            CampusName: "University of Illinois at Urbana-Champaign"
+            Location:
+              Latitude: 40.1095
+              Longitude: -88.2272
+              Floor: 1
+            Appliances:
+              - ID: "washer_001"
+                Status: "available"
+                ApplianceType: "washer"
+                AverageCycleTime: 45
+                TimeRemaining: null
+                Label: "Washer 1"
+              - ID: "dryer_001"
+                Status: "in_use"
+                ApplianceType: "dryer"
+                AverageCycleTime: 60
+                TimeRemaining: 15
+                Label: "Dryer 1"
+              - ID: "washer_002"
+                Status: "maintenance"
+                ApplianceType: "washer"
+                AverageCycleTime: 45
+                TimeRemaining: null
+                Label: "Washer 2"
+    400:
+      description: Bad request - Missing or invalid room ID parameter
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "missing"
+              type:
+                type: string
+                example: "query_param"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["id"]
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    404:
+      description: Not found - Laundry room with specified ID not found
+    500:
+      description: Internal server error 

@@ -1,0 +1,65 @@
+get:
+  tags:
+  - Client
+  summary: Initialize a service request for a laundry machine
+  description: |
+    Returns the problem codes and pending service request status for a specific laundry machine. 
+    This endpoint is used to initialize a service request by providing the available problem codes 
+    and checking if there's already an open issue for the machine.
+    
+    **Auth:** Requires valid first-party service account token with appropriate permissions
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: machineid
+    in: query
+    description: The unique service tag ID of the laundry machine
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+      example: "washer_001"
+  responses:
+    200:
+      description: Success - Returns machine request details and available problem codes
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/MachineRequestDetail.yaml"
+          example:
+            MachineID: "washer_001"
+            Message: "Machine is available for service requests"
+            OpenIssue: false
+            ProblemCodes:
+              - "not_spinning"
+              - "not_draining"
+              - "leaking"
+              - "not_starting"
+              - "error_code"
+              - "other"
+            MachineType: "washer"
+    400:
+      description: Bad request - Missing or invalid machine ID parameter
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "missing"
+              type:
+                type: string
+                example: "query_param"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["machineid"]
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    404:
+      description: Not found - Machine with specified ID not found
+    500:
+      description: Internal server error 

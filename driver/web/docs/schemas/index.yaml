@@ -1,64 +1,112 @@
 # application
+Address:
+  $ref: "./application/Address.yaml"
+Appliance:
+  $ref: "./application/Appliance.yaml"
+AppointmentHost:
+  $ref: "./application/AppointmentHost.yaml"
+AppointmentOptions:
+  $ref: "./application/AppointmentOptions.yaml"
+AppointmentPerson:
+  $ref: "./application/AppointmentPerson.yaml"
+AppointmentPost:
+  $ref: "./application/AppointmentPost.yaml"
+AppointmentUnit:
+  $ref: "./application/AppointmentUnit.yaml"
+BlacklistItems: 
+  $ref: "./application/BlacklistItems.yaml" 
+Building:
+  $ref: "./application/Building.yaml" 
+BuildingBlockAppointment:
+  $ref: "./application/BuildingBlockAppointment.yaml"
+BuildingFeature:
+  $ref: "./application/BuildingFeature.yaml"
+BuildingFeatureLocation:
+  $ref: "./application/BuildingFeatureLocation.yaml"
+CodeDescType:
+  $ref: "./application/CodeDescType.yaml"
+CompactBuilding:
+  $ref: "./application/CompactBuilding.yaml"
 Config:
   $ref: "./application/Config.yaml"
+ContactLegacy:
+  $ref: "./application/ContactLegacy.yaml"  
+Course:
+  $ref: "./application/Course.yaml"
+CourseSection:
+  $ref: "./application/CourseSection.yaml"
+EmergencyContact:
+  $ref: "./application/EmergencyContact.yaml"
+Entrance:
+  $ref: "./application/Entrance.yaml" 
 EnvConfigData:
   $ref: "./application/EnvConfigData.yaml"
 Example:
   $ref: "./application/Example.yaml"
-ContactLegacy:
-  $ref: "./application/ContactLegacy.yaml"  
-LegacyEvent:
-  $ref: "./application/LegacyEvent.yaml"  
-LocationLegacy:
-  $ref: "./application/LocationLegacy.yaml"   
-SubEvents:
-  $ref: "./application/SubEvents.yaml"
-AppointmentPost:
-  $ref: "./application/AppointmentPost.yaml"
-BuildingBlockAppointment:
-  $ref: "./application/BuildingBlockAppointment.yaml"
 ExternalUserID:
   $ref: "./application/ExternalUserID.yaml"
-QuestionAnswer:
-  $ref: "./application/QuestionAnswer.yaml"
-AppointmentOptions:
-  $ref: "./application/AppointmentOptions.yaml"
-TimeSlot:
-  $ref: "./application/TimeSlot.yaml"
-Question:
-  $ref: "./application/Question.yaml"
-BlacklistItems: 
-  $ref: "./application/BlacklistItems.yaml" 
-OriginatingCalendarItem: 
-  $ref: "./application/OriginatingCalendarItem.yaml"   
-WebtoolsSource: 
-  $ref: "./application/WebtoolsSource.yaml"     
-LegacyEventItem: 
-  $ref: "./application/LegacyEventItem.yaml" 
-LegacyEventStatus: 
-  $ref: "./application/LegacyEventStatus.yaml"   
-ValidIgnored: 
-  $ref: "./application/ValidIgnored.yaml"     
-TPsSource: 
-  $ref: "./application/TPsSource.yaml" 
-SummaryEvents: 
-  $ref: "./application/SummaryEvents.yaml" 
-Building:
-  $ref: "./application/Building.yaml" 
+FeatureMapEntry:
+  $ref: "./application/FeatureMapEntry.yaml"
 FloorPlan:
   $ref: "./application/FloorPlan.yaml"
 FloorPlanHighlite:
   $ref: "./application/FloorPlanHighlite.yaml"
 FloorPlanMarker:
   $ref: "./application/FloorPlanMarker.yaml"
-BuildingFeature:
-  $ref: "./application/BuildingFeature.yaml"
-Entrance:
-  $ref: "./application/Entrance.yaml" 
-CompactBuilding:
-  $ref: "./application/CompactBuilding.yaml"
+GiesCourse:
+  $ref: "./application/GiesCourse.yaml"
+LaundryDetails:
+  $ref: "./application/LaundryDetails.yaml"
+LaundryRoom:
+  $ref: "./application/LaundryRoom.yaml"
+LegacyEvent:
+  $ref: "./application/LegacyEvent.yaml"  
+LegacyEventItem: 
+  $ref: "./application/LegacyEventItem.yaml" 
+LegacyEventStatus: 
+  $ref: "./application/LegacyEventStatus.yaml"   
+LocationLegacy:
+  $ref: "./application/LocationLegacy.yaml"   
+MachineRequestDetail:
+  $ref: "./application/MachineRequestDetail.yaml"
+Organization:
+  $ref: "./application/Organization.yaml"
+OriginatingCalendarItem: 
+  $ref: "./application/OriginatingCalendarItem.yaml"   
+Person:
+  $ref: "./application/Person.yaml"
+PhoneNumber:
+  $ref: "./application/PhoneNumber.yaml"
+Question:
+  $ref: "./application/Question.yaml"
+QuestionAnswer:
+  $ref: "./application/QuestionAnswer.yaml"
+RoomDetail:
+  $ref: "./application/RoomDetail.yaml"
+SearchBuildingsResponse:
+  $ref: "./application/SearchBuildingsResponse.yaml"
+ServiceRequestResult:
+  $ref: "./application/ServiceRequestResult.yaml"
+ServiceSubmission:
+  $ref: "./application/ServiceSubmission.yaml"
+SubEvents:
+  $ref: "./application/SubEvents.yaml"
+SummaryEvents: 
+  $ref: "./application/SummaryEvents.yaml" 
+successteam:
+  $ref: "./application/successteam.yaml"
+successteamMember:
+  $ref: "./application/successteamMember.yaml"
 TermSession:
   $ref: "./application/TermSession.yaml"
+TimeSlot:
+  $ref: "./application/TimeSlot.yaml"
+TPsSource: 
+  $ref: "./application/TPsSource.yaml" 
+ValidIgnored: 
+  $ref: "./application/ValidIgnored.yaml"     
+WebtoolsSource: 
+  $ref: "./application/WebtoolsSource.yaml"     
 
 
 # ADMIN section

@@ -3,38 +3,74 @@ get:
   - Client
   summary: Returns a list of buildings matching the requested name
   description: |
-    Returns every building in the campus buildings list that contains the name parameter in the building name property. If the verbose parameter is omitted, the respone will return a compact building for each matching entry.
-
+    Returns every building in the campus buildings list that contains the name parameter in the building name property. 
+    The response is a map where keys are building names and values are building objects.
+    
+    **Verbosity Levels:**
+    - **v=1 or omitted**: Returns CompactBuilding objects (default)
+    - **v=2**: Returns full Building objects with complete details
+    
     **Auth:** Requires valid first-party service account token with `get_building` permission
   security:
     - bearerAuth: []
   parameters:
   - name: name
     in: query
-    description: String to search for in the building name
+    description: String to search for in the building name (case-insensitive)
     required: true
     style: form
     explode: false
     schema:
       type: string
+      example: "Illini"
   - name: v
     in: query
-    description: Set to 1 or omit to return a compact bulding result. Set to 2 to return a verbose building result.
+    description: Verbosity level. Set to 1 or omit for compact buildings, set to 2 for full building details
     required: false
     style: form
     explode: false
     schema:
-      type: number
+      type: string
+      enum: ["1", "2"]
+      default: "1"
+      example: "1"
   responses:
     200:
-      description: Success
+      description: Success - Returns a map of building names to building objects
       content:
         application/json:
           schema:
-            $ref: "../../schemas/application/Building.yaml"
+            $ref: "../../schemas/application/SearchBuildingsResponse.yaml"
+          example:
+            "Illini Union":
+              ID: "illini_union"
+              Name: "Illini Union"
+              Number: "1401"
+              FullAddress: "1401 W Green St, Urbana, IL 61801"
+              ImageURL: "https://example.com/illini_union.jpg"
+              Latitude: 40.1095
+              Longitude: -88.2272
     400:
-      description: Bad request
+      description: Bad request - Missing or invalid name parameter
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "invalid"
+              type:
+                type: string
+                example: "query_param"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["name"]
     401:
-      description: Unauthorized
+      description: Unauthorized - Invalid or missing authentication token
+    404:
+      description: Not found - No buildings match the search criteria
     500:
-      description: Internal error
+      description: Internal server error

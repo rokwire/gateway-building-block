@@ -1,0 +1,63 @@
+post:
+  tags:
+  - Client
+  summary: Submit a service request for a laundry machine
+  description: |
+    Submits a service request for a specific laundry machine. This endpoint requires detailed information 
+    about the problem and contact information for the person submitting the request.
+    
+    **Required Fields:** machineid, problemcode, firstname, lastname, email
+    **Optional Fields:** comments, phone
+    
+    **Auth:** Requires valid first-party service account token with appropriate permissions
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/application/ServiceSubmission.yaml"
+        example:
+          machineid: "washer_001"
+          problemcode: "not_spinning"
+          comments: "Machine makes noise but doesn't spin"
+          firstname: "John"
+          lastname: "Doe"
+          phone: "555-123-4567"
+          email: "john.doe@example.com"
+  responses:
+    200:
+      description: Success - Service request submitted successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/ServiceRequestResult.yaml"
+          example:
+            Message: "Service request submitted successfully"
+            RequestNumber: "SR-2024-001234"
+            Status: "submitted"
+    400:
+      description: Bad request - Missing required fields or invalid data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "missing"
+              type:
+                type: string
+                example: "request_body"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["machineid", "problemcode"]
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    404:
+      description: Not found - Machine with specified ID not found
+    500:
+      description: Internal server error 

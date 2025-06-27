@@ -1,0 +1,35 @@
+type: object
+required:
+- Type
+- Street1
+- City
+- StateAbbr
+- StateName
+- ZipCode
+- County
+- Phone
+properties:
+  Type:
+    type: string
+    enum: ["MA", "PR"]
+    readOnly: true
+  Street1:
+    type: string
+    readOnly: true
+  City:
+    type: string
+    readOnly: true
+  StateAbbr:
+    type: string
+    readOnly: true
+  StateName:
+    type: string
+    readOnly: true
+  ZipCode:
+    type: string
+    readOnly: true
+  County:
+    type: string
+    readOnly: true
+  Phone:
+    $ref: "./PhoneNumber.yaml" 

@@ -1,0 +1,15 @@
+type: object
+required:
+- Message
+- RequestNumber
+- Status
+properties:
+  Message:
+    type: string
+    readOnly: true
+  RequestNumber:
+    type: string
+    readOnly: true
+  Status:
+    type: string
+    readOnly: true 

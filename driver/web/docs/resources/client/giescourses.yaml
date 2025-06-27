@@ -1,0 +1,80 @@
+get:
+  tags:
+  - Client
+  summary: Get registered courses for GIES students
+  description: |
+    Returns a list of registered courses for GIES (Gies College of Business) students. 
+    This endpoint provides course information including term, subject, number, section, 
+    title, and instructor details.
+    
+    **Authentication:** Requires both RokwireAuth and ExternalAuth tokens
+    **Note:** This endpoint is specifically for GIES students and may return different 
+    course information compared to the general student courses endpoint.
+    
+    **Auth:** Requires valid first-party service account token and external authorization token
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: id
+    in: query
+    description: User ID (UIN) of the GIES student
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+      example: "123456789"
+  responses:
+    200:
+      description: Success - Returns list of GIES courses
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/GiesCourse.yaml"
+          example:
+            - term: "2024-FA"
+              subject: "BADM"
+              number: "310"
+              section: "A"
+              title: "Principles of Marketing"
+              instructor: "Dr. Smith"
+            - term: "2024-FA"
+              subject: "BADM"
+              number: "320"
+              section: "B"
+              title: "Business Statistics"
+              instructor: "Dr. Johnson"
+            - term: "2024-FA"
+              subject: "FIN"
+              number: "300"
+              section: "C"
+              title: "Financial Management"
+              instructor: "Dr. Williams"
+    400:
+      description: Bad request - Missing required parameters or invalid external token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "invalid"
+              type:
+                type: string
+                example: "query_param"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["id"]
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    403:
+      description: Forbidden - Insufficient permissions or invalid external token
+    404:
+      description: Not found - Student with specified UIN not found or no courses available
+    500:
+      description: Internal server error 

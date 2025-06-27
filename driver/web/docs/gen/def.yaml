@@ -215,6 +215,86 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/wayfinding/searchbuildings:
+    get:
+      tags:
+        - Client
+      summary: Returns a list of buildings matching the requested name
+      description: |
+        Returns every building in the campus buildings list that contains the name parameter in the building name property. 
+        The response is a map where keys are building names and values are building objects.
+
+        **Verbosity Levels:**
+        - **v=1 or omitted**: Returns CompactBuilding objects (default)
+        - **v=2**: Returns full Building objects with complete details
+
+        **Auth:** Requires valid first-party service account token with `get_building` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          description: String to search for in the building name (case-insensitive)
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: Illini
+        - name: v
+          in: query
+          description: 'Verbosity level. Set to 1 or omit for compact buildings, set to 2 for full building details'
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+            enum:
+              - '1'
+              - '2'
+            default: '1'
+            example: '1'
+      responses:
+        '200':
+          description: Success - Returns a map of building names to building objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchBuildingsResponse'
+              example:
+                Illini Union:
+                  ID: illini_union
+                  Name: Illini Union
+                  Number: '1401'
+                  FullAddress: '1401 W Green St, Urbana, IL 61801'
+                  ImageURL: 'https://example.com/illini_union.jpg'
+                  Latitude: 40.1095
+                  Longitude: -88.2272
+        '400':
+          description: Bad request - Missing or invalid name parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: invalid
+                  type:
+                    type: string
+                    example: query_param
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - name
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found - No buildings match the search criteria
+        '500':
+          description: Internal server error
   /api/termsessions/listcurrent:
     get:
       tags:
@@ -240,6 +320,636 @@ paths:
           description: Unauthorized
         '500':
           description: Internal error
+  /api/laundry/rooms:
+    get:
+      tags:
+        - Client
+      summary: Get list of all campus laundry rooms
+      description: |
+        Returns a list of all laundry rooms available on campus with their basic information including ID, name, status, and location details.
+
+        **Auth:** Requires valid first-party service account token with appropriate permissions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success - Returns organization with list of laundry rooms
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              example:
+                SchoolName: University of Illinois at Urbana-Champaign
+                LaundryRooms:
+                  - ID: 1
+                    Name: Illini Tower Laundry
+                    Status: active
+                    Location:
+                      Latitude: 40.1095
+                      Longitude: -88.2272
+                      Floor: 1
+                  - ID: 2
+                    Name: Bromley Hall Laundry
+                    Status: active
+                    Location:
+                      Latitude: 40.11
+                      Longitude: -88.228
+                      Floor: 2
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found - No laundry rooms available
+        '500':
+          description: Internal server error
+  /api/laundry/room:
+    get:
+      tags:
+        - Client
+      summary: Get detailed information about a specific laundry room
+      description: |
+        Returns detailed information about a specific laundry room including the number of washers and dryers, 
+        a list of all appliances (machines) in the room with their current status, and location details.
+
+        **Auth:** Requires valid first-party service account token with appropriate permissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: The unique identifier of the laundry room
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: '1'
+      responses:
+        '200':
+          description: Success - Returns detailed laundry room information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomDetail'
+              example:
+                NumWashers: 8
+                NumDryers: 6
+                RoomName: Illini Tower Laundry
+                CampusName: University of Illinois at Urbana-Champaign
+                Location:
+                  Latitude: 40.1095
+                  Longitude: -88.2272
+                  Floor: 1
+                Appliances:
+                  - ID: washer_001
+                    Status: available
+                    ApplianceType: washer
+                    AverageCycleTime: 45
+                    TimeRemaining: null
+                    Label: Washer 1
+                  - ID: dryer_001
+                    Status: in_use
+                    ApplianceType: dryer
+                    AverageCycleTime: 60
+                    TimeRemaining: 15
+                    Label: Dryer 1
+                  - ID: washer_002
+                    Status: maintenance
+                    ApplianceType: washer
+                    AverageCycleTime: 45
+                    TimeRemaining: null
+                    Label: Washer 2
+        '400':
+          description: Bad request - Missing or invalid room ID parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: missing
+                  type:
+                    type: string
+                    example: query_param
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - id
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found - Laundry room with specified ID not found
+        '500':
+          description: Internal server error
+  /api/laundry/initrequest:
+    get:
+      tags:
+        - Client
+      summary: Initialize a service request for a laundry machine
+      description: |
+        Returns the problem codes and pending service request status for a specific laundry machine. 
+        This endpoint is used to initialize a service request by providing the available problem codes 
+        and checking if there's already an open issue for the machine.
+
+        **Auth:** Requires valid first-party service account token with appropriate permissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: machineid
+          in: query
+          description: The unique service tag ID of the laundry machine
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: washer_001
+      responses:
+        '200':
+          description: Success - Returns machine request details and available problem codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MachineRequestDetail'
+              example:
+                MachineID: washer_001
+                Message: Machine is available for service requests
+                OpenIssue: false
+                ProblemCodes:
+                  - not_spinning
+                  - not_draining
+                  - leaking
+                  - not_starting
+                  - error_code
+                  - other
+                MachineType: washer
+        '400':
+          description: Bad request - Missing or invalid machine ID parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: missing
+                  type:
+                    type: string
+                    example: query_param
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - machineid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found - Machine with specified ID not found
+        '500':
+          description: Internal server error
+  /api/laundry/requestservice:
+    post:
+      tags:
+        - Client
+      summary: Submit a service request for a laundry machine
+      description: |
+        Submits a service request for a specific laundry machine. This endpoint requires detailed information 
+        about the problem and contact information for the person submitting the request.
+
+        **Required Fields:** machineid, problemcode, firstname, lastname, email
+        **Optional Fields:** comments, phone
+
+        **Auth:** Requires valid first-party service account token with appropriate permissions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceSubmission'
+            example:
+              machineid: washer_001
+              problemcode: not_spinning
+              comments: Machine makes noise but doesn't spin
+              firstname: John
+              lastname: Doe
+              phone: 555-123-4567
+              email: john.doe@example.com
+      responses:
+        '200':
+          description: Success - Service request submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceRequestResult'
+              example:
+                Message: Service request submitted successfully
+                RequestNumber: SR-2024-001234
+                Status: submitted
+        '400':
+          description: Bad request - Missing required fields or invalid data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: missing
+                  type:
+                    type: string
+                    example: request_body
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - machineid
+                      - problemcode
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found - Machine with specified ID not found
+        '500':
+          description: Internal server error
+  /api/person/contactinfo:
+    get:
+      tags:
+        - Client
+      summary: Get contact information for a person
+      description: |
+        Returns comprehensive contact information for a person including name, permanent and mailing addresses, 
+        phone numbers, and emergency contact information.
+
+        **Authentication:** Requires both RokwireAuth and ExternalAuth tokens
+        **Mode Parameter:** 
+        - "0" (default): Standard contact information
+        - "1": Enhanced contact information (for specific UINs)
+
+        **Auth:** Requires valid first-party service account token and external authorization token
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: User ID (UIN) of the person
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: '123456789'
+        - name: mode
+          in: query
+          description: 'Mode for contact information retrieval (0=standard, 1=enhanced)'
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+            enum:
+              - '0'
+              - '1'
+            default: '0'
+            example: '0'
+      responses:
+        '200':
+          description: Success - Returns person's contact information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              example:
+                uin: '123456789'
+                FirstName: John
+                LastName: Doe
+                PreferredName: Johnny
+                MailingAddress:
+                  Type: MA
+                  Street1: 123 Main St
+                  City: Urbana
+                  StateAbbr: IL
+                  StateName: Illinois
+                  ZipCode: '61801'
+                  County: Champaign
+                  Phone:
+                    AreaCode: '217'
+                    Number: 333-1234
+                PermAddress:
+                  Type: PR
+                  Street1: 456 Oak Ave
+                  City: Chicago
+                  StateAbbr: IL
+                  StateName: Illinois
+                  ZipCode: '60601'
+                  County: Cook
+                  Phone:
+                    AreaCode: '312'
+                    Number: 555-6789
+                EmergencyContacts:
+                  - Priority: '1'
+                    RelationShip:
+                      Code: PAR
+                      Name: Parent
+                    FirstName: Jane
+                    LastName: Doe
+                    Address:
+                      Type: PR
+                      Street1: 456 Oak Ave
+                      City: Chicago
+                      StateAbbr: IL
+                      StateName: Illinois
+                      ZipCode: '60601'
+                      County: Cook
+                      Phone:
+                        AreaCode: '312'
+                        Number: 555-6789
+        '400':
+          description: Bad request - Missing required parameters or invalid external token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: missing
+                  type:
+                    type: string
+                    example: header
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - external auth token
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - Insufficient permissions or invalid external token
+        '404':
+          description: Not found - Person with specified UIN not found
+        '500':
+          description: Internal server error
+  /api/person/giescourses:
+    get:
+      tags:
+        - Client
+      summary: Get registered courses for GIES students
+      description: |
+        Returns a list of registered courses for GIES (Gies College of Business) students. 
+        This endpoint provides course information including term, subject, number, section, 
+        title, and instructor details.
+
+        **Authentication:** Requires both RokwireAuth and ExternalAuth tokens
+        **Note:** This endpoint is specifically for GIES students and may return different 
+        course information compared to the general student courses endpoint.
+
+        **Auth:** Requires valid first-party service account token and external authorization token
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: User ID (UIN) of the GIES student
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: '123456789'
+      responses:
+        '200':
+          description: Success - Returns list of GIES courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GiesCourse'
+              example:
+                - term: 2024-FA
+                  subject: BADM
+                  number: '310'
+                  section: A
+                  title: Principles of Marketing
+                  instructor: Dr. Smith
+                - term: 2024-FA
+                  subject: BADM
+                  number: '320'
+                  section: B
+                  title: Business Statistics
+                  instructor: Dr. Johnson
+                - term: 2024-FA
+                  subject: FIN
+                  number: '300'
+                  section: C
+                  title: Financial Management
+                  instructor: Dr. Williams
+        '400':
+          description: Bad request - Missing required parameters or invalid external token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: invalid
+                  type:
+                    type: string
+                    example: query_param
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - id
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - Insufficient permissions or invalid external token
+        '404':
+          description: Not found - Student with specified UIN not found or no courses available
+        '500':
+          description: Internal server error
+  /api/person/studentcourses:
+    get:
+      tags:
+        - Client
+      summary: Get registered courses for a student
+      description: |
+        Returns a comprehensive list of registered courses for a student including detailed course information, 
+        section details, meeting times, locations, and building information. This endpoint provides the most 
+        complete course data compared to other course endpoints.
+
+        **Authentication:** Requires both RokwireAuth and ExternalAuth tokens
+        **Location Enhancement:** Automatically enriches course data with building location information
+        **ADA Support:** Optional ADA-only building filtering for accessibility considerations
+
+        **Auth:** Requires valid first-party service account token and external authorization token
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: User ID (UIN) of the student
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: '123456789'
+        - name: termid
+          in: query
+          description: 'Term ID for the academic term (e.g., "2024-FA" for Fall 2024)'
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+            example: 2024-FA
+        - name: lat
+          in: query
+          description: Latitude coordinate for location-based building information (optional)
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: number
+            format: float
+            example: 40.1095
+        - name: long
+          in: query
+          description: Longitude coordinate for location-based building information (optional)
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: number
+            format: float
+            example: -88.2272
+        - name: adaOnly
+          in: query
+          description: Filter buildings to show only ADA-compliant entrances (optional)
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: boolean
+            default: false
+            example: false
+      responses:
+        '200':
+          description: Success - Returns list of student courses with building information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+              example:
+                - coursetitle: Introduction to Computer Science
+                  courseshortname: CS 101
+                  coursenumber: CS 101
+                  instructionmethod: In Person
+                  coursesection:
+                    days: MWF
+                    meeting_dates_or_range: Aug 26 - Dec 13
+                    room: '1001'
+                    buildingname: Siebel Center for Computer Science
+                    buildingid: siebel
+                    instructiontype: Lecture
+                    instructor: Dr. Smith
+                    start_time: '09:00'
+                    endtime: '09:50'
+                    building:
+                      ID: siebel
+                      Name: Siebel Center for Computer Science
+                      Number: '201'
+                      FullAddress: '201 N Goodwin Ave, Urbana, IL 61801'
+                      Address1: 201 N Goodwin Ave
+                      Address2: ''
+                      City: Urbana
+                      State: IL
+                      ZipCode: '61801'
+                      ImageURL: 'https://example.com/siebel.jpg'
+                      MailCode: MC-258
+                      Latitude: 40.1135
+                      Longitude: -88.2244
+                      Floors:
+                        - '1'
+                        - '2'
+                        - '3'
+                        - '4'
+                    courseReferenceNumber: '12345'
+                    course_section: A
+                - coursetitle: Calculus I
+                  courseshortname: MATH 221
+                  coursenumber: MATH 221
+                  instructionmethod: In Person
+                  coursesection:
+                    days: TR
+                    meeting_dates_or_range: Aug 26 - Dec 13
+                    room: '314'
+                    buildingname: Altgeld Hall
+                    buildingid: altgeld
+                    instructiontype: Lecture
+                    instructor: Dr. Johnson
+                    start_time: '14:00'
+                    endtime: '15:20'
+                    building:
+                      ID: altgeld
+                      Name: Altgeld Hall
+                      Number: '1409'
+                      FullAddress: '1409 W Green St, Urbana, IL 61801'
+                      Address1: 1409 W Green St
+                      Address2: ''
+                      City: Urbana
+                      State: IL
+                      ZipCode: '61801'
+                      ImageURL: 'https://example.com/altgeld.jpg'
+                      MailCode: MC-382
+                      Latitude: 40.1095
+                      Longitude: -88.2272
+                      Floors:
+                        - '1'
+                        - '2'
+                        - '3'
+                    courseReferenceNumber: '67890'
+                    course_section: B
+        '400':
+          description: Bad request - Missing required parameters or invalid external token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: missing
+                  type:
+                    type: string
+                    example: query_param
+                  args:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - id
+                      - termid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - Insufficient permissions or invalid external token
+        '404':
+          description: Not found - Student with specified UIN not found or no courses available for the term
+        '500':
+          description: Internal server error
   /api/admin/examples:
     post:
       tags:
@@ -981,36 +1691,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - provider_id
-                  - name
-                  - location
-                  - hours_of_operation
-                  - details
-                  - next_available
-                  - image_url
-                properties:
-                  id:
-                    type: integer
-                    readOnly: true
-                  provider_id:
-                    type: integer
-                    readOnly: true
-                  name:
-                    type: string
-                    readOnly: true
-                  location:
-                    type: string
-                  hours_of_operation:
-                    type: string
-                  details:
-                    type: string
-                  next_available:
-                    type: string
-                  image_url:
-                    type: string
+                $ref: '#/components/schemas/AppointmentUnit'
         '400':
           description: Bad request
         '401':
@@ -1060,33 +1741,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - provider_id
-                  - unit_id
-                  - next_available
-                  - name
-                  - notes
-                  - image_url
-                properties:
-                  id:
-                    type: string
-                    readOnly: true
-                  provider_id:
-                    type: integer
-                    readOnly: true
-                  unit_id:
-                    type: integer
-                    readOnly: true
-                  next_available:
-                    type: string
-                  name:
-                    type: string
-                  notes:
-                    type: string
-                  image_url:
-                    type: string
+                $ref: '#/components/schemas/AppointmentPerson'
         '400':
           description: Bad request
         '401':
@@ -1565,6 +2220,432 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    Address:
+      type: object
+      required:
+        - Type
+        - Street1
+        - City
+        - StateAbbr
+        - StateName
+        - ZipCode
+        - County
+        - Phone
+      properties:
+        Type:
+          type: string
+          enum:
+            - MA
+            - PR
+          readOnly: true
+        Street1:
+          type: string
+          readOnly: true
+        City:
+          type: string
+          readOnly: true
+        StateAbbr:
+          type: string
+          readOnly: true
+        StateName:
+          type: string
+          readOnly: true
+        ZipCode:
+          type: string
+          readOnly: true
+        County:
+          type: string
+          readOnly: true
+        Phone:
+          $ref: '#/components/schemas/PhoneNumber'
+    Appliance:
+      type: object
+      required:
+        - ID
+        - Status
+        - ApplianceType
+        - AverageCycleTime
+        - Label
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Status:
+          type: string
+          readOnly: true
+        ApplianceType:
+          type: string
+          readOnly: true
+        AverageCycleTime:
+          type: integer
+          readOnly: true
+        TimeRemaining:
+          type: integer
+          nullable: true
+          readOnly: true
+        Label:
+          type: string
+          readOnly: true
+    AppointmentHost:
+      type: object
+      required:
+        - first_name
+        - last_name
+      properties:
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+    AppointmentOptions:
+      type: object
+      required:
+        - time_slots
+        - questions
+      properties:
+        time_slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+          readOnly: true
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+          readOnly: true
+    AppointmentPerson:
+      type: object
+      required:
+        - id
+        - provider_id
+        - unit_id
+        - next_available
+        - name
+        - notes
+        - image_url
+      properties:
+        id:
+          type: string
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        unit_id:
+          type: integer
+          readOnly: true
+        next_available:
+          type: string
+        name:
+          type: string
+        notes:
+          type: string
+        image_url:
+          type: string
+    AppointmentPost:
+      type: object
+      required:
+        - provider_id
+        - unit_id
+        - person_id
+        - type
+        - start_time
+        - end_time
+        - user_external_ids
+        - slot_id
+        - answers
+      properties:
+        provider_id:
+          type: string
+          readOnly: true
+        unit_id:
+          type: string
+          readOnly: true
+        person_id:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          readOnly: true
+        end_time:
+          type: string
+          readOnly: true
+        user_external_ids:
+          $ref: '#/components/schemas/ExternalUserID'
+          readOnly: true
+        slot_id:
+          type: string
+          readOnly: true
+        source_id:
+          type: string
+          readOnly: true
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionAnswer'
+          readOnly: true
+    AppointmentUnit:
+      type: object
+      required:
+        - id
+        - provider_id
+        - name
+        - location
+        - hours_of_operation
+        - details
+        - next_available
+        - image_url
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        location:
+          type: string
+        hours_of_operation:
+          type: string
+        details:
+          type: string
+        next_available:
+          type: string
+        image_url:
+          type: string
+    BlacklistItems:
+      type: object
+      properties:
+        name:
+          type: string
+        data:
+          type: array
+          items:
+            type: string
+    Building:
+      type: object
+      required:
+        - ID
+        - Number
+        - Name
+        - FullAddress
+        - Address1
+        - Address2
+        - City
+        - State
+        - ZipCode
+        - ImageURL
+        - MailCode
+        - Entrances
+        - Latitude
+        - Longitude
+        - Floors
+        - Features
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        Number:
+          type: string
+          readOnly: true
+        FullAddress:
+          type: string
+          readOnly: true
+        Address1:
+          type: string
+        Address2:
+          type: string
+          readOnly: true
+        City:
+          type: string
+          readOnly: true
+        State:
+          type: string
+          readOnly: true
+        ZipCode:
+          type: string
+          readOnly: true
+        ImageURL:
+          type: string
+          readOnly: true
+        MailCode:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+        Entrances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entrance'
+          readOnly: true
+        Floors:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        Features:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuildingFeature'
+          readOnly: true
+    BuildingBlockAppointment:
+      type: object
+      required:
+        - provider_id
+        - unit_id
+        - person_id
+        - type
+        - start_time
+        - end_time
+        - user_external_ids
+        - source_id
+        - host
+      properties:
+        provider_id:
+          type: string
+          readOnly: true
+        unit_id:
+          type: string
+          readOnly: true
+        person_id:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          readOnly: true
+        end_time:
+          type: string
+          readOnly: true
+        user_external_ids:
+          $ref: '#/components/schemas/ExternalUserID'
+          readOnly: true
+        source_id:
+          type: string
+          readOnly: true
+        host:
+          $ref: '#/components/schemas/AppointmentHost'
+    BuildingFeature:
+      type: object
+      required:
+        - ID
+        - BuildingID
+        - EQIndicator
+        - Name
+        - FoundOnFloor
+        - FoundInRoom
+        - IsADA
+        - IsExternal
+        - Comments
+        - Latitude
+        - Longitude
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        BuildingID:
+          type: string
+          readOnly: true
+        EQIndicator:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        FoundOnFloor:
+          type: string
+          readOnly: true
+        FoundInRoom:
+          type: string
+          readOnly: true
+        IsADA:
+          type: boolean
+          readOnly: true
+        IsExternal:
+          type: boolean
+        Comments:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+    BuildingFeatureLocation:
+      type: object
+      required:
+        - Key
+        - Value
+      properties:
+        Key:
+          type: string
+          readOnly: true
+        Value:
+          $ref: '#/components/schemas/FeatureMapEntry'
+    CodeDescType:
+      type: object
+      required:
+        - Code
+        - Name
+      properties:
+        Code:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+    CompactBuilding:
+      type: object
+      required:
+        - ID
+        - Number
+        - Name
+        - FullAddress
+        - ImageURL
+        - Latitude
+        - Longitude
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        Number:
+          type: string
+          readOnly: true
+        FullAddress:
+          type: string
+          readOnly: true
+        ImageURL:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
+        Features:
+          type: array
+          items:
+            $ref: '#/components/schemas/BuildingFeatureLocation'
+          readOnly: true
     Config:
       required:
         - id
@@ -1600,6 +2681,142 @@ components:
           readOnly: true
           type: string
           nullable: true
+    ContactLegacy:
+      type: object
+      properties:
+        contactName:
+          type: string
+        contactEmail:
+          type: string
+        contactPhone:
+          type: string
+    Course:
+      type: object
+      required:
+        - coursetitle
+        - courseshortname
+        - coursenumber
+        - instructionmethod
+        - coursesection
+      properties:
+        coursetitle:
+          type: string
+          readOnly: true
+        courseshortname:
+          type: string
+          readOnly: true
+        coursenumber:
+          type: string
+          readOnly: true
+        instructionmethod:
+          type: string
+          readOnly: true
+        coursesection:
+          $ref: '#/components/schemas/CourseSection'
+    CourseSection:
+      type: object
+      required:
+        - days
+        - meeting_dates_or_range
+        - room
+        - buildingname
+        - buildingid
+        - instructiontype
+        - instructor
+        - start_time
+        - endtime
+        - building
+        - courseReferenceNumber
+        - course_section
+      properties:
+        days:
+          type: string
+          readOnly: true
+        meeting_dates_or_range:
+          type: string
+          readOnly: true
+        room:
+          type: string
+          readOnly: true
+        buildingname:
+          type: string
+          readOnly: true
+        buildingid:
+          type: string
+          readOnly: true
+        instructiontype:
+          type: string
+          readOnly: true
+        instructor:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          readOnly: true
+        endtime:
+          type: string
+          readOnly: true
+        building:
+          $ref: '#/components/schemas/Building'
+        courseReferenceNumber:
+          type: string
+          readOnly: true
+        course_section:
+          type: string
+          readOnly: true
+    EmergencyContact:
+      type: object
+      required:
+        - Priority
+        - RelationShip
+        - FirstName
+        - LastName
+        - Address
+      properties:
+        Priority:
+          type: string
+          readOnly: true
+        RelationShip:
+          $ref: '#/components/schemas/CodeDescType'
+        FirstName:
+          type: string
+          readOnly: true
+        LastName:
+          type: string
+          readOnly: true
+        Address:
+          $ref: '#/components/schemas/Address'
+    Entrance:
+      type: object
+      required:
+        - ID
+        - Name
+        - ADACompliant
+        - Available
+        - ImageURL
+        - Latitude
+        - Longitude
+      properties:
+        ID:
+          type: string
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        ADACopmliant:
+          type: boolean
+          readOnly: true
+        Available:
+          type: boolean
+        ImageUrl:
+          type: string
+          readOnly: true
+        Latitude:
+          type: number
+          readOnly: true
+        Longitude:
+          type: number
+          readOnly: true
     EnvConfigData:
       type: object
       required:
@@ -1634,15 +2851,165 @@ components:
           type: string
           nullable: true
           readOnly: true
-    ContactLegacy:
+    ExternalUserID:
       type: object
+      required:
+        - uin
       properties:
-        contactName:
+        uin:
           type: string
-        contactEmail:
+          readOnly: true
+    FeatureMapEntry:
+      type: object
+      required:
+        - Name
+        - Floors
+      properties:
+        Name:
           type: string
-        contactPhone:
+          readOnly: true
+        Floors:
+          type: array
+          items:
+            type: string
+          readOnly: true
+    FloorPlan:
+      type: object
+      required:
+        - BuildingNumber
+        - BuildingFloor
+        - SVGEncoding
+        - SVG
+        - Markers
+        - Highlites
+      properties:
+        BuildingNumber:
           type: string
+          readOnly: true
+        BuildingFloor:
+          type: string
+          readOnly: true
+        SVGEncoding:
+          type: string
+          readOnly: true
+        SVG:
+          type: string
+        Markers:
+          type: array
+          items:
+            $ref: '#/components/schemas/FloorPlanMarker'
+          readOnly: true
+        Features:
+          type: array
+          items:
+            $ref: '#/components/schemas/FloorPlanHighlite'
+          readOnly: true
+    FloorPlanHighlite:
+      type: object
+      required:
+        - RenderID
+        - Label
+        - Color
+        - Display
+      properties:
+        RenderID:
+          type: string
+          readOnly: true
+        Label:
+          type: string
+          readOnly: true
+        Color:
+          type: string
+          readOnly: true
+        Display:
+          type: string
+    FloorPlanMarker:
+      type: object
+      required:
+        - RenderID
+        - Label
+        - Description
+        - Display
+        - Icon
+      properties:
+        RenderID:
+          type: string
+          readOnly: true
+        Label:
+          type: string
+          readOnly: true
+        Description:
+          type: string
+          readOnly: true
+        Display:
+          type: string
+        Icon:
+          type: string
+          readOnly: true
+    GiesCourse:
+      type: object
+      required:
+        - term
+        - subject
+        - number
+        - section
+        - title
+        - instructor
+      properties:
+        term:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+        section:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        instructor:
+          type: string
+          readOnly: true
+    LaundryDetails:
+      type: object
+      required:
+        - Latitude
+        - Longitude
+        - Floor
+      properties:
+        Latitude:
+          type: number
+          format: float
+          readOnly: true
+        Longitude:
+          type: number
+          format: float
+          readOnly: true
+        Floor:
+          type: integer
+          readOnly: true
+    LaundryRoom:
+      type: object
+      required:
+        - ID
+        - Name
+        - Status
+      properties:
+        ID:
+          type: integer
+          readOnly: true
+        Name:
+          type: string
+          readOnly: true
+        Status:
+          type: string
+          readOnly: true
+        Location:
+          $ref: '#/components/schemas/LaundryDetails'
     LegacyEvent:
       type: object
       required:
@@ -1744,6 +3111,29 @@ components:
           type: string
         cost:
           type: string
+    LegacyEventItem:
+      type: object
+      required:
+        - source
+        - status
+        - legacy_event
+      properties:
+        source:
+          type: string
+        status:
+          $ref: '#/components/schemas/LegacyEventStatus'
+        legacy_event:
+          $ref: '#/components/schemas/LegacyEvent'
+    LegacyEventStatus:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        reason_ignored:
+          type: string
+          nullable: true
     LocationLegacy:
       type: object
       properties:
@@ -1753,115 +3143,127 @@ components:
           type: number
         longitude:
           type: number
-    SubEvents:
-      type: object
-      properties:
-        id:
-          type: string
-        isFeatured:
-          type: boolean
-        track:
-          type: string
-    AppointmentPost:
+    MachineRequestDetail:
       type: object
       required:
-        - provider_id
-        - unit_id
-        - person_id
-        - type
-        - start_time
-        - end_time
-        - user_external_ids
-        - slot_id
-        - answers
+        - MachineID
+        - Message
+        - OpenIssue
+        - ProblemCodes
+        - MachineType
       properties:
-        provider_id:
+        MachineID:
           type: string
           readOnly: true
-        unit_id:
+        Message:
           type: string
           readOnly: true
-        person_id:
-          type: string
+        OpenIssue:
+          type: boolean
           readOnly: true
-        type:
-          type: string
-          readOnly: true
-        start_time:
-          type: string
-          readOnly: true
-        end_time:
-          type: string
-          readOnly: true
-        user_external_ids:
-          $ref: '#/components/schemas/ExternalUserID'
-          readOnly: true
-        slot_id:
-          type: string
-          readOnly: true
-        source_id:
-          type: string
-          readOnly: true
-        answers:
+        ProblemCodes:
           type: array
           items:
-            $ref: '#/components/schemas/QuestionAnswer'
+            type: string
           readOnly: true
-    BuildingBlockAppointment:
+        MachineType:
+          type: string
+          readOnly: true
+    Organization:
       type: object
       required:
-        - provider_id
-        - unit_id
-        - person_id
-        - type
-        - start_time
-        - end_time
-        - user_external_ids
-        - source_id
-        - host
+        - SchoolName
+        - LaundryRooms
       properties:
-        provider_id:
+        SchoolName:
           type: string
           readOnly: true
-        unit_id:
+        LaundryRooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/LaundryRoom'
+          readOnly: true
+    OriginatingCalendarItem:
+      type: object
+      properties:
+        count:
+          type: integer
+        id:
           type: string
-          readOnly: true
-        person_id:
+        name:
           type: string
-          readOnly: true
-        type:
-          type: string
-          readOnly: true
-        start_time:
-          type: string
-          readOnly: true
-        end_time:
-          type: string
-          readOnly: true
-        user_external_ids:
-          $ref: '#/components/schemas/ExternalUserID'
-          readOnly: true
-        source_id:
-          type: string
-          readOnly: true
-        host:
-          type: object
-          required:
-            - first_name
-            - last_name
-          properties:
-            first_name:
-              type: string
-              readOnly: true
-            last_name:
-              type: string
-              readOnly: true
-    ExternalUserID:
+    Person:
       type: object
       required:
         - uin
+        - FirstName
+        - LastName
+        - PreferredName
+        - MailingAddress
+        - PermAddress
+        - EmergencyContacts
       properties:
         uin:
+          type: string
+          readOnly: true
+        FirstName:
+          type: string
+          readOnly: true
+        LastName:
+          type: string
+          readOnly: true
+        PreferredName:
+          type: string
+          readOnly: true
+        MailingAddress:
+          $ref: '#/components/schemas/Address'
+        PermAddress:
+          $ref: '#/components/schemas/Address'
+        EmergencyContacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmergencyContact'
+          readOnly: true
+    PhoneNumber:
+      type: object
+      required:
+        - AreaCode
+        - Number
+      properties:
+        AreaCode:
+          type: string
+          readOnly: true
+        Number:
+          type: string
+          readOnly: true
+    Question:
+      type: object
+      required:
+        - id
+        - provider_id
+        - required
+        - type
+        - select_values
+        - question
+      properties:
+        id:
+          type: string
+          readOnly: true
+        provider_id:
+          type: integer
+          readOnly: true
+        required:
+          type: boolean
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        select_values:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        question:
           type: string
           readOnly: true
     QuestionAnswer:
@@ -1878,21 +3280,193 @@ components:
           items:
             type: string
           readOnly: true
-    AppointmentOptions:
+    RoomDetail:
       type: object
       required:
-        - time_slots
-        - questions
+        - NumWashers
+        - NumDryers
+        - Appliances
+        - RoomName
+        - CampusName
       properties:
-        time_slots:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
+        NumWashers:
+          type: integer
           readOnly: true
-        questions:
+        NumDryers:
+          type: integer
+          readOnly: true
+        Appliances:
           type: array
           items:
-            $ref: '#/components/schemas/Question'
+            $ref: '#/components/schemas/Appliance'
+          readOnly: true
+        RoomName:
+          type: string
+          readOnly: true
+        CampusName:
+          type: string
+          readOnly: true
+        Location:
+          $ref: '#/components/schemas/LaundryDetails'
+    SearchBuildingsResponse:
+      type: object
+      additionalProperties:
+        oneOf:
+          - $ref: '#/components/schemas/CompactBuilding'
+          - $ref: '#/components/schemas/Building'
+      description: |
+        A map where keys are building names and values are either CompactBuilding objects (when v=1 or omitted) 
+        or Building objects (when v=2) 
+    ServiceRequestResult:
+      type: object
+      required:
+        - Message
+        - RequestNumber
+        - Status
+      properties:
+        Message:
+          type: string
+          readOnly: true
+        RequestNumber:
+          type: string
+          readOnly: true
+        Status:
+          type: string
+          readOnly: true
+    ServiceSubmission:
+      type: object
+      required:
+        - machineid
+        - problemcode
+        - firstname
+        - lastname
+        - email
+      properties:
+        machineid:
+          type: string
+          description: The unique service tag ID of the laundry machine
+        problemcode:
+          type: string
+          description: The problem code describing the issue with the machine
+        comments:
+          type: string
+          nullable: true
+          description: Additional comments about the problem (optional)
+        firstname:
+          type: string
+          description: First name of the person submitting the request
+        lastname:
+          type: string
+          description: Last name of the person submitting the request
+        phone:
+          type: string
+          nullable: true
+          description: Phone number of the person submitting the request (optional)
+        email:
+          type: string
+          format: email
+          description: Email address of the person submitting the request
+    SubEvents:
+      type: object
+      properties:
+        id:
+          type: string
+        isFeatured:
+          type: boolean
+        track:
+          type: string
+    SummaryEvents:
+      type: object
+      properties:
+        all_events_count:
+          type: integer
+        valid_events_count:
+          type: integer
+        ignored_events_count:
+          type: integer
+        total_originating_calendars:
+          type: integer
+        valid:
+          items:
+            $ref: '#/components/schemas/ValidIgnored'
+        ignored:
+          items:
+            $ref: '#/components/schemas/ValidIgnored'
+        blacklists:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlacklistItems'
+    successteam:
+      type: object
+      required:
+        - primary_care_providers
+        - academic_advisors
+      properties:
+        primary_care_providers:
+          type: array
+          items:
+            - $ref: '#/components/schemas/successteamMember'
+          readOnly: true
+        academic_advisors:
+          type: array
+          items:
+            - $ref: '#/components/schemas/successteamMember'
+          readOnly: true
+    successteamMember:
+      type: object
+      required:
+        - last_name
+        - email
+        - image
+        - department
+        - first_name
+        - title
+        - external_link
+        - external_link_text
+        - team_member_id
+      properties:
+        last_name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          readOnly: true
+        image:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        external_link:
+          type: string
+          readOnly: true
+        external_link_text:
+          type: string
+          readOnly: true
+        first_name:
+          type: string
+          readOnly: true
+        team_member_id:
+          type: string
+          readOnly: true
+    TermSession:
+      type: object
+      required:
+        - term
+        - termid
+        - is_current
+      properties:
+        term:
+          type: string
+          readOnly: true
+        termid:
+          type: string
+          readOnly: true
+        is_current:
+          type: boolean
           readOnly: true
     TimeSlot:
       type: object
@@ -1928,86 +3502,11 @@ components:
           type: integer
         details:
           type: object
-    Question:
-      type: object
-      required:
-        - id
-        - provider_id
-        - required
-        - type
-        - select_values
-        - question
-      properties:
-        id:
-          type: string
-          readOnly: true
-        provider_id:
-          type: integer
-          readOnly: true
-        required:
-          type: boolean
-          readOnly: true
-        type:
-          type: string
-          readOnly: true
-        select_values:
-          type: array
-          items:
-            type: string
-          readOnly: true
-        question:
-          type: string
-          readOnly: true
-    BlacklistItems:
-      type: object
-      properties:
-        name:
-          type: string
-        data:
-          type: array
-          items:
-            type: string
-    OriginatingCalendarItem:
+    TPsSource:
       type: object
       properties:
         count:
           type: integer
-        id:
-          type: string
-        name:
-          type: string
-    WebtoolsSource:
-      type: object
-      properties:
-        count:
-          type: integer
-        originating_calendar:
-          type: array
-          items:
-            $ref: '#/components/schemas/OriginatingCalendarItem'
-    LegacyEventItem:
-      type: object
-      required:
-        - source
-        - status
-        - legacy_event
-      properties:
-        source:
-          type: string
-        status:
-          $ref: '#/components/schemas/LegacyEventStatus'
-        legacy_event:
-          $ref: '#/components/schemas/LegacyEvent'
-    LegacyEventStatus:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          type: string
-        reason_ignored:
-          type: string
-          nullable: true
     ValidIgnored:
       type: object
       properties:
@@ -2017,304 +3516,15 @@ components:
         tps_api:
           items:
             $ref: '#/components/schemas/TPsSource'
-    TPsSource:
+    WebtoolsSource:
       type: object
       properties:
         count:
           type: integer
-    SummaryEvents:
-      type: object
-      properties:
-        all_events_count:
-          type: integer
-        valid_events_count:
-          type: integer
-        ignored_events_count:
-          type: integer
-        total_originating_calendars:
-          type: integer
-        valid:
-          items:
-            $ref: '#/components/schemas/ValidIgnored'
-        ignored:
-          items:
-            $ref: '#/components/schemas/ValidIgnored'
-        blacklists:
+        originating_calendar:
           type: array
           items:
-            $ref: '#/components/schemas/BlacklistItems'
-    Building:
-      type: object
-      required:
-        - ID
-        - Number
-        - Name
-        - FullAddress
-        - Address1
-        - Address2
-        - City
-        - State
-        - ZipCode
-        - ImageURL
-        - MailCode
-        - Entrances
-        - Latitude
-        - Longitude
-        - Floors
-        - Features
-      properties:
-        ID:
-          type: string
-          readOnly: true
-        Name:
-          type: string
-          readOnly: true
-        Number:
-          type: string
-          readOnly: true
-        FullAddress:
-          type: string
-          readOnly: true
-        Address1:
-          type: string
-        Address2:
-          type: string
-          readOnly: true
-        City:
-          type: string
-          readOnly: true
-        State:
-          type: string
-          readOnly: true
-        ZipCode:
-          type: string
-          readOnly: true
-        ImageURL:
-          type: string
-          readOnly: true
-        MailCode:
-          type: string
-          readOnly: true
-        Latitude:
-          type: number
-          readOnly: true
-        Longitude:
-          type: number
-          readOnly: true
-        Entrances:
-          type: array
-          items:
-            $ref: '#/components/schemas/Entrance'
-          readOnly: true
-        Floors:
-          type: array
-          items:
-            type: string
-          readOnly: true
-        Features:
-          type: array
-          items:
-            $ref: '#/components/schemas/BuildingFeature'
-          readOnly: true
-    FloorPlan:
-      type: object
-      required:
-        - BuildingNumber
-        - BuildingFloor
-        - SVGEncoding
-        - SVG
-        - Markers
-        - Highlites
-      properties:
-        BuildingNumber:
-          type: string
-          readOnly: true
-        BuildingFloor:
-          type: string
-          readOnly: true
-        SVGEncoding:
-          type: string
-          readOnly: true
-        SVG:
-          type: string
-        Markers:
-          type: array
-          items:
-            $ref: '#/components/schemas/FloorPlanMarker'
-          readOnly: true
-        Features:
-          type: array
-          items:
-            $ref: '#/components/schemas/FloorPlanHighlite'
-          readOnly: true
-    FloorPlanHighlite:
-      type: object
-      required:
-        - RenderID
-        - Label
-        - Color
-        - Display
-      properties:
-        RenderID:
-          type: string
-          readOnly: true
-        Label:
-          type: string
-          readOnly: true
-        Color:
-          type: string
-          readOnly: true
-        Display:
-          type: string
-    FloorPlanMarker:
-      type: object
-      required:
-        - RenderID
-        - Label
-        - Description
-        - Display
-        - Icon
-      properties:
-        RenderID:
-          type: string
-          readOnly: true
-        Label:
-          type: string
-          readOnly: true
-        Description:
-          type: string
-          readOnly: true
-        Display:
-          type: string
-        Icon:
-          type: string
-          readOnly: true
-    BuildingFeature:
-      type: object
-      required:
-        - ID
-        - BuildingID
-        - EQIndicator
-        - Name
-        - FoundOnFloor
-        - FoundInRoom
-        - IsADA
-        - IsExternal
-        - Comments
-        - Latitude
-        - Longitude
-      properties:
-        ID:
-          type: string
-          readOnly: true
-        BuildingID:
-          type: string
-          readOnly: true
-        EQIndicator:
-          type: string
-          readOnly: true
-        Name:
-          type: string
-          readOnly: true
-        FoundOnFloor:
-          type: string
-          readOnly: true
-        FoundInRoom:
-          type: string
-          readOnly: true
-        IsADA:
-          type: boolean
-          readOnly: true
-        IsExternal:
-          type: boolean
-        Comments:
-          type: string
-          readOnly: true
-        Latitude:
-          type: number
-          readOnly: true
-        Longitude:
-          type: number
-          readOnly: true
-    Entrance:
-      type: object
-      required:
-        - ID
-        - Name
-        - ADACompliant
-        - Available
-        - ImageURL
-        - Latitude
-        - Longitude
-      properties:
-        ID:
-          type: string
-          readOnly: true
-        Name:
-          type: string
-          readOnly: true
-        ADACopmliant:
-          type: boolean
-          readOnly: true
-        Available:
-          type: boolean
-        ImageUrl:
-          type: string
-          readOnly: true
-        Latitude:
-          type: number
-          readOnly: true
-        Longitude:
-          type: number
-          readOnly: true
-    CompactBuilding:
-      type: object
-      required:
-        - ID
-        - Number
-        - Name
-        - FullAddress
-        - ImageURL
-        - Latitude
-        - Longitude
-      properties:
-        ID:
-          type: string
-          readOnly: true
-        Name:
-          type: string
-          readOnly: true
-        Number:
-          type: string
-          readOnly: true
-        FullAddress:
-          type: string
-          readOnly: true
-        ImageURL:
-          type: string
-          readOnly: true
-        Latitude:
-          type: number
-          readOnly: true
-        Longitude:
-          type: number
-          readOnly: true
-    TermSession:
-      type: object
-      required:
-        - term
-        - termid
-        - is_current
-      properties:
-        term:
-          type: string
-          readOnly: true
-        termid:
-          type: string
-          readOnly: true
-        is_current:
-          type: boolean
-          readOnly: true
+            $ref: '#/components/schemas/OriginatingCalendarItem'
     _admin_req_update-configs:
       required:
         - type

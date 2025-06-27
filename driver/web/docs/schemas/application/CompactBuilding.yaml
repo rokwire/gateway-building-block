@@ -29,3 +29,8 @@ properties:
   Longitude:
     type: number
     readOnly: true
+  Features:
+    type: array
+    items:
+      $ref: "./BuildingFeatureLocation.yaml"
+    readOnly: true

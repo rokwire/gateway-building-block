@@ -1,0 +1,17 @@
+type: object
+required:
+- Latitude
+- Longitude
+- Floor
+properties:
+  Latitude:
+    type: number
+    format: float
+    readOnly: true
+  Longitude:
+    type: number
+    format: float
+    readOnly: true
+  Floor:
+    type: integer
+    readOnly: true 

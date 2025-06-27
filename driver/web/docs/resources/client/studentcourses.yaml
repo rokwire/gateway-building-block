@@ -1,0 +1,163 @@
+get:
+  tags:
+  - Client
+  summary: Get registered courses for a student
+  description: |
+    Returns a comprehensive list of registered courses for a student including detailed course information, 
+    section details, meeting times, locations, and building information. This endpoint provides the most 
+    complete course data compared to other course endpoints.
+    
+    **Authentication:** Requires both RokwireAuth and ExternalAuth tokens
+    **Location Enhancement:** Automatically enriches course data with building location information
+    **ADA Support:** Optional ADA-only building filtering for accessibility considerations
+    
+    **Auth:** Requires valid first-party service account token and external authorization token
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: id
+    in: query
+    description: User ID (UIN) of the student
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+      example: "123456789"
+  - name: termid
+    in: query
+    description: Term ID for the academic term (e.g., "2024-FA" for Fall 2024)
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+      example: "2024-FA"
+  - name: lat
+    in: query
+    description: Latitude coordinate for location-based building information (optional)
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: number
+      format: float
+      example: 40.1095
+  - name: long
+    in: query
+    description: Longitude coordinate for location-based building information (optional)
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: number
+      format: float
+      example: -88.2272
+  - name: adaOnly
+    in: query
+    description: Filter buildings to show only ADA-compliant entrances (optional)
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: boolean
+      default: false
+      example: false
+  responses:
+    200:
+      description: Success - Returns list of student courses with building information
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/Course.yaml"
+          example:
+            - coursetitle: "Introduction to Computer Science"
+              courseshortname: "CS 101"
+              coursenumber: "CS 101"
+              instructionmethod: "In Person"
+              coursesection:
+                days: "MWF"
+                meeting_dates_or_range: "Aug 26 - Dec 13"
+                room: "1001"
+                buildingname: "Siebel Center for Computer Science"
+                buildingid: "siebel"
+                instructiontype: "Lecture"
+                instructor: "Dr. Smith"
+                start_time: "09:00"
+                endtime: "09:50"
+                building:
+                  ID: "siebel"
+                  Name: "Siebel Center for Computer Science"
+                  Number: "201"
+                  FullAddress: "201 N Goodwin Ave, Urbana, IL 61801"
+                  Address1: "201 N Goodwin Ave"
+                  Address2: ""
+                  City: "Urbana"
+                  State: "IL"
+                  ZipCode: "61801"
+                  ImageURL: "https://example.com/siebel.jpg"
+                  MailCode: "MC-258"
+                  Latitude: 40.1135
+                  Longitude: -88.2244
+                  Floors: ["1", "2", "3", "4"]
+                courseReferenceNumber: "12345"
+                course_section: "A"
+            - coursetitle: "Calculus I"
+              courseshortname: "MATH 221"
+              coursenumber: "MATH 221"
+              instructionmethod: "In Person"
+              coursesection:
+                days: "TR"
+                meeting_dates_or_range: "Aug 26 - Dec 13"
+                room: "314"
+                buildingname: "Altgeld Hall"
+                buildingid: "altgeld"
+                instructiontype: "Lecture"
+                instructor: "Dr. Johnson"
+                start_time: "14:00"
+                endtime: "15:20"
+                building:
+                  ID: "altgeld"
+                  Name: "Altgeld Hall"
+                  Number: "1409"
+                  FullAddress: "1409 W Green St, Urbana, IL 61801"
+                  Address1: "1409 W Green St"
+                  Address2: ""
+                  City: "Urbana"
+                  State: "IL"
+                  ZipCode: "61801"
+                  ImageURL: "https://example.com/altgeld.jpg"
+                  MailCode: "MC-382"
+                  Latitude: 40.1095
+                  Longitude: -88.2272
+                  Floors: ["1", "2", "3"]
+                courseReferenceNumber: "67890"
+                course_section: "B"
+    400:
+      description: Bad request - Missing required parameters or invalid external token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "missing"
+              type:
+                type: string
+                example: "query_param"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["id", "termid"]
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    403:
+      description: Forbidden - Insufficient permissions or invalid external token
+    404:
+      description: Not found - Student with specified UIN not found or no courses available for the term
+    500:
+      description: Internal server error 
