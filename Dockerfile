@@ -1,4 +1,4 @@
-FROM golang:1.22-bullseye as builder
+FROM golang:1.24-alpine as builder
 
 ENV CGO_ENABLED=0
 
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . .
 RUN make
 
-FROM alpine:3.21.3
+FROM alpine:3.22
 
 #we need timezone database + certificates
 RUN apk add --no-cache tzdata ca-certificates
@@ -26,8 +26,8 @@ COPY --from=builder /app/driver/web/bbs_permission_policy.csv /driver/web/bbs_pe
 COPY --from=builder /app/driver/web/tps_permission_policy.csv /driver/web/tps_permission_policy.csv
 COPY --from=builder /app/driver/web/system_permission_policy.csv /driver/web/system_permission_policy.csv
 
-COPY --from=builder /app/vendor/github.com/rokwire/core-auth-library-go/v3/authorization/authorization_model_scope.conf /app/vendor/github.com/rokwire/core-auth-library-go/v3/authorization/authorization_model_scope.conf
-COPY --from=builder /app/vendor/github.com/rokwire/core-auth-library-go/v3/authorization/authorization_model_string.conf /app/vendor/github.com/rokwire/core-auth-library-go/v3/authorization/authorization_model_string.conf
+COPY --from=builder /app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_scope.conf /app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_scope.conf
+COPY --from=builder /app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_string.conf /app/vendor/github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/authorization/authorization_model_string.conf
 
 COPY --from=builder /etc/passwd /etc/passwd
 

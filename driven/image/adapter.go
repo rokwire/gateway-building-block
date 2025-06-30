@@ -27,14 +27,14 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rokwire/core-auth-library-go/v3/authservice"
-	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
 )
 
 // Adapter implements the Image interface
 type Adapter struct {
 	baseURL        string
-	accountManager *authservice.ServiceAccountManager
+	accountManager *auth.ServiceAccountManager
 
 	logger logs.Logger
 }
@@ -210,6 +210,6 @@ func (im Adapter) sendRequest(targetURL, path string, width, height, quality int
 }
 
 // NewImageAdapter creates a new image adapter instance
-func NewImageAdapter(imageHost string, accountManager *authservice.ServiceAccountManager, logger logs.Logger) *Adapter {
+func NewImageAdapter(imageHost string, accountManager *auth.ServiceAccountManager, logger logs.Logger) *Adapter {
 	return &Adapter{baseURL: imageHost, accountManager: accountManager, logger: logger}
 }

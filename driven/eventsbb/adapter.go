@@ -21,7 +21,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/rokwire/logging-library-go/v2/logs"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
 )
 
 // Adapter implements the Storage interface

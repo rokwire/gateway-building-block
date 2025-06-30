@@ -19,7 +19,7 @@ import (
 	"application/driven/storage"
 	"time"
 
-	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/tokenauth"
 )
 
 // Default exposes client APIs for the driver adapters
