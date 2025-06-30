@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Unreleased - 2025-06-30
+### Changed
+- Updated to building block sdk library [#146](https://github.com/rokwire/gateway-building-block/issues/146)
+
 ## [2.17.0] - 2025-04-17
 ### Changed
 - Support Google Trust Services as CA [#142](https://github.com/rokwire/gateway-building-block/issues/142)

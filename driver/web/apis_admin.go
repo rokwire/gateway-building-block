@@ -23,10 +23,10 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/rokwire/core-auth-library-go/v3/authutils"
-	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
-	"github.com/rokwire/logging-library-go/v2/logs"
-	"github.com/rokwire/logging-library-go/v2/logutils"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/tokenauth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logutils"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/rokwireutils"
 )
 
 // AdminAPIsHandler handles the rest Admin APIs implementation
@@ -170,11 +170,11 @@ func (h AdminAPIsHandler) createConfig(l *logs.Log, r *http.Request, claims *tok
 
 	appID := claims.AppID
 	if requestData.AllApps != nil && *requestData.AllApps {
-		appID = authutils.AllApps
+		appID = rokwireutils.AllApps
 	}
 	orgID := claims.OrgID
 	if requestData.AllOrgs != nil && *requestData.AllOrgs {
-		orgID = authutils.AllOrgs
+		orgID = rokwireutils.AllOrgs
 	}
 	config := model.Config{Type: requestData.Type, AppID: appID, OrgID: orgID, System: requestData.System, Data: requestData.Data}
 
@@ -206,11 +206,11 @@ func (h AdminAPIsHandler) updateConfig(l *logs.Log, r *http.Request, claims *tok
 
 	appID := claims.AppID
 	if requestData.AllApps != nil && *requestData.AllApps {
-		appID = authutils.AllApps
+		appID = rokwireutils.AllApps
 	}
 	orgID := claims.OrgID
 	if requestData.AllOrgs != nil && *requestData.AllOrgs {
-		orgID = authutils.AllOrgs
+		orgID = rokwireutils.AllOrgs
 	}
 	config := model.Config{ID: id, Type: requestData.Type, AppID: appID, OrgID: orgID, System: requestData.System, Data: requestData.Data}
 

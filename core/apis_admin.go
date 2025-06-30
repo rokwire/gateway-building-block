@@ -19,10 +19,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/rokwire/core-auth-library-go/v3/authutils"
-	"github.com/rokwire/core-auth-library-go/v3/tokenauth"
-	"github.com/rokwire/logging-library-go/v2/errors"
-	"github.com/rokwire/logging-library-go/v2/logutils"
+	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth/tokenauth"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/errors"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logutils"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/rokwireutils"
 )
 
 // appAdmin contains admin implementations
@@ -120,8 +120,8 @@ func (a appAdmin) GetConfigs(configType *string, claims *tokenauth.Claims) ([]mo
 
 func (a appAdmin) CreateConfig(config model.Config, claims *tokenauth.Claims) (*model.Config, error) {
 	// must be a system config if applying to all orgs
-	if config.OrgID == authutils.AllOrgs && !config.System {
-		return nil, errors.ErrorData(logutils.StatusInvalid, "config system status", &logutils.FieldArgs{"config.org_id": authutils.AllOrgs})
+	if config.OrgID == rokwireutils.AllOrgs && !config.System {
+		return nil, errors.ErrorData(logutils.StatusInvalid, "config system status", &logutils.FieldArgs{"config.org_id": rokwireutils.AllOrgs})
 	}
 
 	err := claims.CanAccess(config.AppID, config.OrgID, config.System)
@@ -140,8 +140,8 @@ func (a appAdmin) CreateConfig(config model.Config, claims *tokenauth.Claims) (*
 
 func (a appAdmin) UpdateConfig(config model.Config, claims *tokenauth.Claims) error {
 	// must be a system config if applying to all orgs
-	if config.OrgID == authutils.AllOrgs && !config.System {
-		return errors.ErrorData(logutils.StatusInvalid, "config system status", &logutils.FieldArgs{"config.org_id": authutils.AllOrgs})
+	if config.OrgID == rokwireutils.AllOrgs && !config.System {
+		return errors.ErrorData(logutils.StatusInvalid, "config system status", &logutils.FieldArgs{"config.org_id": rokwireutils.AllOrgs})
 	}
 
 	oldConfig, err := a.app.storage.FindConfig(config.Type, config.AppID, config.OrgID)
