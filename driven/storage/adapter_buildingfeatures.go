@@ -18,8 +18,8 @@ import (
 	"application/core/model"
 	"time"
 
-	"github.com/rokwire/logging-library-go/v2/errors"
-	"github.com/rokwire/logging-library-go/v2/logutils"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/errors"
+	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logutils"
 )
 
 // LoadAppBuildingFeatures loads all of the configured building features
