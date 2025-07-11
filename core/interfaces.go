@@ -97,6 +97,7 @@ type System interface {
 type Shared interface {
 	getExample(orgID string, appID string, id string) (*model.Example, error)
 	getBuildingFeatures() ([]model.AppBuildingFeature, error)
+	getFloorPlanMarkup() (*model.FloorPlanMarkup, error)
 }
 
 // EventsBBAdapter is used by core to communicate with the events BB
@@ -159,6 +160,7 @@ type Storage interface {
 	InsertLegacyLocationItem(items model.LegacyLocation) error
 
 	LoadAppBuildingFeatures() ([]model.AppBuildingFeature, error)
+	LoadFloorPlanMarkup() (*model.FloorPlanMarkup, error)
 }
 
 // StorageListener represents storage listener
