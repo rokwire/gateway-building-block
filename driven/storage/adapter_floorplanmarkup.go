@@ -22,7 +22,7 @@ import (
 	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logutils"
 )
 
-// FindCalendars finds all calendars for a given unit id
+// LoadFloorPlanMarkup loads the markup needed to wrap around a floor plan svg
 func (a *Adapter) LoadFloorPlanMarkup() (*model.FloorPlanMarkup, error) {
 	var data []model.FloorPlanMarkup
 
