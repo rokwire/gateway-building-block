@@ -194,7 +194,7 @@ type WayFinding interface {
 	GetEntrance(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Entrance, error)
 	GetBuildings(conf *model.EnvConfigData) (*[]model.Building, error)
 	GetBuilding(bldgID string, adaAccessibleOnly bool, latitude float64, longitude float64, conf *model.EnvConfigData) (*model.Building, error)
-	GetFloorPlan(bldgNum string, floornumber string, markers string, highlites string, conf *model.EnvConfigData) (*model.FloorPlan, error)
+	GetFloorPlan(bldgNum string, floornumber string, markers string, highlites string, markup string, conf *model.EnvConfigData) (*model.FloorPlan, error)
 }
 
 // Appointments represents the adapter needed to interace with various appoinment data providers

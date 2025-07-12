@@ -18,6 +18,7 @@ import (
 	model "application/core/model"
 	"slices"
 	"strconv"
+	"strings"
 )
 
 // CampusEntrance representes a campus specific building entrance
@@ -129,8 +130,10 @@ type ServerLocationData struct {
 }
 
 // NewFloorPlan creates a wayfinding floorplan instance from a UIUCFloorPlan instance
-func NewFloorPlan(fp CampusFloorPlan) *model.FloorPlan {
-	newfp := model.FloorPlan{BuildingNumber: fp.BuildingNumber, BuildingFloor: fp.BuildingFloor, SVGEncoding: fp.SVGEncoding, SVG: fp.SVG}
+func NewFloorPlan(fp CampusFloorPlan, markup string) *model.FloorPlan {
+
+	finalMarkup := strings.Replace(markup, "$floorPlanSvg", fp.SVG, 1)
+	newfp := model.FloorPlan{BuildingNumber: fp.BuildingNumber, BuildingFloor: fp.BuildingFloor, SVGEncoding: fp.SVGEncoding, SVG: finalMarkup}
 	for i := 0; i < len(fp.Markers); i++ {
 		newfp.Markers = append(newfp.Markers, model.FloorPlanMarker{RenderID: fp.Markers[i].RenderID, Label: fp.Markers[i].Label, Description: fp.Markers[i].Description,
 			Display: fp.Markers[i].Display, Icon: fp.Markers[i].Icon})
