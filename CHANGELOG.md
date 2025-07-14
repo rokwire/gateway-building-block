@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased - 2025-06-30
 ### Changed
-- Updated to building block sdk library [#146](https://github.com/rokwire/gateway-building-block/issues/146)
+- Updated to building block sdk library and added html markup to floor plan svg [#146](https://github.com/rokwire/gateway-building-block/issues/146)
+- Created missing documentation for end points [#136] https://github.com/rokwire/gateway-building-block/issues/136
 
 ## [2.17.0] - 2025-04-17
 ### Changed
