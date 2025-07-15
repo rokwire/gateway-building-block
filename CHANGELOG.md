@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased - 2025-06-30
+## [2.17.1] - 2025-06-30
 ### Changed
 - Updated to building block sdk library and added html markup to floor plan svg [#146](https://github.com/rokwire/gateway-building-block/issues/146)
 - Created missing documentation for end points [#136] https://github.com/rokwire/gateway-building-block/issues/136
