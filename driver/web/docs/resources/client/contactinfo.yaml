@@ -1,0 +1,115 @@
+get:
+  tags:
+  - Client
+  summary: Get contact information for a person
+  description: |
+    Returns comprehensive contact information for a person including name, permanent and mailing addresses, 
+    phone numbers, and emergency contact information.
+    
+    **Authentication:** Requires both RokwireAuth and ExternalAuth tokens
+    **Mode Parameter:** 
+    - "0" (default): Standard contact information
+    - "1": Enhanced contact information (for specific UINs)
+    
+    **Auth:** Requires valid first-party service account token and external authorization token
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: id
+    in: query
+    description: User ID (UIN) of the person
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+      example: "123456789"
+  - name: mode
+    in: query
+    description: Mode for contact information retrieval (0=standard, 1=enhanced)
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: string
+      enum: ["0", "1"]
+      default: "0"
+      example: "0"
+  responses:
+    200:
+      description: Success - Returns person's contact information
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/Person.yaml"
+          example:
+            uin: "123456789"
+            FirstName: "John"
+            LastName: "Doe"
+            PreferredName: "Johnny"
+            MailingAddress:
+              Type: "MA"
+              Street1: "123 Main St"
+              City: "Urbana"
+              StateAbbr: "IL"
+              StateName: "Illinois"
+              ZipCode: "61801"
+              County: "Champaign"
+              Phone:
+                AreaCode: "217"
+                Number: "333-1234"
+            PermAddress:
+              Type: "PR"
+              Street1: "456 Oak Ave"
+              City: "Chicago"
+              StateAbbr: "IL"
+              StateName: "Illinois"
+              ZipCode: "60601"
+              County: "Cook"
+              Phone:
+                AreaCode: "312"
+                Number: "555-6789"
+            EmergencyContacts:
+              - Priority: "1"
+                RelationShip:
+                  Code: "PAR"
+                  Name: "Parent"
+                FirstName: "Jane"
+                LastName: "Doe"
+                Address:
+                  Type: "PR"
+                  Street1: "456 Oak Ave"
+                  City: "Chicago"
+                  StateAbbr: "IL"
+                  StateName: "Illinois"
+                  ZipCode: "60601"
+                  County: "Cook"
+                  Phone:
+                    AreaCode: "312"
+                    Number: "555-6789"
+    400:
+      description: Bad request - Missing required parameters or invalid external token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "missing"
+              type:
+                type: string
+                example: "header"
+              args:
+                type: array
+                items:
+                  type: string
+                example: ["external auth token"]
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    403:
+      description: Forbidden - Insufficient permissions or invalid external token
+    404:
+      description: Not found - Person with specified UIN not found
+    500:
+      description: Internal server error 

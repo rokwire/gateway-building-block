@@ -1,0 +1,56 @@
+get:
+  tags:
+  - Client
+  summary: Gets building information
+  description: |
+    Gets building information by id
+
+    **Auth:** Requires valid first-party service account token with `get_building` permission
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: id
+    in: query
+    description: Building id
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+  - name: adaOnly
+    in: query
+    description: Prioritize ADA accessible entrances in the response
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: boolean
+  - name: lat
+    in: query
+    description: lattidue of the user's location
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: double
+  - name: long
+    in: query
+    description: longitude of the user's location
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: double
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/Building.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

@@ -1,0 +1,22 @@
+type: object
+required:
+- coursetitle
+- courseshortname
+- coursenumber
+- instructionmethod
+- coursesection
+properties:
+  coursetitle:
+    type: string
+    readOnly: true
+  courseshortname:
+    type: string
+    readOnly: true
+  coursenumber:
+    type: string
+    readOnly: true
+  instructionmethod:
+    type: string
+    readOnly: true
+  coursesection:
+    $ref: "./CourseSection.yaml" 

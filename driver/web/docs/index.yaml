@@ -33,28 +33,30 @@ paths:
   # Client
   /api/examples/{id}:
     $ref: "./resources/client/examples-id.yaml"
-  #/api/laundry/rooms:
-  #  $ref: "./resources/client/laundryrooms.yaml"
-  #/api/laundry/room:
-  #  $ref: "./resources/client/laundryroom.yaml"
-  #/api/laundry/initrequest:
-  #  $ref: "./resources/client/initrequest.yaml"
-  #/api/laundry/requestservice:
-  #  $ref: "./resources/client/requestservice.yaml"
-  #/api/wayfinding/building:
-  #  $ref: "./resources/client/building.yaml"
-  #/api/wayfinding/entrance:
-  #  $ref: "./resources/client/entrance.yaml"
-  #/api/wayfinding/buildings:
-  #  $ref: "./resources/client/buildings.yaml"
-  #/api/person/contactinfo:
-  #  $ref: "./resources/client/contactinfo.yaml"
-  #/api/person/giescourses:
-  #  $ref: "./resources/client/giescourses.yaml"
-  #/api/person/studentcourses:
-  #  $ref: "./resources/client/studentcourses.yaml"
-  #/api/termsessions/listcurrent:
-  #  $ref: "./resources/client/termsessions.yaml"
+  /api/wayfinidng/buildng:
+    $ref: "./resources/client/building.yaml"
+  /api/wayfinding/buildings:
+    $ref: "./resources/client/buildings.yaml"
+  /api/wayfinding/floorplan:
+    $ref: "./resources/client/floorplan.yaml"
+  /api/wayfinding/searchbuildings:
+    $ref: "./resources/client/searchbuildings.yaml"
+  /api/termsessions/listcurrent:
+    $ref: "./resources/client/termsessions.yaml"
+  /api/laundry/rooms:
+    $ref: "./resources/client/laundryrooms.yaml"
+  /api/laundry/room:
+    $ref: "./resources/client/laundryroomdetail.yaml"
+  /api/laundry/initrequest:
+    $ref: "./resources/client/laundryinitrequest.yaml"
+  /api/laundry/requestservice:
+    $ref: "./resources/client/laundryrequestservice.yaml"
+  /api/person/contactinfo:
+    $ref: "./resources/client/contactinfo.yaml"
+  /api/person/giescourses:
+    $ref: "./resources/client/giescourses.yaml"
+  /api/person/studentcourses:
+    $ref: "./resources/client/studentcourses.yaml"
   
   # Admin
   /api/admin/examples:

@@ -37,3 +37,8 @@ func newAppShared(app *Application) appShared {
 func (a appShared) getBuildingFeatures() ([]model.AppBuildingFeature, error) {
 	return a.app.storage.LoadAppBuildingFeatures()
 }
+
+// getFloorPlanMarkup returns the floor plan markup needed by the app
+func (a appShared) getFloorPlanMarkup() (*model.FloorPlanMarkup, error) {
+	return a.app.storage.LoadFloorPlanMarkup()
+}

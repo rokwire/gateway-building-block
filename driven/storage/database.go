@@ -43,6 +43,7 @@ type database struct {
 	examples            *collectionWrapper
 	unitcalendars       *collectionWrapper
 	appbuildingfeatures *collectionWrapper
+	floorplanmarkup     *collectionWrapper
 
 	legacyEvents           *collectionWrapper
 	legacyLocations        *collectionWrapper
@@ -103,6 +104,7 @@ func (d *database) start() error {
 	unitcalendars := &collectionWrapper{database: d, coll: db.Collection("unitcalendars")}
 
 	appbuildingfeatures := &collectionWrapper{database: d, coll: db.Collection("building_features")}
+	floorplanmarkup := &collectionWrapper{database: d, coll: db.Collection("floorplan_markup")}
 
 	legacyLocations := &collectionWrapper{database: d, coll: db.Collection("legacy_locations")}
 	err = d.applyLegacyLocationsChecks(legacyEvents)
@@ -132,6 +134,7 @@ func (d *database) start() error {
 	d.legacyEvents = legacyEvents
 	d.unitcalendars = unitcalendars
 	d.appbuildingfeatures = appbuildingfeatures
+	d.floorplanmarkup = floorplanmarkup
 	d.legacyLocations = legacyLocations
 	d.webtoolsBlacklistItems = webtoolsBlacklistItems
 	d.processedImages = processedImages

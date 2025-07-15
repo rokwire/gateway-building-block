@@ -1,0 +1,31 @@
+type: object
+required:
+- uin
+- FirstName
+- LastName
+- PreferredName
+- MailingAddress
+- PermAddress
+- EmergencyContacts
+properties:
+  uin:
+    type: string
+    readOnly: true
+  FirstName:
+    type: string
+    readOnly: true
+  LastName:
+    type: string
+    readOnly: true
+  PreferredName:
+    type: string
+    readOnly: true
+  MailingAddress:
+    $ref: "./Address.yaml"
+  PermAddress:
+    $ref: "./Address.yaml"
+  EmergencyContacts:
+    type: array
+    items:
+      $ref: "./EmergencyContact.yaml"
+    readOnly: true 

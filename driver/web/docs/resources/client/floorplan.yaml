@@ -1,0 +1,56 @@
+get:
+  tags:
+  - Client
+  summary: Returns the markup required to display the requested floor plan.
+  description: |
+    Returns the markup and data structures needed to display an svg of the request floor plan.
+
+    **Auth:** Requires valid first-party service account token with `get_building` permission
+  security:
+    - bearerAuth: []
+  parameters:
+  - name: bldgid
+    in: query
+    description: The building id for the selected building
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+  - name: floor
+    in: query
+    description: Identifier of the floor to retrieve.
+    required: true
+    style: form
+    explode: false
+    schema:
+      type: string
+  - name: markers
+    in: query
+    description: If omitted, the value is set to "on". Indicates the initial state of all the marker on the floor plan. Values are "on" or "off".
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: number
+  - name: highlites
+    in: query
+    description: If omitted, the values is set to "on". Indicates the initial state of all the highlites on the flloor plan. Values are "on" or "off".
+    required: false
+    style: form
+    explode: false
+    schema:
+      type: number
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/FloorPlan.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

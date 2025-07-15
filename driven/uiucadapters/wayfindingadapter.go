@@ -112,7 +112,7 @@ func (uwf *UIUCWayFinding) GetBuilding(bldgID string, adaAccessibleOnly bool, la
 }
 
 // GetFloorPlan returns the requested floor plan
-func (uwf *UIUCWayFinding) GetFloorPlan(bldgNum string, floornumber string, markers string, highlites string, conf *model.EnvConfigData) (*model.FloorPlan, error) {
+func (uwf *UIUCWayFinding) GetFloorPlan(bldgNum string, floornumber string, markers string, highlites string, markup string, conf *model.EnvConfigData) (*model.FloorPlan, error) {
 	apiURL := conf.WayFindingURL
 	apikey := conf.WayFindingKey
 	reqParams := "?"
@@ -135,7 +135,7 @@ func (uwf *UIUCWayFinding) GetFloorPlan(bldgNum string, floornumber string, mark
 	if err != nil {
 		return nil, err
 	}
-	return uiuc.NewFloorPlan(*uiucfp), nil
+	return uiuc.NewFloorPlan(*uiucfp, markup), nil
 }
 
 // the entrance list coming back from a ranged query to the API is sorted closest to farthest from

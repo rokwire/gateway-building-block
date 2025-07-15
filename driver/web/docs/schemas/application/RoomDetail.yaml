@@ -1,0 +1,27 @@
+type: object
+required:
+- NumWashers
+- NumDryers
+- Appliances
+- RoomName
+- CampusName
+properties:
+  NumWashers:
+    type: integer
+    readOnly: true
+  NumDryers:
+    type: integer
+    readOnly: true
+  Appliances:
+    type: array
+    items:
+      $ref: "./Appliance.yaml"
+    readOnly: true
+  RoomName:
+    type: string
+    readOnly: true
+  CampusName:
+    type: string
+    readOnly: true
+  Location:
+    $ref: "./LaundryDetails.yaml" 

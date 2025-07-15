@@ -1,0 +1,11 @@
+type: object
+required:
+- AreaCode
+- Number
+properties:
+  AreaCode:
+    type: string
+    readOnly: true
+  Number:
+    type: string
+    readOnly: true 

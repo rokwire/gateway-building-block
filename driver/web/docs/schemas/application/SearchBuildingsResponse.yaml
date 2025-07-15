@@ -1,0 +1,8 @@
+type: object
+additionalProperties:
+  oneOf:
+    - $ref: "./CompactBuilding.yaml"
+    - $ref: "./Building.yaml"
+description: |
+  A map where keys are building names and values are either CompactBuilding objects (when v=1 or omitted) 
+  or Building objects (when v=2) 

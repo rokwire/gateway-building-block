@@ -1,0 +1,50 @@
+type: object
+required:
+- days
+- meeting_dates_or_range
+- room
+- buildingname
+- buildingid
+- instructiontype
+- instructor
+- start_time
+- endtime
+- building
+- courseReferenceNumber
+- course_section
+properties:
+  days:
+    type: string
+    readOnly: true
+  meeting_dates_or_range:
+    type: string
+    readOnly: true
+  room:
+    type: string
+    readOnly: true
+  buildingname:
+    type: string
+    readOnly: true
+  buildingid:
+    type: string
+    readOnly: true
+  instructiontype:
+    type: string
+    readOnly: true
+  instructor:
+    type: string
+    readOnly: true
+  start_time:
+    type: string
+    readOnly: true
+  endtime:
+    type: string
+    readOnly: true
+  building:
+    $ref: "./Building.yaml"
+  courseReferenceNumber:
+    type: string
+    readOnly: true
+  course_section:
+    type: string
+    readOnly: true 

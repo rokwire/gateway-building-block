@@ -1,0 +1,40 @@
+get:
+  tags:
+  - Client
+  summary: Get list of all campus laundry rooms
+  description: |
+    Returns a list of all laundry rooms available on campus with their basic information including ID, name, status, and location details.
+    
+    **Auth:** Requires valid first-party service account token with appropriate permissions
+  security:
+    - bearerAuth: []
+  responses:
+    200:
+      description: Success - Returns organization with list of laundry rooms
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/application/Organization.yaml"
+          example:
+            SchoolName: "University of Illinois at Urbana-Champaign"
+            LaundryRooms:
+              - ID: 1
+                Name: "Illini Tower Laundry"
+                Status: "active"
+                Location:
+                  Latitude: 40.1095
+                  Longitude: -88.2272
+                  Floor: 1
+              - ID: 2
+                Name: "Bromley Hall Laundry"
+                Status: "active"
+                Location:
+                  Latitude: 40.1100
+                  Longitude: -88.2280
+                  Floor: 2
+    401:
+      description: Unauthorized - Invalid or missing authentication token
+    404:
+      description: Not found - No laundry rooms available
+    500:
+      description: Internal server error 

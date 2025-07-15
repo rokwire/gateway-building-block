@@ -1,0 +1,11 @@
+type: object
+required:
+- Code
+- Name
+properties:
+  Code:
+    type: string
+    readOnly: true
+  Name:
+    type: string
+    readOnly: true 

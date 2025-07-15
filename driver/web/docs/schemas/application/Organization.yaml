@@ -1,0 +1,13 @@
+type: object
+required:
+- SchoolName
+- LaundryRooms
+properties:
+  SchoolName:
+    type: string
+    readOnly: true
+  LaundryRooms:
+    type: array
+    items:
+      $ref: "./LaundryRoom.yaml"
+    readOnly: true 

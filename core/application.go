@@ -49,8 +49,9 @@ type Application struct {
 	System  System  // expose to the drivers adapters
 	shared  Shared
 
-	CampusBuildings model.CachedBuildings               //caches a list of all campus building data
-	AppBLdgFeatures map[string]model.AppBuildingFeature //caches the configured set of building features
+	CampusBuildings  model.CachedBuildings               //caches a list of all campus building data
+	AppBLdgFeatures  map[string]model.AppBuildingFeature //caches the configured set of building features
+	FloorPlanWrapper model.FloorPlanMarkup               //caches the floor plan markup
 
 	AppointmentAdapters map[string]Appointments //expose to the different vendor specific appointment adapters
 
@@ -113,6 +114,14 @@ func NewApplication(version string, build string,
 	application.System = newAppSystem(&application)
 	application.shared = newAppShared(&application)
 	application.eventsLogic = newAppEventsLogic(&application, eventsBBAdapter, geoBBAdapter, *logger)
+
+	fmpw, fmerr := application.shared.getFloorPlanMarkup()
+	if fmerr != nil {
+		application.logger.Errorf("Error getting floor plan markup: %v", fmerr)
+	} else {
+		application.logger.Infof("Floor plan markup loaded successfully")
+		application.FloorPlanWrapper = *fmpw
+	}
 
 	bldfeatures, blderr := application.shared.getBuildingFeatures()
 	if blderr != nil {

@@ -1,0 +1,27 @@
+type: object
+required:
+- ID
+- Status
+- ApplianceType
+- AverageCycleTime
+- Label
+properties:
+  ID:
+    type: string
+    readOnly: true
+  Status:
+    type: string
+    readOnly: true
+  ApplianceType:
+    type: string
+    readOnly: true
+  AverageCycleTime:
+    type: integer
+    readOnly: true
+  TimeRemaining:
+    type: integer
+    nullable: true
+    readOnly: true
+  Label:
+    type: string
+    readOnly: true 

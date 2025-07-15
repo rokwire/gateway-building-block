@@ -1,0 +1,17 @@
+type: object
+required:
+- ID
+- Name
+- Status
+properties:
+  ID:
+    type: integer
+    readOnly: true
+  Name:
+    type: string
+    readOnly: true
+  Status:
+    type: string
+    readOnly: true
+  Location:
+    $ref: "./LaundryDetails.yaml" 
