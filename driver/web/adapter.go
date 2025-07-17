@@ -17,6 +17,7 @@ package web
 import (
 	"application/core"
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -31,6 +32,7 @@ import (
 	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
 	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logutils"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -220,10 +222,32 @@ func (a Adapter) wrapFunc(handler handlerFunc, authorization tokenauth.Handler) 
 
 // NewWebAdapter creates new WebAdapter instance
 func NewWebAdapter(baseURL string, port string, serviceID string, apiKey string, app *core.Application, serviceRegManager *auth.ServiceRegManager, serviceAccountManager *auth.ServiceAccountManager, logger *logs.Logger) Adapter {
+
+	//openAPI doc
+	loader := &openapi3.Loader{Context: context.Background(), IsExternalRefsAllowed: true}
+
 	yamlDoc, err := loadDocsYAML(baseURL)
 	if err != nil {
 		logger.Fatalf("error parsing docs yaml - %s", err.Error())
 	}
+	doc, err := loader.LoadFromData(yamlDoc)
+	if err != nil {
+		logger.Fatalf("error loading docs yaml - %s", err.Error())
+	}
+	err = doc.Validate(loader.Context, openapi3.EnableExamplesValidation())
+	if err != nil {
+		logger.Fatalf("error on openapi3 validate - %s", err.Error())
+	}
+
+	//Ignore servers. Validating reqeusts against the documented servers can cause issues when routing traffic through proxies/load-balancers.
+	doc.Servers = nil
+
+	//To correctly route traffic to base path, we must add to all paths since servers are ignored
+	paths := openapi3.NewPaths()
+	for path, obj := range doc.Paths.Map() {
+		paths.Set("/gateway"+path, obj)
+	}
+	doc.Paths = paths
 
 	auth, err := NewAuth(serviceRegManager, apiKey)
 	if err != nil {

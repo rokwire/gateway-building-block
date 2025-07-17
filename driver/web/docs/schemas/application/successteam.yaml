@@ -6,10 +6,10 @@ properties:
   primary_care_providers:
     type: array
     items:
-      - $ref: "./successteamMember.yaml"
+      $ref: "./successteamMember.yaml"
     readOnly: true
   academic_advisors:
     type: array
     items:
-      - $ref: "./successteamMember.yaml"
+      $ref: "./successteamMember.yaml"
     readOnly: true
