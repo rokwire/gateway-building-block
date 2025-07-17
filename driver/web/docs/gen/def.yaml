@@ -149,9 +149,10 @@ paths:
           description: Success
           content:
             application/json:
-              type: array
-              items:
-                $ref: '#/components/schemas/Building'
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Building'
         '400':
           description: Bad request
         '401':
@@ -311,9 +312,10 @@ paths:
           description: Success
           content:
             application/json:
-              type: array
-              items:
-                $ref: '#/components/schemas/TermSession'
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TermSession'
         '400':
           description: Bad request
         '401':
@@ -3405,12 +3407,12 @@ components:
         primary_care_providers:
           type: array
           items:
-            - $ref: '#/components/schemas/successteamMember'
+            $ref: '#/components/schemas/successteamMember'
           readOnly: true
         academic_advisors:
           type: array
           items:
-            - $ref: '#/components/schemas/successteamMember'
+            $ref: '#/components/schemas/successteamMember'
           readOnly: true
     successteamMember:
       type: object
