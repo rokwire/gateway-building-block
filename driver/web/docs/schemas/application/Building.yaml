@@ -68,5 +68,5 @@ properties:
   Features:
     type: array
     items:
-      $ref: "./BuildingFeature.yaml"
+      $ref: "./BuildingFeatureLocation.yaml"
     readOnly: true

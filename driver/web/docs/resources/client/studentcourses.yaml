@@ -102,6 +102,42 @@ get:
                   Latitude: 40.1135
                   Longitude: -88.2244
                   Floors: ["1", "2", "3", "4"]
+                  Entrances: [
+                    {
+                      ID: "9bd26229-f95e-4b83-bcd3-34ee91f75b5b",
+                      Name: "Main Entrance",
+                      ADACompliant: true,
+                      Available: true,
+                      ImageURL: "https://example.com/entrance1.jpg",
+                      Latitude: 40.1135,
+                      Longitude: -88.2244
+                    },
+                    {
+                      ID: "entrance2",
+                      Name: "Side Entrance",
+                      ADACompliant: false,
+                      Available: true,
+                      ImageURL: "https://example.com/entrance2.jpg",
+                      Latitude: 40.1136,
+                      Longitude: -88.2245
+                    }
+                  ]
+                  Features: [
+                    {
+                      Key: "ADA_ENTRANCE",
+                      Value: {
+                        Name: "ADA Entrance",
+                        Floors: ["01"]
+                      }
+                    },
+                    {
+                      Key: "RR-ALLGENDER",
+                      Value: {
+                        Name: "All Gender Restroom",
+                        Floors: ["02"]
+                      }
+                    }
+                  ]
                 courseReferenceNumber: "12345"
                 course_section: "A"
             - coursetitle: "Calculus I"
@@ -133,6 +169,42 @@ get:
                   Latitude: 40.1095
                   Longitude: -88.2272
                   Floors: ["1", "2", "3"]
+                  Entrances: [
+                    {
+                      ID: "9bd26229-f95e-4b83-bcd3-34ee91f75b5b",
+                      Name: "Main Entrance",
+                      ADACompliant: true,
+                      Available: true,
+                      ImageURL: "https://example.com/entrance1.jpg",
+                      Latitude: 40.1135,
+                      Longitude: -88.2244
+                    },
+                    {
+                      ID: "entrance2",
+                      Name: "Side Entrance",
+                      ADACompliant: false,
+                      Available: true,
+                      ImageURL: "https://example.com/entrance2.jpg",
+                      Latitude: 40.1136,
+                      Longitude: -88.2245
+                    }
+                  ]
+                  Features: [
+                    {
+                      Key: "ADA_ENTRANCE",
+                      Value: {
+                        Name: "ADA Entrance",
+                        Floors: ["01"]
+                      }
+                    },
+                    {
+                      Key: "RR-ALLGENDER",
+                      Value: {
+                        Name: "All Gender Restroom",
+                        Floors: ["02"]
+                      }
+                    }
+                  ]
                 courseReferenceNumber: "67890"
                 course_section: "B"
     400:

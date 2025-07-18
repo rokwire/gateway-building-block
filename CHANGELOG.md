@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed 
 - Small issues [#150](https://github.com/rokwire/gateway-building-block/issues/150)
 - Fixed errors in buildings.yaml and termsessions.yaml to remove generated errors in def.yaml
+- Documentation is not up to date [#136]https://github.com/rokwire/gateway-building-block/issues/136
 
 ## [2.17.1] - 2025-06-30
 ### Changed
