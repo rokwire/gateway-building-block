@@ -5,10 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [2.17.3] - 2025-07-23
 ### Changed 
 - Small issues [#150](https://github.com/rokwire/gateway-building-block/issues/150)
 - Fixed errors in buildings.yaml and termsessions.yaml to remove generated errors in def.yaml
 - Documentation is not up to date [#136]https://github.com/rokwire/gateway-building-block/issues/136
+- added RUN apk add --no-cache --update make git to docker file
 
 ## [2.17.1] - 2025-06-30
 ### Changed

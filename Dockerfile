@@ -2,7 +2,7 @@ FROM golang:1.24-alpine as builder
 
 ENV CGO_ENABLED=0
 
-#RUN apk add --no-cache --update make git
+RUN apk add --no-cache --update make git
 
 RUN mkdir /app
 WORKDIR /app
