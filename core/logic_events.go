@@ -116,7 +116,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 		leftToday := 86400 - nowSecondsInDay
 		durationInSeconds = leftToday + desiredMoment // the time which left today + desired moment from tomorrow
 	}
-	//log.Println(durationInSeconds)
+	log.Println(durationInSeconds)
 	//duration := time.Second * time.Duration(3)
 	duration := time.Second * time.Duration(durationInSeconds)
 	e.logger.Infof("setupWebToolsTimer -> first call after %s", duration)
@@ -164,6 +164,22 @@ func (e eventsLogic) processWebToolsEvents() {
 	if err != nil {
 		e.logger.Errorf("error on loading web tools events - %s", err)
 		return
+	}
+
+	// Keep only one instance per unique EventID to prevent duplicates in the app.
+	uniqueByID := make(map[string]model.WebToolsEvent)
+	for _, ev := range allWebToolsEvents {
+		if _, exists := uniqueByID[ev.EventID]; !exists {
+			uniqueByID[ev.EventID] = ev
+		}
+	}
+	if len(uniqueByID) != len(allWebToolsEvents) {
+		e.logger.Infof("deduped webtools events by EventID: %d -> %d", len(allWebToolsEvents), len(uniqueByID))
+	}
+	// rebuild slice from map
+	allWebToolsEvents = allWebToolsEvents[:0]
+	for _, ev := range uniqueByID {
+		allWebToolsEvents = append(allWebToolsEvents, ev)
 	}
 
 	webToolsCount := len(allWebToolsEvents)
