@@ -166,6 +166,13 @@ func (e eventsLogic) processWebToolsEvents() {
 		return
 	}
 
+	// Keep only one instance per unique EventID to prevent duplicates in the app.
+	allWebToolsEvents, err = e.preventDuplicateEvents(allWebToolsEvents)
+	if err != nil {
+		e.logger.Errorf("error on prevent duplicate web tools events - %s", err)
+		return
+	}
+
 	webToolsCount := len(allWebToolsEvents)
 	if webToolsCount == 0 {
 		e.logger.Error("web tools are nil")
@@ -287,6 +294,25 @@ func (e eventsLogic) processImages(allWebtoolsEvents []model.WebToolsEvent) ([]m
 	}
 
 	return imagesData, nil
+}
+
+func (e eventsLogic) preventDuplicateEvents(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
+	uniqueByID := make(map[string]model.WebToolsEvent)
+	for _, ev := range allWebtoolsEvents {
+		if _, exists := uniqueByID[ev.EventID]; !exists {
+			uniqueByID[ev.EventID] = ev
+		}
+	}
+	if len(uniqueByID) != len(allWebtoolsEvents) {
+		e.logger.Infof("deduped webtools events by EventID: %d -> %d", len(allWebtoolsEvents), len(uniqueByID))
+	}
+	// rebuild slice from map
+	allWebtoolsEvents = allWebtoolsEvents[:0]
+	for _, ev := range uniqueByID {
+		allWebtoolsEvents = append(allWebtoolsEvents, ev)
+	}
+	return allWebtoolsEvents, nil
+
 }
 
 func (e eventsLogic) getEventsForImagesProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
