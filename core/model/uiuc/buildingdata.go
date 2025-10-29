@@ -154,7 +154,7 @@ func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildin
 		buildingName = buildingName + " (" + bldg.ShortName + ")"
 	}
 	newBldg := model.Building{ID: bldg.UUID, Name: buildingName, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2,
-		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number}
+		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number, ShortName: bldg.ShortName}
 	newBldg.Entrances = make([]model.Entrance, 0)
 	for _, n := range bldg.Entrances {
 		if n.Available {

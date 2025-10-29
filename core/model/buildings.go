@@ -47,6 +47,7 @@ type Building struct {
 	ZipCode     string
 	ImageURL    string
 	MailCode    string
+	ShortName   string
 	Entrances   []Entrance
 	Latitude    float64
 	Longitude   float64
@@ -64,6 +65,7 @@ type CompactBuilding struct {
 	Latitude    float64
 	Longitude   float64
 	Features    []BuildingFeatureLocation
+	ShortName   string
 }
 
 // BuildingFeatureLocation represents a list of where each feature belonging to a building can be found
