@@ -41,6 +41,15 @@ func (lv StudentCourseAdapter) GetStudentCourses(uin string, termid string, acce
 
 	courseAPIEP := conf.CentralCampusURL
 	courseAuth := conf.CentralCampusKey
+	if termid == "" {
+		crntDate := time.Now()
+		crntYear := strconv.Itoa(crntDate.Year())
+		if crntDate.Month() >= 6 && crntDate.Month() <= 12 {
+			termid = "1" + crntYear + "8"
+		} else {
+			termid = "1" + crntYear + "1"
+		}
+	}
 	finalURL := courseAPIEP + "/student-registration/student-enrollment-query/v2_0/" + uin + "/" + termid
 
 	retValue := make([]model.Course, 0)

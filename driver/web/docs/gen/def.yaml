@@ -809,13 +809,13 @@ paths:
             example: '123456789'
         - name: termid
           in: query
-          description: 'Term ID for the academic term (e.g., "2024-FA" for Fall 2024)'
-          required: true
+          description: 'Term ID for the academic term (e.g., "120258" for Fall 2025). If not provided, defaults to the current term.'
+          required: false
           style: form
           explode: false
           schema:
             type: string
-            example: 2024-FA
+            example: '120258'
         - name: lat
           in: query
           description: Latitude coordinate for location-based building information (optional)

@@ -670,7 +670,8 @@ func (h ClientAPIsHandler) getStudentCourses(l *logs.Log, r *http.Request, claim
 	}
 
 	if termid == "" || termid == "null" {
-		return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("termid"), nil, http.StatusBadRequest, false)
+		//return l.HTTPResponseErrorData(logutils.StatusMissing, logutils.TypeQueryParam, logutils.StringArgs("termid"), nil, http.StatusBadRequest, false)
+		termid = ""
 	}
 
 	courseList, statusCode, err := h.app.Client.GetStudentCourses(id, termid, externalToken)
