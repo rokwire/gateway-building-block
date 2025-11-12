@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Add ShortName property to campus buildings to pass through the aka_name from the campus data
 - Added ShortName to the fields searched by the searchbuilding api end point
+- Made termsessionid optional when calling student courses end point. If omitted, calculate the current term baed on the month.
 
 ## [2.17.5] - 2025-10-30
 ### Fixed
