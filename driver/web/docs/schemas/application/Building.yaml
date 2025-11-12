@@ -70,3 +70,6 @@ properties:
     items:
       $ref: "./BuildingFeatureLocation.yaml"
     readOnly: true
+  ShortName:
+    type: string
+    readOnly: true

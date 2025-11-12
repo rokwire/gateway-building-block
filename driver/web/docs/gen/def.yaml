@@ -269,6 +269,7 @@ paths:
                   Number: '1401'
                   FullAddress: '1401 W Green St, Urbana, IL 61801'
                   ImageURL: 'https://example.com/illini_union.jpg'
+                  ShortName: Union
                   Latitude: 40.1095
                   Longitude: -88.2272
         '400':
@@ -2553,6 +2554,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BuildingFeatureLocation'
+          readOnly: true
+        ShortName:
+          type: string
           readOnly: true
     BuildingBlockAppointment:
       type: object
