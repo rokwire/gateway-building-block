@@ -7,6 +7,7 @@ required:
 - ImageURL
 - Latitude
 - Longitude
+- ShortName
 properties:
   ID:
     type: string
@@ -33,4 +34,7 @@ properties:
     type: array
     items:
       $ref: "./BuildingFeatureLocation.yaml"
+    readOnly: true
+  ShortName:
+    type: string
     readOnly: true

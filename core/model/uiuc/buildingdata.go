@@ -51,6 +51,7 @@ type CampusBuilding struct {
 	Floors      []string                `json:"floor_ids"`
 	Features    []CampusBuildingFeature `'json:"features"`
 	FloorsInFAM []string                `json:"floors_in_FAM"`
+	ShortName   string                  `json:"aka_name"`
 }
 
 // CampusBuildingFeature represents a UIUC specific representation of features found in buildings
@@ -148,8 +149,12 @@ func NewFloorPlan(fp CampusFloorPlan, markup string) *model.FloorPlan {
 // NewBuilding creates a wayfinding.Building instance from a campusBuilding,
 // including all active entrances for the building
 func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildingFeature) *model.Building {
-	newBldg := model.Building{ID: bldg.UUID, Name: bldg.Name, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2,
-		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number}
+	buildingName := bldg.Name
+	if bldg.ShortName != "" {
+		buildingName = buildingName + " (" + bldg.ShortName + ")"
+	}
+	newBldg := model.Building{ID: bldg.UUID, Name: buildingName, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2,
+		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number, ShortName: bldg.ShortName}
 	newBldg.Entrances = make([]model.Entrance, 0)
 	for _, n := range bldg.Entrances {
 		if n.Available {

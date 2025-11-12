@@ -134,9 +134,9 @@ func (a appClient) SearchBuildings(bldgName string, returnCompact bool) (*map[st
 	}
 	var retData = make(map[string]any)
 	for _, v := range *allbuildings {
-		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(bldgName)) {
+		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(bldgName)) || strings.Contains(strings.ToLower(v.ShortName), strings.ToLower(bldgName)) {
 			if returnCompact {
-				crntBldg := model.CompactBuilding{Name: v.Name, FullAddress: v.FullAddress, Latitude: v.Latitude, Longitude: v.Longitude, ImageURL: v.ImageURL, Number: v.Number}
+				crntBldg := model.CompactBuilding{Name: v.Name, FullAddress: v.FullAddress, Latitude: v.Latitude, Longitude: v.Longitude, ImageURL: v.ImageURL, Number: v.Number, ShortName: v.ShortName}
 				retData[v.Name] = crntBldg
 			} else {
 				retData[v.Name] = v
