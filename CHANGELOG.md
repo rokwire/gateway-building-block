@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-## [2.17.6] - 2025-11-12
+## [2.17.7] - 2025-11-12
 ### Changed
 - Add ShortName property to campus buildings to pass through the aka_name from the campus data
 - Added ShortName to the fields searched by the searchbuilding api end point
