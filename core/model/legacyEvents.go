@@ -32,6 +32,7 @@ type WebToolsResponse struct {
 	Text           string          `xml:",chardata"`
 	Deprecated     string          `xml:"deprecated"`
 	MaxPageSize    string          `xml:"maxPageSize"`
+	EndOfService   string          `xml:"endOfServiceDate"`
 	WebToolsEvents []WebToolsEvent `xml:"publicEventWS"`
 }
 
@@ -49,6 +50,9 @@ type WebToolsEvent struct {
 	TitleURL                           string `xml:"titleURL"`
 	EventType                          string `xml:"eventType"`
 	Sponsor                            string `xml:"sponsor"`
+	SponsorType                        string `xml:"sponsorType"`
+	SponsorUnitID                      string `xml:"sponsorUnitId"`
+	SponsorDepartmentID                string `xml:"sponsorDepartmentId"`
 	DateDisplay                        string `xml:"dateDisplay"`
 	StartDate                          string `xml:"startDate"`
 	EndDate                            string `xml:"endDate"`
@@ -58,6 +62,11 @@ type WebToolsEvent struct {
 	EndTimeLabel                       string `xml:"endTimeLabel"`
 	InPersonEvent                      string `xml:"inPersonEvent"`
 	Location                           string `xml:"location"`
+	LocationType                       string `xml:"locationType"`
+	LocationLink                       string `xml:"locationLink"`
+	LocationBuildingID                 string `xml:"locationBuildingId"`
+	LocationLatitude                   string `xml:"locationLatitude"`
+	LocationLongitude                  string `xml:"locationLongitude"`
 	Description                        string `xml:"description"`
 	Speaker                            string `xml:"speaker"`
 	RegistrationLabel                  string `xml:"registrationLabel"`
@@ -86,6 +95,7 @@ type WebToolsEvent struct {
 	LargeImageSize                     string `xml:"largeImageSize"`
 	VirtualEvent                       string `xml:"virtualEvent"`
 	VirtualEventURL                    string `xml:"virtualEventURL"`
+	ImageUploaded                      string `xml:"imageUploaded"`
 	Topic                              []struct {
 		Text string `xml:",chardata"`
 		ID   string `xml:"id"`
