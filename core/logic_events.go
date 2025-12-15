@@ -491,7 +491,7 @@ func (e eventsLogic) loadAllWebToolsEvents() ([]model.WebToolsEvent, error) {
 
 	page := 0
 	for {
-		resp, err := http.Get(fmt.Sprintf("https://xml.calendars.illinois.edu/eventXML16/6991.xml?pageNumber=%d", page))
+		resp, err := http.Get(fmt.Sprintf("https://xml.calendars.illinois.edu/eventXML17/6991.xml?pageNumber=%d", page))
 		if err != nil {
 			log.Printf("error: %s", err)
 			break
