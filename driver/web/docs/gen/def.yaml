@@ -3153,6 +3153,10 @@ components:
           type: string
         sponsor:
           type: string
+        sponsor_unit_id:
+          type: string
+        sponsor_department_id:
+          type: string
         start_date:
           type: string
         title:
