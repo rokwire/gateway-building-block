@@ -177,6 +177,8 @@ type LegacyEvent struct {
 	RecurringFlag           bool            `json:"recurringFlag" bson:"recurringFlag"`
 	SourceID                string          `json:"sourceId" bson:"sourceId"`
 	Sponsor                 string          `json:"sponsor" bson:"sponsor"`
+	SponsorUnitID           *string         `json:"sponsorUnitId" bson:"sponsorUnitId"`
+	SponsorDepartmentID     *string         `json:"sponsorDepartmentId" bson:"sponsorDepartmentId"`
 	StartDate               string          `json:"startDate" bson:"startDate"`
 	Title                   string          `json:"title" bson:"title"`
 	TitleURL                string          `json:"titleURL" bson:"titleURL"`
