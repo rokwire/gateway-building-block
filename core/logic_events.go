@@ -673,11 +673,21 @@ func (e eventsLogic) constructLegacyEvent(g model.WebToolsEvent, id string, stat
 		category = foundCategory
 	}
 
+	var sponsorUnitID *string
+	if g.SponsorUnitID != "" {
+		sponsorUnitID = &g.SponsorUnitID
+	}
+
+	var sponsorDepartmentID *string
+	if g.SponsorDepartmentID != "" {
+		sponsorDepartmentID = &g.SponsorDepartmentID
+	}
+
 	return model.LegacyEventItem{SyncProcessSource: syncProcessSource, SyncDate: now, Status: status,
 		Item: model.LegacyEvent{ID: id, Category: category, CreatedBy: createdBy,
 			OriginatingCalendarID: g.OriginatingCalendarID, OriginatingCalendarName: g.OriginatingCalendarName,
 			IsVirtial: isVirtual, DataModified: modifiedDate, DateCreated: createdDate,
-			Sponsor: g.Sponsor, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
+			Sponsor: g.Sponsor, SponsorUnitID: sponsorUnitID, SponsorDepartmentID: sponsorDepartmentID, Title: g.Title, CalendarID: g.CalendarID, SourceID: "0", AllDay: allDay, IsEventFree: costFree, Cost: g.Cost, LongDescription: g.Description,
 			TitleURL: g.TitleURL, RegistrationURL: g.RegistrationURL, RecurringFlag: Recurrence, IcalURL: icalURL, OutlookURL: outlookURL,
 			RecurrenceID: recurrenceID, Location: loc, Contacts: contatsLegacy,
 			DataSourceEventID: g.EventID, StartDate: startDateStr, EndDate: endDateStr,
