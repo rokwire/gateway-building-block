@@ -67,20 +67,34 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 
 // Why do you call this API two times??
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
-	currentAppConfig := "https://calendars.illinois.edu/eventImage"
+	currentAppConfig := "https://calendars.illinois.edu/eventImage/%s/%s"
 	currAppConfig := "large.png"
-	webtoolImageURL := fmt.Sprintf("%s/%s/%s/%s",
-		currentAppConfig,
-		item.OriginatingCalendarID,
-		item.EventID,
-		currAppConfig,
+
+	// Try the NEW documented image first
+	newImageURL := fmt.Sprintf(
+		"%s/%s",
+		fmt.Sprintf(currentAppConfig, item.OriginatingCalendarID, item.EventID),
+		"eventImage.png",
 	)
 
-	// Make a GET request to download the image
-	response, err := http.Get(webtoolImageURL)
+	response, err := http.Get(newImageURL)
 	if err != nil {
-		fmt.Println("Error while downloading the image:", err)
 		return nil, err
+	}
+	// If new image does not exist, fall back to OLD behavior
+	if response.StatusCode == http.StatusNotFound {
+		response.Body.Close()
+
+		webtoolImageURL := fmt.Sprintf(
+			"%s/%s",
+			fmt.Sprintf(currentAppConfig, item.OriginatingCalendarID, item.EventID),
+			currAppConfig, // large.png
+		)
+
+		response, err = http.Get(webtoolImageURL)
+		if err != nil {
+			return nil, err
+		}
 	}
 	defer response.Body.Close()
 
