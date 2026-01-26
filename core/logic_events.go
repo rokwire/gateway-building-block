@@ -318,7 +318,7 @@ func (e eventsLogic) preventDuplicateEvents(allWebtoolsEvents []model.WebToolsEv
 func (e eventsLogic) getEventsForImagesProcessing(allWebtoolsEvents []model.WebToolsEvent) ([]model.WebToolsEvent, error) {
 	res := []model.WebToolsEvent{}
 	for _, w := range allWebtoolsEvents {
-		if w.LargeImageUploaded == "true" {
+		if w.ImageUploaded == "true" || w.LargeImageUploaded == "true" {
 			res = append(res, w)
 		}
 
