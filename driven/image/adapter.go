@@ -70,13 +70,13 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 	currentAppConfig := "https://calendars.illinois.edu/eventImage/%s/%s"
 	currAppConfig := "large.png"
 
-	// Try the NEW documented image first
+	// Make a GET request to download the new image endpoint
 	newImageURL := fmt.Sprintf(
 		"%s/%s",
 		fmt.Sprintf(currentAppConfig, item.OriginatingCalendarID, item.EventID),
 		"eventImage.png",
 	)
-
+	// Make a GET request to download the image
 	response, err := http.Get(newImageURL)
 	if err != nil {
 		return nil, err
