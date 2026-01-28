@@ -44,6 +44,7 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 	//downlaod
 	webtoolsImage, err := im.downloadWebtoolImages(item)
 	if err != nil {
+		im.logger.Infof("Error with download the webtools image ")
 		return nil, err
 	}
 
@@ -57,6 +58,7 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 		webtoolsImage.Height, webtoolsImage.Width, webtoolsImage.Quality,
 		webtoolsImage.Path, webtoolsImage.FileName)
 	if err != nil {
+		im.logger.Infof("Error with uploading image from content - %s", err)
 		return nil, err
 	}
 
@@ -67,74 +69,72 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 
 // Why do you call this API two times??
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
+
+	// base URL pattern
 	currentAppConfig := "https://calendars.illinois.edu/eventImage/%s/%s"
-	currAppConfig := "large.png"
 
-	// Make a GET request to download the new image endpoint
-	newImageURL := fmt.Sprintf(
-		"%s/%s",
-		fmt.Sprintf(currentAppConfig, item.OriginatingCalendarID, item.EventID),
+	// ALL known PNG variants
+	pngVariants := []string{
 		"eventImage.png",
-	)
-	// Make a GET request to download the image
-	response, err := http.Get(newImageURL)
-	if err != nil {
-		return nil, err
+		"large.png",
+		"thumb.png",
 	}
-	// If new image does not exist, fall back to OLD behavior
-	if response.StatusCode == http.StatusNotFound {
-		response.Body.Close()
 
+	var response *http.Response
+	var err error
+
+	// try each PNG variant until one works
+	for _, fileName := range pngVariants {
 		webtoolImageURL := fmt.Sprintf(
 			"%s/%s",
 			fmt.Sprintf(currentAppConfig, item.OriginatingCalendarID, item.EventID),
-			currAppConfig, // large.png
+			fileName,
 		)
 
 		response, err = http.Get(webtoolImageURL)
 		if err != nil {
 			return nil, err
 		}
+
+		if response.StatusCode == http.StatusOK {
+			// found a valid PNG
+			break
+		}
+
+		response.Body.Close()
+		response = nil
+	}
+
+	if response == nil {
+		im.logger.Infof("no PNG image found for %s", item.EventID)
+		return nil, nil
 	}
 	defer response.Body.Close()
 
-	// Check if the response status code is OK
-	if response.StatusCode != http.StatusOK {
-		im.logger.Infof("response code %d for %s", response.StatusCode, item.EventID)
-		return nil, nil //do not return error when cannot get/find an image
-	}
-
-	// Decode the image
+	// decode PNG
 	img, _, err := image.Decode(response.Body)
 	if err != nil {
-		fmt.Println("Error while decoding the image:", err)
 		return nil, err
 	}
 
-	// Get the image dimensions
 	bounds := img.Bounds()
 	width := bounds.Dx()
 	height := bounds.Dy()
 
-	// Encode the image as PNG
 	var buf bytes.Buffer
-	err = png.Encode(&buf, img)
-	if err != nil {
-		fmt.Println("Error while encoding the image as PNG:", err)
+	if err := png.Encode(&buf, img); err != nil {
 		return nil, err
 	}
 
-	// Fetch additional data and return
-	webtoolImage := model.ImageData{
+	// Fetch additional data
+	return &model.ImageData{
 		ImageData: buf.Bytes(),
 		Height:    height,
 		Width:     width,
 		Quality:   100,
 		Path:      "event/tout",
 		FileName:  "image.png",
-	}
-
-	return &webtoolImage, nil
+	}, nil
 }
 
 // Function to upload image to another API along with additional data
@@ -207,7 +207,7 @@ func (im Adapter) sendRequest(targetURL, path string, width, height, quality int
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		log.Printf("error with response code - %d", response.StatusCode)
+		log.Printf("error with response code from ContentBB - %d", response.StatusCode)
 		return "", fmt.Errorf("error with response code != 200")
 	}
 
