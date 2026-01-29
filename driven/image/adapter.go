@@ -26,6 +26,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
 	"github.com/rokwire/rokwire-building-block-sdk-go/utils/logging/logs"
@@ -36,7 +37,8 @@ type Adapter struct {
 	baseURL        string
 	accountManager *auth.ServiceAccountManager
 
-	logger logs.Logger
+	logger     logs.Logger
+	httpClient *http.Client
 }
 
 // ProcessImage process an image
@@ -70,6 +72,12 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 // Why do you call this API two times??
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
 
+	// resolve HTTP client (fail-fast)
+	client := im.httpClient
+	if client == nil {
+		client = &http.Client{Timeout: 120 * time.Second}
+	}
+
 	// base URL pattern
 	currentAppConfig := "https://calendars.illinois.edu/eventImage/%s/%s"
 
@@ -91,8 +99,9 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 			fileName,
 		)
 
-		response, err = http.Get(webtoolImageURL)
+		response, err = client.Get(webtoolImageURL)
 		if err != nil {
+			// timeout / network error → fail fast
 			return nil, err
 		}
 
@@ -126,7 +135,6 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 		return nil, err
 	}
 
-	// Fetch additional data
 	return &model.ImageData{
 		ImageData: buf.Bytes(),
 		Height:    height,
@@ -225,5 +233,7 @@ func (im Adapter) sendRequest(targetURL, path string, width, height, quality int
 
 // NewImageAdapter creates a new image adapter instance
 func NewImageAdapter(imageHost string, accountManager *auth.ServiceAccountManager, logger logs.Logger) *Adapter {
-	return &Adapter{baseURL: imageHost, accountManager: accountManager, logger: logger}
+	return &Adapter{baseURL: imageHost, accountManager: accountManager, logger: logger, httpClient: &http.Client{
+		Timeout: 120 * time.Second,
+	}}
 }
