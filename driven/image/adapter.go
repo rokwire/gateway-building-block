@@ -17,6 +17,7 @@ package image
 import (
 	"application/core/model"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -75,7 +76,7 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 	// resolve HTTP client (fail-fast)
 	client := im.httpClient
 	if client == nil {
-		client = &http.Client{Timeout: 120 * time.Second}
+		client = &http.Client{Timeout: 20 * time.Second}
 	}
 
 	// base URL pattern
@@ -172,41 +173,45 @@ func (im Adapter) uploadImageFromContent(imageData []byte, height int, width int
 }
 
 func (im Adapter) sendRequest(targetURL, path string, width, height, quality int, filePath string) (string, error) {
-	// Create a new buffer to store the multipart form data
+	// Create a buffer to hold the multipart form data
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 
-	// Add the path, width, height, and quality as form fields
+	// Add form fields: path, width, height and quality
 	_ = writer.WriteField("path", path)
 	_ = writer.WriteField("width", strconv.Itoa(width))
 	_ = writer.WriteField("height", strconv.Itoa(height))
 	_ = writer.WriteField("quality", strconv.Itoa(quality))
 
-	// Add the file as a form file field
+	// Add the image file to the multipart form
 	fileWriter, err := writer.CreateFormFile("fileName", "image.jpg")
 	if err != nil {
 		return "", fmt.Errorf("error creating form file: %w", err)
 	}
 
-	// Copy the file data into the file writer
+	// Copy image data into the multipart file field
 	_, err = io.Copy(fileWriter, bytes.NewReader([]byte(filePath)))
 	if err != nil {
 		return "", fmt.Errorf("error copying file data: %w", err)
 	}
 
-	// Close the multipart writer
+	// Close the multipart writer to finalize the request body
 	writer.Close()
 
-	// Create the HTTP request
-	request, err := http.NewRequest("POST", targetURL, &requestBody)
+	// Create a context with timeout to avoid hanging requests
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	// Create the HTTP POST request with the timeout context
+	request, err := http.NewRequestWithContext(ctx, "POST", targetURL, &requestBody)
 	if err != nil {
 		return "", fmt.Errorf("error creating HTTP request: %w", err)
 	}
 
-	// Set the content type header
+	// Set the correct Content-Type for multipart form data
 	request.Header.Set("Content-Type", writer.FormDataContentType())
 
-	// Send the request
+	// Send the request using the account manager (adds auth, headers, etc.)
 	response, err := im.accountManager.MakeRequest(request, "all", "all")
 	if err != nil {
 		log.Printf("error sending request - %s", err)
@@ -214,7 +219,8 @@ func (im Adapter) sendRequest(targetURL, path string, width, height, quality int
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	// Validate successful response status
+	if response.StatusCode != http.StatusOK {
 		log.Printf("error with response code from ContentBB - %d", response.StatusCode)
 		return "", fmt.Errorf("error with response code != 200")
 	}
@@ -225,15 +231,13 @@ func (im Adapter) sendRequest(targetURL, path string, width, height, quality int
 		return "", fmt.Errorf("error reading response body: %w", err)
 	}
 
-	// Convert response body to string
-	responseString := string(responseBody)
-
-	return responseString, nil
+	// Return the response as string
+	return string(responseBody), nil
 }
 
 // NewImageAdapter creates a new image adapter instance
 func NewImageAdapter(imageHost string, accountManager *auth.ServiceAccountManager, logger logs.Logger) *Adapter {
 	return &Adapter{baseURL: imageHost, accountManager: accountManager, logger: logger, httpClient: &http.Client{
-		Timeout: 120 * time.Second,
+		Timeout: 10 * time.Second,
 	}}
 }
