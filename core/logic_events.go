@@ -104,7 +104,7 @@ func (e eventsLogic) setupWebToolsTimer() {
 	e.logger.Infof("setupWebToolsTimer -> now - hours:%d minutes:%d seconds:%d\n", now.Hour(), now.Minute(), now.Second())
 
 	nowSecondsInDay := 60*60*now.Hour() + 60*now.Minute() + now.Second()
-	desiredMoment := 18000
+	desiredMoment := 5400
 
 	var durationInSeconds int
 	log.Printf("setupWebToolsTimer -> nowSecondsInDay:%d desiredMoment:%d\n", nowSecondsInDay, desiredMoment)
