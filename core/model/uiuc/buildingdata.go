@@ -151,8 +151,13 @@ func NewFloorPlan(fp CampusFloorPlan, markup string) *model.FloorPlan {
 func NewBuilding(bldg CampusBuilding, knownFeatures *map[string]model.AppBuildingFeature) *model.Building {
 	buildingName := bldg.Name
 
+	newshortName := strings.TrimSpace(bldg.ShortName)
+	if strings.EqualFold(newshortName, "NONE") {
+		newshortName = ""
+	}
+
 	newBldg := model.Building{ID: bldg.UUID, Name: buildingName, ImageURL: bldg.ImageURL, Address1: bldg.Address1, Address2: bldg.Address2,
-		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number, ShortName: bldg.ShortName}
+		FullAddress: bldg.FullAddress, City: bldg.City, ZipCode: bldg.ZipCode, State: bldg.State, Latitude: bldg.Latitude, Longitude: bldg.Longitude, Number: bldg.Number, ShortName: newshortName}
 	newBldg.Entrances = make([]model.Entrance, 0)
 	for _, n := range bldg.Entrances {
 		if n.Available {
