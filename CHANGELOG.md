@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 ### Fixed
+- Fix images [#192](https://github.com/rokwire/gateway-building-block/issues/192)
+### Fixed
 - Replace "None" building short names with an empty string [#181] (https://github.com/rokwire/gateway-building-block/issues/181)
 ## [2.20.3] - 2026-01-29
 ### Fixed
