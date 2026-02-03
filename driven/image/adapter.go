@@ -27,6 +27,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rokwire/rokwire-building-block-sdk-go/services/core/auth"
@@ -70,76 +71,105 @@ func (im Adapter) ProcessImage(item model.WebToolsEvent) (*model.ContentImagesUR
 	return &res, nil
 }
 
-// Why do you call this API two times??
 func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageData, error) {
 
-	// resolve HTTP client (fail-fast)
-	client := im.httpClient
-	if client == nil {
-		client = &http.Client{Timeout: 20 * time.Second}
-	}
-
-	// base URL pattern
-	currentAppConfig := "https://calendars.illinois.edu/eventImage/%s/%s"
-
-	// ALL known PNG variants
-	pngVariants := []string{
-		"eventImage.png",
-		"large.png",
-		"thumb.png",
-	}
-
-	var response *http.Response
-	var err error
-
-	// try each PNG variant until one works
-	for _, fileName := range pngVariants {
-		webtoolImageURL := fmt.Sprintf(
-			"%s/%s",
-			fmt.Sprintf(currentAppConfig, item.OriginatingCalendarID, item.EventID),
-			fileName,
-		)
-
-		response, err = client.Get(webtoolImageURL)
-		if err != nil {
-			// timeout / network error → fail fast
-			return nil, err
-		}
-
-		if response.StatusCode == http.StatusOK {
-			// found a valid PNG
-			break
-		}
-
-		response.Body.Close()
-		response = nil
-	}
-
-	if response == nil {
-		im.logger.Infof("no PNG image found for %s", item.EventID)
+	if item.ImageUploaded != "true" {
 		return nil, nil
 	}
-	defer response.Body.Close()
 
-	// decode PNG
-	img, _, err := image.Decode(response.Body)
+	// Explicitly skip recurring events
+	if item.RecurrenceID != "" && item.RecurrenceID != "0" {
+		return nil, nil
+	}
+
+	client := im.httpClient
+	if client == nil {
+		client = &http.Client{Timeout: 6 * time.Second}
+	}
+
+	imageURL := fmt.Sprintf(
+		"https://calendars.illinois.edu/eventImage/%s/%s/eventImage.png",
+		item.OriginatingCalendarID,
+		item.EventID,
+	)
+
+	log.Printf(
+		"[webtools-image] fetch originatingCalendarId=%s eventId=%s url=%s",
+		item.OriginatingCalendarID,
+		item.EventID,
+		imageURL,
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, imageURL, nil)
 	if err != nil {
 		return nil, err
 	}
 
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf(
+			"[webtools-image] request failed originatingCalendarId=%s eventId=%s err=%v",
+			item.OriginatingCalendarID,
+			item.EventID,
+			err,
+		)
+		return nil, nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf(
+			"[webtools-image] image not found originatingCalendarId=%s eventId=%s status=%d",
+			item.OriginatingCalendarID,
+			item.EventID,
+			resp.StatusCode,
+		)
+		return nil, nil
+	}
+
+	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "image/") {
+		log.Printf(
+			"[webtools-image] non-image response originatingCalendarId=%s eventId=%s content-type=%q",
+			item.OriginatingCalendarID,
+			item.EventID,
+			resp.Header.Get("Content-Type"),
+		)
+		return nil, nil
+	}
+
+	img, _, err := image.Decode(resp.Body)
+	if err != nil {
+		log.Printf(
+			"[webtools-image] decode failed originatingCalendarId=%s eventId=%s err=%v",
+			item.OriginatingCalendarID,
+			item.EventID,
+			err,
+		)
+		return nil, nil // ✅ skip image, continue batch
+	}
+
 	bounds := img.Bounds()
-	width := bounds.Dx()
-	height := bounds.Dy()
 
 	var buf bytes.Buffer
 	if err := png.Encode(&buf, img); err != nil {
 		return nil, err
 	}
 
+	log.Printf(
+		"[webtools-image] success originatingCalendarId=%s eventId=%s width=%d height=%d",
+		item.OriginatingCalendarID,
+		item.EventID,
+		bounds.Dx(),
+		bounds.Dy(),
+	)
+
 	return &model.ImageData{
 		ImageData: buf.Bytes(),
-		Height:    height,
-		Width:     width,
+		Width:     bounds.Dx(),
+		Height:    bounds.Dy(),
 		Quality:   100,
 		Path:      "event/tout",
 		FileName:  "image.png",
