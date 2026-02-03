@@ -148,7 +148,7 @@ func (im Adapter) downloadWebtoolImages(item model.WebToolsEvent) (*model.ImageD
 			item.EventID,
 			err,
 		)
-		return nil, nil // ✅ skip image, continue batch
+		return nil, nil //skip image, continue batch
 	}
 
 	bounds := img.Bounds()
