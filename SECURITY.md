@@ -4,8 +4,8 @@
 Patches for **Gateway Building Block** in this repository will only be applied to the following versions:
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.20.3  | :white_check_mark: |
-| < 2.20.3 | :x:                |
+| 2.21.0  | :white_check_mark: |
+| < 2.21.0 | :x:                |
 
 ## Reporting a Bug or Vulnerability
 
