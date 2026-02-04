@@ -5,11 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## [2.21.1] - 2026-02-04
+### Fixed
+- Clean up download images function [#195](https://github.com/rokwire/gateway-building-block/issues/195)
+
 ## [2.21.0] - 2026-02-03
 ### Fixed
 - Fix images [#192](https://github.com/rokwire/gateway-building-block/issues/192)
 ### Fixed
 - Replace "None" building short names with an empty string [#181] (https://github.com/rokwire/gateway-building-block/issues/181)
+
 ## [2.20.3] - 2026-01-29
 ### Fixed
 -  Fix the timer [#188] (https://github.com/rokwire/gateway-building-block/issues/188)
