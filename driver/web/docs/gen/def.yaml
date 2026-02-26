@@ -1005,6 +1005,109 @@ paths:
           description: Not found - Student with specified UIN not found or no courses available for the term
         '500':
           description: Internal server error
+  /api/crowdmeter:
+    get:
+      tags:
+        - Client
+      summary: Gets all crowd meter dataa
+      description: |
+        Gets all crowd meter data for all locations
+
+        **Auth:** Requires valid first-party service account token with `get_crowd` permission
+      security:
+        - bearerAuth: []
+      parameters: null
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Crowd'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/crowdmeter/location:
+    get:
+      tags:
+        - Client
+      summary: Gets crowd meter data for a location
+      description: |
+        Gets crowd meter data for a specific location by id
+
+        **Auth:** Requires valid first-party service account token with `get_crowd` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: lid
+          in: query
+          description: location id
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: 'Type of crowd data to retrieve (Dining, CampusRec)'
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Crowd'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /api/crowdmeter/type:
+    get:
+      tags:
+        - Client
+      summary: Gets crowd meter data for all locations of the same type
+      description: |
+        Gets crowd meter data for all locations of a specific type
+
+        **Auth:** Requires valid first-party service account token with `get_crowd` permission
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          description: 'Type of crowd data to retrieve (Dining, CampusRec)'
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Crowd'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
   /api/admin/examples:
     post:
       tags:
@@ -2825,6 +2928,42 @@ components:
           readOnly: true
         course_section:
           type: string
+          readOnly: true
+    Crowd:
+      type: object
+      required:
+        - CrowdType
+        - LocationID
+        - LocationName
+        - Day
+      properties:
+        CrowdType:
+          type: string
+          readOnly: true
+        LocationID:
+          type: integer
+          readOnly: true
+        LocationName:
+          type: string
+          readOnly: true
+        Days:
+          type: array
+          items:
+            $ref: '#/components/schemas/Day'
+          readOnly: true
+    Day:
+      type: object
+      required:
+        - Day
+        - BusyLevels
+      properties:
+        Day:
+          type: string
+          readOnly: true
+        BusyLevels:
+          type: array
+          items:
+            type: integer
           readOnly: true
     EmergencyContact:
       type: object

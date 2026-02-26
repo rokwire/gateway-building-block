@@ -1,0 +1,23 @@
+type: object
+required:
+- CrowdType
+- LocationID
+- LocationName
+- Day
+properties:
+  CrowdType:
+    type: string
+    readOnly: true
+  LocationID:
+    type: integer
+    readOnly: true
+  LocationName:
+    type: string
+    readOnly: true
+  Days:
+    type: array
+    items:
+      $ref: "./Day.yaml"
+    readOnly: true
+
+      

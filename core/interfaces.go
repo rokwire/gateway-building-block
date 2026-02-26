@@ -47,6 +47,9 @@ type Client interface {
 	GetAcademicAdvisors(uin string, unitid string, accessToken string) (*[]model.SuccessTeamMember, int, error)
 	GetFloorPlan(buildingnumber string, floornumber string, markers string, highlites string) (*model.FloorPlan, int, error)
 	SearchBuildings(bldgName string, returnCompact bool) (*map[string]any, error)
+	GetCrowdMeterDataForLocation(locationid int, crowdtype string) (*model.Crowd, error)
+	GetCrowdMeterData() (*[]model.Crowd, error)
+	GetCrowdMeterDataByType(crowdtype string) (*[]model.Crowd, error)
 }
 
 // Admin exposes administrative APIs for the driver adapters
@@ -212,4 +215,9 @@ type SuccessTeam interface {
 	GetSuccessTeam(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*model.SuccessTeam, int, error)
 	GetPrimaryCareProvider(uin string, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
 	GetAcademicAdvisors(uin string, calendars *[]model.UnitCalendar, accesstoken string, conf *model.EnvConfigData) (*[]model.SuccessTeamMember, int, error)
+}
+
+// Crowdmeter represents the adapter needed to interface with crowdmeter data providers
+type Crowdmeter interface {
+	GetCrowdData(conf *model.EnvConfigData) (*[]model.Crowd, error)
 }

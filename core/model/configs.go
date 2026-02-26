@@ -61,6 +61,7 @@ type EnvConfigData struct {
 	EngAppointmentBaseURL   string `json:"GATEWAY_APPOINTMENTS_ENGURL" bson:"GATEWAY_APPOINTMENTS_ENGURL"`
 	PCPEndpoint             string `json:"GATEWAY_STUDENTSUCCESS_PCPENDPOINT" bson:"GATEWAY_STUDENTSUCCESS_PCPENDPOINT"`
 	ImageEndpoint           string `json:"GATEWAY_STUDENTSUCCESS_IMAGES" bson:"GATEWAY_STUDENTSUCCESS_IMAGES"`
+	CrowdMeterURL           string `json:"GATEWAY_CROWDMETER_APIURL" bson:"GATEWAY_CROWDMETER_APIURL"`
 }
 
 // GetConfigData returns a pointer to the given config's Data as the given type T

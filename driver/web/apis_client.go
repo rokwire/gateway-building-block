@@ -874,6 +874,130 @@ func (h ClientAPIsHandler) submitServiceRequest(l *logs.Log, r *http.Request, cl
 	return l.HTTPResponseSuccessJSON(resAsJSON)
 }
 
+// getCrowdMeterData returns all crowdmeter data
+// @Summary return all crowdmeter data for the campus
+// @Tags Client
+// @ID GetCrowdMeterData
+// @Accept json
+// @Produce json
+// @success 200 {object} []model.Crowd
+// @Security RokwireAuth
+// @Router /crowdmeter [get]
+func (h ClientAPIsHandler) getCrowdMeterData(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+	crowdData, err := h.app.Client.GetCrowdMeterData()
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeCrowd, nil, err, http.StatusInternalServerError, true)
+	}
+
+	if crowdData == nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeCrowd, nil, err, http.StatusNotFound, true)
+
+	}
+	resAsJSON, err := json.Marshal(crowdData)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResult, nil, err, http.StatusInternalServerError, false)
+	}
+
+	return l.HTTPResponseSuccessJSON(resAsJSON)
+}
+
+// getCrowdMeterDataByLocation returns all crowdmeter data by location
+// @Summary return all crowdmeter data for the campus by location
+// @Tags Client
+// @ID GetCrowdMeterDataByLocation
+// @Accept json
+// @Produce json
+// @success 200 {object} []model.Crowd
+// @Security RokwireAuth
+// @Router /crowdmeter/location [get]
+// @Param id query int true "location id"
+// @Param type query string true "Data type (dining, campus rec)"
+func (h ClientAPIsHandler) getCrowdMeterDataByLocation(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	locationid := ""
+	datatype := ""
+
+	reqParams := utils.ConstructFilter(r)
+
+	for _, v := range reqParams.Items {
+		if v.Field == "lid" {
+			locationid = v.Value[0]
+		}
+		if v.Field == "type" {
+			datatype = v.Value[0]
+		}
+	}
+	if locationid == "" || locationid == "nil" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("lid"), nil, http.StatusBadRequest, false)
+	}
+
+	if datatype == "" || datatype == "nil" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("type"), nil, http.StatusBadRequest, false)
+	}
+
+	locID, err := strconv.ParseInt(locationid, 10, 64)
+	if err != nil {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("lid"), nil, http.StatusBadRequest, false)
+	}
+
+	crowdData, err := h.app.Client.GetCrowdMeterDataForLocation(int(locID), datatype)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeCrowd, nil, err, http.StatusInternalServerError, true)
+	}
+
+	if crowdData == nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeCrowd, nil, err, http.StatusNotFound, true)
+
+	}
+	resAsJSON, err := json.Marshal(crowdData)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResult, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(resAsJSON)
+}
+
+// getCrowdMeterDataByType returns all crowdmeter data by type
+// @Summary return all crowdmeter data for the campus by type
+// @Tags Client
+// @ID GetCrowdMeterDataByType
+// @Accept json
+// @Produce json
+// @success 200 {object} []model.Crowd
+// @Security RokwireAuth
+// @Router /crowdmeter/crowdtype [get]
+// @Param type query string true "Data type (dining, campus rec)"
+func (h ClientAPIsHandler) getCrowdMeterDataByType(l *logs.Log, r *http.Request, claims *tokenauth.Claims) logs.HTTPResponse {
+
+	datatype := ""
+
+	reqParams := utils.ConstructFilter(r)
+
+	for _, v := range reqParams.Items {
+
+		if v.Field == "type" {
+			datatype = v.Value[0]
+		}
+	}
+
+	if datatype == "" || datatype == "nil" {
+		return l.HTTPResponseErrorData(logutils.StatusInvalid, logutils.TypeQueryParam, logutils.StringArgs("type"), nil, http.StatusBadRequest, false)
+	}
+	crowdData, err := h.app.Client.GetCrowdMeterDataByType(datatype)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeCrowd, nil, err, http.StatusInternalServerError, true)
+	}
+
+	if crowdData == nil {
+		return l.HTTPResponseErrorAction(logutils.ActionGet, model.TypeCrowd, nil, err, http.StatusNotFound, true)
+
+	}
+	resAsJSON, err := json.Marshal(crowdData)
+	if err != nil {
+		return l.HTTPResponseErrorAction(logutils.ActionMarshal, logutils.TypeResult, nil, err, http.StatusInternalServerError, false)
+	}
+	return l.HTTPResponseSuccessJSON(resAsJSON)
+}
+
 // NewClientAPIsHandler creates new client API handler instance
 func NewClientAPIsHandler(app *core.Application) ClientAPIsHandler {
 	return ClientAPIsHandler{app: app}

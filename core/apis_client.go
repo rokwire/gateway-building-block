@@ -17,11 +17,10 @@ package core
 import (
 	"application/core/model"
 	"application/driven/uiucadapters"
-	"strings"
-	"time"
-
 	"encoding/json"
 	"os"
+	"strings"
+	"time"
 )
 
 // appClient contains client implementations
@@ -32,6 +31,7 @@ type appClient struct {
 	LaundryAdapter     LaundryService
 	ContactAdapter     Contact
 	SuccessTeamAdapter SuccessTeam
+	CrowdMeterAdapter  Crowdmeter
 }
 
 // GetExample gets an Example by ID
@@ -234,6 +234,91 @@ func (a appClient) GetAcademicAdvisors(uin string, unitid string, accesstoken st
 
 }
 
+func (a appClient) GetCrowdMeterData() (*[]model.Crowd, error) {
+	retData, err := a.getCachedCrowdData()
+	if err != nil {
+		return nil, err
+	}
+
+	return retData, nil
+}
+
+func (a appClient) GetCrowdMeterDataForLocation(locationid int, crowdtype string) (*model.Crowd, error) {
+	crowdList, err := a.getCachedCrowdData()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, crowd := range *crowdList {
+		if crowd.LocationID == locationid && crowd.CrowdType == crowdtype {
+			return &crowd, nil
+		}
+	}
+	return nil, nil
+}
+
+func (a appClient) GetCrowdMeterDataByType(crowdtype string) (*[]model.Crowd, error) {
+	crowdList, err := a.getCachedCrowdData()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []model.Crowd
+	for _, crowd := range *crowdList {
+		if crowd.CrowdType == crowdtype {
+			result = append(result, crowd)
+		}
+	}
+	return &result, nil
+}
+
+func (a appClient) getCachedCrowdData() (*[]model.Crowd, error) {
+	conf, _ := a.app.GetEnvConfigs()
+	crntDate := time.Now()
+
+	// Check if we need to refresh: either cache is empty OR we've passed 8:00 AM on a new day
+	needsRefresh := len(a.app.CrowdDataCache.CrowdData) == 0 || a.shouldRefreshAtEightAM(crntDate, a.app.CrowdDataCache.LoadDate)
+
+	if !needsRefresh {
+		return &a.app.CrowdDataCache.CrowdData, nil
+	}
+
+	// Fetch fresh crowd data from the adapter
+	retData, err := a.CrowdMeterAdapter.GetCrowdData(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	// Cache the results with the current timestamp
+	a.app.CrowdDataCache.CrowdData = *retData
+	a.app.CrowdDataCache.LoadDate = crntDate
+	return retData, nil
+}
+
+// shouldRefreshAtEightAM checks if we should refresh data by comparing the last load time to 8:00 AM today
+func (a appClient) shouldRefreshAtEightAM(currentTime time.Time, lastLoadTime time.Time) bool {
+	// Get today's date (year, month, day)
+	currentYear, currentMonth, currentDay := currentTime.Date()
+	eightAMToday := time.Date(currentYear, currentMonth, currentDay, 8, 0, 0, 0, currentTime.Location())
+
+	// If last load was before today, we need to refresh
+	lastYear, lastMonth, lastDay := lastLoadTime.Date()
+	lastLoadDate := time.Date(lastYear, lastMonth, lastDay, 0, 0, 0, 0, lastLoadTime.Location())
+	todayDate := time.Date(currentYear, currentMonth, currentDay, 0, 0, 0, 0, currentTime.Location())
+
+	if lastLoadDate.Before(todayDate) {
+		return true
+	}
+
+	// If last load was today but before 8:00 AM, and current time is after 8:00 AM, refresh
+	if lastLoadDate.Equal(todayDate) && lastLoadTime.Before(eightAMToday) && currentTime.After(eightAMToday) {
+		return true
+	}
+
+	// Otherwise, no refresh needed
+	return false
+}
+
 // newAppClient creates new appClient
 func newAppClient(app *Application) appClient {
 
@@ -254,5 +339,6 @@ func newAppClient(app *Application) appClient {
 	client.Courseadapter = uiucadapters.NewCourseAdapter()
 	client.LocationAdapter = uiucadapters.NewUIUCWayFinding(&app.AppBLdgFeatures)
 	client.SuccessTeamAdapter = uiucadapters.NewSuccessTeamAdapter()
+	client.CrowdMeterAdapter = uiucadapters.NewUIUCCrowdMeterAdapter()
 	return client
 }
