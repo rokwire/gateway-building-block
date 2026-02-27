@@ -35,6 +35,10 @@ Course:
   $ref: "./application/Course.yaml"
 CourseSection:
   $ref: "./application/CourseSection.yaml"
+Crowd:
+  $ref: "./application/Crowd.yaml"
+Day:
+  $ref: "./application/Day.yaml"
 EmergencyContact:
   $ref: "./application/EmergencyContact.yaml"
 Entrance:

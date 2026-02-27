@@ -97,6 +97,10 @@ func (a Adapter) Start() {
 	mainRouter.HandleFunc("/successteam/pcp", a.wrapFunc(a.clientAPIsHandler.getPrimaryCareProvider, a.auth.client.User)).Methods("GET")
 	mainRouter.HandleFunc("/successteam/advisors", a.wrapFunc(a.clientAPIsHandler.getAcademicAdvisors, a.auth.client.User)).Methods("GET")
 
+	mainRouter.HandleFunc("/crowdmeter", a.wrapFunc(a.clientAPIsHandler.getCrowdMeterData, a.auth.client.Standard)).Methods("GET")
+	mainRouter.HandleFunc("/crowdmeter/location", a.wrapFunc(a.clientAPIsHandler.getCrowdMeterDataByLocation, a.auth.client.Standard)).Methods("GET")
+	mainRouter.HandleFunc("/crowdmeter/type", a.wrapFunc(a.clientAPIsHandler.getCrowdMeterDataByType, a.auth.client.Standard)).Methods("GET")
+
 	// Admin APIs
 	adminRouter := mainRouter.PathPrefix("/admin").Subrouter()
 	adminRouter.HandleFunc("/examples/{id}", a.wrapFunc(a.adminAPIsHandler.getExample, a.auth.admin.Permissions)).Methods("GET")

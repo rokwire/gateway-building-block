@@ -1,0 +1,26 @@
+get:
+  tags:
+  - Client
+  summary: Gets all crowd meter dataa
+  description: |
+    Gets all crowd meter data for all locations
+
+    **Auth:** Requires valid first-party service account token with `get_crowd` permission
+  security:
+    - bearerAuth: []
+  parameters:
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../../schemas/application/Crowd.yaml"
+    400:
+      description: Bad request
+    401:
+      description: Unauthorized
+    500:
+      description: Internal error

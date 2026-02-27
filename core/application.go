@@ -52,6 +52,7 @@ type Application struct {
 	CampusBuildings  model.CachedBuildings               //caches a list of all campus building data
 	AppBLdgFeatures  map[string]model.AppBuildingFeature //caches the configured set of building features
 	FloorPlanWrapper model.FloorPlanMarkup               //caches the floor plan markup
+	CrowdDataCache   model.CachedCrowdData               //caches crowd data for locations
 
 	AppointmentAdapters map[string]Appointments //expose to the different vendor specific appointment adapters
 
@@ -136,6 +137,7 @@ func NewApplication(version string, build string,
 	//	if err != nil {
 	//set to one day ago to force a retry and refresh
 	application.CampusBuildings.LoadDate = time.Now().AddDate(0, 0, -1)
+	application.CrowdDataCache.LoadDate = time.Now().AddDate(0, 0, -1)
 	//}
 
 	return &application

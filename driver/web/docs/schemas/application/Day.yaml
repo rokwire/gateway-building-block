@@ -1,0 +1,13 @@
+type: object
+required:
+- Day
+- BusyLevels
+properties:
+  Day:
+    type: string
+    readOnly: true
+  BusyLevels:
+    type: array
+    items:
+      type: integer
+    readOnly: true

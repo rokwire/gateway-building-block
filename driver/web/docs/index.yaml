@@ -57,6 +57,12 @@ paths:
     $ref: "./resources/client/giescourses.yaml"
   /api/person/studentcourses:
     $ref: "./resources/client/studentcourses.yaml"
+  /api/crowdmeter:
+    $ref: "./resources/client/crowdmeter.yaml"
+  /api/crowdmeter/location:
+    $ref: "./resources/client/crowdmeterlocation.yaml"
+  /api/crowdmeter/type:
+    $ref: "./resources/client/crowdmetertype.yaml"
   
   # Admin
   /api/admin/examples:
