@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Changed
+- Update Webtools event XML URL to v18 [#202](https://github.com/rokwire/gateway-building-block/issues/202)
+
+### Fixed
+- Security vulnerability reported during docker build.
 
 ## [2.30.0] - 2026-02-27
 ### Added

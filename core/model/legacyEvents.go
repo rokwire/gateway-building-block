@@ -71,6 +71,7 @@ type WebToolsEvent struct {
 	Speaker                            string `xml:"speaker"`
 	RegistrationLabel                  string `xml:"registrationLabel"`
 	RegistrationURL                    string `xml:"registrationURL"`
+	RegistrationStartTimestamp         string `xml:"registrationStartTimestamp"`
 	ContactName                        string `xml:"contactName"`
 	ContactEmail                       string `xml:"contactEmail"`
 	ContactPhone                       string `xml:"contactPhone"`
